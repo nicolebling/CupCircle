@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, Modal, ScrollView, ActivityIndicator } from 'react-native';
 import { useColorScheme } from '@/hooks/useColorScheme';
@@ -26,7 +25,7 @@ interface Profile {
 export default function MatchingScreen() {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
-  
+
   // Mock profiles data
   const [profiles] = useState<Profile[]>([
     {
@@ -114,16 +113,16 @@ export default function MatchingScreen() {
       matchedCafe: true,
     },
   ]);
-  
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFilterModalVisible, setFilterModalVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [matchAnimation, setMatchAnimation] = useState(false);
-  
+
   // Animation values
   const cardOffset = useSharedValue(0);
   const cardRotate = useSharedValue(0);
-  
+
   const cardAnimatedStyle = useAnimatedStyle(() => {
     return {
       transform: [
@@ -132,15 +131,15 @@ export default function MatchingScreen() {
       ]
     };
   });
-  
+
   const handleLike = () => {
     // Animate card off-screen to the right
     cardOffset.value = withSpring(500);
     cardRotate.value = withSpring(20);
-    
+
     // Here you would typically send a like request to your backend
     console.log(`Liked ${profiles[currentIndex].name}`);
-    
+
     // Show match animation randomly (simulate mutual match)
     if (Math.random() > 0.7) {
       setTimeout(() => {
@@ -148,7 +147,7 @@ export default function MatchingScreen() {
         setTimeout(() => setMatchAnimation(false), 3000);
       }, 500);
     }
-    
+
     // Small delay before moving to next profile
     setTimeout(() => {
       if (currentIndex < profiles.length - 1) {
@@ -159,14 +158,14 @@ export default function MatchingScreen() {
       }
     }, 300);
   };
-  
+
   const handleSkip = () => {
     // Animate card off-screen to the left
     cardOffset.value = withSpring(-500);
     cardRotate.value = withSpring(-20);
-    
+
     console.log(`Skipped ${profiles[currentIndex].name}`);
-    
+
     // Small delay before moving to next profile
     setTimeout(() => {
       if (currentIndex < profiles.length - 1) {
@@ -177,27 +176,27 @@ export default function MatchingScreen() {
       }
     }, 300);
   };
-  
+
   const handlePrevious = () => {
     if (currentIndex > 0) {
       setCurrentIndex(currentIndex - 1);
     }
   };
-  
+
   const openFilterModal = () => {
     setFilterModalVisible(true);
   };
-  
+
   const applyFilters = () => {
     setIsLoading(true);
     setFilterModalVisible(false);
-    
+
     // Simulate API call for new profiles based on filters
     setTimeout(() => {
       setIsLoading(false);
     }, 1500);
   };
-  
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.header}>
@@ -211,7 +210,7 @@ export default function MatchingScreen() {
           Discover professionals for your next coffee chat
         </Text>
       </View>
-      
+
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 20 }}>
         <View style={styles.cardsContainer}>
           {isLoading ? (
@@ -228,7 +227,7 @@ export default function MatchingScreen() {
                   onSkip={handleSkip}
                 />
               </Animated.View>
-              
+
               <View style={styles.navigationControls}>
               <TouchableOpacity 
                 onPress={handlePrevious} 
@@ -241,7 +240,7 @@ export default function MatchingScreen() {
                 <Ionicons name="arrow-back" size={20} color={colors.primary} />
                 <Text style={[styles.navButtonText, { color: colors.primary }]}>Previous</Text>
               </TouchableOpacity>
-              
+
               <TouchableOpacity 
                 onPress={() => {}} 
                 style={[styles.navButton, { backgroundColor: colors.card }]}
@@ -270,7 +269,7 @@ export default function MatchingScreen() {
         )}
       </View>
       </ScrollView>
-      
+
       {/* Filter Modal */}
       <Modal
         visible={isFilterModalVisible}
@@ -286,7 +285,7 @@ export default function MatchingScreen() {
                 <Ionicons name="close" size={24} color={colors.text} />
               </TouchableOpacity>
             </View>
-            
+
             <ScrollView style={styles.modalBody}>
               <Text style={[styles.filterLabel, { color: colors.text }]}>Industry</Text>
               <View style={styles.filterOptions}>
@@ -302,7 +301,7 @@ export default function MatchingScreen() {
                   </TouchableOpacity>
                 ))}
               </View>
-              
+
               <Text style={[styles.filterLabel, { color: colors.text }]}>Experience Level</Text>
               <View style={styles.filterOptions}>
                 {['Entry', 'Mid-Level', 'Senior', 'Executive'].map((level) => (
@@ -317,7 +316,7 @@ export default function MatchingScreen() {
                   </TouchableOpacity>
                 ))}
               </View>
-              
+
               <Text style={[styles.filterLabel, { color: colors.text }]}>Neighborhoods</Text>
               <View style={styles.filterOptions}>
                 {['Downtown', 'Midtown', 'Financial District', 'Tech District', 'Arts District'].map((neighborhood) => (
@@ -332,7 +331,7 @@ export default function MatchingScreen() {
                   </TouchableOpacity>
                 ))}
               </View>
-              
+
               <Text style={[styles.filterLabel, { color: colors.text }]}>Favorite Cafés</Text>
               <View style={styles.filterOptions}>
                 {['Coffee House', 'The Roastery', 'Bean There', 'Morning Brew', 'Finance Cafe'].map((cafe) => (
@@ -348,7 +347,7 @@ export default function MatchingScreen() {
                 ))}
               </View>
             </ScrollView>
-            
+
             <View style={styles.modalFooter}>
               <TouchableOpacity 
                 style={[styles.modalButton, styles.clearButton, { borderColor: colors.border }]} 
@@ -366,7 +365,7 @@ export default function MatchingScreen() {
           </View>
         </View>
       </Modal>
-      
+
       {/* Match Animation Modal */}
       <Modal
         visible={matchAnimation}

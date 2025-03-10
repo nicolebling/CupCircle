@@ -5,7 +5,7 @@ import { useColorScheme } from '@/hooks/useColorScheme';
 import Colors from '@/constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
 
-// Types for our messages
+// Types for our chat data
 interface Chat {
   id: string;
   name: string;
@@ -15,6 +15,14 @@ interface Chat {
   timestamp: string;
   unread: number;
   isOnline: boolean;
+}
+
+// Types for our messages
+interface Message {
+  id: string;
+  text: string;
+  sent: boolean;
+  timestamp: string;
 }
 
 export default function ChatsScreen() {
@@ -86,7 +94,7 @@ export default function ChatsScreen() {
   ]);
   
   const [activeChat, setActiveChat] = useState<string | null>(null);
-  const [messages, setMessages] = useState<{[key: string]: any[]}>({
+  const [messages, setMessages] = useState<{[key: string]: Message[]}>({
     '1': [
       { id: '1-1', text: 'Hi Sarah, looking forward to our coffee chat tomorrow!', sent: true, timestamp: '10:30 AM' },
       { id: '1-2', text: 'Me too! Should we meet at Coffee House downtown?', sent: false, timestamp: '10:35 AM' },
@@ -96,42 +104,40 @@ export default function ChatsScreen() {
     '2': [
       { id: '2-1', text: 'Hey David, have you tried that new cafe on Main Street?', sent: true, timestamp: 'Yesterday 2:15 PM' },
       { id: '2-2', text: 'Yes, I went there last week. The cold brew is amazing!', sent: false, timestamp: 'Yesterday 2:30 PM' },
-      { id: '2-3', text: 'That cafe you recommended was great. We should meet there again.', sent: false, timestamp: 'Yesterday 5:45 PM' },
+      { id: '2-3', text: 'We should meet there next time!', sent: true, timestamp: 'Yesterday 2:32 PM' },
     ],
     '3': [
-      { id: '3-1', text: 'Hi Olivia, it was great meeting you yesterday!', sent: true, timestamp: 'Yesterday 9:15 AM' },
-      { id: '3-2', text: 'Likewise! I enjoyed our conversation about content marketing.', sent: false, timestamp: 'Yesterday 9:30 AM' },
-      { id: '3-3', text: 'I'll put together some resources we discussed and send them over.', sent: false, timestamp: 'Yesterday 9:45 AM' },
-      { id: '3-4', text: 'That would be great, thank you!', sent: true, timestamp: 'Yesterday 10:00 AM' },
-      { id: '3-5', text: 'I sent you the marketing plan we discussed during our coffee chat.', sent: false, timestamp: 'Yesterday 4:30 PM' },
+      { id: '3-1', text: 'I just emailed you the marketing plan. Let me know what you think!', sent: false, timestamp: 'Yesterday 4:20 PM' },
+      { id: '3-2', text: 'Thanks, Olivia! I\'ll take a look at it tonight.', sent: true, timestamp: 'Yesterday 4:45 PM' },
     ],
   });
   
   const [newMessage, setNewMessage] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  
-  const filteredChats = chats.filter(chat => 
-    chat.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    chat.lastMessage.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const scrollViewRef = useRef<ScrollView>(null);
   
   const handleChatPress = (chatId: string) => {
     setActiveChat(chatId);
     
-    // Mark messages as read
-    const updatedChats = chats.map(chat => {
-      if (chat.id === chatId) {
-        return { ...chat, unread: 0 };
-      }
-      return chat;
-    });
-    
-    setChats(updatedChats);
+    // Mark messages as read when opening a chat
+    setChats(prev => 
+      prev.map(chat => {
+        if (chat.id === chatId) {
+          return {...chat, unread: 0};
+        }
+        return chat;
+      })
+    );
   };
   
-  const handleBackPress = () => {
+  const handleBackToList = () => {
     setActiveChat(null);
   };
+  
+  const filteredChats = chats.filter(chat => 
+    chat.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    chat.occupation.toLowerCase().includes(searchQuery.toLowerCase())
+  );
   
   const handleSendMessage = () => {
     if (newMessage.trim() === '' || !activeChat) return;
@@ -143,7 +149,7 @@ export default function ChatsScreen() {
     setMessages(prev => ({
       ...prev,
       [activeChat]: [
-        ...prev[activeChat] || [],
+        ...(prev[activeChat] || []),
         {
           id: messageId,
           text: newMessage,
@@ -184,7 +190,7 @@ export default function ChatsScreen() {
         setMessages(prev => ({
           ...prev,
           [activeChat]: [
-            ...prev[activeChat],
+            ...(prev[activeChat] || []),
             {
               id: `${activeChat}-${Date.now()}`,
               text: responseText,
@@ -241,10 +247,9 @@ export default function ChatsScreen() {
           <Text style={[styles.lastMessage, { color: colors.secondaryText }]} numberOfLines={1}>
             {item.lastMessage}
           </Text>
-          
           {item.unread > 0 && (
             <View style={[styles.unreadBadge, { backgroundColor: colors.primary }]}>
-              <Text style={styles.unreadCount}>{item.unread}</Text>
+              <Text style={styles.unreadText}>{item.unread}</Text>
             </View>
           )}
         </View>
@@ -252,101 +257,44 @@ export default function ChatsScreen() {
     </TouchableOpacity>
   );
   
-  const renderMessage = (message: any, index: number, messages: any[]) => {
-    const isSent = message.sent;
-    const showTimestamp = index === 0 || 
-                          messages[index - 1].sent !== message.sent ||
-                          messages[index - 1].timestamp !== message.timestamp;
-    
-    return (
-      <View 
-        key={message.id} 
-        style={[
-          styles.messageContainer,
-          isSent ? styles.sentMessageContainer : styles.receivedMessageContainer
-        ]}
-      >
-        <View 
-          style={[
-            styles.messageBubble,
-            isSent 
-              ? [styles.sentMessageBubble, { backgroundColor: colors.primary }]
-              : [styles.receivedMessageBubble, { backgroundColor: colors.card, borderColor: colors.border }]
-          ]}
-        >
-          <Text style={[
-            styles.messageText,
-            { color: isSent ? 'white' : colors.text }
-          ]}>
-            {message.text}
-          </Text>
-        </View>
-        
-        {showTimestamp && (
-          <Text 
-            style={[
-              styles.messageTimestamp,
-              { color: colors.secondaryText }
-            ]}
-          >
-            {message.timestamp}
-          </Text>
-        )}
-      </View>
-    );
-  };
-  
-  const renderEmptyState = () => (
+  const renderEmptyList = () => (
     <View style={styles.emptyContainer}>
-      <Ionicons name="cafe-outline" size={64} color={colors.primary} />
+      <Ionicons name="chatbubbles" size={60} color={colors.secondaryText} />
       <Text style={[styles.emptyTitle, { color: colors.text }]}>No messages yet</Text>
-      <Text style={[styles.emptySubtitle, { color: colors.secondaryText }]}>
-        Match with people by exploring potential connections to start messaging
+      <Text style={[styles.emptyMessage, { color: colors.secondaryText }]}>
+        Match with professionals to start chatting
       </Text>
-      <TouchableOpacity
+      <TouchableOpacity 
         style={[styles.matchButton, { backgroundColor: colors.primary }]}
-        // Navigate to matching screen
-        onPress={() => {}}
       >
-        <Text style={styles.matchButtonText}>Find Connections</Text>
+        <Text style={styles.matchButtonText}>Find Matches</Text>
       </TouchableOpacity>
     </View>
   );
   
-  if (isLoading) {
-    return (
-      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={colors.primary} />
-          <Text style={[styles.loadingText, { color: colors.text }]}>Loading conversations...</Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
-  
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       {!activeChat ? (
-        // Chat List View
+        // Chat list view
         <>
           <View style={styles.header}>
             <Text style={[styles.title, { color: colors.text }]}>Messages</Text>
           </View>
           
-          <View style={[styles.searchContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <View style={[styles.searchContainer, { 
+            backgroundColor: colors.card,
+            borderColor: isSearchFocused ? colors.primary : colors.border
+          }]}>
             <Ionicons name="search" size={20} color={colors.secondaryText} />
             <TextInput
               style={[styles.searchInput, { color: colors.text }]}
-              placeholder="Search conversations"
+              placeholder="Search messages..."
               placeholderTextColor={colors.secondaryText}
               value={searchQuery}
               onChangeText={setSearchQuery}
+              onFocus={() => setIsSearchFocused(true)}
+              onBlur={() => setIsSearchFocused(false)}
             />
-            {searchQuery !== '' && (
-              <TouchableOpacity onPress={() => setSearchQuery('')}>
-                <Ionicons name="close-circle" size={20} color={colors.secondaryText} />
-              </TouchableOpacity>
-            )}
           </View>
           
           {filteredChats.length > 0 ? (
@@ -357,63 +305,95 @@ export default function ChatsScreen() {
               contentContainerStyle={styles.chatList}
             />
           ) : (
-            renderEmptyState()
+            <View style={styles.noResultsContainer}>
+              <Text style={[styles.noResultsText, { color: colors.secondaryText }]}>
+                No chats found matching "{searchQuery}"
+              </Text>
+            </View>
           )}
         </>
       ) : (
-        // Active Chat View
+        // Individual chat view
         <>
           <View style={[styles.chatHeader, { borderBottomColor: colors.border }]}>
-            <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
+            <TouchableOpacity style={styles.backButton} onPress={handleBackToList}>
               <Ionicons name="arrow-back" size={24} color={colors.primary} />
             </TouchableOpacity>
             
-            <View style={styles.activeChatInfo}>
-              {chats.find(chat => chat.id === activeChat) && (
-                <>
-                  <Image 
-                    source={{ uri: chats.find(chat => chat.id === activeChat)?.photo }} 
-                    style={styles.activeAvatar} 
-                  />
-                  <View>
+            {chats.filter(chat => chat.id === activeChat).map(chat => (
+              <View key={chat.id} style={styles.activeChatInfo}>
+                <View style={styles.photoNameContainer}>
+                  <Image source={{ uri: chat.photo }} style={styles.activeChatAvatar} />
+                  <View style={styles.activeChatTextContainer}>
                     <Text style={[styles.activeChatName, { color: colors.text }]}>
-                      {chats.find(chat => chat.id === activeChat)?.name}
+                      {chat.name}
                     </Text>
                     <Text style={[styles.activeChatStatus, { color: colors.secondaryText }]}>
-                      {chats.find(chat => chat.id === activeChat)?.isOnline ? 'Online' : 'Offline'}
+                      {chat.isOnline ? 'Online' : 'Offline'}
                     </Text>
                   </View>
-                </>
-              )}
-            </View>
-            
-            <TouchableOpacity style={styles.infoButton}>
-              <Ionicons name="information-circle-outline" size={24} color={colors.primary} />
-            </TouchableOpacity>
+                </View>
+                <TouchableOpacity style={styles.infoButton}>
+                  <Ionicons name="information-circle-outline" size={24} color={colors.primary} />
+                </TouchableOpacity>
+              </View>
+            ))}
           </View>
           
-          <View style={styles.messagesContainer}>
-            {messages[activeChat]?.length > 0 ? (
-              <ScrollView 
-                style={{ flex: 1 }}
-                contentContainerStyle={styles.messagesContent}
+          <ScrollView 
+            ref={scrollViewRef}
+            style={styles.messagesContainer}
+            contentContainerStyle={styles.messagesContent}
+            onContentSizeChange={() => scrollViewRef.current?.scrollToEnd({ animated: false })}
+          >
+            {messages[activeChat]?.map(message => (
+              <View 
+                key={message.id} 
+                style={[
+                  styles.messageContainer,
+                  message.sent ? styles.sentMessageContainer : styles.receivedMessageContainer
+                ]}
               >
-                {messages[activeChat].map((message, index, messages) => 
-                  renderMessage(message, index, messages)
-                )}
-              </ScrollView>
-            ) : (
+                <View 
+                  style={[
+                    styles.messageBubble,
+                    message.sent 
+                      ? [styles.sentMessageBubble, { backgroundColor: colors.primary }]
+                      : [styles.receivedMessageBubble, { backgroundColor: colors.card, borderColor: colors.border }]
+                  ]}
+                >
+                  <Text 
+                    style={[
+                      styles.messageText, 
+                      { color: message.sent ? 'white' : colors.text }
+                    ]}
+                  >
+                    {message.text}
+                  </Text>
+                </View>
+                <Text 
+                  style={[
+                    styles.messageTimestamp, 
+                    { color: colors.secondaryText }
+                  ]}
+                >
+                  {message.timestamp}
+                </Text>
+              </View>
+            ))}
+            
+            {!messages[activeChat]?.length && (
               <View style={styles.noMessagesContainer}>
                 <Text style={[styles.noMessagesText, { color: colors.secondaryText }]}>
                   No messages yet. Start the conversation!
                 </Text>
               </View>
             )}
-          </View>
+          </ScrollView>
           
-          <View style={[styles.inputContainer, { borderTopColor: colors.border }]}>
+          <View style={[styles.inputContainer, { borderTopColor: colors.border, backgroundColor: colors.background }]}>
             <TextInput
-              style={[styles.messageInput, { color: colors.text, backgroundColor: colors.card }]}
+              style={[styles.messageInput, { backgroundColor: colors.card, color: colors.text, borderColor: colors.border }]}
               placeholder="Type a message..."
               placeholderTextColor={colors.secondaryText}
               value={newMessage}
@@ -421,17 +401,11 @@ export default function ChatsScreen() {
               multiline
             />
             <TouchableOpacity 
-              style={[
-                styles.sendButton, 
-                { 
-                  backgroundColor: newMessage.trim() ? colors.primary : colors.card,
-                  opacity: newMessage.trim() ? 1 : 0.5,
-                }
-              ]}
+              style={[styles.sendButton, { backgroundColor: colors.primary }]}
               onPress={handleSendMessage}
-              disabled={!newMessage.trim()}
+              disabled={newMessage.trim() === ''}
             >
-              <Ionicons name="send" size={20} color={newMessage.trim() ? 'white' : colors.secondaryText} />
+              <Ionicons name="send" size={18} color="white" />
             </TouchableOpacity>
           </View>
         </>
@@ -536,72 +510,77 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginLeft: 8,
   },
-  unreadCount: {
-    fontFamily: 'K2D-Bold',
-    fontSize: 12,
+  unreadText: {
     color: 'white',
+    fontSize: 12,
+    fontFamily: 'K2D-SemiBold',
+  },
+  noResultsContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 16,
+  },
+  noResultsText: {
+    fontFamily: 'K2D-Regular',
+    fontSize: 16,
+    textAlign: 'center',
   },
   emptyContainer: {
     flex: 1,
-    alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 32,
+    alignItems: 'center',
+    padding: 32,
   },
   emptyTitle: {
-    fontFamily: 'K2D-Bold',
+    fontFamily: 'K2D-SemiBold',
     fontSize: 20,
     marginTop: 16,
     marginBottom: 8,
   },
-  emptySubtitle: {
+  emptyMessage: {
     fontFamily: 'K2D-Regular',
     fontSize: 16,
     textAlign: 'center',
-    marginBottom: 32,
+    marginBottom: 24,
   },
   matchButton: {
     paddingHorizontal: 24,
     paddingVertical: 12,
-    borderRadius: 24,
+    borderRadius: 25,
   },
   matchButtonText: {
-    fontFamily: 'K2D-SemiBold',
-    fontSize: 16,
     color: 'white',
-  },
-  loadingContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  loadingText: {
-    fontFamily: 'K2D-Regular',
+    fontFamily: 'K2D-Medium',
     fontSize: 16,
-    marginTop: 16,
   },
-  // Active Chat Styles
+  backButton: {
+    padding: 10,
+  },
   chatHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
-    marginBottom: 16,
+    padding: 10,
     borderBottomWidth: 1,
-    paddingHorizontal: 16,
-  },
-  backButton: {
-    padding: 8,
   },
   activeChatInfo: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    marginLeft: 12,
+    justifyContent: 'space-between',
   },
-  activeAvatar: {
+  photoNameContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  activeChatAvatar: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    marginRight: 12,
+    marginRight: 10,
+  },
+  activeChatTextContainer: {
+    justifyContent: 'center',
   },
   activeChatName: {
     fontFamily: 'K2D-SemiBold',
