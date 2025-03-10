@@ -1,79 +1,9 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import { Image, StyleSheet, Platform, SafeAreaView } from 'react-native';
 
 import { HelloWave } from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-
-//This HomeScreen is removed because it is a duplicate and the edited code provides a replacement.
-//export default function HomeScreen() {
-//  return (
-//    <ParallaxScrollView
-//      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-//      headerImage={
-//        <Image
-//          source={require('@/assets/images/partial-react-logo.png')}
-//          style={styles.reactLogo}
-//        />
-//      }>
-//      <ThemedView style={styles.titleContainer}>
-//        <ThemedText type="title">Welcome to Expo on Replit!</ThemedText>
-//        <HelloWave />
-//      </ThemedView>
-//      <ThemedView style={styles.stepContainer}>
-//        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-//        <ThemedText>
-//          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-//          Press{' '}
-//          <ThemedText type="defaultSemiBold">
-//            {Platform.select({
-//              ios: 'cmd + d',
-//              android: 'cmd + m',
-//              web: 'F12'
-//            })}
-//          </ThemedText>{' '}
-//          to open developer tools.
-//        </ThemedText>
-//      </ThemedView>
-//      <ThemedView style={styles.stepContainer}>
-//        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-//        <ThemedText>
-//          Tap the Explore tab to learn more about what's included in this starter app.
-//        </ThemedText>
-//      </ThemedView>
-//      <ThemedView style={styles.stepContainer}>
-//        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-//        <ThemedText>
-//          When you're ready, run{' '}
-//          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-//          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-//          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-//          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-//        </ThemedText>
-//      </ThemedView>
-//    </ParallaxScrollView>
-//  );
-//}
-
-//This HomeScreen is removed because it is a duplicate and the edited code provides a replacement.
-//const styles = StyleSheet.create({
-//  titleContainer: {
-//    flexDirection: 'row',
-//    alignItems: 'center',
-//    gap: 8,
-//  },
-//  stepContainer: {
-//    gap: 8,
-//    marginBottom: 8,
-//  },
-//  reactLogo: {
-//    height: 178,
-//    width: 290,
-//    bottom: 0,
-//    left: 0,
-//    position: 'absolute',
-//  },
-//});
 
 import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
@@ -87,115 +17,103 @@ export default function HomeScreen() {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
 
-  // Mock data
-  const upcomingMeetings = [
-    {
-      id: '1',
-      name: 'Sarah Johnson',
-      occupation: 'UX Designer',
-      date: 'Today, 3:00 PM',
-      location: 'Starbucks, Downtown',
-      photo: 'https://randomuser.me/api/portraits/women/44.jpg',
-    },
-    {
-      id: '2',
-      name: 'David Chen',
-      occupation: 'Product Manager',
-      date: 'Tomorrow, 10:00 AM',
-      location: 'Coffee Bean, Tech Park',
-      photo: 'https://randomuser.me/api/portraits/men/32.jpg',
-    },
-  ];
-
-  const pendingRequests = [
-    {
-      id: '3',
-      name: 'Michael Rodriguez',
-      occupation: 'Software Engineer',
-      photo: 'https://randomuser.me/api/portraits/men/67.jpg',
-    },
-  ];
+  const [upcomingMeetings, setUpcomingMeetings] = useState([
+    { id: 1, name: 'Sarah Johnson', position: 'UX Designer', company: 'Design Co', date: 'Today, 2:00 PM', location: 'Coffee Bean', distance: '0.5 miles' },
+    { id: 2, name: 'Michael Chang', position: 'Software Engineer', company: 'Tech Solutions', date: 'Tomorrow, 10:00 AM', location: 'Starbucks', distance: '1.2 miles' },
+  ]);
 
   return (
-    <ScrollView style={[styles.container, {backgroundColor: colors.background}]}>
-      <View style={styles.header}>
-        <Text style={[styles.welcomeText, {color: colors.text}]}>
-          Welcome back, {user ? user.displayName || 'User' : 'Guest'}
-        </Text>
-        <TouchableOpacity style={styles.notificationButton}>
-          <Ionicons name="notifications-outline" size={24} color={colors.text} />
-        </TouchableOpacity>
-      </View>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View style={styles.header}>
+          <Text style={[styles.greeting, { color: colors.text }]}>Hello, {user?.displayName || 'Guest'}</Text>
+          <View style={styles.notificationIcon}>
+            <Ionicons name="notifications-outline" size={24} color={colors.text} />
+          </View>
+        </View>
 
-      {/* Upcoming Meetings Section */}
-      <View style={styles.section}>
-        <Text style={[styles.sectionTitle, {color: colors.text}]}>Upcoming Coffee Chats</Text>
-        {upcomingMeetings.length > 0 ? (
-          upcomingMeetings.map(meeting => (
-            <View key={meeting.id} style={[styles.meetingCard, {backgroundColor: colors.card}]}>
-              <Image source={{uri: meeting.photo}} style={styles.profileImage} />
-              <View style={styles.meetingInfo}>
-                <Text style={[styles.name, {color: colors.text}]}>{meeting.name}</Text>
-                <Text style={[styles.occupation, {color: colors.text}]}>{meeting.occupation}</Text>
-                <View style={styles.meetingDetails}>
-                  <View style={styles.detailRow}>
-                    <Ionicons name="time-outline" size={16} color={colors.primary} />
-                    <Text style={[styles.detailText, {color: colors.text}]}>{meeting.date}</Text>
-                  </View>
-                  <View style={styles.detailRow}>
-                    <Ionicons name="location-outline" size={16} color={colors.primary} />
-                    <Text style={[styles.detailText, {color: colors.text}]}>{meeting.location}</Text>
+        <View style={[styles.upcomingSection, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Upcoming Coffee Meetings</Text>
+
+          {upcomingMeetings.length > 0 ? (
+            upcomingMeetings.map(meeting => (
+              <View key={meeting.id} style={[styles.meetingCard, { borderColor: colors.border }]}>
+                <View style={styles.meetingHeader}>
+                  <Image 
+                    source={{ uri: 'https://randomuser.me/api/portraits/men/32.jpg' }} 
+                    style={styles.profileImage} 
+                  />
+                  <View style={styles.meetingInfo}>
+                    <Text style={[styles.personName, { color: colors.text }]}>{meeting.name}</Text>
+                    <Text style={[styles.position, { color: colors.secondaryText }]}>{meeting.position} at {meeting.company}</Text>
                   </View>
                 </View>
-              </View>
-            </View>
-          ))
-        ) : (
-          <Text style={[styles.emptyText, {color: colors.textDim}]}>No upcoming meetings</Text>
-        )}
-      </View>
 
-      {/* Pending Requests Section */}
-      <View style={styles.section}>
-        <Text style={[styles.sectionTitle, {color: colors.text}]}>Pending Requests</Text>
-        {pendingRequests.length > 0 ? (
-          pendingRequests.map(request => (
-            <View key={request.id} style={[styles.requestCard, {backgroundColor: colors.card}]}>
-              <Image source={{uri: request.photo}} style={styles.profileImage} />
-              <View style={styles.requestInfo}>
-                <Text style={[styles.name, {color: colors.text}]}>{request.name}</Text>
-                <Text style={[styles.occupation, {color: colors.text}]}>{request.occupation}</Text>
-              </View>
-              <View style={styles.actionButtons}>
-                <TouchableOpacity style={[styles.actionButton, styles.acceptButton]}>
-                  <Text style={styles.actionButtonText}>Accept</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={[styles.actionButton, styles.declineButton]}>
-                  <Text style={[styles.actionButtonText, {color: colors.text}]}>Decline</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          ))
-        ) : (
-          <Text style={[styles.emptyText, {color: colors.textDim}]}>No pending requests</Text>
-        )}
-      </View>
+                <View style={styles.meetingDetails}>
+                  <View style={styles.detailItem}>
+                    <Ionicons name="calendar-outline" size={16} color={colors.primary} />
+                    <Text style={[styles.detailText, { color: colors.secondaryText }]}>{meeting.date}</Text>
+                  </View>
 
-      {/* Find New Connections Section */}
-      <TouchableOpacity 
-        style={[styles.findConnectionsButton, {backgroundColor: colors.primary}]}
-        onPress={() => {/* Navigate to matching screen */}}
-      >
-        <Text style={styles.findConnectionsText}>Find New Connections</Text>
-        <Ionicons name="people" size={20} color="white" />
-      </TouchableOpacity>
-    </ScrollView>
+                  <View style={styles.detailItem}>
+                    <Ionicons name="location-outline" size={16} color={colors.primary} />
+                    <Text style={[styles.detailText, { color: colors.secondaryText }]}>{meeting.location} ({meeting.distance})</Text>
+                  </View>
+                </View>
+
+                <View style={styles.actionButtons}>
+                  <TouchableOpacity style={styles.messageButton}>
+                    <Ionicons name="chatbubble-outline" size={16} color={colors.primary} />
+                    <Text style={[styles.buttonText, { color: colors.primary }]}>Message</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity style={[styles.rescheduleButton, { backgroundColor: colors.primary }]}>
+                    <Text style={styles.rescheduleText}>Reschedule</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            ))
+          ) : (
+            <View style={styles.emptyState}>
+              <Ionicons name="calendar-outline" size={48} color={colors.secondaryText} />
+              <Text style={[styles.emptyText, { color: colors.secondaryText }]}>No upcoming meetings</Text>
+              <TouchableOpacity style={[styles.findButton, { backgroundColor: colors.primary }]}>
+                <Text style={styles.findButtonText}>Find Coffee Partners</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
+
+        <View style={[styles.suggestedSection, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Suggested Connections</Text>
+
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.suggestedScroll}>
+            {[1, 2, 3, 4].map(id => (
+              <View key={id} style={[styles.suggestedCard, { backgroundColor: colors.background, borderColor: colors.border }]}>
+                <Image 
+                  source={{ uri: `https://randomuser.me/api/portraits/${id % 2 === 0 ? 'women' : 'men'}/${id * 10}.jpg` }} 
+                  style={styles.suggestedImage} 
+                />
+                <Text style={[styles.suggestedName, { color: colors.text }]}>Jane Doe</Text>
+                <Text style={[styles.suggestedPosition, { color: colors.secondaryText }]}>Product Manager</Text>
+                <Text style={[styles.suggestedCompany, { color: colors.secondaryText }]}>Tech Inc.</Text>
+                <TouchableOpacity style={[styles.connectButton, { backgroundColor: colors.primary }]}>
+                  <Text style={styles.connectText}>Connect</Text>
+                </TouchableOpacity>
+              </View>
+            ))}
+          </ScrollView>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  scrollContent: {
     padding: 16,
   },
   header: {
@@ -203,122 +121,162 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 24,
-    marginTop: 16,
   },
-  welcomeText: {
-    fontSize: 22,
-    fontFamily: 'K2D-SemiBold',
+  greeting: {
+    fontSize: 24,
+    fontFamily: 'K2D-Bold',
   },
-  notificationButton: {
-    padding: 8,
+  notificationIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  section: {
+  upcomingSection: {
+    borderRadius: 16,
+    padding: 16,
     marginBottom: 24,
+    borderWidth: 1,
   },
   sectionTitle: {
     fontSize: 18,
     fontFamily: 'K2D-SemiBold',
-    marginBottom: 12,
+    marginBottom: 16,
   },
   meetingCard: {
+    borderBottomWidth: 1,
+    paddingVertical: 16,
+  },
+  meetingHeader: {
     flexDirection: 'row',
-    padding: 16,
-    borderRadius: 12,
     marginBottom: 12,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
   },
   profileImage: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
   },
   meetingInfo: {
-    marginLeft: 16,
+    marginLeft: 12,
     flex: 1,
+    justifyContent: 'center',
   },
-  name: {
+  personName: {
     fontSize: 16,
     fontFamily: 'K2D-SemiBold',
+    marginBottom: 4,
   },
-  occupation: {
+  position: {
     fontSize: 14,
-    marginBottom: 8,
     fontFamily: 'K2D-Regular',
   },
   meetingDetails: {
-    gap: 4,
+    marginBottom: 12,
   },
-  detailRow: {
+  detailItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    marginBottom: 6,
   },
   detailText: {
+    marginLeft: 8,
     fontSize: 14,
     fontFamily: 'K2D-Regular',
   },
-  requestCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 12,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-  },
-  requestInfo: {
-    marginLeft: 16,
-    flex: 1,
-  },
   actionButtons: {
     flexDirection: 'row',
-    gap: 8,
+    justifyContent: 'space-between',
   },
-  actionButton: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 8,
+  messageButton: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
   },
-  acceptButton: {
-    backgroundColor: '#4CAF50',
-  },
-  declineButton: {
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: '#ddd',
-  },
-  actionButtonText: {
-    color: 'white',
+  buttonText: {
+    marginLeft: 6,
     fontSize: 14,
     fontFamily: 'K2D-Medium',
   },
-  emptyText: {
-    fontStyle: 'italic',
-    textAlign: 'center',
-    marginTop: 8,
+  rescheduleButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 20,
   },
-  findConnectionsButton: {
-    flexDirection: 'row',
+  rescheduleText: {
+    color: '#FFF',
+    fontSize: 14,
+    fontFamily: 'K2D-Medium',
+  },
+  emptyState: {
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 16,
-    borderRadius: 12,
-    marginTop: 8,
-    marginBottom: 24,
-    gap: 8,
+    paddingVertical: 32,
   },
-  findConnectionsText: {
-    color: 'white',
+  emptyText: {
+    fontSize: 16,
+    fontFamily: 'K2D-Medium',
+    marginTop: 12,
+    marginBottom: 16,
+  },
+  findButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+  },
+  findButtonText: {
+    color: '#FFF',
+    fontSize: 14,
+    fontFamily: 'K2D-SemiBold',
+  },
+  suggestedSection: {
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+  },
+  suggestedScroll: {
+    paddingVertical: 8,
+  },
+  suggestedCard: {
+    width: 160,
+    borderRadius: 12,
+    padding: 12,
+    marginRight: 16,
+    alignItems: 'center',
+    borderWidth: 1,
+  },
+  suggestedImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    marginBottom: 12,
+  },
+  suggestedName: {
     fontSize: 16,
     fontFamily: 'K2D-SemiBold',
+    marginBottom: 4,
+    textAlign: 'center',
+  },
+  suggestedPosition: {
+    fontSize: 14,
+    fontFamily: 'K2D-Regular',
+    textAlign: 'center',
+  },
+  suggestedCompany: {
+    fontSize: 12,
+    fontFamily: 'K2D-Regular',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  connectButton: {
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 16,
+  },
+  connectText: {
+    color: '#FFF',
+    fontSize: 12,
+    fontFamily: 'K2D-Medium',
   },
 });
