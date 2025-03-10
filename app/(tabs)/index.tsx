@@ -1,6 +1,12 @@
+import { Image, StyleSheet, Platform, SafeAreaView } from 'react-native';
+
+import { HelloWave } from '@/components/HelloWave';
+import ParallaxScrollView from '@/components/ParallaxScrollView';
+import { ThemedText } from '@/components/ThemedText';
+import { ThemedView } from '@/components/ThemedView';
 
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, ScrollView, TouchableOpacity, Image, SafeAreaView } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/contexts/AuthContext';
 import { useColorScheme } from '@/hooks/useColorScheme';
@@ -16,17 +22,11 @@ export default function HomeScreen() {
     { id: 2, name: 'Michael Chang', position: 'Software Engineer', company: 'Tech Solutions', date: 'Tomorrow, 10:00 AM', location: 'Starbucks', distance: '1.2 miles' },
   ]);
 
-  const suggestedConnections = [
-    { id: 1, name: 'Emily Williams', position: 'Product Manager', company: 'InnoTech', mutualConnections: 3, photo: 'https://randomuser.me/api/portraits/women/44.jpg' },
-    { id: 2, name: 'David Lee', position: 'Frontend Developer', company: 'WebCore', mutualConnections: 2, photo: 'https://randomuser.me/api/portraits/men/42.jpg' },
-    { id: 3, name: 'Jessica Chen', position: 'UI/UX Designer', company: 'Creative Minds', mutualConnections: 1, photo: 'https://randomuser.me/api/portraits/women/11.jpg' },
-  ];
-
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
-          <Text style={[styles.greeting, { color: colors.text }]}>Hello, {user?.name || 'Guest'}</Text>
+          <Text style={[styles.greeting, { color: colors.text }]}>Hello, {user?.displayName || 'Guest'}</Text>
           <View style={styles.notificationIcon}>
             <Ionicons name="notifications-outline" size={24} color={colors.text} />
           </View>
@@ -86,51 +86,23 @@ export default function HomeScreen() {
 
         <View style={[styles.suggestedSection, { backgroundColor: colors.card, borderColor: colors.border }]}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>Suggested Connections</Text>
-          
-          {suggestedConnections.map(connection => (
-            <View key={connection.id} style={[styles.connectionCard, { borderColor: colors.border }]}>
-              <Image 
-                source={{ uri: connection.photo }} 
-                style={styles.profileImage} 
-              />
-              <View style={styles.connectionInfo}>
-                <Text style={[styles.personName, { color: colors.text }]}>{connection.name}</Text>
-                <Text style={[styles.position, { color: colors.secondaryText }]}>{connection.position} at {connection.company}</Text>
-                <Text style={[styles.mutualConnections, { color: colors.secondaryText }]}>
-                  {connection.mutualConnections} mutual connection{connection.mutualConnections !== 1 ? 's' : ''}
-                </Text>
+
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.suggestedScroll}>
+            {[1, 2, 3, 4].map(id => (
+              <View key={id} style={[styles.suggestedCard, { backgroundColor: colors.background, borderColor: colors.border }]}>
+                <Image 
+                  source={{ uri: `https://randomuser.me/api/portraits/${id % 2 === 0 ? 'women' : 'men'}/${id * 10}.jpg` }} 
+                  style={styles.suggestedImage} 
+                />
+                <Text style={[styles.suggestedName, { color: colors.text }]}>Jane Doe</Text>
+                <Text style={[styles.suggestedPosition, { color: colors.secondaryText }]}>Product Manager</Text>
+                <Text style={[styles.suggestedCompany, { color: colors.secondaryText }]}>Tech Inc.</Text>
+                <TouchableOpacity style={[styles.connectButton, { backgroundColor: colors.primary }]}>
+                  <Text style={styles.connectText}>Connect</Text>
+                </TouchableOpacity>
               </View>
-              <TouchableOpacity style={[styles.connectButton, { borderColor: colors.primary }]}>
-                <Text style={[styles.connectText, { color: colors.primary }]}>Connect</Text>
-              </TouchableOpacity>
-            </View>
-          ))}
-          
-          <TouchableOpacity style={styles.viewMoreButton}>
-            <Text style={[styles.viewMoreText, { color: colors.primary }]}>View More</Text>
-          </TouchableOpacity>
-        </View>
-        
-        <View style={[styles.tipsSection, { backgroundColor: colors.card, borderColor: colors.border }]}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>Networking Tips</Text>
-          
-          <View style={styles.tipCard}>
-            <Ionicons name="bulb-outline" size={24} color={colors.primary} />
-            <Text style={[styles.tipText, { color: colors.text }]}>
-              Prepare 2-3 specific questions for your upcoming coffee meeting with Sarah Johnson.
-            </Text>
-          </View>
-          
-          <View style={styles.tipCard}>
-            <Ionicons name="time-outline" size={24} color={colors.primary} />
-            <Text style={[styles.tipText, { color: colors.text }]}>
-              Arrive 5 minutes early to secure a good spot and settle in before your meeting.
-            </Text>
-          </View>
-          
-          <TouchableOpacity style={styles.viewMoreButton}>
-            <Text style={[styles.viewMoreText, { color: colors.primary }]}>More Tips</Text>
-          </TouchableOpacity>
+            ))}
+          </ScrollView>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -220,101 +192,91 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 8,
+    paddingHorizontal: 12,
   },
   buttonText: {
     marginLeft: 6,
     fontSize: 14,
-    fontFamily: 'K2D-Regular',
+    fontFamily: 'K2D-Medium',
   },
   rescheduleButton: {
     paddingVertical: 8,
     paddingHorizontal: 16,
-    borderRadius: 8,
+    borderRadius: 20,
   },
   rescheduleText: {
-    color: 'white',
+    color: '#FFF',
     fontSize: 14,
     fontFamily: 'K2D-Medium',
   },
   emptyState: {
     alignItems: 'center',
-    padding: 24,
+    justifyContent: 'center',
+    paddingVertical: 32,
   },
   emptyText: {
     fontSize: 16,
     fontFamily: 'K2D-Medium',
     marginTop: 12,
-    marginBottom: 24,
+    marginBottom: 16,
   },
   findButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 20,
   },
   findButtonText: {
-    color: 'white',
+    color: '#FFF',
+    fontSize: 14,
     fontFamily: 'K2D-SemiBold',
-    fontSize: 16,
   },
   suggestedSection: {
     borderRadius: 16,
     padding: 16,
-    marginBottom: 24,
     borderWidth: 1,
   },
-  connectionCard: {
-    flexDirection: 'row',
+  suggestedScroll: {
+    paddingVertical: 8,
+  },
+  suggestedCard: {
+    width: 160,
+    borderRadius: 12,
+    padding: 12,
+    marginRight: 16,
     alignItems: 'center',
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-  },
-  connectionInfo: {
-    flex: 1,
-    marginLeft: 12,
-  },
-  mutualConnections: {
-    fontSize: 12,
-    fontFamily: 'K2D-Regular',
-    marginTop: 4,
-  },
-  connectButton: {
     borderWidth: 1,
-    borderRadius: 8,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
   },
-  connectText: {
-    fontSize: 14,
-    fontFamily: 'K2D-Medium',
+  suggestedImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    marginBottom: 12,
   },
-  viewMoreButton: {
-    alignItems: 'center',
-    paddingVertical: 12,
-    marginTop: 8,
-  },
-  viewMoreText: {
+  suggestedName: {
     fontSize: 16,
     fontFamily: 'K2D-SemiBold',
+    marginBottom: 4,
+    textAlign: 'center',
   },
-  tipsSection: {
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 24,
-    borderWidth: 1,
-  },
-  tipCard: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: 16,
-    paddingBottom: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E1E1E1',
-  },
-  tipText: {
-    flex: 1,
-    marginLeft: 12,
+  suggestedPosition: {
     fontSize: 14,
     fontFamily: 'K2D-Regular',
-    lineHeight: 20,
+    textAlign: 'center',
+  },
+  suggestedCompany: {
+    fontSize: 12,
+    fontFamily: 'K2D-Regular',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  connectButton: {
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 16,
+  },
+  connectText: {
+    color: '#FFF',
+    fontSize: 12,
+    fontFamily: 'K2D-Medium',
   },
 });

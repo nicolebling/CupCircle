@@ -1,0 +1,88 @@
+The My Profile page in the CupCircle app is where users manage their personal and professional information. This page serves as both an onboarding experience for new users and a profile management tool for existing users.
+
+Visual Design
+Color Scheme: Orange/coffee theme (#F97415) as primary, white backgrounds, dark brown text (#1E1916)
+Typography: K2D font family (imported from Google Fonts)
+Profile Image: Circular photo display with upload capability
+Layout: Single column, scrollable form with clearly separated sections
+States
+View Mode: Displays the user's profile information in a read-only format
+Edit Mode: Presents form fields for updating profile information
+Onboarding Mode: Similar to edit mode but with guidance for first-time users
+Core Components
+Header Section
+
+Page title ("My Profile"/"Edit Profile"/"Complete Your Profile")
+Edit/Back button toggle
+Settings button (gear icon) that links to the Settings page
+Profile Photo Section
+
+Circular image display
+Upload button with camera icon
+Image cropping capability when uploading
+Personal Information Section
+
+Name input (required)
+Birthday date picker (required)
+Age (calculated automatically)
+Occupation input (required)
+Professional Details Section
+
+Experience level dropdown (Student, Internship, Entry Level, etc.)
+Industry categories multi-select (with search functionality)
+Skills multi-select (with search functionality)
+Experience textarea for work history
+Education input
+Bio Section
+
+About me textarea (limited to 500 characters)
+Character count display
+Location Preferences Section
+
+City (fixed to "New York City")
+Neighborhoods multi-select organized by borough
+Favorite cafes search with Google Places integration
+Interest Section
+
+Interest multi-select from predefined list
+Search functionality for easier selection
+Save Button
+
+Prominent primary-colored button at the bottom
+Loading state during form submission
+Validation error summary if form has errors
+Functionality
+Data Fetching
+
+Load existing profile data on mount
+Display skeleton loader during initial fetch
+Form Validation
+
+Real-time field validation with error messages
+Required field highlighting
+Age verification (must be at least 18)
+Location Integration
+
+Geolocation capturing (with user permission)
+Cafe suggestions based on input using Google Places API
+Image Handling
+
+Photo upload with preview
+Image cropping interface
+Image compression before submission
+Form Submission
+
+Optimistic UI updates
+Error handling with toast notifications
+Redirect to home page on successful onboarding completion
+User Experience Notes
+Form should save scroll position during validation
+Input fields should be large enough for comfortable mobile typing
+Toast notifications for successful saves and errors
+Help tooltips for fields that may need explanation
+Smooth transitions between view and edit modes
+Accessibility Considerations
+High contrast text for readability
+Form labels properly associated with inputs
+Error states that are screen-reader friendly
+Keyboard navigation support for all interactive elements
