@@ -18,6 +18,7 @@ export default {
     tint: tintColorLight,
     tabIconDefault: '#786F67',
     tabIconSelected: tintColorLight,
+    fontFamily: 'K2D-Regular',
   },
   dark: {
     primary: '#F97415',
@@ -30,5 +31,6 @@ export default {
     tint: tintColorDark,
     tabIconDefault: '#B9B2A6',
     tabIconSelected: tintColorDark,
+    fontFamily: 'K2D-Regular',
   },
 };

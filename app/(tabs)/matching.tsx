@@ -212,23 +212,24 @@ export default function MatchingScreen() {
         </Text>
       </View>
       
-      <View style={styles.cardsContainer}>
-        {isLoading ? (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color={colors.primary} />
-            <Text style={[styles.loadingText, { color: colors.text }]}>Finding perfect matches...</Text>
-          </View>
-        ) : currentIndex < profiles.length ? (
-          <>
-            <Animated.View style={[styles.animatedCardContainer, cardAnimatedStyle]}>
-              <ProfileCard
-                profile={profiles[currentIndex]}
-                onLike={handleLike}
-                onSkip={handleSkip}
-              />
-            </Animated.View>
-            
-            <View style={styles.navigationControls}>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 20 }}>
+        <View style={styles.cardsContainer}>
+          {isLoading ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color={colors.primary} />
+              <Text style={[styles.loadingText, { color: colors.text }]}>Finding perfect matches...</Text>
+            </View>
+          ) : currentIndex < profiles.length ? (
+            <>
+              <Animated.View style={[styles.animatedCardContainer, cardAnimatedStyle]}>
+                <ProfileCard
+                  profile={profiles[currentIndex]}
+                  onLike={handleLike}
+                  onSkip={handleSkip}
+                />
+              </Animated.View>
+              
+              <View style={styles.navigationControls}>
               <TouchableOpacity 
                 onPress={handlePrevious} 
                 style={[
@@ -268,6 +269,7 @@ export default function MatchingScreen() {
           </View>
         )}
       </View>
+      </ScrollView>
       
       {/* Filter Modal */}
       <Modal
