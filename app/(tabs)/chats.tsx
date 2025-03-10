@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView, FlatList, Image, TextInput, ScrollView, ActivityIndicator } from 'react-native';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import Colors from '@/constants/Colors';
@@ -134,19 +134,23 @@ export default function ChatsScreen() {
   };
   
   const handleSendMessage = () => {
-    if (!newMessage.trim() || !activeChat) return;
+    if (newMessage.trim() === '' || !activeChat) return;
     
-    const newMessageObj = {
-      id: `${activeChat}-${Date.now()}`,
-      text: newMessage,
-      sent: true,
-      timestamp: 'Just now',
-    };
+    const messageId = `${activeChat}-${Date.now()}`;
+    const timestamp = 'Just now';
     
-    // Update messages
+    // Add new message to current chat
     setMessages(prev => ({
       ...prev,
-      [activeChat]: prev[activeChat] ? [...prev[activeChat], newMessageObj] : [newMessageObj],
+      [activeChat]: [
+        ...prev[activeChat] || [],
+        {
+          id: messageId,
+          text: newMessage,
+          sent: true,
+          timestamp
+        }
+      ]
     }));
     
     // Update last message in chat list
@@ -156,38 +160,38 @@ export default function ChatsScreen() {
           return {
             ...chat,
             lastMessage: newMessage,
-            timestamp: 'Just now',
+            timestamp
           };
         }
         return chat;
       })
     );
     
+    // Clear input
     setNewMessage('');
     
-    // Simulate received message after a delay
-    if (Math.random() > 0.5) {
+    // Simulate response (for demo purposes)
+    if (Math.random() > 0.3) {
       setTimeout(() => {
-        const responses = [
-          'Thanks for the message!',
-          'I'll get back to you soon.',
-          'That sounds good to me.',
-          'Looking forward to our next coffee chat!',
-          'Great! Talk to you soon.',
-        ];
-        
-        const responseText = responses[Math.floor(Math.random() * responses.length)];
-        
-        const responseMessage = {
-          id: `${activeChat}-${Date.now() + 1}`,
-          text: responseText,
-          sent: false,
-          timestamp: 'Just now',
-        };
+        const responseText = [
+          "Thanks for your message! I'll get back to you soon.",
+          "That sounds great!",
+          "I appreciate your input on this.",
+          "When would be a good time to meet again?",
+          "Let me check my calendar and get back to you.",
+        ][Math.floor(Math.random() * 5)];
         
         setMessages(prev => ({
           ...prev,
-          [activeChat]: [...prev[activeChat], responseMessage],
+          [activeChat]: [
+            ...prev[activeChat],
+            {
+              id: `${activeChat}-${Date.now()}`,
+              text: responseText,
+              sent: false,
+              timestamp: 'Just now'
+            }
+          ]
         }));
         
         setChats(prev => 
@@ -248,133 +252,168 @@ export default function ChatsScreen() {
     </TouchableOpacity>
   );
   
-  const renderMessageItem = ({ item }: { item: any }) => (
-    <View style={[
-      styles.messageContainer,
-      item.sent ? styles.sentMessageContainer : styles.receivedMessageContainer
-    ]}>
-      <View style={[
-        styles.messageBubble,
-        item.sent ? 
-          [styles.sentMessageBubble, { backgroundColor: colors.primary }] : 
-          [styles.receivedMessageBubble, { backgroundColor: colors.card, borderColor: colors.border }]
-      ]}>
-        <Text style={[
-          styles.messageText,
-          { color: item.sent ? 'white' : colors.text }
-        ]}>
-          {item.text}
-        </Text>
+  const renderMessage = (message: any, index: number, messages: any[]) => {
+    const isSent = message.sent;
+    const showTimestamp = index === 0 || 
+                          messages[index - 1].sent !== message.sent ||
+                          messages[index - 1].timestamp !== message.timestamp;
+    
+    return (
+      <View 
+        key={message.id} 
+        style={[
+          styles.messageContainer,
+          isSent ? styles.sentMessageContainer : styles.receivedMessageContainer
+        ]}
+      >
+        <View 
+          style={[
+            styles.messageBubble,
+            isSent 
+              ? [styles.sentMessageBubble, { backgroundColor: colors.primary }]
+              : [styles.receivedMessageBubble, { backgroundColor: colors.card, borderColor: colors.border }]
+          ]}
+        >
+          <Text style={[
+            styles.messageText,
+            { color: isSent ? 'white' : colors.text }
+          ]}>
+            {message.text}
+          </Text>
+        </View>
+        
+        {showTimestamp && (
+          <Text 
+            style={[
+              styles.messageTimestamp,
+              { color: colors.secondaryText }
+            ]}
+          >
+            {message.timestamp}
+          </Text>
+        )}
       </View>
-      <Text style={[styles.messageTimestamp, { color: colors.secondaryText }]}>
-        {item.timestamp}
+    );
+  };
+  
+  const renderEmptyState = () => (
+    <View style={styles.emptyContainer}>
+      <Ionicons name="cafe-outline" size={64} color={colors.primary} />
+      <Text style={[styles.emptyTitle, { color: colors.text }]}>No messages yet</Text>
+      <Text style={[styles.emptySubtitle, { color: colors.secondaryText }]}>
+        Match with people by exploring potential connections to start messaging
       </Text>
+      <TouchableOpacity
+        style={[styles.matchButton, { backgroundColor: colors.primary }]}
+        // Navigate to matching screen
+        onPress={() => {}}
+      >
+        <Text style={styles.matchButtonText}>Find Connections</Text>
+      </TouchableOpacity>
     </View>
   );
   
-  const activeChatData = activeChat ? chats.find(chat => chat.id === activeChat) : null;
-  const activeChatMessages = activeChat && messages[activeChat] ? messages[activeChat] : [];
+  if (isLoading) {
+    return (
+      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={colors.primary} />
+          <Text style={[styles.loadingText, { color: colors.text }]}>Loading conversations...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
   
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       {!activeChat ? (
-        // Chats List View
+        // Chat List View
         <>
           <View style={styles.header}>
             <Text style={[styles.title, { color: colors.text }]}>Messages</Text>
-            <View style={styles.unreadContainer}>
-              <Text style={[styles.unreadTotal, { color: colors.text }]}>
-                {chats.reduce((acc, chat) => acc + chat.unread, 0)}
-              </Text>
-            </View>
           </View>
           
           <View style={[styles.searchContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <Ionicons name="search" size={20} color={colors.secondaryText} />
             <TextInput
               style={[styles.searchInput, { color: colors.text }]}
-              placeholder="Search messages..."
+              placeholder="Search conversations"
               placeholderTextColor={colors.secondaryText}
               value={searchQuery}
               onChangeText={setSearchQuery}
             />
-            {searchQuery.length > 0 && (
+            {searchQuery !== '' && (
               <TouchableOpacity onPress={() => setSearchQuery('')}>
                 <Ionicons name="close-circle" size={20} color={colors.secondaryText} />
               </TouchableOpacity>
             )}
           </View>
           
-          {isLoading ? (
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color={colors.primary} />
-              <Text style={[styles.loadingText, { color: colors.text }]}>Loading conversations...</Text>
-            </View>
-          ) : filteredChats.length > 0 ? (
+          {filteredChats.length > 0 ? (
             <FlatList
               data={filteredChats}
               renderItem={renderChatItem}
               keyExtractor={item => item.id}
-              contentContainerStyle={{ paddingBottom: 20 }}
+              contentContainerStyle={styles.chatList}
             />
           ) : (
-            <View style={styles.emptyContainer}>
-              <Ionicons name="chatbubbles" size={60} color={colors.primary} />
-              <Text style={[styles.emptyTitle, { color: colors.text }]}>No messages yet</Text>
-              <Text style={[styles.emptySubtitle, { color: colors.secondaryText }]}>
-                {searchQuery.length > 0 ? 
-                  'No messages match your search.' : 
-                  'Start matching with professionals to begin conversations.'}
-              </Text>
-              <TouchableOpacity style={[styles.matchButton, { backgroundColor: colors.primary }]}>
-                <Text style={styles.matchButtonText}>Find Matches</Text>
-              </TouchableOpacity>
-            </View>
+            renderEmptyState()
           )}
         </>
       ) : (
         // Active Chat View
         <>
-          <View style={styles.chatHeader}>
+          <View style={[styles.chatHeader, { borderBottomColor: colors.border }]}>
             <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
               <Ionicons name="arrow-back" size={24} color={colors.primary} />
             </TouchableOpacity>
             
-            {activeChatData && (
-              <View style={styles.activeChatInfo}>
-                <Image source={{ uri: activeChatData.photo }} style={styles.activeAvatar} />
-                <View>
-                  <Text style={[styles.activeChatName, { color: colors.text }]}>{activeChatData.name}</Text>
-                  <Text style={[styles.activeChatStatus, { color: colors.secondaryText }]}>
-                    {activeChatData.isOnline ? 'Online' : 'Offline'}
-                  </Text>
-                </View>
-              </View>
-            )}
+            <View style={styles.activeChatInfo}>
+              {chats.find(chat => chat.id === activeChat) && (
+                <>
+                  <Image 
+                    source={{ uri: chats.find(chat => chat.id === activeChat)?.photo }} 
+                    style={styles.activeAvatar} 
+                  />
+                  <View>
+                    <Text style={[styles.activeChatName, { color: colors.text }]}>
+                      {chats.find(chat => chat.id === activeChat)?.name}
+                    </Text>
+                    <Text style={[styles.activeChatStatus, { color: colors.secondaryText }]}>
+                      {chats.find(chat => chat.id === activeChat)?.isOnline ? 'Online' : 'Offline'}
+                    </Text>
+                  </View>
+                </>
+              )}
+            </View>
             
             <TouchableOpacity style={styles.infoButton}>
               <Ionicons name="information-circle-outline" size={24} color={colors.primary} />
             </TouchableOpacity>
           </View>
           
-          <ScrollView 
-            style={styles.messagesContainer} 
-            contentContainerStyle={styles.messagesContent}
-          >
-            {activeChatMessages.length > 0 ? (
-              activeChatMessages.map(message => renderMessageItem({ item: message }))
+          <View style={styles.messagesContainer}>
+            {messages[activeChat]?.length > 0 ? (
+              <ScrollView 
+                style={{ flex: 1 }}
+                contentContainerStyle={styles.messagesContent}
+              >
+                {messages[activeChat].map((message, index, messages) => 
+                  renderMessage(message, index, messages)
+                )}
+              </ScrollView>
             ) : (
               <View style={styles.noMessagesContainer}>
                 <Text style={[styles.noMessagesText, { color: colors.secondaryText }]}>
-                  No messages yet. Send your first message!
+                  No messages yet. Start the conversation!
                 </Text>
               </View>
             )}
-          </ScrollView>
+          </View>
           
-          <View style={[styles.inputContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <View style={[styles.inputContainer, { borderTopColor: colors.border }]}>
             <TextInput
-              style={[styles.messageInput, { color: colors.text }]}
+              style={[styles.messageInput, { color: colors.text, backgroundColor: colors.card }]}
               placeholder="Type a message..."
               placeholderTextColor={colors.secondaryText}
               value={newMessage}
@@ -382,11 +421,17 @@ export default function ChatsScreen() {
               multiline
             />
             <TouchableOpacity 
-              style={[styles.sendButton, { opacity: newMessage.trim() ? 1 : 0.5 }]}
+              style={[
+                styles.sendButton, 
+                { 
+                  backgroundColor: newMessage.trim() ? colors.primary : colors.card,
+                  opacity: newMessage.trim() ? 1 : 0.5,
+                }
+              ]}
               onPress={handleSendMessage}
               disabled={!newMessage.trim()}
             >
-              <Ionicons name="send" size={20} color={colors.primary} />
+              <Ionicons name="send" size={20} color={newMessage.trim() ? 'white' : colors.secondaryText} />
             </TouchableOpacity>
           </View>
         </>
@@ -398,38 +443,23 @@ export default function ChatsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
+    padding: 16,
+    paddingBottom: 8,
   },
   title: {
     fontFamily: 'K2D-Bold',
     fontSize: 28,
   },
-  unreadContainer: {
-    backgroundColor: '#F97415',
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  unreadTotal: {
-    color: 'white',
-    fontFamily: 'K2D-Bold',
-    fontSize: 14,
-  },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 12,
-    height: 44,
-    borderRadius: 22,
+    borderRadius: 12,
+    marginHorizontal: 16,
     marginBottom: 16,
+    height: 40,
     borderWidth: 1,
   },
   searchInput: {
@@ -438,9 +468,12 @@ const styles = StyleSheet.create({
     fontFamily: 'K2D-Regular',
     fontSize: 16,
   },
+  chatList: {
+    paddingHorizontal: 16,
+  },
   chatItem: {
     flexDirection: 'row',
-    padding: 16,
+    padding: 12,
     borderRadius: 12,
     marginBottom: 8,
   },
@@ -448,14 +481,14 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   avatar: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
   },
   onlineIndicator: {
     position: 'absolute',
-    bottom: 2,
-    right: 2,
+    bottom: 0,
+    right: 0,
     width: 12,
     height: 12,
     borderRadius: 6,
@@ -470,13 +503,11 @@ const styles = StyleSheet.create({
   chatHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 4,
+    marginBottom: 2,
   },
   chatName: {
     fontFamily: 'K2D-SemiBold',
     fontSize: 16,
-    flex: 1,
   },
   timestamp: {
     fontFamily: 'K2D-Regular',
@@ -554,6 +585,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     marginBottom: 16,
+    borderBottomWidth: 1,
+    paddingHorizontal: 16,
   },
   backButton: {
     padding: 8,
@@ -644,6 +677,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingHorizontal: 16,
     paddingVertical: 8,
+    marginRight: 8,
     fontFamily: 'K2D-Regular',
     fontSize: 16,
   },
@@ -653,6 +687,5 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    marginLeft: 8,
   },
 });
