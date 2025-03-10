@@ -1,0 +1,95 @@
+App Overview
+CupCircle is a networking app that connects professionals over coffee meetings. Users can create profiles, match with others based on professional interests, schedule meetings at coffee shops, and chat with their matches.
+
+Key Features
+Authentication (email/password and LinkedIn)
+Profile creation and management
+Matching system with other professionals
+Availability scheduling
+Coffee chat scheduling and management
+Real-time messaging
+Location-based coffee shop recommendations
+Pages & Screens
+1. Authentication Screen
+Login with email/password
+Register with email/password
+Login with LinkedIn
+Password reset
+Agreement to Terms and Privacy Policy
+Animated coffee cup logo
+2. Home/Dashboard Screen
+Welcome message
+Summary of pending/upcoming coffee chats
+Quick access to matches and messages
+Profile completion progress
+3. Profile Screen
+Profile photo upload
+Personal information (name, age, occupation)
+Professional details (experience level, skills, industry)
+Bio/about section
+Education background
+Favorite cafes/neighborhoods
+Professional interests
+4. Matching Screen
+Card-based matching interface (similar to dating apps)
+User profiles with photo, name, occupation
+Professional information display
+Swipe interaction or button-based accept/reject
+Initial message composition for matches
+5. Calendar/Availability Screen
+Calendar interface for selecting available times
+Time slot management
+Date and time picker for availability
+List of current availability slots
+6. Coffee Chats Screen
+List of confirmed and pending coffee chats
+Details for each chat (partner, time, location)
+Options to confirm, cancel, or reschedule
+Meeting preparation suggestions
+7. Messages Screen
+List of conversations with matched users
+Conversation thread interface
+Real-time message delivery
+Unread message indicators
+Ability to send text messages
+8. Settings Screen
+Account settings
+Password change
+Email update
+Notification preferences
+Support/contact options
+Logout functionality
+UI Components
+Navigation
+Bottom tab navigation (Home, Profile, Matching, Chats, Messages)
+Stack navigation for screen depth
+Header with back button and context actions
+Common UI Components
+Profile cards
+Button variants (primary, outline, text)
+Form inputs and validation
+Date and time pickers
+Modals and drawers for additional content
+Toast notifications for feedback
+Loading indicators
+Avatar components
+Badge components for notifications
+Style Theme
+Primary color: Orange/Coffee theme (#F97415)
+Secondary color: White (#FFFFFF)
+Text colors: Dark brown (#1E1916) and light cream (#EFE9D3)
+Card backgrounds: White with subtle borders
+Font family: K2D (or a similar React Native compatible font)
+Custom icons for navigation and actions
+Backend Integration
+RESTful API calls to your existing Express backend
+WebSocket connection for real-time messaging
+Image upload for profile photos
+Geolocation services for nearby cafes
+Google Places API integration for coffee shop suggestions
+Data Flow & State Management
+Authentication state with secure token storage
+Profile data cache
+Real-time messaging with optimistic updates
+Match data synchronization
+Form state management with validation
