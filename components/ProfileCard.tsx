@@ -82,6 +82,48 @@ export default function ProfileCard({ profile, onLike, onSkip }: ProfileCardProp
           ))}
         </View>
         
+        {profile.favoriteCafes && profile.favoriteCafes.length > 0 && (
+          <>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Favorite Cafes</Text>
+            <View style={styles.interestsContainer}>
+              {profile.favoriteCafes.slice(0, 3).map((cafe, index) => (
+                <View 
+                  key={index} 
+                  style={[
+                    styles.interestTag, 
+                    { backgroundColor: colors.primary + '15' }
+                  ]}
+                >
+                  <Text style={[styles.interestText, { color: colors.primary }]}>
+                    <Ionicons name="cafe-outline" size={12} color={colors.primary} /> {cafe}
+                  </Text>
+                </View>
+              ))}
+            </View>
+          </>
+        )}
+        
+        {profile.neighborhoods && profile.neighborhoods.length > 0 && (
+          <>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Neighborhoods</Text>
+            <View style={styles.interestsContainer}>
+              {profile.neighborhoods.slice(0, 3).map((neighborhood, index) => (
+                <View 
+                  key={index} 
+                  style={[
+                    styles.interestTag, 
+                    { backgroundColor: colors.primary + '15' }
+                  ]}
+                >
+                  <Text style={[styles.interestText, { color: colors.primary }]}>
+                    <Ionicons name="location-outline" size={12} color={colors.primary} /> {neighborhood}
+                  </Text>
+                </View>
+              ))}
+            </View>
+          </>
+        )}
+        
         {profile.experience && (
           <>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>Experience</Text>
