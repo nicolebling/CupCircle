@@ -1,0 +1,95 @@
+The Matching Page is the heart of the CupCircle app, where users discover potential connections for coffee chats. This page presents profiles of other professionals one at a time in a card-based interface, allowing users to review and either accept or decline potential matches.
+
+Visual Design
+Color Scheme: Orange/coffee theme (#F97415) as primary, white card backgrounds, dark brown text (#1E1916)
+Typography: K2D font family for consistency across the app
+Layout: Single-column, full-height design with a profile card as the main focus
+Core Components
+Header Section
+
+Page title ("Explore Your Circle")
+Filter button (gear/funnel icon) that opens the filter modal
+Navigation controls visible at top of screen
+Profile Card Component
+
+Large profile photo (occupying top ~60% of card)
+User name and age (prominently displayed)
+Occupation badge with icon
+Brief bio excerpt (limited to 2-3 lines with truncation)
+Coffee cup icon indicating matched café interests (if any)
+Key skills/interests displayed as badges (limited to top 3-5)
+Neighborhood/location info with map pin icon
+Experience level indicator
+Action Controls
+
+Swipe gestures for accept/decline (with visual feedback)
+Large, distinct buttons for accept (green with check icon) and decline (red with X icon)
+Profile details button to see complete profile information
+Previous profile button (if available)
+Matching Process UI
+
+Connection animation when mutual match occurs
+Option to send initial message when matching
+Time slot selection interface for proposing meeting times
+Empty State
+
+Coffee cup illustration
+"No Matches Found" message
+Encouragement text to check back later
+Option to adjust filters
+Filter Modal
+
+Industry category selection (multi-select)
+Experience level range selection
+Skills keyword search and selection
+Neighborhood preferences
+Café preferences
+Clear filters and Apply buttons
+Functionality
+Profile Navigation
+
+Smooth card transitions between profiles
+Swipe right to accept, left to decline
+Button alternatives for the swipe actions
+Previous profile button to revisit last shown profile
+Matching Algorithm Integration
+
+Profile display prioritization based on:
+Shared interests/skills
+Compatible availability times
+Location preferences
+Common favorite cafés
+Match Processing
+
+Real-time feedback when a match is created
+Opportunity to select available time slots
+Interface to choose a café location
+Option to write introductory message
+Profile Interactions
+
+View detailed profile with expanded information
+See all skills, interests, and experience
+Full-size profile photo viewing capability
+Profile Management
+
+Avoid showing already declined profiles
+Avoid showing profiles the user has already matched with
+Option to report inappropriate profiles
+User Experience Notes
+Animation when swiping cards for visual feedback
+Haptic feedback for important actions
+Easy-to-access filter adjustments
+Clear visual hierarchy emphasizing photo and key information
+Persistent loading indicators during data fetching
+Pull-to-refresh to get new potential matches
+Smooth transitions between states
+Error States
+Friendly message when no more matches are available
+Appropriate feedback when network connectivity issues occur
+Option to retry failed actions
+Clear guidance on how to improve match potential (update profile, adjust filters)
+Accessibility Considerations
+Large touch targets for critical actions
+High contrast between text and backgrounds
+Screen reader support with proper element labeling
+Support for system font sizing
