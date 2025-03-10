@@ -1,43 +1,36 @@
+/**
+ * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
+ * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
+ */
 
-import { ColorSchemeName, PlatformColor } from 'react-native';
-
-// These values are shared between the different color schemes
-const common = {
-  primary: '#F97415',
-  background: '#FFFFFF',
-  card: '#FFFFFF',
-  text: '#1E1916',
-  border: '#E0E0E0',
-  notification: '#FF453A',
-  secondaryText: '#666666',
-  highlight: '#FFF2E9',
-  tabIconDefault: '#CCCCCC',
-  tabIconSelected: '#F97415',
-}
-
-// Light theme (default)
-const light = {
-  ...common,
-  background: '#FFFFFF',
-  card: '#FFFFFF',
-  text: '#1E1916',
-  border: '#E0E0E0',
-  tabIconDefault: '#CCCCCC',
-}
-
-// Dark theme
-const dark = {
-  ...common,
-  background: '#121212',
-  card: '#202020',
-  text: '#FFFFFF',
-  border: '#404040',
-  secondaryText: '#AAAAAA',
-  highlight: '#3D2E25',
-  tabIconDefault: '#666666',
-}
+const tintColorLight = '#F97415';
+const tintColorDark = '#F97415';
 
 export default {
-  light,
-  dark
+  light: {
+    primary: '#F97415',
+    background: '#FFFFFF',
+    card: '#FFFFFF',
+    text: '#1E1916',
+    secondaryText: '#786F67',
+    border: '#EFE9D3',
+    notification: '#F97415',
+    tint: tintColorLight,
+    tabIconDefault: '#786F67',
+    tabIconSelected: tintColorLight,
+    fontFamily: 'K2D-Regular',
+  },
+  dark: {
+    primary: '#F97415',
+    background: '#1E1916',
+    card: '#2D2621',
+    text: '#EFE9D3',
+    secondaryText: '#B9B2A6',
+    border: '#3A332D',
+    notification: '#F97415',
+    tint: tintColorDark,
+    tabIconDefault: '#B9B2A6',
+    tabIconSelected: tintColorDark,
+    fontFamily: 'K2D-Regular',
+  },
 };
