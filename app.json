@@ -9,7 +9,7 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "extra": {
-      "DATABASE_URL": "${process.env.DATABASE_URL}"
+      "API_URL": "https://your-api-server-url.com"
     },
     "ios": {
       "supportsTablet": true
