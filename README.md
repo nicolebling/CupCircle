@@ -188,3 +188,37 @@ Join our community of developers creating universal apps.
 
 - [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
 - [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+
+
+## Database Setup
+
+This project uses PostgreSQL for data storage. Follow these steps to set up the database:
+
+1. Create a PostgreSQL database using Replit's Database feature.
+2. Set up the database connection by adding an environment variable:
+   - Click on the "Secrets" tab (lock icon in the sidebar)
+   - Add a new secret with key `DATABASE_URL` and value from your Replit PostgreSQL connection string
+
+3. Initialize the database schema with:
+```bash
+npx tsx scripts/setup-database.ts
+```
+
+### Database Schema
+
+The application uses the following tables:
+
+1. `users`: Stores user authentication data
+2. `profiles`: Contains user profile information
+3. `availability`: Tracks when users are available for coffee chats
+4. `matches`: Records connections between users
+
+### Sample Data
+
+The setup script creates sample users with the following credentials:
+
+- Email: john@example.com, Password: password123
+- Email: jane@example.com, Password: password123
+
+You can use these accounts to test the application.
+

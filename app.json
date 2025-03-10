@@ -1,13 +1,16 @@
 {
   "expo": {
-    "name": "expo-on-replit",
-    "slug": "expo-on-replit",
+    "name": "CupCircle",
+    "slug": "cup-circle",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
+    "scheme": "cupcircle",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "extra": {
+      "DATABASE_URL": process.env.DATABASE_URL
+    },
     "ios": {
       "supportsTablet": true
     },

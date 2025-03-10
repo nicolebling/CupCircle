@@ -2,28 +2,39 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { authService } from '../services/api';
+import { profileService } from '../services/api';
 
 type User = {
   id: string;
-  name: string;
+  username: string;
   email: string;
+};
+
+type UserProfile = {
+  id: string;
+  username: string;
+  email: string;
+  name?: string;
   photo?: string;
   occupation?: string;
+  bio?: string;
+  interests?: string[];
 };
 
 type AuthContextType = {
-  user: User | null;
+  user: UserProfile | null;
   isLoading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, name: string) => Promise<void>;
+  signUp: (username: string, email: string, password: string, name: string) => Promise<void>;
   signOut: () => void;
-  updateUser: (userData: Partial<User>) => Promise<void>;
+  updateUser: (userData: Partial<UserProfile>) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -50,20 +61,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signIn = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      // Mock API call - replace with actual API call
-      // const response = await fetch('your-api/login', { ... });
-      // const data = await response.json();
+      // Get user from database
+      const authenticatedUser = await authService.login(email, password);
       
-      // Mock user data
-      const mockUser: User = {
-        id: '123456',
-        name: 'John Doe',
-        email: email,
-        occupation: 'Software Developer',
+      if (!authenticatedUser) {
+        throw new Error('Invalid email or password');
+      }
+      
+      // Get user profile
+      const profile = await profileService.getProfileByUserId(authenticatedUser.id);
+      
+      // Combine user and profile data
+      const userProfile: UserProfile = {
+        id: authenticatedUser.id,
+        username: authenticatedUser.username,
+        email: authenticatedUser.email,
+        name: profile?.name,
+        photo: profile?.photo,
+        occupation: profile?.occupation,
+        bio: profile?.bio,
+        interests: profile?.interests,
       };
       
-      await AsyncStorage.setItem('@user', JSON.stringify(mockUser));
-      setUser(mockUser);
+      await AsyncStorage.setItem('@user', JSON.stringify(userProfile));
+      setUser(userProfile);
       router.replace('/(tabs)');
     } catch (error) {
       console.error('Login failed', error);
@@ -73,22 +94,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const signUp = async (email: string, password: string, name: string) => {
+  const signUp = async (username: string, email: string, password: string, name: string) => {
     setIsLoading(true);
     try {
-      // Mock API call - replace with actual API call
-      // const response = await fetch('your-api/register', { ... });
-      // const data = await response.json();
+      // Register new user
+      const newUser = await authService.register(username, email, password);
       
-      // Mock user data
-      const mockUser: User = {
-        id: '123456',
+      // Create user profile
+      await profileService.saveProfile({
+        user_id: newUser.id,
         name: name,
-        email: email,
+      });
+      
+      // Create user profile object
+      const userProfile: UserProfile = {
+        id: newUser.id,
+        username: newUser.username,
+        email: newUser.email,
+        name: name,
       };
       
-      await AsyncStorage.setItem('@user', JSON.stringify(mockUser));
-      setUser(mockUser);
+      await AsyncStorage.setItem('@user', JSON.stringify(userProfile));
+      setUser(userProfile);
       router.replace('/(tabs)');
     } catch (error) {
       console.error('Registration failed', error);
@@ -108,10 +135,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
   
-  const updateUser = async (userData: Partial<User>) => {
+  const updateUser = async (userData: Partial<UserProfile>) => {
     try {
       if (!user) return;
       
+      // Update profile in database
+      if (user.id) {
+        const profileData: any = {};
+        
+        // Map user profile fields to profile model fields
+        if (userData.name) profileData.name = userData.name;
+        if (userData.photo) profileData.photo = userData.photo;
+        if (userData.occupation) profileData.occupation = userData.occupation;
+        if (userData.bio) profileData.bio = userData.bio;
+        if (userData.interests) profileData.interests = userData.interests;
+        
+        if (Object.keys(profileData).length > 0) {
+          await profileService.saveProfile({
+            user_id: user.id,
+            ...profileData
+          });
+        }
+      }
+      
+      // Update local user state
       const updatedUser = { ...user, ...userData };
       await AsyncStorage.setItem('@user', JSON.stringify(updatedUser));
       setUser(updatedUser);
