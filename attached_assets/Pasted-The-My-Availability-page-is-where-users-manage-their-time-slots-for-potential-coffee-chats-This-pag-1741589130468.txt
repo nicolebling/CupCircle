@@ -1,0 +1,86 @@
+The My Availability page is where users manage their time slots for potential coffee chats. This page allows users to set, view, and delete time slots when they're available to meet with other professionals.
+
+Visual Design
+Color Scheme: Orange/coffee theme (#F97415) as primary color, white backgrounds, dark brown text (#1E1916)
+Typography: K2D font family
+Layout: Single column, scrollable view with two main sections - calendar and time slot list
+States
+Empty State: When no availability slots have been added
+Loading State: While fetching existing availability data
+Listing State: Displaying all available time slots
+Adding State: When user is adding a new time slot
+Error State: When there's an issue with adding or removing time slots
+Core Components
+Header Section
+
+Page title ("My Availability")
+Add button (plus icon) to create new time slots
+Brief instruction text explaining the purpose
+Calendar Section
+
+Weekly calendar view showing next 7 days
+Date selection with day of week visible
+Current date highlighted
+Visual indicators for dates with existing availability
+Disabled styling for past dates
+Time Selector
+
+Time picker in 30-minute increments
+Options limited to reasonable coffee chat hours (8:00 AM - 7:00 PM)
+Clear indication that all time slots are 30 minutes in duration
+Helper text explaining the purpose of setting availability
+Availability List Section
+
+List of all saved time slots
+Each item shows date, day of week, and time range
+Delete button for each time slot
+Empty state message when no slots exist
+Visual grouping by date
+Add Time Slot Modal
+
+Date picker (pre-selected based on calendar view)
+Time picker for selecting start time
+Clear indication that end time will be automatically set to 30 minutes later
+Save button
+Cancel button
+Functionality
+Data Fetching
+
+Load existing availability slots on mount
+Refresh list after adding/removing slots
+Sort slots chronologically
+Time Validation
+
+Prevent selecting times in the past
+Enforce time slot duration of 30 minutes
+Prevent overlapping time slots
+Limit to 7 days in advance
+Time Management
+
+Add new time slots with date and start time
+Automatically calculate end time (30 minutes after start)
+Delete existing time slots
+Clear confirmation for deletion
+Time Zone Handling
+
+All times displayed in the user's local time zone
+Clear indication of time zone being used
+Proper storage of UTC timestamps
+User Experience Notes
+Smooth transitions between states
+Intuitive date and time selection
+Clear, concise instructions and error messages
+Toast notifications for successful actions and errors
+Consistent loading indicators
+Pull-to-refresh functionality to update availability list
+Haptic feedback for important actions
+Error Handling
+Friendly error messages for failed operations
+Retry options for network failures
+Validation feedback before submission
+Clear error states with recovery paths
+Accessibility Considerations
+Large touch targets for time and date selection
+High contrast text and icons
+Screen reader friendly labels
+Support for system font sizing
