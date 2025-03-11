@@ -7,6 +7,7 @@ import Button from './ui/Button';
 import { Ionicons } from '@expo/vector-icons';
 import IndustrySelector from './IndustrySelector';
 import ExperienceLevelSelector from './ExperienceLevelSelector';
+import InterestSelector from './InterestSelector';
 
 const { width } = Dimensions.get('window');
 
@@ -591,17 +592,10 @@ export default function ProfileCard({
         {/* Interests */}
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>Interests</Text>
-          <TextInput
-            style={[
-              styles.textArea,
-              { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }
-            ]}
-            value={userData.interests ? userData.interests.join(', ') : ''}
-            onChangeText={(value) => handleChange('interests', value.split(',').map(item => item.trim()).filter(item => item !== ''))}
-            placeholder="React, UX Design, Entrepreneurship, etc. (comma separated)"
-            placeholderTextColor={colors.secondaryText}
-            multiline
-            numberOfLines={3}
+          <InterestSelector
+            selectedInterests={userData.interests || []}
+            onInterestsChange={(interests) => handleChange('interests', interests)}
+            maxInterests={10}
           />
         </View>
 
