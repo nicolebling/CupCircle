@@ -181,11 +181,12 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   selectedBubble: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-    marginRight: 8,
-    marginBottom: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+    marginRight: 6,
+    marginBottom: 6,
+    alignSelf: 'flex-start', // Make bubble width fit content
   },
   selectedBubbleText: {
     fontFamily: 'K2D-Medium',
