@@ -1,240 +1,152 @@
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+} from "react-native";
+import { useRouter } from 'expo-router';
 
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, SafeAreaView, KeyboardAvoidingView, Platform, Image } from 'react-native';
-import { Link } from 'expo-router';
-import Colors from '@/constants/Colors';
-import { useAuth } from '@/contexts/AuthContext';
-import { Ionicons } from '@expo/vector-icons';
+export default function AuthScreen({ navigation }) {
+  const [isLogin, setIsLogin] = useState(true); // Toggle between Login & Register
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const router = useRouter();
 
-export default function LoginScreen() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
 
-  const { signIn } = useAuth();
-  const colors = Colors.light;
+  useEffect(() => {
+    // Redirect to the auth page if not already there - for example, after successful authentication. This would need further implementation based on your auth strategy.
+    // This example only shows how to use the router. You need to add the actual authentication logic here.
 
-  const handleLogin = async () => {
-    setError('');
+    // Placeholder - replace with your authentication check logic
+    const isAuthenticated = false; // Replace with actual authentication check
 
-    // Simple validation
-    if (!email || !password) {
-      setError('Email and password are required');
-      return;
+    if (!isAuthenticated && router.route !== '/(auth)/auth') {
+      router.replace('/(auth)/auth');
     }
-
-    setLoading(true);
-    try {
-      await signIn(email, password);
-      // Navigation is handled inside signIn function in AuthContext
-    } catch (err: any) {
-      setError(err.message || 'Login failed');
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [router]);
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      <KeyboardAvoidingView 
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.keyboardAvoidingView}
+    <View style={styles.container}>
+      <Text style={styles.title}>CupCircle</Text>
+      <Text style={styles.subtitle}>Where every cup connects</Text>
+
+      {/* Toggle Buttons */}
+      <View style={styles.switchContainer}>
+        <TouchableOpacity
+          onPress={() => setIsLogin(true)}
+          style={[styles.switchButton, isLogin && styles.activeButton]}
+        >
+          <Text style={isLogin ? styles.activeText : styles.inactiveText}>
+            Login
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => setIsLogin(false)}
+          style={[styles.switchButton, !isLogin && styles.activeButton]}
+        >
+          <Text style={!isLogin ? styles.activeText : styles.inactiveText}>
+            Register
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Input Fields */}
+      <TextInput
+        style={styles.input}
+        placeholder="Email"
+        value={email}
+        onChangeText={setEmail}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Password"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+      />
+
+      {/* Register has extra fields */}
+      {!isLogin && (
+        <>
+          <TextInput
+            style={styles.input}
+            placeholder="Confirm Password"
+            secureTextEntry
+          />
+        </>
+      )}
+
+      {/* Submit Button */}
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() =>
+          console.log(isLogin ? "Logging in..." : "Registering...")
+        }
       >
-        <View style={styles.content}>
-          <View style={styles.header}>
-            <Image 
-              source={require('@/assets/images/logo.png')} 
-              style={styles.logo} 
-              resizeMode="contain"
-            />
-            <Text style={[styles.title, { color: colors.text }]}>CupCircle</Text>
-            <Text style={[styles.subtitle, { color: colors.secondaryText }]}>
-              Where every cup connects
-            </Text>
-          </View>
+        <Text style={styles.buttonText}>{isLogin ? "Login" : "Register"}</Text>
+      </TouchableOpacity>
 
-          <View style={styles.formContainer}>
-            <Text style={[styles.formTitle, { color: colors.text }]}>Welcome Back</Text>
-            
-            {error ? (
-              <View style={styles.errorContainer}>
-                <Text style={styles.errorText}>{error}</Text>
-              </View>
-            ) : null}
-
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={[styles.input, { color: colors.text, borderColor: colors.border }]}
-                placeholder="Email"
-                placeholderTextColor={colors.placeholder}
-                value={email}
-                onChangeText={setEmail}
-                autoCapitalize="none"
-                keyboardType="email-address"
-              />
-            </View>
-
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={[styles.input, { color: colors.text, borderColor: colors.border }]}
-                placeholder="Password"
-                placeholderTextColor={colors.placeholder}
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry={!showPassword}
-              />
-              <TouchableOpacity 
-                style={styles.passwordVisibilityButton}
-                onPress={() => setShowPassword(!showPassword)}
-              >
-                <Ionicons 
-                  name={showPassword ? 'eye-off' : 'eye'} 
-                  size={24} 
-                  color={colors.secondaryText} 
-                />
-              </TouchableOpacity>
-            </View>
-
-            <TouchableOpacity 
-              style={[styles.button, { backgroundColor: colors.primary }]}
-              onPress={handleLogin}
-              disabled={loading}
-            >
-              <Text style={styles.buttonText}>
-                {loading ? 'Logging in...' : 'Log In'}
-              </Text>
-            </TouchableOpacity>
-
-            <Link href="/(auth)/forgot-password" asChild>
-              <TouchableOpacity style={styles.forgotPasswordButton}>
-                <Text style={[styles.forgotPasswordText, { color: colors.secondaryText }]}>
-                  Forgot Password?
-                </Text>
-              </TouchableOpacity>
-            </Link>
-          </View>
-
-          <View style={styles.footer}>
-            <Text style={[styles.footerText, { color: colors.secondaryText }]}>
-              Don't have an account?
-            </Text>
-            <Link href="/(auth)/register" asChild>
-              <TouchableOpacity>
-                <Text style={[styles.registerLink, { color: colors.primary }]}>Sign Up</Text>
-              </TouchableOpacity>
-            </Link>
-          </View>
-        </View>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+      {/* Optional Sign-in with LinkedIn (Login Only) */}
+      {isLogin && (
+        <TouchableOpacity
+          style={styles.linkedInButton}
+          onPress={() => console.log("Login with LinkedIn")}
+        >
+          <Text style={styles.linkedInText}>Sign in with LinkedIn</Text>
+        </TouchableOpacity>
+      )}
+    </View>
   );
 }
 
+// Styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#F5F5F5",
   },
-  keyboardAvoidingView: {
-    flex: 1,
-  },
-  content: {
-    flex: 1,
-    padding: 20,
-    justifyContent: 'space-between',
-  },
-  header: {
-    alignItems: 'center',
-    marginTop: 40,
-  },
-  logo: {
-    width: 80,
-    height: 80,
-    marginBottom: 10,
-  },
-  title: {
-    fontSize: 32,
-    fontFamily: 'K2D-Bold',
-  },
-  subtitle: {
-    fontSize: 16,
-    fontFamily: 'K2D-Regular',
-    marginTop: 5,
-  },
-  formContainer: {
-    width: '100%',
-    maxWidth: 400,
-    alignSelf: 'center',
-    marginVertical: 30,
-  },
-  formTitle: {
-    fontSize: 24,
-    fontFamily: 'K2D-SemiBold',
+  title: { fontSize: 32, fontWeight: "bold", color: "#E76F51" },
+  subtitle: { fontSize: 16, color: "#757575", marginBottom: 20 },
+  switchContainer: {
+    flexDirection: "row",
+    backgroundColor: "#eee",
+    borderRadius: 20,
+    padding: 5,
     marginBottom: 20,
-    textAlign: 'center',
   },
-  errorContainer: {
-    backgroundColor: '#ffebee',
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 15,
-  },
-  errorText: {
-    color: '#c62828',
-    fontFamily: 'K2D-Regular',
-    textAlign: 'center',
-  },
-  inputContainer: {
-    marginBottom: 15,
-    position: 'relative',
-  },
+  switchButton: { padding: 10, paddingHorizontal: 30, borderRadius: 20 },
+  activeButton: { backgroundColor: "#E76F51" },
+  activeText: { color: "#fff", fontWeight: "bold" },
+  inactiveText: { color: "#757575" },
   input: {
+    width: "80%",
     height: 50,
     borderWidth: 1,
-    borderRadius: 10,
-    paddingHorizontal: 15,
-    fontSize: 16,
-    fontFamily: 'K2D-Regular',
-  },
-  passwordVisibilityButton: {
-    position: 'absolute',
-    right: 15,
-    top: 13,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 10,
   },
   button: {
-    height: 50,
-    borderRadius: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 10,
+    width: "80%",
+    backgroundColor: "#E76F51",
+    padding: 15,
+    alignItems: "center",
+    borderRadius: 8,
+    marginBottom: 10,
   },
-  buttonText: {
-    color: 'white',
-    fontSize: 16,
-    fontFamily: 'K2D-SemiBold',
+  buttonText: { color: "#fff", fontSize: 16 },
+  linkedInButton: {
+    width: "80%",
+    borderWidth: 1,
+    borderColor: "#E76F51",
+    padding: 15,
+    alignItems: "center",
+    borderRadius: 8,
   },
-  forgotPasswordButton: {
-    alignSelf: 'center',
-    marginTop: 15,
-    padding: 5,
-  },
-  forgotPasswordText: {
-    fontSize: 14,
-    fontFamily: 'K2D-Regular',
-  },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 5,
-  },
-  footerText: {
-    fontSize: 14,
-    fontFamily: 'K2D-Regular',
-  },
-  registerLink: {
-    fontSize: 14,
-    fontFamily: 'K2D-SemiBold',
-  },
+  linkedInText: { color: "#E76F51", fontSize: 16 },
 });
