@@ -503,6 +503,64 @@ export default function ProfileCard({
             placeholder="Your education background"
             placeholderTextColor={colors.secondaryText}
           />
+          
+          <Text style={[styles.label, { color: colors.secondaryText }]}>Industries</Text>
+          <TextInput
+            style={[
+              styles.input,
+              { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }
+            ]}
+            value={userData.industries ? userData.industries.join(', ') : ''}
+            onChangeText={(value) => handleChange('industries', value.split(',').map(item => item.trim()).filter(item => item !== ''))}
+            placeholder="Tech, Finance, Marketing, etc. (comma separated)"
+            placeholderTextColor={colors.secondaryText}
+          />
+        </View>
+
+        {/* Location Preferences */}
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Location Preferences</Text>
+          
+          <Text style={[styles.label, { color: colors.secondaryText }]}>Neighborhoods</Text>
+          <TextInput
+            style={[
+              styles.input,
+              { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }
+            ]}
+            value={userData.neighborhoods ? userData.neighborhoods.join(', ') : ''}
+            onChangeText={(value) => handleChange('neighborhoods', value.split(',').map(item => item.trim()).filter(item => item !== ''))}
+            placeholder="Downtown, Tech District, etc. (comma separated)"
+            placeholderTextColor={colors.secondaryText}
+          />
+          
+          <Text style={[styles.label, { color: colors.secondaryText }]}>Favorite Cafes</Text>
+          <TextInput
+            style={[
+              styles.input,
+              { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }
+            ]}
+            value={userData.favoriteCafes ? userData.favoriteCafes.join(', ') : ''}
+            onChangeText={(value) => handleChange('favoriteCafes', value.split(',').map(item => item.trim()).filter(item => item !== ''))}
+            placeholder="Coffee House, Bean There, etc. (comma separated)"
+            placeholderTextColor={colors.secondaryText}
+          />
+        </View>
+        
+        {/* Interests */}
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Interests</Text>
+          <TextInput
+            style={[
+              styles.textArea,
+              { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }
+            ]}
+            value={userData.interests ? userData.interests.join(', ') : ''}
+            onChangeText={(value) => handleChange('interests', value.split(',').map(item => item.trim()).filter(item => item !== ''))}
+            placeholder="React, UX Design, Entrepreneurship, etc. (comma separated)"
+            placeholderTextColor={colors.secondaryText}
+            multiline
+            numberOfLines={3}
+          />
         </View>
 
         {/* Bio */}
