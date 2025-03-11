@@ -1,10 +1,19 @@
-
-import React, { useState } from 'react';
-import { View, Text, Image, StyleSheet, Dimensions, TouchableOpacity, ScrollView, TextInput, ActivityIndicator } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { 
+  View, 
+  Text, 
+  Image, 
+  TouchableOpacity, 
+  StyleSheet, 
+  ScrollView, 
+  TextInput,
+  ActivityIndicator,
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import InterestSelector from './InterestSelector';
 import Button from './ui/Button';
-import { Ionicons } from '@expo/vector-icons';
 import IndustrySelector from './IndustrySelector';
 import ExperienceLevelSelector from './ExperienceLevelSelector';
 
@@ -105,7 +114,7 @@ export default function ProfileCard({
   const [userData, setUserData] = useState<UserProfileData>(profile);
   const [isSaving, setIsSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  
+
   // Function to handle edit button press
   const handleEdit = () => {
     if (onSave) {
@@ -165,14 +174,14 @@ export default function ProfileCard({
     return (
       <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
         <Image source={{ uri: profile.photo }} style={styles.image} />
-        
+
         {profile.matchedCafe && (
           <View style={[styles.matchBadge, { backgroundColor: colors.primary }]}>
             <Ionicons name="cafe" size={14} color="white" />
             <Text style={styles.matchBadgeText}>Café Match</Text>
           </View>
         )}
-        
+
         <View style={styles.content}>
           <View style={styles.nameRow}>
             <Text style={[styles.name, { color: colors.text }]}>
@@ -185,19 +194,19 @@ export default function ProfileCard({
               </View>
             )}
           </View>
-          
+
           <View style={[styles.occupationBadge, { backgroundColor: colors.primary + '20' }]}>
             <Ionicons name="briefcase-outline" size={14} color={colors.primary} style={styles.occupationIcon} />
             <Text style={[styles.occupation, { color: colors.primary }]}>{profile.occupation}</Text>
           </View>
-          
+
           <View style={styles.divider} />
-          
+
           <Text style={[styles.sectionTitle, { color: colors.text }]}>About</Text>
           <Text style={[styles.sectionText, { color: colors.secondaryText }]} numberOfLines={3}>
             {profile.bio}
           </Text>
-          
+
           <Text style={[styles.sectionTitle, { color: colors.text }]}>Interests</Text>
           <View style={styles.interestsContainer}>
             {profile.interests && profile.interests.slice(0, 5).map((interest, index) => (
@@ -212,7 +221,7 @@ export default function ProfileCard({
               </View>
             ))}
           </View>
-          
+
           {profile.favoriteCafes && profile.favoriteCafes.length > 0 && (
             <>
               <Text style={[styles.sectionTitle, { color: colors.text }]}>Favorite Cafes</Text>
@@ -233,7 +242,7 @@ export default function ProfileCard({
               </View>
             </>
           )}
-          
+
           {profile.neighborhoods && profile.neighborhoods.length > 0 && (
             <>
               <Text style={[styles.sectionTitle, { color: colors.text }]}>Neighborhoods</Text>
@@ -254,7 +263,7 @@ export default function ProfileCard({
               </View>
             </>
           )}
-          
+
           {profile.experience && (
             <>
               <Text style={[styles.sectionTitle, { color: colors.text }]}>Experience</Text>
@@ -264,7 +273,7 @@ export default function ProfileCard({
             </>
           )}
         </View>
-        
+
         {onLike && onSkip && (
           <View style={styles.buttonsContainer}>
             <TouchableOpacity 
@@ -273,7 +282,7 @@ export default function ProfileCard({
             >
               <Ionicons name="close" size={24} color="#EF4444" />
             </TouchableOpacity>
-            
+
             <TouchableOpacity 
               onPress={onLike} 
               style={[styles.actionButton, styles.likeButton, { backgroundColor: '#DCFCE7' }]}
@@ -320,7 +329,7 @@ export default function ProfileCard({
           {/* Professional Details */}
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>Professional Details</Text>
-            
+
             {profile.experienceLevel && (
               <>
                 <Text style={[styles.label, { color: colors.secondaryText }]}>Experience Level</Text>
@@ -393,7 +402,7 @@ export default function ProfileCard({
           {/* Location */}
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>Location Preferences</Text>
-            
+
             {profile.city && (
               <>
                 <Text style={[styles.label, { color: colors.secondaryText }]}>City</Text>
@@ -550,7 +559,7 @@ export default function ProfileCard({
             placeholder="Your education background"
             placeholderTextColor={colors.secondaryText}
           />
-          
+
           <Text style={[styles.label, { color: colors.secondaryText }]}>Industries (select up to 3)</Text>
           <IndustrySelector
             selectedIndustries={userData.industries || []}
@@ -562,7 +571,7 @@ export default function ProfileCard({
         {/* Location Preferences */}
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>Location Preferences</Text>
-          
+
           <Text style={[styles.label, { color: colors.secondaryText }]}>Neighborhoods</Text>
           <TextInput
             style={[
@@ -574,7 +583,7 @@ export default function ProfileCard({
             placeholder="Downtown, Tech District, etc. (comma separated)"
             placeholderTextColor={colors.secondaryText}
           />
-          
+
           <Text style={[styles.label, { color: colors.secondaryText }]}>Favorite Cafes</Text>
           <TextInput
             style={[
@@ -587,21 +596,13 @@ export default function ProfileCard({
             placeholderTextColor={colors.secondaryText}
           />
         </View>
-        
+
         {/* Interests */}
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>Interests</Text>
-          <TextInput
-            style={[
-              styles.textArea,
-              { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }
-            ]}
-            value={userData.interests ? userData.interests.join(', ') : ''}
-            onChangeText={(value) => handleChange('interests', value.split(',').map(item => item.trim()).filter(item => item !== ''))}
-            placeholder="React, UX Design, Entrepreneurship, etc. (comma separated)"
-            placeholderTextColor={colors.secondaryText}
-            multiline
-            numberOfLines={3}
+          <InterestSelector 
+            selectedInterests={userData.interests || []}
+            onInterestsChange={(interests) => handleChange('interests', interests)}
           />
         </View>
 
@@ -681,7 +682,7 @@ const styles = StyleSheet.create({
     fontFamily: 'K2D-Bold',
     fontSize: 24,
   },
-  
+
   // Matching card styles
   image: {
     width: '100%',
@@ -798,7 +799,7 @@ const styles = StyleSheet.create({
   likeButton: {
     // Styles specific to like button
   },
-  
+
   // User profile styles
   photoContainer: {
     alignItems: 'center',
