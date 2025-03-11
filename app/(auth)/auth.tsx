@@ -8,12 +8,9 @@ import {
   Linking,
   ActivityIndicator,
 } from "react-native";
-import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { insertUserSchema } from "@db/schema";
-import { useUser } from "@/hooks/use-user";
-import { useToast } from "@/hooks/use-toast";
-import { createClient } from "@supabase/supabase-js";
+import { useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useApi } from '@/hooks/useApi';
 import { Button, Card, Divider } from "react-native-paper";
 
 // Mock Legal Content Modal
