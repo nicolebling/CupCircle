@@ -121,9 +121,6 @@ export default function ChatsScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={styles.header}>
-        <Text style={[styles.title, { color: colors.text }]}>Messages</Text>
-      </View>
 
       <View style={[styles.searchContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
         <Ionicons name="search" size={20} color={colors.secondaryText} />
@@ -168,6 +165,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginHorizontal: 16,
+    marginTop: 16,
     marginBottom: 16,
     paddingHorizontal: 12,
     height: 44,
