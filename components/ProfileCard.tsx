@@ -182,7 +182,8 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   matchBadgeText: {
-    fontFamily: 'K2D-Medium',
+    fontFamily: 'Arial, sans-serif',
+    fontWeight: '500',
     fontSize: 12,
     color: 'white',
     marginLeft: 4,
@@ -197,7 +198,8 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   name: {
-    fontFamily: 'K2D-Bold',
+    fontFamily: 'Arial, sans-serif',
+    fontWeight: 'bold',
     fontSize: 24,
   },
   locationContainer: {
@@ -205,7 +207,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   location: {
-    fontFamily: 'K2D-Regular',
+    fontFamily: 'Arial, sans-serif',
     fontSize: 14,
     marginLeft: 4,
   },
@@ -222,7 +224,8 @@ const styles = StyleSheet.create({
     marginRight: 6,
   },
   occupation: {
-    fontFamily: 'K2D-Medium',
+    fontFamily: 'Arial, sans-serif',
+    fontWeight: '500',
     fontSize: 14,
   },
   divider: {
@@ -231,12 +234,13 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   sectionTitle: {
-    fontFamily: 'K2D-SemiBold',
+    fontFamily: 'Arial, sans-serif',
+    fontWeight: '600',
     fontSize: 16,
     marginBottom: 4,
   },
   sectionText: {
-    fontFamily: 'K2D-Regular',
+    fontFamily: 'Arial, sans-serif',
     fontSize: 14,
     marginBottom: 16,
     lineHeight: 20,
@@ -254,7 +258,8 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   interestText: {
-    fontFamily: 'K2D-Medium',
+    fontFamily: 'Arial, sans-serif',
+    fontWeight: '500',
     fontSize: 12,
   },
   buttonsContainer: {

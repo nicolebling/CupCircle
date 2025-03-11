@@ -389,7 +389,8 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   title: {
-    fontFamily: 'K2D-Bold',
+    fontFamily: 'Arial, sans-serif',
+    fontWeight: 'bold',
     fontSize: 24,
   },
   photoContainer: {
@@ -416,17 +417,19 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   sectionTitle: {
-    fontFamily: 'K2D-SemiBold',
+    fontFamily: 'Arial, sans-serif',
+    fontWeight: '600',
     fontSize: 18,
     marginBottom: 16,
   },
   label: {
-    fontFamily: 'K2D-Medium',
+    fontFamily: 'Arial, sans-serif',
+    fontWeight: '500',
     fontSize: 14,
     marginBottom: 8,
   },
   value: {
-    fontFamily: 'K2D-Regular',
+    fontFamily: 'Arial, sans-serif',
     fontSize: 16,
     marginBottom: 16,
   },
@@ -443,7 +446,8 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   tagText: {
-    fontFamily: 'K2D-Medium',
+    fontFamily: 'Arial, sans-serif',
+    fontWeight: '500',
     fontSize: 12,
   },
   input: {
@@ -452,7 +456,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 12,
     marginBottom: 16,
-    fontFamily: 'K2D-Regular',
+    fontFamily: 'Arial, sans-serif',
     fontSize: 16,
   },
   textArea: {
@@ -462,12 +466,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingTop: 12,
     marginBottom: 8,
-    fontFamily: 'K2D-Regular',
+    fontFamily: 'Arial, sans-serif',
     fontSize: 16,
     textAlignVertical: 'top',
   },
   characterCount: {
-    fontFamily: 'K2D-Regular',
+    fontFamily: 'Arial, sans-serif',
     fontSize: 12,
     alignSelf: 'flex-end',
     marginBottom: 16,
@@ -486,7 +490,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     color: 'red',
-    fontFamily: 'K2D-Regular',
+    fontFamily: 'Arial, sans-serif',
     fontSize: 12,
     marginTop: -12,
     marginBottom: 16,
@@ -499,7 +503,8 @@ const styles = StyleSheet.create({
   },
   errorSummaryText: {
     color: 'red',
-    fontFamily: 'K2D-Medium',
+    fontFamily: 'Arial, sans-serif',
+    fontWeight: '500',
     fontSize: 14,
   },
 });

@@ -358,11 +358,12 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   title: {
-    fontFamily: 'K2D-Bold',
+    fontFamily: 'Arial, sans-serif',
+    fontWeight: 'bold',
     fontSize: 24,
   },
   subtitle: {
-    fontFamily: 'K2D-Regular',
+    fontFamily: 'Arial, sans-serif',
     fontSize: 14,
     marginBottom: 24,
   },
@@ -389,12 +390,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F5F5',
   },
   dayText: {
-    fontFamily: 'K2D-Medium',
+    fontFamily: 'Arial, sans-serif',
+    fontWeight: '500',
     fontSize: 14,
     marginBottom: 4,
   },
   dateText: {
-    fontFamily: 'K2D-Bold',
+    fontFamily: 'Arial, sans-serif',
+    fontWeight: 'bold',
     fontSize: 20,
   },
   dotIndicator: {
@@ -414,7 +417,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   sectionTitle: {
-    fontFamily: 'K2D-SemiBold',
+    fontFamily: 'Arial, sans-serif',
+    fontWeight: '600',
     fontSize: 18,
     marginBottom: 16,
   },
@@ -424,7 +428,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   loadingText: {
-    fontFamily: 'K2D-Regular',
+    fontFamily: 'Arial, sans-serif',
     fontSize: 16,
     marginTop: 16,
   },
@@ -434,14 +438,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   emptyStateText: {
-    fontFamily: 'K2D-Medium',
+    fontFamily: 'Arial, sans-serif',
+    fontWeight: '500',
     fontSize: 16,
     marginTop: 16,
     marginBottom: 8,
     textAlign: 'center',
   },
   emptyStateSubtext: {
-    fontFamily: 'K2D-Regular',
+    fontFamily: 'Arial, sans-serif',
     fontSize: 14,
     textAlign: 'center',
     paddingHorizontal: 32,
@@ -453,7 +458,8 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   dateGroupTitle: {
-    fontFamily: 'K2D-Medium',
+    fontFamily: 'Arial, sans-serif',
+    fontWeight: '500',
     fontSize: 16,
     marginBottom: 8,
   },
@@ -464,17 +470,19 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   addSlotTitle: {
-    fontFamily: 'K2D-SemiBold',
+    fontFamily: 'Arial, sans-serif',
+    fontWeight: '600',
     fontSize: 18,
     marginBottom: 8,
   },
   selectedDateText: {
-    fontFamily: 'K2D-Regular',
+    fontFamily: 'Arial, sans-serif',
     fontSize: 16,
     marginBottom: 16,
   },
   timeSelectorLabel: {
-    fontFamily: 'K2D-Medium',
+    fontFamily: 'Arial, sans-serif',
+    fontWeight: '500',
     fontSize: 14,
     marginBottom: 8,
   },
@@ -495,14 +503,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F5F5',
   },
   timeText: {
-    fontFamily: 'K2D-Regular',
+    fontFamily: 'Arial, sans-serif',
     fontSize: 14,
   },
   disabledTime: {
     opacity: 0.5,
   },
   endTimeText: {
-    fontFamily: 'K2D-Regular',
+    fontFamily: 'Arial, sans-serif',
     fontSize: 14,
     marginBottom: 16,
   },
@@ -513,7 +521,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   saveButtonText: {
-    fontFamily: 'K2D-SemiBold',
+    fontFamily: 'Arial, sans-serif',
+    fontWeight: '600',
     fontSize: 16,
     color: 'white',
   },
