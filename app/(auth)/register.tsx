@@ -51,12 +51,7 @@ export default function RegisterScreen() {
       >
         <View style={styles.content}>
           <View style={styles.logoContainer}>
-            <Image 
-              source={require('@/assets/images/logo.png')} 
-              style={styles.logo}
-              resizeMode="contain"
-            />
-            <Text style={[styles.appName, { color: colors.text }]}>CupCircle</Text>
+            <Text style={styles.logoText}>Cup Circle</Text>
           </View>
 
           <Text style={[styles.title, { color: colors.text }]}>Create an Account</Text>
@@ -194,11 +189,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 30,
   },
-  logo: {
-    width: 150,
-    height: 150,
-  },
-  appName: {
+  logoText: {
     fontFamily: 'K2D-Bold',
     fontSize: 24,
     marginTop: 10,
