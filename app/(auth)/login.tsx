@@ -1,207 +1,137 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
-import { Link } from 'expo-router';
-import { useAuth } from '@/contexts/AuthContext';
-import { useColorScheme } from '@/hooks/useColorScheme';
-import Colors from '@/constants/Colors';
-import Input from '@/components/ui/Input';
-import Button from '@/components/ui/Button';
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+} from "react-native";
 
-export default function LoginScreen() {
-  const { signIn } = useAuth();
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
-
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [errors, setErrors] = useState({ email: '', password: '' });
-  const [isLoading, setIsLoading] = useState(false);
-
-  const validateForm = () => {
-    let isValid = true;
-    const newErrors = { email: '', password: '' };
-
-    if (!email) {
-      newErrors.email = 'Email is required';
-      isValid = false;
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = 'Email is invalid';
-      isValid = false;
-    }
-
-    if (!password) {
-      newErrors.password = 'Password is required';
-      isValid = false;
-    }
-
-    setErrors(newErrors);
-    return isValid;
-  };
-
-  const handleLogin = async () => {
-    if (!validateForm()) return;
-
-    setIsLoading(true);
-    try {
-      await signIn(email, password);
-    } catch (error) {
-      alert('Login failed. Please check your credentials.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+export default function AuthScreen({ navigation }) {
+  const [isLogin, setIsLogin] = useState(true); // Toggle between Login & Register
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <ScrollView
-        contentContainerStyle={[
-          styles.container,
-          { backgroundColor: colors.background }
-        ]}
-      >
-        <View style={styles.logoContainer}>
-          <Text style={styles.logoText}>CupCircle</Text>
-          {/*Removed Image component as per the intention of removing image logo*/}
-          <Text style={[styles.appName, { color: colors.text }]}>CupCircle</Text>
-          <Text style={[styles.tagline, { color: colors.secondaryText }]}>
-            Connect over coffee. Build your network.
+    <View style={styles.container}>
+      <Text style={styles.title}>CupCircle</Text>
+      <Text style={styles.subtitle}>Where every cup connects</Text>
+
+      {/* Toggle Buttons */}
+      <View style={styles.switchContainer}>
+        <TouchableOpacity
+          onPress={() => setIsLogin(true)}
+          style={[styles.switchButton, isLogin && styles.activeButton]}
+        >
+          <Text style={isLogin ? styles.activeText : styles.inactiveText}>
+            Login
           </Text>
-        </View>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => setIsLogin(false)}
+          style={[styles.switchButton, !isLogin && styles.activeButton]}
+        >
+          <Text style={!isLogin ? styles.activeText : styles.inactiveText}>
+            Register
+          </Text>
+        </TouchableOpacity>
+      </View>
 
-        <View style={styles.formContainer}>
-          <Input
-            label="Email"
-            placeholder="Enter your email"
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            error={errors.email}
-          />
+      {/* Input Fields */}
+      <TextInput
+        style={styles.input}
+        placeholder="Email"
+        value={email}
+        onChangeText={setEmail}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Password"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+      />
 
-          <Input
-            label="Password"
-            placeholder="Enter your password"
-            value={password}
-            onChangeText={setPassword}
+      {/* Register has extra fields */}
+      {!isLogin && (
+        <>
+          <TextInput
+            style={styles.input}
+            placeholder="Confirm Password"
             secureTextEntry
-            error={errors.password}
           />
+        </>
+      )}
 
-          <TouchableOpacity style={styles.forgotPassword}>
-            <Text style={[styles.forgotPasswordText, { color: colors.primary }]}>
-              Forgot Password?
-            </Text>
-          </TouchableOpacity>
+      {/* Submit Button */}
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() =>
+          console.log(isLogin ? "Logging in..." : "Registering...")
+        }
+      >
+        <Text style={styles.buttonText}>{isLogin ? "Login" : "Register"}</Text>
+      </TouchableOpacity>
 
-          <Button
-            title="Log In"
-            onPress={handleLogin}
-            style={styles.loginButton}
-            loading={isLoading}
-          />
-
-          <View style={styles.dividerContainer}>
-            <View style={[styles.divider, { backgroundColor: colors.border }]} />
-            <Text style={[styles.dividerText, { color: colors.secondaryText }]}>or</Text>
-            <View style={[styles.divider, { backgroundColor: colors.border }]} />
-          </View>
-
-          <Button
-            title="Connect with LinkedIn"
-            onPress={() => {}}
-            variant="outline"
-            style={styles.socialButton}
-          />
-        </View>
-
-        <View style={styles.footer}>
-          <Text style={[styles.footerText, { color: colors.secondaryText }]}>
-            Don't have an account?{' '}
-          </Text>
-          <Link href="/(auth)/register" asChild>
-            <TouchableOpacity>
-              <Text style={[styles.footerLink, { color: colors.primary }]}>Sign Up</Text>
-            </TouchableOpacity>
-          </Link>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+      {/* Optional Sign-in with LinkedIn (Login Only) */}
+      {isLogin && (
+        <TouchableOpacity
+          style={styles.linkedInButton}
+          onPress={() => console.log("Login with LinkedIn")}
+        >
+          <Text style={styles.linkedInText}>Sign in with LinkedIn</Text>
+        </TouchableOpacity>
+      )}
+    </View>
   );
 }
 
+// Styles
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
-    padding: 20,
-    justifyContent: 'center',
-  },
-  logoContainer: {
-    alignItems: 'center',
-    marginBottom: 40,
-  },
-  logoText: {
-    fontFamily: 'K2D-Bold',
-    fontSize: 28,
-    color: '#F97415',
-    textAlign: 'center',
-  },
-  appName: {
-    fontFamily: 'K2D-Bold',
-    fontSize: 32,
-    marginTop: 16,
-  },
-  tagline: {
-    fontFamily: 'K2D-Regular',
-    fontSize: 16,
-    marginTop: 8,
-    textAlign: 'center',
-  },
-  formContainer: {
-    marginBottom: 20,
-  },
-  forgotPassword: {
-    alignSelf: 'flex-end',
-    marginTop: 4,
-    marginBottom: 20,
-  },
-  forgotPasswordText: {
-    fontFamily: 'K2D-Medium',
-    fontSize: 14,
-  },
-  loginButton: {
-    marginBottom: 20,
-  },
-  dividerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  divider: {
     flex: 1,
-    height: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#F5F5F5",
   },
-  dividerText: {
-    fontFamily: 'K2D-Regular',
-    paddingHorizontal: 10,
-    fontSize: 14,
-  },
-  socialButton: {
+  title: { fontSize: 32, fontWeight: "bold", color: "#E76F51" },
+  subtitle: { fontSize: 16, color: "#757575", marginBottom: 20 },
+  switchContainer: {
+    flexDirection: "row",
+    backgroundColor: "#eee",
+    borderRadius: 20,
+    padding: 5,
     marginBottom: 20,
   },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 20,
+  switchButton: { padding: 10, paddingHorizontal: 30, borderRadius: 20 },
+  activeButton: { backgroundColor: "#E76F51" },
+  activeText: { color: "#fff", fontWeight: "bold" },
+  inactiveText: { color: "#757575" },
+  input: {
+    width: "80%",
+    height: 50,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 10,
   },
-  footerText: {
-    fontFamily: 'K2D-Regular',
-    fontSize: 16,
+  button: {
+    width: "80%",
+    backgroundColor: "#E76F51",
+    padding: 15,
+    alignItems: "center",
+    borderRadius: 8,
+    marginBottom: 10,
   },
-  footerLink: {
-    fontFamily: 'K2D-SemiBold',
-    fontSize: 16,
+  buttonText: { color: "#fff", fontSize: 16 },
+  linkedInButton: {
+    width: "80%",
+    borderWidth: 1,
+    borderColor: "#E76F51",
+    padding: 15,
+    alignItems: "center",
+    borderRadius: 8,
   },
+  linkedInText: { color: "#E76F51", fontSize: 16 },
 });
