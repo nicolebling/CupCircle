@@ -124,8 +124,7 @@ const styles = StyleSheet.create({
   },
   greeting: {
     fontSize: 24,
-    fontFamily: 'Arial, sans-serif',
-    fontWeight: 'bold',
+    fontFamily: 'K2D-Bold',
   },
   notificationIcon: {
     width: 40,
@@ -142,8 +141,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontFamily: 'Arial, sans-serif',
-    fontWeight: '600',
+    fontFamily: 'K2D-SemiBold',
     marginBottom: 16,
   },
   meetingCard: {
@@ -166,13 +164,12 @@ const styles = StyleSheet.create({
   },
   personName: {
     fontSize: 16,
-    fontFamily: 'Arial, sans-serif',
-    fontWeight: '600',
+    fontFamily: 'K2D-SemiBold',
     marginBottom: 4,
   },
   position: {
     fontSize: 14,
-    fontFamily: 'Arial, sans-serif',
+    fontFamily: 'K2D-Regular',
   },
   meetingDetails: {
     marginBottom: 12,
@@ -185,7 +182,7 @@ const styles = StyleSheet.create({
   detailText: {
     marginLeft: 8,
     fontSize: 14,
-    fontFamily: 'Arial, sans-serif',
+    fontFamily: 'K2D-Regular',
   },
   actionButtons: {
     flexDirection: 'row',
@@ -200,8 +197,7 @@ const styles = StyleSheet.create({
   buttonText: {
     marginLeft: 6,
     fontSize: 14,
-    fontFamily: 'Arial, sans-serif',
-    fontWeight: '500',
+    fontFamily: 'K2D-Medium',
   },
   rescheduleButton: {
     paddingVertical: 8,
@@ -211,8 +207,7 @@ const styles = StyleSheet.create({
   rescheduleText: {
     color: '#FFF',
     fontSize: 14,
-    fontFamily: 'Arial, sans-serif',
-    fontWeight: '500',
+    fontFamily: 'K2D-Medium',
   },
   emptyState: {
     alignItems: 'center',
@@ -221,8 +216,7 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
-    fontFamily: 'Arial, sans-serif',
-    fontWeight: '500',
+    fontFamily: 'K2D-Medium',
     marginTop: 12,
     marginBottom: 16,
   },
@@ -234,8 +228,7 @@ const styles = StyleSheet.create({
   findButtonText: {
     color: '#FFF',
     fontSize: 14,
-    fontFamily: 'Arial, sans-serif',
-    fontWeight: '600',
+    fontFamily: 'K2D-SemiBold',
   },
   suggestedSection: {
     borderRadius: 16,
@@ -261,19 +254,18 @@ const styles = StyleSheet.create({
   },
   suggestedName: {
     fontSize: 16,
-    fontFamily: 'Arial, sans-serif',
-    fontWeight: '600',
+    fontFamily: 'K2D-SemiBold',
     marginBottom: 4,
     textAlign: 'center',
   },
   suggestedPosition: {
     fontSize: 14,
-    fontFamily: 'Arial, sans-serif',
+    fontFamily: 'K2D-Regular',
     textAlign: 'center',
   },
   suggestedCompany: {
     fontSize: 12,
-    fontFamily: 'Arial, sans-serif',
+    fontFamily: 'K2D-Regular',
     marginBottom: 12,
     textAlign: 'center',
   },
@@ -285,7 +277,6 @@ const styles = StyleSheet.create({
   connectText: {
     color: '#FFF',
     fontSize: 12,
-    fontFamily: 'Arial, sans-serif',
-    fontWeight: '500',
+    fontFamily: 'K2D-Medium',
   },
 });

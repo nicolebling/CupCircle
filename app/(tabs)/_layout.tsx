@@ -21,12 +21,10 @@ export default function TabLayout() {
         },
         headerTintColor: colors.text,
         headerTitleStyle: {
-          fontFamily: 'Arial, sans-serif',
-          fontWeight: '600',
+          fontFamily: 'K2D-SemiBold',
         },
         tabBarLabelStyle: {
-          fontFamily: 'Arial, sans-serif',
-          fontWeight: '500',
+          fontFamily: 'K2D-Medium',
         },
       }}
     >

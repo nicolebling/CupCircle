@@ -5,10 +5,10 @@ import { View, Text, StyleSheet } from 'react-native';
 export default function FontTest() {
   return (
     <View style={styles.container}>
-      <Text style={styles.regular}>Arial Regular</Text>
-      <Text style={styles.medium}>Arial Medium</Text>
-      <Text style={styles.semiBold}>Arial SemiBold</Text>
-      <Text style={styles.bold}>Arial Bold</Text>
+      <Text style={styles.regular}>K2D Regular</Text>
+      <Text style={styles.medium}>K2D Medium</Text>
+      <Text style={styles.semiBold}>K2D SemiBold</Text>
+      <Text style={styles.bold}>K2D Bold</Text>
     </View>
   );
 }
@@ -21,25 +21,22 @@ const styles = StyleSheet.create({
     margin: 10,
   },
   regular: {
-    fontFamily: 'Arial, sans-serif',
+    fontFamily: 'K2D-Regular',
     fontSize: 18,
     marginBottom: 10,
   },
   medium: {
-    fontFamily: 'Arial, sans-serif',
-    fontWeight: '500',
+    fontFamily: 'K2D-Medium',
     fontSize: 18,
     marginBottom: 10,
   },
   semiBold: {
-    fontFamily: 'Arial, sans-serif',
-    fontWeight: '600',
+    fontFamily: 'K2D-SemiBold',
     fontSize: 18,
     marginBottom: 10,
   },
   bold: {
-    fontFamily: 'Arial, sans-serif',
-    fontWeight: 'bold',
+    fontFamily: 'K2D-Bold',
     fontSize: 18,
   }
 });
