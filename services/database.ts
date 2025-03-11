@@ -1,3 +1,4 @@
+
 import { Pool } from 'pg';
 
 // Configuration from environment variable
