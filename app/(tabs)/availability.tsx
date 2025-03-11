@@ -452,6 +452,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
   },
   slotsList: {
+    padding: 16,
     paddingBottom: 24,
   },
   dateGroup: {
