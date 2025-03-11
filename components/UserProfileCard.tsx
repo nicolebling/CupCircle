@@ -389,7 +389,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   title: {
-    fontFamily: 'Arial, sans-serif',
+    fontFamily: 'K2D-Regular, sans-serif',
     fontWeight: 'bold',
     fontSize: 24,
   },

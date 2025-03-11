@@ -162,7 +162,6 @@ export default function AvailabilityScreen() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.header}>
-        <Text style={[styles.title, { color: colors.text }]}>My Availability</Text>
         <TouchableOpacity 
           style={[styles.addButton, { backgroundColor: colors.primary }]}
           onPress={() => setIsAddingSlot(!isAddingSlot)}
@@ -356,16 +355,17 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 8,
+    padding: 16
   },
   title: {
-    fontFamily: 'Arial, sans-serif',
+    fontFamily: 'K2D-SemiBold, sans-serif',
     fontWeight: 'bold',
     fontSize: 24,
   },
   subtitle: {
-    fontFamily: 'Arial, sans-serif',
+    fontFamily: 'K2D-Regular, sans-serif',
+    paddingLeft: 16,
     fontSize: 14,
-    marginBottom: 24,
   },
   addButton: {
     width: 40,
@@ -376,6 +376,7 @@ const styles = StyleSheet.create({
   },
   calendarContainer: {
     marginBottom: 24,
+    padding: 16
   },
   calendarList: {
     paddingVertical: 8,
@@ -390,13 +391,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F5F5',
   },
   dayText: {
-    fontFamily: 'Arial, sans-serif',
+    fontFamily: 'K2D-Regular, sans-serif',
     fontWeight: '500',
     fontSize: 14,
     marginBottom: 4,
   },
   dateText: {
-    fontFamily: 'Arial, sans-serif',
+    fontFamily: 'K2D-Regular, sans-serif',
     fontWeight: 'bold',
     fontSize: 20,
   },
@@ -417,10 +418,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   sectionTitle: {
-    fontFamily: 'Arial, sans-serif',
+    fontFamily: 'K2D-Regular, sans-serif',
     fontWeight: '600',
     fontSize: 18,
     marginBottom: 16,
+    paddingLeft: 16
   },
   loadingContainer: {
     flex: 1,
@@ -428,7 +430,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   loadingText: {
-    fontFamily: 'Arial, sans-serif',
+    fontFamily: 'K2D-Regular, sans-serif',
     fontSize: 16,
     marginTop: 16,
   },
@@ -438,7 +440,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   emptyStateText: {
-    fontFamily: 'Arial, sans-serif',
+    fontFamily: 'K2D-Regular, sans-serif',
     fontWeight: '500',
     fontSize: 16,
     marginTop: 16,
@@ -446,7 +448,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   emptyStateSubtext: {
-    fontFamily: 'Arial, sans-serif',
+    fontFamily: 'K2D-Regular, sans-serif',
     fontSize: 14,
     textAlign: 'center',
     paddingHorizontal: 32,
@@ -459,7 +461,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   dateGroupTitle: {
-    fontFamily: 'Arial, sans-serif',
+    fontFamily: 'K2D-Regular, sans-serif',
     fontWeight: '500',
     fontSize: 16,
     marginBottom: 8,
@@ -471,18 +473,18 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   addSlotTitle: {
-    fontFamily: 'Arial, sans-serif',
+    fontFamily: 'K2D-Regular, sans-serif',
     fontWeight: '600',
     fontSize: 18,
     marginBottom: 8,
   },
   selectedDateText: {
-    fontFamily: 'Arial, sans-serif',
+    fontFamily: 'K2D-Regular, sans-serif',
     fontSize: 16,
     marginBottom: 16,
   },
   timeSelectorLabel: {
-    fontFamily: 'Arial, sans-serif',
+    fontFamily: 'K2D-Regular, sans-serif',
     fontWeight: '500',
     fontSize: 14,
     marginBottom: 8,
@@ -504,14 +506,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F5F5',
   },
   timeText: {
-    fontFamily: 'Arial, sans-serif',
+    fontFamily: 'K2D-Regular, sans-serif',
     fontSize: 14,
   },
   disabledTime: {
     opacity: 0.5,
   },
   endTimeText: {
-    fontFamily: 'Arial, sans-serif',
+    fontFamily: 'K2D-Regular, sans-serif',
     fontSize: 14,
     marginBottom: 16,
   },
@@ -522,7 +524,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   saveButtonText: {
-    fontFamily: 'Arial, sans-serif',
+    fontFamily: 'K2D-Regular, sans-serif',
     fontWeight: '600',
     fontSize: 16,
     color: 'white',
