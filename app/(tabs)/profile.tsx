@@ -93,7 +93,6 @@ export default function ProfileScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.header}>
         <View style={styles.headerContent}>
-          <Text style={[styles.title, { color: colors.text, fontFamily: 'K2D-Bold' }]}>My Profile</Text>
           <TouchableOpacity 
             style={styles.editButton} 
             onPress={() => setIsEditMode(!isEditMode)}
@@ -105,9 +104,6 @@ export default function ProfileScreen() {
             />
           </TouchableOpacity>
         </View>
-        <Text style={[styles.subtitle, { color: colors.secondaryText, fontFamily: 'K2D-Regular' }]}>
-          Manage your professional details
-        </Text>
       </View>
       
       <UserProfileCard 
