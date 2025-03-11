@@ -5,6 +5,7 @@ import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import Button from './ui/Button';
 import { Ionicons } from '@expo/vector-icons';
+import IndustrySelector from './IndustrySelector';
 
 const { width } = Dimensions.get('window');
 
@@ -512,16 +513,11 @@ export default function ProfileCard({
             placeholderTextColor={colors.secondaryText}
           />
           
-          <Text style={[styles.label, { color: colors.secondaryText }]}>Industries</Text>
-          <TextInput
-            style={[
-              styles.input,
-              { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }
-            ]}
-            value={userData.industries ? userData.industries.join(', ') : ''}
-            onChangeText={(value) => handleChange('industries', value.split(',').map(item => item.trim()).filter(item => item !== ''))}
-            placeholder="Tech, Finance, Marketing, etc. (comma separated)"
-            placeholderTextColor={colors.secondaryText}
+          <Text style={[styles.label, { color: colors.secondaryText }]}>Industries (select up to 3)</Text>
+          <IndustrySelector
+            selectedIndustries={userData.industries || []}
+            onIndustriesChange={(industries) => handleChange('industries', industries)}
+            maxSelections={3}
           />
         </View>
 
