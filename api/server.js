@@ -3,6 +3,9 @@ const express = require('express');
 const { Pool } = require('pg');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
+require('dotenv').config();
+
+console.log('Environment setup complete');
 
 const app = express();
 const port = 3000;
@@ -12,6 +15,8 @@ app.use(express.json());
 app.use(cors());
 
 // Database connection
+console.log('Connecting to database with URL:', process.env.DATABASE_URL ? 'URL is set' : 'URL is missing');
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: {
@@ -23,9 +28,15 @@ const pool = new Pool({
 pool.query('SELECT NOW()', (err, res) => {
   if (err) {
     console.error('Database connection error:', err);
+    console.error('Please check your DATABASE_URL in .env and make sure it is set correctly');
   } else {
     console.log('Connected to database at:', res.rows[0].now);
   }
+});
+
+// Handle connection errors
+pool.on('error', (err) => {
+  console.error('Unexpected database error:', err);
 });
 
 // Auth routes
