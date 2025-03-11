@@ -23,6 +23,9 @@ export default function TabLayout() {
         headerTitleStyle: {
           fontFamily: 'K2D-SemiBold',
         },
+        tabBarLabelStyle: {
+          fontFamily: 'K2D-Medium',
+        },
       }}
     >
       <Tabs.Screen

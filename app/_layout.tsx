@@ -28,10 +28,16 @@ export default function RootLayout() {
     if (loaded) {
       // Set default text and text input properties
       Text.defaultProps = Text.defaultProps || {};
-      Text.defaultProps.style = { fontFamily: 'K2D-Regular' };
+      Text.defaultProps.style = { 
+        fontFamily: 'K2D-Regular',
+        ...(Text.defaultProps.style || {}),
+      };
 
       TextInput.defaultProps = TextInput.defaultProps || {};
-      TextInput.defaultProps.style = { fontFamily: 'K2D-Regular' };
+      TextInput.defaultProps.style = { 
+        fontFamily: 'K2D-Regular',
+        ...(TextInput.defaultProps.style || {}),
+      };
 
       // Hide splash screen
       SplashScreen.hideAsync();
