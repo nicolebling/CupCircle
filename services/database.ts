@@ -1,28 +1,35 @@
-import { Pool } from 'pg';
 
-// Configuration from environment variable
-const connectionString = process.env.DATABASE_URL;
+// Modified to use fetch API instead of direct database access
+// This is a client-side service that should communicate with your backend API
 
-// Create a new PostgreSQL pool
-const pool = new Pool({
-  connectionString,
-  ssl: {
-    rejectUnauthorized: false // Required for some PostgreSQL hosts
-  }
-});
+import Constants from 'expo-constants';
 
-// Export a query helper function
-export async function query(text: string, params?: any[]) {
+// Base URL for your API
+const API_BASE_URL = Constants.expoConfig?.extra?.API_URL || 
+                    'https://your-backend-api.com';
+
+// Helper function for database queries via API
+export const query = async (endpoint: string, params?: any) => {
   try {
-    const client = await pool.connect();
-    try {
-      const result = await client.query(text, params);
-      return result;
-    } finally {
-      client.release();
+    const response = await fetch(`${API_BASE_URL}/${endpoint}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(params || {}),
+    });
+    
+    if (!response.ok) {
+      throw new Error(`API request failed with status ${response.status}`);
     }
+    
+    return await response.json();
   } catch (error) {
     console.error('Database query error:', error);
     throw error;
   }
-}
+};
+
+export default {
+  query
+};

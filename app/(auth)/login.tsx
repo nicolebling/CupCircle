@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { Link } from 'expo-router';
@@ -11,7 +12,7 @@ export default function LoginScreen() {
   const { signIn } = useAuth();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
-
+  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({ email: '', password: '' });
@@ -63,8 +64,10 @@ export default function LoginScreen() {
         ]}
       >
         <View style={styles.logoContainer}>
-          <Text style={styles.logoText}>CupCircle</Text>
-          {/*Removed Image component as per the intention of removing image logo*/}
+          <Image
+            source={require('@/assets/images/cupcircle-logo.png')}
+            style={styles.logo}
+          />
           <Text style={[styles.appName, { color: colors.text }]}>CupCircle</Text>
           <Text style={[styles.tagline, { color: colors.secondaryText }]}>
             Connect over coffee. Build your network.
@@ -142,11 +145,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 40,
   },
-  logoText: {
-    fontFamily: 'K2D-Bold',
-    fontSize: 28,
-    color: '#F97415',
-    textAlign: 'center',
+  logo: {
+    width: 100,
+    height: 100,
+    resizeMode: 'contain',
   },
   appName: {
     fontFamily: 'K2D-Bold',

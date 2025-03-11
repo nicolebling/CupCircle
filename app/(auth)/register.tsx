@@ -1,266 +1,236 @@
+
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, SafeAreaView, KeyboardAvoidingView, Platform, Image } from 'react-native';
-import { Link, router } from 'expo-router';
-import Colors from '@/constants/Colors';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
+import { Link } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
-import { Ionicons } from '@expo/vector-icons';
+import { useColorScheme } from '@/hooks/useColorScheme';
+import Colors from '@/constants/Colors';
+import Input from '@/components/ui/Input';
+import Button from '@/components/ui/Button';
 
 export default function RegisterScreen() {
-  const [username, setUsername] = useState('');
+  const { signUp } = useAuth();
+  const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme];
+  
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [errors, setErrors] = useState({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+  });
+  const [isLoading, setIsLoading] = useState(false);
 
-  const { signUp } = useAuth();
-  const colors = Colors.light;
+  const validateForm = () => {
+    let isValid = true;
+    const newErrors = { name: '', email: '', password: '', confirmPassword: '' };
 
-  const handleRegister = async () => {
-    setError('');
+    if (!name) {
+      newErrors.name = 'Name is required';
+      isValid = false;
+    }
 
-    // Simple validation
-    if (!username || !email || !password || !confirmPassword || !name) {
-      setError('All fields are required');
-      return;
+    if (!email) {
+      newErrors.email = 'Email is required';
+      isValid = false;
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      newErrors.email = 'Email is invalid';
+      isValid = false;
+    }
+
+    if (!password) {
+      newErrors.password = 'Password is required';
+      isValid = false;
+    } else if (password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters';
+      isValid = false;
     }
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
-      return;
+      newErrors.confirmPassword = 'Passwords do not match';
+      isValid = false;
     }
 
-    setLoading(true);
+    setErrors(newErrors);
+    return isValid;
+  };
+
+  const handleRegister = async () => {
+    if (!validateForm()) return;
+
+    setIsLoading(true);
     try {
-      await signUp(username, email, password, name);
-      router.replace('/(auth)/onboarding');
-    } catch (err: any) {
-      setError(err.message || 'Registration failed');
+      await signUp(email, password, name);
+    } catch (error) {
+      alert('Registration failed. Please try again.');
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={{ flex: 1 }}
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      <ScrollView
+        contentContainerStyle={[
+          styles.container,
+          { backgroundColor: colors.background }
+        ]}
       >
-        <View style={styles.content}>
-          <View style={styles.logoContainer}>
-            <Text style={styles.logoText}>Cup Circle</Text>
-          </View>
-
-          <Text style={[styles.title, { color: colors.text }]}>Create an Account</Text>
-
-          {error ? (
-            <View style={styles.errorContainer}>
-              <Text style={styles.errorText}>{error}</Text>
-            </View>
-          ) : null}
-
-          <View style={styles.inputContainer}>
-            <Text style={[styles.label, { color: colors.text }]}>Username</Text>
-            <View style={[styles.inputWrapper, { backgroundColor: colors.card, borderColor: colors.border }]}>
-              <Ionicons name="person-outline" size={20} color={colors.secondaryText} style={styles.inputIcon} />
-              <TextInput
-                style={[styles.input, { color: colors.text }]}
-                placeholder="Enter username"
-                placeholderTextColor={colors.secondaryText}
-                value={username}
-                onChangeText={setUsername}
-                autoCapitalize="none"
-              />
-            </View>
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={[styles.label, { color: colors.text }]}>Full Name</Text>
-            <View style={[styles.inputWrapper, { backgroundColor: colors.card, borderColor: colors.border }]}>
-              <Ionicons name="person" size={20} color={colors.secondaryText} style={styles.inputIcon} />
-              <TextInput
-                style={[styles.input, { color: colors.text }]}
-                placeholder="Enter your full name"
-                placeholderTextColor={colors.secondaryText}
-                value={name}
-                onChangeText={setName}
-              />
-            </View>
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={[styles.label, { color: colors.text }]}>Email Address</Text>
-            <View style={[styles.inputWrapper, { backgroundColor: colors.card, borderColor: colors.border }]}>
-              <Ionicons name="mail-outline" size={20} color={colors.secondaryText} style={styles.inputIcon} />
-              <TextInput
-                style={[styles.input, { color: colors.text }]}
-                placeholder="Enter email address"
-                placeholderTextColor={colors.secondaryText}
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-              />
-            </View>
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={[styles.label, { color: colors.text }]}>Password</Text>
-            <View style={[styles.inputWrapper, { backgroundColor: colors.card, borderColor: colors.border }]}>
-              <Ionicons name="lock-closed-outline" size={20} color={colors.secondaryText} style={styles.inputIcon} />
-              <TextInput
-                style={[styles.input, { color: colors.text }]}
-                placeholder="Enter password"
-                placeholderTextColor={colors.secondaryText}
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry={!showPassword}
-              />
-              <TouchableOpacity 
-                style={styles.eyeIcon} 
-                onPress={() => setShowPassword(!showPassword)}
-              >
-                <Ionicons 
-                  name={showPassword ? "eye-off-outline" : "eye-outline"} 
-                  size={20} 
-                  color={colors.secondaryText} 
-                />
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={[styles.label, { color: colors.text }]}>Confirm Password</Text>
-            <View style={[styles.inputWrapper, { backgroundColor: colors.card, borderColor: colors.border }]}>
-              <Ionicons name="lock-closed-outline" size={20} color={colors.secondaryText} style={styles.inputIcon} />
-              <TextInput
-                style={[styles.input, { color: colors.text }]}
-                placeholder="Confirm password"
-                placeholderTextColor={colors.secondaryText}
-                value={confirmPassword}
-                onChangeText={setConfirmPassword}
-                secureTextEntry={!showPassword}
-              />
-            </View>
-          </View>
-
-          <TouchableOpacity 
-            style={[styles.registerButton, { backgroundColor: colors.primary }, loading && { opacity: 0.7 }]} 
-            onPress={handleRegister}
-            disabled={loading}
-          >
-            {loading ? (
-              <Ionicons name="sync" size={24} color="white" style={styles.spinner} />
-            ) : (
-              <Text style={styles.registerButtonText}>Register</Text>
-            )}
-          </TouchableOpacity>
-
-          <View style={styles.footer}>
-            <Text style={[styles.footerText, { color: colors.secondaryText }]}>
-              Already have an account?
-            </Text>
-            <Link href="/(auth)/login" asChild>
-              <TouchableOpacity>
-                <Text style={[styles.loginLink, { color: colors.primary }]}>Log In</Text>
-              </TouchableOpacity>
-            </Link>
-          </View>
+        <View style={styles.header}>
+          <Text style={[styles.title, { color: colors.text }]}>Create Account</Text>
+          <Text style={[styles.subtitle, { color: colors.secondaryText }]}>
+            Sign up to start connecting with professionals
+          </Text>
         </View>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+
+        <View style={styles.formContainer}>
+          <Input
+            label="Full Name"
+            placeholder="Enter your full name"
+            value={name}
+            onChangeText={setName}
+            autoCapitalize="words"
+            error={errors.name}
+          />
+
+          <Input
+            label="Email"
+            placeholder="Enter your email"
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            error={errors.email}
+          />
+
+          <Input
+            label="Password"
+            placeholder="Create a password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            error={errors.password}
+          />
+
+          <Input
+            label="Confirm Password"
+            placeholder="Confirm your password"
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            secureTextEntry
+            error={errors.confirmPassword}
+          />
+
+          <Text style={[styles.termsText, { color: colors.secondaryText }]}>
+            By signing up, you agree to our{' '}
+            <Text style={[styles.termsLink, { color: colors.primary }]}>Terms of Service</Text> and{' '}
+            <Text style={[styles.termsLink, { color: colors.primary }]}>Privacy Policy</Text>
+          </Text>
+
+          <Button
+            title="Sign Up"
+            onPress={handleRegister}
+            style={styles.registerButton}
+            loading={isLoading}
+          />
+
+          <View style={styles.dividerContainer}>
+            <View style={[styles.divider, { backgroundColor: colors.border }]} />
+            <Text style={[styles.dividerText, { color: colors.secondaryText }]}>or</Text>
+            <View style={[styles.divider, { backgroundColor: colors.border }]} />
+          </View>
+
+          <Button
+            title="Connect with LinkedIn"
+            onPress={() => {}}
+            variant="outline"
+            style={styles.socialButton}
+          />
+        </View>
+
+        <View style={styles.footer}>
+          <Text style={[styles.footerText, { color: colors.secondaryText }]}>
+            Already have an account?{' '}
+          </Text>
+          <Link href="/(auth)/login" asChild>
+            <TouchableOpacity>
+              <Text style={[styles.footerLink, { color: colors.primary }]}>Log In</Text>
+            </TouchableOpacity>
+          </Link>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 50,
-  },
-  content: {
-    flex: 1,
+    flexGrow: 1,
+    padding: 20,
     justifyContent: 'center',
   },
-  logoContainer: {
+  header: {
     alignItems: 'center',
     marginBottom: 30,
   },
-  logoText: {
-    fontFamily: 'K2D-Bold',
-    fontSize: 24,
-    marginTop: 10,
-  },
   title: {
     fontFamily: 'K2D-Bold',
-    fontSize: 24,
+    fontSize: 28,
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontFamily: 'K2D-Regular',
+    fontSize: 16,
     textAlign: 'center',
+  },
+  formContainer: {
     marginBottom: 20,
   },
-  errorContainer: {
-    marginBottom: 10,
-    alignItems: 'center',
-  },
-  errorText: {
-    color: 'red',
-  },
-  inputContainer: {
-    marginBottom: 15,
-  },
-  label: {
-    fontFamily: 'K2D-Medium',
-    marginBottom: 5,
-  },
-  inputWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    borderRadius: 5,
-    borderWidth: 1,
-  },
-  inputIcon: {
-    marginRight: 10,
-  },
-  input: {
-    flex: 1,
+  termsText: {
     fontFamily: 'K2D-Regular',
+    fontSize: 14,
+    marginVertical: 20,
+    textAlign: 'center',
   },
-  eyeIcon: {
-    position: 'absolute',
-    right: 10,
-    top: '50%',
-    transform: [{ translateY: -10 }],
+  termsLink: {
+    fontFamily: 'K2D-Medium',
   },
   registerButton: {
-    height: 50,
-    borderRadius: 5,
-    justifyContent: 'center',
+    marginBottom: 20,
+  },
+  dividerContainer: {
+    flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 20,
+    marginBottom: 20,
   },
-  registerButtonText: {
-    color: 'white',
-    fontFamily: 'K2D-Bold',
-    fontSize: 18,
+  divider: {
+    flex: 1,
+    height: 1,
   },
-  spinner: {
-    marginRight: 10,
+  dividerText: {
+    fontFamily: 'K2D-Regular',
+    paddingHorizontal: 10,
+    fontSize: 14,
+  },
+  socialButton: {
+    marginBottom: 20,
   },
   footer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: 30,
+    marginTop: 20,
   },
   footerText: {
     fontFamily: 'K2D-Regular',
     fontSize: 16,
-    marginRight: 5,
   },
-  loginLink: {
+  footerLink: {
     fontFamily: 'K2D-SemiBold',
     fontSize: 16,
   },
