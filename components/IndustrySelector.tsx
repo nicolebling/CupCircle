@@ -107,7 +107,8 @@ export default function IndustrySelector({
             <FlatList
               data={INDUSTRIES}
               keyExtractor={(item) => item}
-              numColumns={2}
+              numColumns={3}
+              columnWrapperStyle={styles.columnWrapper}
               renderItem={({ item }) => {
                 const isSelected = tempSelected.includes(item);
                 return (
@@ -220,20 +221,25 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   industryItem: {
-    width: (width - 60) / 2,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    minWidth: 100,
+    maxWidth: (width - 60) / 3,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
     borderRadius: 8,
-    marginHorizontal: 5,
-    marginBottom: 10,
+    marginHorizontal: 4,
+    marginBottom: 8,
     borderWidth: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    alignSelf: 'flex-start', // Make width fit content
+  },
+  columnWrapper: {
+    justifyContent: 'flex-start',
   },
   industryText: {
     fontFamily: 'K2D-Regular',
-    fontSize: 14,
+    fontSize: 13,
     flex: 1,
   },
   checkIcon: {
