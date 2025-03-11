@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, FlatList, TouchableOpacity, Image } from 'react-native';
 import Colors from '@/constants/Colors';
@@ -19,7 +18,7 @@ interface Message {
 
 export default function ChatsScreen() {
   const colors = Colors.light;
-  
+
   // Dummy messages data
   const [messages] = useState<Message[]>([
     {
@@ -90,13 +89,13 @@ export default function ChatsScreen() {
       </View>
       <View style={styles.messageContent}>
         <View style={styles.messageHeader}>
-          <Text style={[styles.senderName, { color: colors.text }]}>{item.sender.name}</Text>
-          <Text style={[styles.timestamp, { color: colors.secondaryText }]}>{item.timestamp}</Text>
+          <Text style={[styles.senderName, { color: colors.text, fontFamily: 'K2D-SemiBold' }]}>{item.sender.name}</Text>
+          <Text style={[styles.timestamp, { color: colors.secondaryText, fontFamily: 'K2D-Regular' }]}>{item.timestamp}</Text>
         </View>
         <Text 
           style={[
             styles.messageText, 
-            { color: item.unread ? colors.text : colors.secondaryText },
+            { color: item.unread ? colors.text : colors.secondaryText, fontFamily: item.unread ? 'K2D-Medium' : 'K2D-Regular' },
             item.unread && styles.unreadText
           ]}
           numberOfLines={1}
@@ -111,12 +110,12 @@ export default function ChatsScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.header}>
         <View style={styles.headerContent}>
-          <Text style={[styles.title, { color: colors.text }]}>Messages</Text>
+          <Text style={[styles.title, { color: colors.text, fontFamily: 'K2D-Bold' }]}>Messages</Text>
           <TouchableOpacity style={styles.newMessageButton}>
             <Ionicons name="create-outline" size={24} color={colors.primary} />
           </TouchableOpacity>
         </View>
-        <Text style={[styles.subtitle, { color: colors.secondaryText }]}>
+        <Text style={[styles.subtitle, { color: colors.secondaryText, fontFamily: 'K2D-Regular' }]}>
           Connect with your coffee chat partners
         </Text>
       </View>
@@ -131,8 +130,8 @@ export default function ChatsScreen() {
       ) : (
         <View style={styles.emptyContainer}>
           <Ionicons name="chatbubbles-outline" size={60} color={colors.secondaryText} />
-          <Text style={[styles.emptyText, { color: colors.text }]}>No messages yet</Text>
-          <Text style={[styles.emptySubtext, { color: colors.secondaryText }]}>
+          <Text style={[styles.emptyText, { color: colors.text, fontFamily: 'K2D-SemiBold' }]}>No messages yet</Text>
+          <Text style={[styles.emptySubtext, { color: colors.secondaryText, fontFamily: 'K2D-Regular' }]}>
             Start matching with professionals to begin conversations
           </Text>
         </View>
