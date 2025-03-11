@@ -56,15 +56,6 @@ export default function LoginScreen() {
     } finally {
       setIsLoading(false);
     }
-
-    setIsLoading(true);
-    try {
-      await signIn(email, password);
-    } catch (error) {
-      alert('Login failed. Please check your credentials.');
-    } finally {
-      setIsLoading(false);
-    }
   };
 
   return (

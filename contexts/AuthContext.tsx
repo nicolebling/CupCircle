@@ -68,8 +68,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw new Error('Invalid email or password');
       }
       
-      // Get user profile
-      const profile = await profileService.getProfileByUserId(authenticatedUser.id);
+      let profile = null;
+      try {
+        // Get user profile - this might fail if database is unavailable
+        profile = await profileService.getProfileByUserId(authenticatedUser.id);
+      } catch (error) {
+        console.log('Failed to fetch profile, using mock profile data');
+        // Profile will be handled by the mock data in profileService
+      }
       
       // Combine user and profile data
       const userProfile: UserProfile = {

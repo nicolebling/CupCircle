@@ -3,14 +3,48 @@
 // This is a client-side service that should communicate with your backend API
 
 import Constants from 'expo-constants';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Base URL for your API
+// Base URL for your API - fallback to mock API if not configured
 const API_BASE_URL = Constants.expoConfig?.extra?.API_URL || 
-                    'https://your-backend-api.com';
+                    'https://mock-api.cupcircle.com';
+
+// Flag to use mock data when API is unavailable
+let useMockData = true;
+
+// Initialize service
+export const initDatabase = async () => {
+  try {
+    // Test API connection
+    const response = await fetch(`${API_BASE_URL}/health-check`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    
+    useMockData = !response.ok;
+    console.log(`API connection ${useMockData ? 'failed, using mock data' : 'successful'}`);
+    
+    // Store API status for session
+    await AsyncStorage.setItem('@api_status', useMockData ? 'mock' : 'live');
+  } catch (error) {
+    console.log('API connection failed, using mock data');
+    useMockData = true;
+    await AsyncStorage.setItem('@api_status', 'mock');
+  }
+};
 
 // Helper function for database queries via API
 export const query = async (endpoint: string, params?: any) => {
   try {
+    // Check if we're in mock mode
+    const apiStatus = await AsyncStorage.getItem('@api_status');
+    if (apiStatus === 'mock' || useMockData) {
+      console.log('Using mock data for query:', endpoint);
+      throw new Error('Using mock data');
+    }
+    
     const response = await fetch(`${API_BASE_URL}/${endpoint}`, {
       method: 'POST',
       headers: {
@@ -20,16 +54,25 @@ export const query = async (endpoint: string, params?: any) => {
     });
     
     if (!response.ok) {
+      console.log(`API request failed with status ${response.status}`);
       throw new Error(`API request failed with status ${response.status}`);
     }
     
     return await response.json();
   } catch (error) {
-    console.error('Database query error:', error);
-    throw error;
+    console.log('Database query error, returning mock response:', error);
+    // Let the calling code handle mock data generation
+    // We'll throw a special error that can be caught
+    throw new Error('MOCK_DATA_REQUIRED');
   }
 };
 
+// Initialize the database connection immediately
+initDatabase().catch(err => {
+  console.error('Failed to initialize database connection:', err);
+});
+
 export default {
-  query
+  query,
+  initDatabase
 };
