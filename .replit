@@ -1,5 +1,5 @@
-entrypoint = "README.md"
 modules = ["nodejs-20", "postgresql-16"]
+run = "npm run start"
 
 [nix]
 channel = "stable-24_05"
@@ -13,7 +13,6 @@ localPort = 8081
 externalPort = 80
 
 [workflows]
-runButton = "Run All"
 
 [[workflows.workflow]]
 name = "Dev Server"
@@ -72,4 +71,4 @@ task = "shell.exec"
 args = "npm run dev & node api/server.js"
 
 [deployment]
-run = ["sh", "-c", "node api/server.js"]
+run = ["sh", "-c", "npm run start"]
