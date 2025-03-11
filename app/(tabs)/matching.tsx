@@ -200,14 +200,10 @@ export default function MatchingScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.header}>
         <View style={styles.headerContent}>
-          <Text style={[styles.title, { color: colors.text }]}>Explore Your Circle</Text>
           <TouchableOpacity onPress={openFilterModal} style={styles.filterButton}>
             <Ionicons name="options" size={24} color={colors.primary} />
           </TouchableOpacity>
         </View>
-        <Text style={[styles.subtitle, { color: colors.secondaryText }]}>
-          Discover professionals for your next coffee chat
-        </Text>
       </View>
       
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 20 }}>
