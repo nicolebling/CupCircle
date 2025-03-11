@@ -317,7 +317,7 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     justifyContent: 'center',
     alignItems: 'center',
-    flex: currentStep === 1 ? 2 : 1,
+    flex: step === 1 ? 2 : 1,
     flexDirection: 'row',
   },
   nextButtonText: {
