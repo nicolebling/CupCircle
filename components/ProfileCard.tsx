@@ -75,6 +75,14 @@ export default function ProfileCard({
   const [userData, setUserData] = useState<UserProfileData>(profile);
   const [isSaving, setIsSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  
+  // Function to handle edit button press
+  const handleEdit = () => {
+    if (onSave) {
+      // This will trigger edit mode in the parent component
+      onSave(userData);
+    }
+  };
 
   const getTitle = () => {
     if (isOnboarding) return 'Complete Your Profile';
@@ -256,8 +264,8 @@ export default function ProfileCard({
           {/* Header */}
           <View style={styles.header}>
             <Text style={[styles.title, { color: colors.text }]}>{getTitle()}</Text>
-            <TouchableOpacity onPress={() => onCancel && onCancel()}>
-              <Ionicons name="create-outline" size={24} color={colors.primary} />
+            <TouchableOpacity onPress={() => isEditMode ? (onCancel && onCancel()) : handleEdit()}>
+              <Ionicons name={isEditMode ? "close-outline" : "create-outline"} size={24} color={colors.primary} />
             </TouchableOpacity>
           </View>
 

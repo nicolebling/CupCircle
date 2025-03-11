@@ -68,6 +68,12 @@ export default function ProfileScreen() {
   }, [error]);
   
   const handleSaveProfile = async (updatedData: UserProfileData) => {
+    // If not in edit mode, toggle to edit mode
+    if (!isEditMode) {
+      setIsEditMode(true);
+      return;
+    }
+    
     // Convert UI format to database format
     const profileFormData: ProfileFormData = {
       name: updatedData.name,
