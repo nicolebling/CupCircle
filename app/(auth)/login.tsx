@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -6,11 +6,26 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from "react-native";
+import { useRouter } from 'expo-router';
 
 export default function AuthScreen({ navigation }) {
   const [isLogin, setIsLogin] = useState(true); // Toggle between Login & Register
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const router = useRouter();
+
+
+  useEffect(() => {
+    // Redirect to the auth page if not already there - for example, after successful authentication. This would need further implementation based on your auth strategy.
+    // This example only shows how to use the router. You need to add the actual authentication logic here.
+
+    // Placeholder - replace with your authentication check logic
+    const isAuthenticated = false; // Replace with actual authentication check
+
+    if (!isAuthenticated && router.route !== '/(auth)/auth') {
+      router.replace('/(auth)/auth');
+    }
+  }, [router]);
 
   return (
     <View style={styles.container}>
