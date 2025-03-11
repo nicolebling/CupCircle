@@ -176,7 +176,39 @@ app.post('/api/profile', async (req, res) => {
   }
 });
 
+// Add some basic rate limiting
+app.use((req, res, next) => {
+  // Simple in-memory rate limiting
+  const ip = req.ip;
+  const now = Date.now();
+  const windowMs = 60 * 1000; // 1 minute
+  const maxRequests = 100; // max 100 requests per minute
+  
+  // Initialize or get the requests map
+  global.requests = global.requests || new Map();
+  const requestRecord = global.requests.get(ip) || { count: 0, resetTime: now + windowMs };
+  
+  if (now > requestRecord.resetTime) {
+    // Reset the window
+    requestRecord.count = 1;
+    requestRecord.resetTime = now + windowMs;
+  } else {
+    // Increment request count
+    requestRecord.count += 1;
+  }
+  
+  global.requests.set(ip, requestRecord);
+  
+  // Check if over limit
+  if (requestRecord.count > maxRequests) {
+    return res.status(429).json({ error: 'Too many requests, please try again later' });
+  }
+  
+  next();
+});
+
 // Start server
 app.listen(port, '0.0.0.0', () => {
   console.log(`Server running on port ${port}`);
+  console.log(`API available at: ${process.env.EXPO_PUBLIC_API_URL || 'https://your-replit-domain.replit.app'}`);
 });
