@@ -80,6 +80,17 @@ export default function TabLayout() {
           ),
         }}
       />
+      
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: 'Settings',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="settings-outline" size={size} color={color} />
+          ),
+          tabBarButton: () => null, // Hide from tab bar but keep in navigation
+        }}
+      />
     </Tabs>
   );
 }
