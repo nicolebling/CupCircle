@@ -99,7 +99,7 @@ export default function ProfileScreen() {
   };
 
   const navigateToSettings = () => {
-    router.push('/settings');
+    router.push('/(tabs)/settings');
   };
   
   return (
