@@ -4,12 +4,12 @@
  * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
  */
 
-const tintColorLight = '#F97415';
+const tintColorLight = '#FFF';
 const tintColorDark = '#F97415';
 
 export default {
   light: {
-    primary: '#F97415',
+    primary: '#FFF',
     background: 'hsl(28, 18%, 95%)',
     card: '#FFFFFF',
     text: '#1E1916',
