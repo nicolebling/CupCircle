@@ -88,6 +88,14 @@ app.post('/api/auth/register', async (req, res) => {
 });
 
 // Profile routes
+app.get('/', (req, res) => {
+  res.json({ message: 'API server is running' });
+});
+
+app.get('/profile', (req, res) => {
+  res.json({ message: 'Profile endpoint reached' });
+});
+
 app.get('/api/profile/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
