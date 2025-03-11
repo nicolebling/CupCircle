@@ -12,6 +12,7 @@ export default function TabLayout() {
       screenOptions={{
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.tabIconDefault,
+        tabBarShowLabel: false,
         tabBarStyle: {
           borderTopColor: colors.border,
           backgroundColor: colors.background,
@@ -22,9 +23,6 @@ export default function TabLayout() {
         headerTintColor: colors.text,
         headerTitleStyle: {
           fontFamily: 'K2D-SemiBold',
-        },
-        tabBarLabelStyle: {
-          fontFamily: 'K2D-Medium',
         },
       }}
     >
