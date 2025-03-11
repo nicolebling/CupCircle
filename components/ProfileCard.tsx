@@ -569,6 +569,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     marginBottom: 16,
     padding: 16,
+    margin: 16,
   },
   header: {
     flexDirection: 'row',
