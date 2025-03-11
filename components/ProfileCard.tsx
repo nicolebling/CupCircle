@@ -305,6 +305,18 @@ export default function ProfileCard({
             <Image source={{ uri: profile.photo }} style={styles.profilePhoto} />
           </View>
 
+          <View style={styles.nameRow}>
+            <Text style={[styles.name, { color: colors.text }]}>
+              {profile.name} {profile.age && <Text>{profile.age}</Text>}
+            </Text>
+            {profile.location && (
+              <View style={styles.locationContainer}>
+                <Ionicons name="location" size={16} color={colors.secondaryText} />
+                <Text style={[styles.location, { color: colors.secondaryText }]}>{profile.location}</Text>
+              </View>
+            )}
+          </View>
+
           {/* Personal Information */}
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>Personal Information</Text>
@@ -317,6 +329,26 @@ export default function ProfileCard({
             <Text style={[styles.label, { color: colors.secondaryText }]}>Occupation</Text>
             <Text style={[styles.value, { color: colors.text }]}>{profile.occupation}</Text>
           </View>
+
+          {/* Bio */}
+          <View style={styles.section}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>About Me</Text>
+            <Text style={[styles.value, { color: colors.text }]}>{profile.bio}</Text>
+          </View>
+
+          {/* Interests */}
+          {profile.interests && profile.interests.length > 0 && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>Interests</Text>
+              <View style={styles.tagsContainer}>
+                {profile.interests.map((interest, index) => (
+                  <View key={index} style={[styles.tag, { backgroundColor: colors.primary + '20' }]}>
+                    <Text style={[styles.tagText, { color: colors.primary }]}>{interest}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          )}
 
           {/* Professional Details */}
           <View style={styles.section}>
@@ -385,12 +417,6 @@ export default function ProfileCard({
             )}
           </View>
 
-          {/* Bio */}
-          <View style={styles.section}>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>About Me</Text>
-            <Text style={[styles.value, { color: colors.text }]}>{profile.bio}</Text>
-          </View>
-
           {/* Location */}
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>Location Preferences</Text>
@@ -429,19 +455,7 @@ export default function ProfileCard({
             )}
           </View>
 
-          {/* Interests */}
-          {profile.interests && profile.interests.length > 0 && (
-            <View style={styles.section}>
-              <Text style={[styles.sectionTitle, { color: colors.text }]}>Interests</Text>
-              <View style={styles.tagsContainer}>
-                {profile.interests.map((interest, index) => (
-                  <View key={index} style={[styles.tag, { backgroundColor: colors.primary + '20' }]}>
-                    <Text style={[styles.tagText, { color: colors.primary }]}>{interest}</Text>
-                  </View>
-                ))}
-              </View>
-            </View>
-          )}
+          
         </View>
       </ScrollView>
     );
