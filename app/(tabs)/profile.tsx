@@ -97,20 +97,6 @@ export default function ProfileScreen() {
   
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={styles.header}>
-        <View style={styles.headerContent}>
-          <TouchableOpacity 
-            style={styles.editButton} 
-            onPress={() => setIsEditMode(!isEditMode)}
-          >
-            <Ionicons 
-              name={isEditMode ? "close" : "create-outline"} 
-              size={24} 
-              color={colors.primary} 
-            />
-          </TouchableOpacity>
-        </View>
-      </View>
       
       <UserProfileCard 
         isEditMode={isEditMode}
