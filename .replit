@@ -70,3 +70,6 @@ author = 38320710
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npm run dev & node api/server.js"
+
+[deployment]
+run = ["sh", "-c", "node api/server.js"]
