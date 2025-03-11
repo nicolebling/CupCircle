@@ -6,9 +6,12 @@ import UserProfileCard, { UserProfileData } from '@/components/UserProfileCard';
 import { useProfileManager, ProfileFormData } from '@/hooks/useProfileManager';
 import { useAuth } from '@/contexts/AuthContext';
 import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
+import { useColorScheme } from '@/hooks/useColorScheme';
 
 export default function ProfileScreen() {
-  const colors = Colors.light;
+  const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme];
   const { user } = useAuth();
   const [isEditMode, setIsEditMode] = useState(false);
   const [profileData, setProfileData] = useState<UserProfileData>({
@@ -94,9 +97,24 @@ export default function ProfileScreen() {
       Alert.alert('Success', 'Profile updated successfully');
     }
   };
+
+  const navigateToSettings = () => {
+    router.push('/(tabs)/settings');
+  };
   
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={styles.header}>
+        <View style={styles.headerContent}>
+          <Text style={[styles.title, { color: colors.text }]}>My Profile</Text>
+          <TouchableOpacity 
+            style={styles.settingsButton}
+            onPress={navigateToSettings}
+          >
+            <Ionicons name="settings-outline" size={24} color={colors.text} />
+          </TouchableOpacity>
+        </View>
+      </View>
       
       <UserProfileCard 
         isEditMode={isEditMode}
@@ -125,12 +143,16 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
+    fontFamily: 'K2D-Bold',
   },
   subtitle: {
     fontSize: 16,
     marginBottom: 16,
   },
   editButton: {
+    padding: 8,
+  },
+  settingsButton: {
     padding: 8,
   },
 });
