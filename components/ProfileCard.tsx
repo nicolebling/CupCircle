@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { View, Text, Image, StyleSheet, Dimensions, TouchableOpacity, ScrollView, TextInput, ActivityIndicator } from 'react-native';
+import { View, Text, Image, StyleSheet, Dimensions, TouchableOpacity, ScrollView, TextInput, ActivityIndicator, Platform } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
@@ -518,9 +518,16 @@ export default function ProfileCard({
             <DateTimePicker
               value={birthdayDate || new Date(2000, 0, 1)}
               mode="date"
-              display="spinner"
+              display={Platform.OS === 'ios' ? 'spinner' : 'default'}
               onChange={(event, selectedDate) => {
-                setShowDatePicker(false);
+                // On Android, the modal automatically dismisses after selection
+                // On iOS, we need to manually handle this
+                if (Platform.OS === 'ios') {
+                  setShowDatePicker(false);
+                } else {
+                  setShowDatePicker(false);
+                }
+                
                 if (selectedDate) {
                   setBirthdayDate(selectedDate);
                   // Format date as MM/DD/YYYY
