@@ -1,8 +1,9 @@
 import React from 'react';
 import ProfileCard, { UserProfileData } from './ProfileCard';
-import { View, Text, TextInput } from 'react-native'; // Added imports for React Native components
-import { Button } from 'react-native-elements'; // Assuming a Button component from react-native-elements
-import Ionicons from '@expo/vector-icons/Ionicons'; // Added import for Ionicons
+import { View, Text, TextInput } from 'react-native'; 
+import { Button } from 'react-native-elements'; 
+import Ionicons from '@expo/vector-icons/Ionicons'; 
+import InterestSelector from './InterestSelector'; // Added import for InterestSelector
 
 type UserProfileProps = {
   isEditMode?: boolean;

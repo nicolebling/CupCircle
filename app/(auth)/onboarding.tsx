@@ -5,6 +5,7 @@ import { router } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import Colors from '@/constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
+import InterestSelector from '@/components/InterestSelector';
 
 export default function OnboardingScreen() {
   const { user, updateUser } = useAuth();
@@ -17,8 +18,6 @@ export default function OnboardingScreen() {
     interests: [] as string[],
     photo: 'https://randomuser.me/api/portraits/lego/1.jpg', // Default avatar
   });
-  const [interest, setInterest] = useState('');
-
   const colors = Colors.light;
 
   const handleNext = () => {
@@ -33,25 +32,6 @@ export default function OnboardingScreen() {
     if (step > 1) {
       setStep(step - 1);
     }
-  };
-
-  const addInterest = () => {
-    if (interest.trim() && !profileData.interests.includes(interest.trim())) {
-      setProfileData({
-        ...profileData,
-        interests: [...profileData.interests, interest.trim()]
-      });
-      setInterest('');
-    }
-  };
-
-  const removeInterest = (index: number) => {
-    const newInterests = [...profileData.interests];
-    newInterests.splice(index, 1);
-    setProfileData({
-      ...profileData,
-      interests: newInterests
-    });
   };
 
   const handleSubmit = async () => {
@@ -130,36 +110,14 @@ export default function OnboardingScreen() {
                 Add interests that will help connect you with like-minded professionals
               </Text>
               
-              <View style={styles.interestInputContainer}>
-                <TextInput
-                  style={[styles.interestInput, { backgroundColor: colors.card, color: colors.text, borderColor: colors.border }]}
-                  placeholder="Add an interest (e.g., React, Marketing, Leadership)"
-                  placeholderTextColor={colors.secondaryText}
-                  value={interest}
-                  onChangeText={setInterest}
-                  onSubmitEditing={addInterest}
-                />
-                <TouchableOpacity 
-                  style={[styles.addButton, { backgroundColor: colors.primary }]}
-                  onPress={addInterest}
-                >
-                  <Ionicons name="add" size={24} color="white" />
-                </TouchableOpacity>
-              </View>
-              
-              <View style={styles.interestTags}>
-                {profileData.interests.map((item, index) => (
-                  <View 
-                    key={index} 
-                    style={[styles.tag, { backgroundColor: colors.card, borderColor: colors.border }]}
-                  >
-                    <Text style={[styles.tagText, { color: colors.text }]}>{item}</Text>
-                    <TouchableOpacity onPress={() => removeInterest(index)}>
-                      <Ionicons name="close-circle" size={18} color={colors.secondaryText} />
-                    </TouchableOpacity>
-                  </View>
-                ))}
-              </View>
+              <InterestSelector
+                selectedInterests={profileData.interests}
+                onInterestsChange={(interests) => setProfileData({...profileData, interests})}
+                maxInterests={5}
+              />
+              <Text style={[styles.helperText, { color: colors.secondaryText }]}>
+                Select up to 5 interests that will help connect you with like-minded professionals
+              </Text>
             </View>
           )}
 
@@ -227,6 +185,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'K2D-Regular',
     marginBottom: 16,
+  },
+  helperText: {
+    fontFamily: 'K2D-Regular',
+    fontSize: 12,
+    marginTop: 8,
+    marginBottom: 16,
+    fontStyle: 'italic',
   },
   label: {
     fontSize: 16,
