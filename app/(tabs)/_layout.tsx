@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Tabs } from 'expo-router';
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
@@ -10,12 +9,15 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.tabIconDefault,
+        tabBarActiveTintColor: '#FFFFFF',
+        tabBarInactiveTintColor: 'rgba(255, 255, 255, 0.7)',
         tabBarShowLabel: false,
         tabBarStyle: {
-          borderTopColor: colors.border,
-          backgroundColor: colors.background,
+          borderTopColor: 'transparent',
+          backgroundColor: '#F97415',
+          borderTopWidth: 0,
+          height: 60,
+          paddingVertical: 8,
         },
         headerStyle: {
           backgroundColor: colors.background,
@@ -24,6 +26,9 @@ export default function TabLayout() {
         headerTitleStyle: {
           fontFamily: 'K2D-SemiBold',
         },
+        tabBarItemStyle: {
+          paddingVertical: 8,
+        }
       }}
     >
       <Tabs.Screen
@@ -71,7 +76,7 @@ export default function TabLayout() {
         options={{
           title: 'Profile',
           tabBarIcon: ({ color, size }) => (
-            <FontAwesome5 name="user" size={size-2} color={color} />
+            <FontAwesome5 name="user" size={size - 2} color={color} />
           ),
         }}
       />

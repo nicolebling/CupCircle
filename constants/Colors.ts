@@ -12,8 +12,8 @@ export default {
     border: '#EFE9D3',
     notification: '#F97415',
     tint: '#FFF',
-    tabIconDefault: '#64748B',
-    tabIconSelected: '#F97415',
+    tabIconDefault: 'rgba(255, 255, 255, 0.7)',
+    tabIconSelected: '#FFFFFF',
     fontFamily: 'K2D-Regular',
   }
 };
