@@ -17,32 +17,26 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
 
-  const [loaded, error] = useFonts({
-    'K2D-Regular': require('../assets/fonts/K2D-Regular.ttf'),
-    'K2D-Medium': require('../assets/fonts/K2D-Medium.ttf'),
-    'K2D-Bold': require('../assets/fonts/K2D-Bold.ttf'),
-    'K2D-SemiBold': require('../assets/fonts/K2D-SemiBold.ttf'),
-  });
+  // Using system fonts instead of custom fonts
+  const [loaded, error] = useState(true);
 
   useEffect(() => {
-    if (loaded) {
-      // Set default text and text input properties
-      Text.defaultProps = Text.defaultProps || {};
-      Text.defaultProps.style = { 
-        fontFamily: 'K2D-Regular',
-        ...(Text.defaultProps.style || {}),
-      };
+    // Set default text and text input properties
+    Text.defaultProps = Text.defaultProps || {};
+    Text.defaultProps.style = { 
+      fontFamily: 'Arial, sans-serif',
+      ...(Text.defaultProps.style || {}),
+    };
 
-      TextInput.defaultProps = TextInput.defaultProps || {};
-      TextInput.defaultProps.style = { 
-        fontFamily: 'K2D-Regular',
-        ...(TextInput.defaultProps.style || {}),
-      };
+    TextInput.defaultProps = TextInput.defaultProps || {};
+    TextInput.defaultProps.style = { 
+      fontFamily: 'Arial, sans-serif',
+      ...(TextInput.defaultProps.style || {}),
+    };
 
-      // Hide splash screen
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
+    // Hide splash screen
+    SplashScreen.hideAsync();
+  }, []);
 
   if (!loaded) {
     return null;

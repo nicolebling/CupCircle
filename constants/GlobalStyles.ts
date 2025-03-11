@@ -3,40 +3,47 @@ import { StyleSheet } from 'react-native';
 
 const GlobalStyles = StyleSheet.create({
   text: {
-    fontFamily: 'K2D-Regular',
+    fontFamily: 'Arial, sans-serif',
   },
   textMedium: {
-    fontFamily: 'K2D-Medium',
+    fontFamily: 'Arial, sans-serif',
+    fontWeight: '500',
   },
   textSemiBold: {
-    fontFamily: 'K2D-SemiBold',
+    fontFamily: 'Arial, sans-serif',
+    fontWeight: '600',
   },
   textBold: {
-    fontFamily: 'K2D-Bold',
+    fontFamily: 'Arial, sans-serif',
+    fontWeight: 'bold',
   },
   heading1: {
-    fontFamily: 'K2D-Bold',
+    fontFamily: 'Arial, sans-serif',
+    fontWeight: 'bold',
     fontSize: 28,
   },
   heading2: {
-    fontFamily: 'K2D-SemiBold',
+    fontFamily: 'Arial, sans-serif',
+    fontWeight: '600',
     fontSize: 24,
   },
   heading3: {
-    fontFamily: 'K2D-SemiBold',
+    fontFamily: 'Arial, sans-serif',
+    fontWeight: '600',
     fontSize: 20,
   },
   paragraph: {
-    fontFamily: 'K2D-Regular',
+    fontFamily: 'Arial, sans-serif',
     fontSize: 16,
     lineHeight: 24,
   },
   button: {
-    fontFamily: 'K2D-Medium',
+    fontFamily: 'Arial, sans-serif',
+    fontWeight: '500',
     fontSize: 16,
   },
   caption: {
-    fontFamily: 'K2D-Regular',
+    fontFamily: 'Arial, sans-serif',
     fontSize: 14,
   },
 });
