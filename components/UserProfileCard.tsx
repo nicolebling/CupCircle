@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, TextInput, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -59,7 +58,7 @@ export default function UserProfileCard({
 }: UserProfileProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
-  
+
   const [userData, setUserData] = useState<UserProfileData>(initialData || EMPTY_PROFILE);
   const [isSaving, setIsSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -72,7 +71,7 @@ export default function UserProfileCard({
 
   const handleChange = (field: keyof UserProfileData, value: any) => {
     setUserData(prev => ({ ...prev, [field]: value }));
-    
+
     // Clear error for this field if it exists
     if (errors[field]) {
       setErrors(prev => {
@@ -85,22 +84,22 @@ export default function UserProfileCard({
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
-    
+
     if (!userData.name) newErrors.name = 'Name is required';
     if (!userData.birthday) newErrors.birthday = 'Birthday is required';
     if (!userData.occupation) newErrors.occupation = 'Occupation is required';
     if (!userData.bio) newErrors.bio = 'Bio is required';
     if (userData.bio.length > 500) newErrors.bio = 'Bio must be less than 500 characters';
-    
+
     // Add more validation as needed
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSave = () => {
     if (!validateForm()) return;
-    
+
     setIsSaving(true);
     // Simulate API call
     setTimeout(() => {
@@ -121,31 +120,31 @@ export default function UserProfileCard({
               <Ionicons name="create-outline" size={24} color={colors.primary} />
             </TouchableOpacity>
           </View>
-          
+
           {/* Profile Photo */}
           <View style={styles.photoContainer}>
             <Image source={{ uri: userData.photo }} style={styles.profilePhoto} />
           </View>
-          
+
           {/* Personal Information */}
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>Personal Information</Text>
             <Text style={[styles.label, { color: colors.secondaryText }]}>Name</Text>
             <Text style={[styles.value, { color: colors.text }]}>{userData.name}</Text>
-            
+
             <Text style={[styles.label, { color: colors.secondaryText }]}>Age</Text>
             <Text style={[styles.value, { color: colors.text }]}>{userData.age || 'Not provided'}</Text>
-            
+
             <Text style={[styles.label, { color: colors.secondaryText }]}>Occupation</Text>
             <Text style={[styles.value, { color: colors.text }]}>{userData.occupation}</Text>
           </View>
-          
+
           {/* Professional Details */}
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>Professional Details</Text>
             <Text style={[styles.label, { color: colors.secondaryText }]}>Experience Level</Text>
             <Text style={[styles.value, { color: colors.text }]}>{userData.experienceLevel}</Text>
-            
+
             <Text style={[styles.label, { color: colors.secondaryText }]}>Industries</Text>
             <View style={styles.tagsContainer}>
               {userData.industries.map((industry, index) => (
@@ -154,7 +153,7 @@ export default function UserProfileCard({
                 </View>
               ))}
             </View>
-            
+
             <Text style={[styles.label, { color: colors.secondaryText }]}>Skills</Text>
             <View style={styles.tagsContainer}>
               {userData.skills.map((skill, index) => (
@@ -163,26 +162,26 @@ export default function UserProfileCard({
                 </View>
               ))}
             </View>
-            
+
             <Text style={[styles.label, { color: colors.secondaryText }]}>Experience</Text>
             <Text style={[styles.value, { color: colors.text }]}>{userData.experience}</Text>
-            
+
             <Text style={[styles.label, { color: colors.secondaryText }]}>Education</Text>
             <Text style={[styles.value, { color: colors.text }]}>{userData.education}</Text>
           </View>
-          
+
           {/* Bio */}
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>About Me</Text>
             <Text style={[styles.value, { color: colors.text }]}>{userData.bio}</Text>
           </View>
-          
+
           {/* Location */}
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>Location Preferences</Text>
             <Text style={[styles.label, { color: colors.secondaryText }]}>City</Text>
             <Text style={[styles.value, { color: colors.text }]}>{userData.city}</Text>
-            
+
             <Text style={[styles.label, { color: colors.secondaryText }]}>Neighborhoods</Text>
             <View style={styles.tagsContainer}>
               {userData.neighborhoods.map((neighborhood, index) => (
@@ -191,7 +190,7 @@ export default function UserProfileCard({
                 </View>
               ))}
             </View>
-            
+
             <Text style={[styles.label, { color: colors.secondaryText }]}>Favorite Cafes</Text>
             <View style={styles.tagsContainer}>
               {userData.favoriteCafes.map((cafe, index) => (
@@ -201,7 +200,7 @@ export default function UserProfileCard({
               ))}
             </View>
           </View>
-          
+
           {/* Interests */}
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>Interests</Text>
@@ -217,7 +216,7 @@ export default function UserProfileCard({
       </ScrollView>
     );
   }
-  
+
   // Edit mode or Onboarding mode
   return (
     <ScrollView>
@@ -231,7 +230,7 @@ export default function UserProfileCard({
             </TouchableOpacity>
           )}
         </View>
-        
+
         {/* Profile Photo */}
         <View style={styles.photoContainer}>
           <Image source={{ uri: userData.photo }} style={styles.profilePhoto} />
@@ -242,11 +241,11 @@ export default function UserProfileCard({
             <Ionicons name="camera" size={20} color="white" />
           </TouchableOpacity>
         </View>
-        
+
         {/* Personal Information */}
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>Personal Information</Text>
-          
+
           <Text style={[styles.label, { color: colors.secondaryText }]}>Name*</Text>
           <TextInput
             style={[
@@ -259,7 +258,7 @@ export default function UserProfileCard({
             placeholderTextColor={colors.secondaryText}
           />
           {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
-          
+
           <Text style={[styles.label, { color: colors.secondaryText }]}>Birthday*</Text>
           <TextInput
             style={[
@@ -272,7 +271,7 @@ export default function UserProfileCard({
             placeholderTextColor={colors.secondaryText}
           />
           {errors.birthday && <Text style={styles.errorText}>{errors.birthday}</Text>}
-          
+
           <Text style={[styles.label, { color: colors.secondaryText }]}>Occupation*</Text>
           <TextInput
             style={[
@@ -286,11 +285,11 @@ export default function UserProfileCard({
           />
           {errors.occupation && <Text style={styles.errorText}>{errors.occupation}</Text>}
         </View>
-        
+
         {/* Professional Details */}
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>Professional Details</Text>
-          
+
           <Text style={[styles.label, { color: colors.secondaryText }]}>Experience Level</Text>
           <TextInput
             style={[
@@ -302,7 +301,7 @@ export default function UserProfileCard({
             placeholder="Student, Entry Level, Senior, etc."
             placeholderTextColor={colors.secondaryText}
           />
-          
+
           <Text style={[styles.label, { color: colors.secondaryText }]}>Experience</Text>
           <TextInput
             style={[
@@ -316,7 +315,7 @@ export default function UserProfileCard({
             multiline
             numberOfLines={4}
           />
-          
+
           <Text style={[styles.label, { color: colors.secondaryText }]}>Education</Text>
           <TextInput
             style={[
@@ -329,7 +328,7 @@ export default function UserProfileCard({
             placeholderTextColor={colors.secondaryText}
           />
         </View>
-        
+
         {/* Bio */}
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>About Me*</Text>
@@ -351,7 +350,7 @@ export default function UserProfileCard({
           </Text>
           {errors.bio && <Text style={styles.errorText}>{errors.bio}</Text>}
         </View>
-        
+
         {/* Save Button */}
         <View style={styles.buttonContainer}>
           <Button
@@ -362,7 +361,7 @@ export default function UserProfileCard({
           />
           {isSaving && <ActivityIndicator color={colors.primary} style={styles.spinner} />}
         </View>
-        
+
         {/* Error Summary */}
         {Object.keys(errors).length > 0 && (
           <View style={styles.errorSummary}>
@@ -389,7 +388,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   title: {
-    fontFamily: 'K2D-Regular, sans-serif',
+    fontFamily: 'K2D-Regular',
     fontWeight: 'bold',
     fontSize: 24,
   },
@@ -417,19 +416,19 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   sectionTitle: {
-    fontFamily: 'Arial, sans-serif',
+    fontFamily: 'K2D-Regular',
     fontWeight: '600',
     fontSize: 18,
     marginBottom: 16,
   },
   label: {
-    fontFamily: 'Arial, sans-serif',
+    fontFamily: 'K2D-Regular',
     fontWeight: '500',
     fontSize: 14,
     marginBottom: 8,
   },
   value: {
-    fontFamily: 'Arial, sans-serif',
+    fontFamily: 'K2D-Regular',
     fontSize: 16,
     marginBottom: 16,
   },
@@ -446,7 +445,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   tagText: {
-    fontFamily: 'Arial, sans-serif',
+    fontFamily: 'K2D-Regular',
     fontWeight: '500',
     fontSize: 12,
   },
@@ -456,7 +455,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 12,
     marginBottom: 16,
-    fontFamily: 'Arial, sans-serif',
+    fontFamily: 'K2D-Regular',
     fontSize: 16,
   },
   textArea: {
@@ -466,12 +465,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingTop: 12,
     marginBottom: 8,
-    fontFamily: 'Arial, sans-serif',
+    fontFamily: 'K2D-Regular',
     fontSize: 16,
     textAlignVertical: 'top',
   },
   characterCount: {
-    fontFamily: 'Arial, sans-serif',
+    fontFamily: 'K2D-Regular',
     fontSize: 12,
     alignSelf: 'flex-end',
     marginBottom: 16,
@@ -490,7 +489,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     color: 'red',
-    fontFamily: 'Arial, sans-serif',
+    fontFamily: 'K2D-Regular',
     fontSize: 12,
     marginTop: -12,
     marginBottom: 16,
@@ -503,7 +502,7 @@ const styles = StyleSheet.create({
   },
   errorSummaryText: {
     color: 'red',
-    fontFamily: 'Arial, sans-serif',
+    fontFamily: 'K2D-Regular',
     fontWeight: '500',
     fontSize: 14,
   },
