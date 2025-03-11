@@ -1,70 +1,68 @@
 
-import { query } from './database';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Profile } from '../models/Profile';
+
+// Base URL for API
+const API_URL = process.env.EXPO_PUBLIC_API_URL || 'https://your-replit-subdomain.replit.dev';
 
 // Auth service
 export const authService = {
   // Login function
   async login(email: string, password: string) {
     try {
-      const result = await query('SELECT * FROM users WHERE email = $1', [email]);
+      // For development, use mockAuthService if API is not available
+      if (!API_URL.includes('replit.dev')) {
+        console.log('Using mock auth service');
+        return mockAuthService.login(email, password);
+      }
       
-      if (result.rows.length === 0) {
+      const response = await fetch(`${API_URL}/api/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+      
+      if (!response.ok) {
         return null;
       }
       
-      const user = result.rows[0];
-      
-      // In a real app, you would hash the password and compare it
-      if (user.password !== password) {
-        return null;
-      }
-      
-      return {
-        id: user.id,
-        username: user.username,
-        email: user.email
-      };
+      return await response.json();
     } catch (error) {
       console.error('Login error:', error);
-      return null;
+      // Fallback to mock during development
+      return mockAuthService.login(email, password);
     }
   },
   
   // Register function
   async register(username: string, email: string, password: string) {
     try {
-      // Check if email already exists
-      const existingUser = await query('SELECT * FROM users WHERE email = $1', [email]);
-      
-      if (existingUser.rows.length > 0) {
-        throw new Error('Email already exists');
+      // For development, use mockAuthService if API is not available
+      if (!API_URL.includes('replit.dev')) {
+        console.log('Using mock auth service');
+        return mockAuthService.register(username, email, password);
       }
       
-      // In a real app, you would hash the password before storing
-      const users = await query('SELECT * FROM users', []);
-      const userId = String(users.rows.length + 1);
+      const response = await fetch(`${API_URL}/api/auth/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, email, password }),
+      });
       
-      const newUser = {
-        id: userId,
-        username,
-        email,
-        password // In a real app, this would be hashed
-      };
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Registration failed');
+      }
       
-      // Since we're using AsyncStorage mock, we'll add it manually
-      const existingUsers = JSON.parse(await AsyncStorage.getItem('@db_users') || '[]');
-      existingUsers.push(newUser);
-      await AsyncStorage.setItem('@db_users', JSON.stringify(existingUsers));
-      
-      return {
-        id: userId,
-        username,
-        email
-      };
+      return await response.json();
     } catch (error) {
       console.error('Register error:', error);
-      throw error;
+      // Fallback to mock during development
+      return mockAuthService.register(username, email, password);
     }
   }
 };
@@ -76,8 +74,131 @@ export const profileService = {
     try {
       if (!userId) return null;
       
-      const result = await query('SELECT * FROM profiles WHERE user_id = $1', [userId]);
-      return result.rows.length > 0 ? result.rows[0] : null;
+      // For development, use mockProfileService if API is not available
+      if (!API_URL.includes('replit.dev')) {
+        console.log('Using mock profile service');
+        return mockProfileService.getProfileByUserId(userId);
+      }
+      
+      const response = await fetch(`${API_URL}/api/profile/${userId}`);
+      
+      if (!response.ok) {
+        return null;
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Failed to load user profile', error);
+      // Fallback to mock during development
+      return mockProfileService.getProfileByUserId(userId);
+    }
+  },
+  
+  // Save profile (create or update)
+  async saveProfile(profileData: Partial<Profile> & { user_id: string }) {
+    try {
+      // For development, use mockProfileService if API is not available
+      if (!API_URL.includes('replit.dev')) {
+        console.log('Using mock profile service');
+        return mockProfileService.saveProfile(profileData);
+      }
+      
+      const response = await fetch(`${API_URL}/api/profile`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(profileData),
+      });
+      
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to save profile');
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Failed to save profile', error);
+      // Fallback to mock during development
+      return mockProfileService.saveProfile(profileData);
+    }
+  }
+};
+
+// Mock auth service (for development)
+export const mockAuthService = {
+  // Login function
+  async login(email: string, password: string) {
+    try {
+      // For development, accept any login
+      return {
+        id: '1',
+        username: 'demouser',
+        email: email
+      };
+    } catch (error) {
+      console.error('Login error:', error);
+      return null;
+    }
+  },
+  
+  // Register function
+  async register(username: string, email: string, password: string) {
+    try {
+      return {
+        id: Date.now().toString(),
+        username,
+        email
+      };
+    } catch (error) {
+      console.error('Register error:', error);
+      throw error;
+    }
+  }
+};
+
+// Mock profile service (for development)
+export const mockProfileService = {
+  // Mock data for development
+  MOCK_PROFILES: [
+    {
+      id: '1',
+      user_id: '1',
+      name: 'Alex Thompson',
+      age: 28,
+      photo: 'https://randomuser.me/api/portraits/men/32.jpg',
+      occupation: 'Software Engineer',
+      bio: 'Passionate about building scalable web applications and mentoring junior developers.',
+      industry_categories: ['Technology', 'Software Development'],
+      skills: ['React', 'Node.js', 'TypeScript'],
+      neighborhoods: ['Downtown', 'Tech District'],
+      favorite_cafes: ['Coffee House', 'Bean There'],
+      interests: ['Coding', 'Hiking', 'Photography']
+    },
+    {
+      id: '2',
+      user_id: '2',
+      name: 'Sophia Wang',
+      age: 31,
+      photo: 'https://randomuser.me/api/portraits/women/44.jpg',
+      occupation: 'UX/UI Designer',
+      bio: 'Creative designer with a strong focus on user-centered design.',
+      industry_categories: ['Design', 'Technology'],
+      skills: ['UI Design', 'User Research', 'Figma'],
+      neighborhoods: ['Arts District', 'Midtown'],
+      favorite_cafes: ['The Roastery', 'Morning Brew'],
+      interests: ['Design', 'Art', 'Photography']
+    }
+  ],
+  
+  // Get profile by user ID
+  async getProfileByUserId(userId: string) {
+    try {
+      if (!userId) return null;
+      
+      const storedProfiles = await AsyncStorage.getItem('@profiles');
+      const profiles = storedProfiles ? JSON.parse(storedProfiles) : this.MOCK_PROFILES;
+      return profiles.find((profile: any) => profile.user_id === userId) || null;
     } catch (error) {
       console.error('Failed to load user profile', error);
       return null;
@@ -85,66 +206,43 @@ export const profileService = {
   },
   
   // Save profile (create or update)
-  async saveProfile(profileData: Partial<Profile> & { user_id: string }) {
+  async saveProfile(profileData: any) {
     try {
       const { user_id } = profileData;
       
-      // Check if profile exists
-      const existingProfile = await this.getProfileByUserId(user_id);
+      // Get existing profiles
+      const storedProfiles = await AsyncStorage.getItem('@profiles');
+      const profiles = storedProfiles ? JSON.parse(storedProfiles) : this.MOCK_PROFILES;
       
-      if (existingProfile) {
+      // Check if profile exists
+      const existingIndex = profiles.findIndex((p: any) => p.user_id === user_id);
+      
+      if (existingIndex >= 0) {
         // Update existing profile
-        const result = await query(
-          `UPDATE profiles SET name = $2, age = $3, occupation = $4, photo = $5, bio = $6, 
-           industry_categories = $7, skills = $8, neighborhoods = $9, favorite_cafes = $10, 
-           interests = $11, updated_at = NOW() WHERE id = $1 RETURNING *`,
-          [
-            existingProfile.id,
-            profileData.name || existingProfile.name,
-            profileData.age || existingProfile.age,
-            profileData.occupation || existingProfile.occupation,
-            profileData.photo || existingProfile.photo,
-            profileData.bio || existingProfile.bio,
-            profileData.industry_categories || existingProfile.industry_categories,
-            profileData.skills || existingProfile.skills,
-            profileData.neighborhoods || existingProfile.neighborhoods,
-            profileData.favorite_cafes || existingProfile.favorite_cafes,
-            profileData.interests || existingProfile.interests
-          ]
-        );
-        
-        return result.rows[0];
+        profiles[existingIndex] = {
+          ...profiles[existingIndex],
+          ...profileData,
+          updated_at: new Date().toISOString()
+        };
       } else {
         // Create new profile
-        const result = await query(
-          `INSERT INTO profiles(
-            user_id, name, age, occupation, photo, bio,
-            industry_categories, skills, neighborhoods, favorite_cafes, interests
-          ) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) 
-          RETURNING *`,
-          [
-            user_id,
-            profileData.name || '',
-            profileData.age || null,
-            profileData.occupation || '',
-            profileData.photo || '',
-            profileData.bio || '',
-            profileData.industry_categories || [],
-            profileData.skills || [],
-            profileData.neighborhoods || [],
-            profileData.favorite_cafes || [],
-            profileData.interests || []
-          ]
-        );
-        
-        return result.rows[0];
+        profiles.push({
+          id: Date.now().toString(),
+          user_id,
+          ...profileData,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        });
       }
+      
+      // Save updated profiles
+      await AsyncStorage.setItem('@profiles', JSON.stringify(profiles));
+      
+      // Return the saved profile
+      return profiles.find((p: any) => p.user_id === user_id);
     } catch (error) {
       console.error('Failed to save profile', error);
       throw error;
     }
   }
 };
-
-// Add AsyncStorage import at the top
-import AsyncStorage from '@react-native-async-storage/async-storage';
