@@ -1,7 +1,6 @@
 
 import React, { useState, useRef } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, Modal, ScrollView, ActivityIndicator } from 'react-native';
-import { useColorScheme } from '@/hooks/useColorScheme';
 import Colors from '@/constants/Colors';
 import ProfileCard from '@/components/ProfileCard';
 import { Ionicons } from '@expo/vector-icons';
@@ -24,8 +23,7 @@ interface Profile {
 }
 
 export default function MatchingScreen() {
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const colors = Colors.light;
   
   // Mock profiles data
   const [profiles] = useState<Profile[]>([
