@@ -6,8 +6,37 @@ import { useColorScheme } from '@/hooks/useColorScheme';
 import Button from './ui/Button';
 import { Ionicons } from '@expo/vector-icons';
 import IndustrySelector from './IndustrySelector';
+import ExperienceLevelSelector from './ExperienceLevelSelector';
 
 const { width } = Dimensions.get('window');
+
+// Function to get coffee theme based on experience level
+const getCoffeeTheme = (level: string): string => {
+  switch (level) {
+    case 'Student': return 'Warm Milk';
+    case 'Internship': return 'Latte';
+    case 'Entry': return 'Light Roast';
+    case 'Junior': return 'Medium Roast';
+    case 'Senior': return 'Dark Roast';
+    case 'Director': return 'Nitro Cold Brew';
+    case 'Executive': return 'Espresso';
+    default: return '';
+  }
+};
+
+// Function to get color based on coffee level
+const getCoffeeColor = (level: string): string => {
+  switch (level) {
+    case 'Student': return '#E6C8A0'; // Warm milk color
+    case 'Internship': return '#D2B48C'; // Latte color
+    case 'Entry': return '#C19A6B'; // Light roast
+    case 'Junior': return '#A67B5B'; // Medium roast
+    case 'Senior': return '#654321'; // Dark roast
+    case 'Director': return '#483C32'; // Nitro cold brew
+    case 'Executive': return '#301E1E'; // Espresso
+    default: return '#F97415'; // App primary color
+  }
+};
 
 export type UserProfileData = {
   id?: string;
@@ -295,7 +324,22 @@ export default function ProfileCard({
             {profile.experienceLevel && (
               <>
                 <Text style={[styles.label, { color: colors.secondaryText }]}>Experience Level</Text>
-                <Text style={[styles.value, { color: colors.text }]}>{profile.experienceLevel}</Text>
+                <View style={styles.coffeeExperienceContainer}>
+                  <Text style={[styles.value, { color: colors.text }]}>
+                    {profile.experienceLevel}
+                  </Text>
+                  {/* Display coffee theme based on experience level */}
+                  <View style={[styles.coffeeBadge, { 
+                    backgroundColor: getCoffeeColor(profile.experienceLevel) + '20' 
+                  }]}>
+                    <Ionicons name="cafe" size={14} color={getCoffeeColor(profile.experienceLevel)} />
+                    <Text style={[styles.coffeeBadgeText, { 
+                      color: getCoffeeColor(profile.experienceLevel) 
+                    }]}>
+                      {getCoffeeTheme(profile.experienceLevel)}
+                    </Text>
+                  </View>
+                </View>
               </>
             )}
 
@@ -476,15 +520,9 @@ export default function ProfileCard({
           <Text style={[styles.sectionTitle, { color: colors.text }]}>Professional Details</Text>
 
           <Text style={[styles.label, { color: colors.secondaryText }]}>Experience Level</Text>
-          <TextInput
-            style={[
-              styles.input,
-              { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }
-            ]}
-            value={userData.experienceLevel}
-            onChangeText={(value) => handleChange('experienceLevel', value)}
-            placeholder="Student, Entry Level, Senior, etc."
-            placeholderTextColor={colors.secondaryText}
+          <ExperienceLevelSelector
+            selectedLevel={userData.experienceLevel || ''}
+            onLevelChange={(level) => handleChange('experienceLevel', level)}
           />
 
           <Text style={[styles.label, { color: colors.secondaryText }]}>Experience</Text>
@@ -866,5 +904,22 @@ const styles = StyleSheet.create({
     color: 'red',
     fontFamily: 'K2D-Medium',
     fontSize: 14,
+  },
+  coffeeExperienceContainer: {
+    marginBottom: 16,
+  },
+  coffeeBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 16,
+    alignSelf: 'flex-start',
+    marginTop: 4,
+  },
+  coffeeBadgeText: {
+    fontFamily: 'K2D-Medium',
+    fontSize: 12,
+    marginLeft: 4,
   },
 });

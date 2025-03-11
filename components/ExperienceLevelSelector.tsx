@@ -1,0 +1,213 @@
+
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Modal, FlatList } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import Colors from '@/constants/Colors';
+import { useColorScheme } from '@/hooks/useColorScheme';
+
+// Experience levels with coffee themes
+const EXPERIENCE_LEVELS = [
+  { level: 'Student', coffeeTheme: 'Warm Milk', icon: 'school-outline' },
+  { level: 'Internship', coffeeTheme: 'Latte', icon: 'cafe-outline' },
+  { level: 'Entry', coffeeTheme: 'Light Roast', icon: 'cafe-outline' },
+  { level: 'Junior', coffeeTheme: 'Medium Roast', icon: 'cafe-outline' },
+  { level: 'Senior', coffeeTheme: 'Dark Roast', icon: 'cafe-outline' },
+  { level: 'Director', coffeeTheme: 'Nitro Cold Brew', icon: 'cafe-outline' },
+  { level: 'Executive', coffeeTheme: 'Espresso', icon: 'cafe-outline' }
+];
+
+type ExperienceLevelSelectorProps = {
+  selectedLevel: string;
+  onLevelChange: (level: string) => void;
+};
+
+export default function ExperienceLevelSelector({ 
+  selectedLevel, 
+  onLevelChange 
+}: ExperienceLevelSelectorProps) {
+  const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme];
+  
+  const [modalVisible, setModalVisible] = useState(false);
+  
+  // Find the selected level's coffee theme
+  const selectedLevelData = EXPERIENCE_LEVELS.find(item => item.level === selectedLevel);
+  
+  // Handle selection
+  const handleSelect = (level: string) => {
+    onLevelChange(level);
+    setModalVisible(false);
+  };
+  
+  const getDisplayText = () => {
+    if (!selectedLevel) return 'Select your experience level';
+    
+    return selectedLevelData 
+      ? `${selectedLevelData.level} (${selectedLevelData.coffeeTheme})` 
+      : selectedLevel;
+  };
+  
+  return (
+    <View>
+      <TouchableOpacity 
+        style={[styles.selector, { backgroundColor: colors.background, borderColor: colors.border }]} 
+        onPress={() => setModalVisible(true)}
+      >
+        <Text style={[styles.selectorText, { color: selectedLevel ? colors.text : colors.secondaryText }]}>
+          {getDisplayText()}
+        </Text>
+        <Ionicons name="chevron-down" size={20} color={colors.secondaryText} />
+      </TouchableOpacity>
+      
+      <Modal
+        visible={modalVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { backgroundColor: colors.background }]}>
+            <View style={styles.modalHeader}>
+              <Text style={[styles.modalTitle, { color: colors.text }]}>
+                Select Experience Level
+              </Text>
+              <TouchableOpacity onPress={() => setModalVisible(false)}>
+                <Ionicons name="close" size={24} color={colors.text} />
+              </TouchableOpacity>
+            </View>
+            
+            <FlatList
+              data={EXPERIENCE_LEVELS}
+              keyExtractor={(item) => item.level}
+              renderItem={({ item }) => {
+                const isSelected = selectedLevel === item.level;
+                const coffeeColor = getCoffeeColor(item.level, colors.primary);
+                
+                return (
+                  <TouchableOpacity
+                    style={[
+                      styles.levelItem,
+                      { borderColor: colors.border },
+                      isSelected && { backgroundColor: coffeeColor + '30' }
+                    ]}
+                    onPress={() => handleSelect(item.level)}
+                  >
+                    <View style={styles.levelItemContent}>
+                      <View style={[styles.iconContainer, { backgroundColor: coffeeColor + '40' }]}>
+                        <Ionicons 
+                          name={item.icon as any} 
+                          size={20} 
+                          color={coffeeColor} 
+                        />
+                      </View>
+                      <View style={styles.levelTextContainer}>
+                        <Text style={[styles.levelText, { color: colors.text }]}>
+                          {item.level}
+                        </Text>
+                        <Text style={[styles.coffeeThemeText, { color: colors.secondaryText }]}>
+                          {item.coffeeTheme}
+                        </Text>
+                      </View>
+                    </View>
+                    {isSelected && (
+                      <Ionicons name="checkmark-circle" size={20} color={coffeeColor} />
+                    )}
+                  </TouchableOpacity>
+                );
+              }}
+              contentContainerStyle={styles.levelsList}
+            />
+          </View>
+        </View>
+      </Modal>
+    </View>
+  );
+}
+
+// Function to get color based on coffee level
+const getCoffeeColor = (level: string, defaultColor: string): string => {
+  switch (level) {
+    case 'Student': return '#E6C8A0'; // Warm milk color
+    case 'Internship': return '#D2B48C'; // Latte color
+    case 'Entry': return '#C19A6B'; // Light roast
+    case 'Junior': return '#A67B5B'; // Medium roast
+    case 'Senior': return '#654321'; // Dark roast
+    case 'Director': return '#483C32'; // Nitro cold brew
+    case 'Executive': return '#301E1E'; // Espresso
+    default: return defaultColor;
+  }
+};
+
+const styles = StyleSheet.create({
+  selector: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    height: 48,
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    marginBottom: 16,
+  },
+  selectorText: {
+    fontFamily: 'K2D-Regular',
+    fontSize: 16,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 20,
+    maxHeight: '80%',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  modalTitle: {
+    fontFamily: 'K2D-Bold',
+    fontSize: 20,
+  },
+  levelsList: {
+    paddingBottom: 20,
+  },
+  levelItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+  levelItemContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  iconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  levelTextContainer: {
+    flex: 1,
+  },
+  levelText: {
+    fontFamily: 'K2D-Medium',
+    fontSize: 16,
+  },
+  coffeeThemeText: {
+    fontFamily: 'K2D-Regular',
+    fontSize: 14,
+  }
+});
