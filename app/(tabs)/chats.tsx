@@ -1,16 +1,18 @@
+
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, FlatList, TouchableOpacity, Image } from 'react-native';
 import Colors from '@/constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
 
-// Dummy message interface
+interface MessageSender {
+  id: string;
+  name: string;
+  avatar: string;
+}
+
 interface Message {
   id: string;
-  sender: {
-    id: string;
-    name: string;
-    avatar: string;
-  };
+  sender: MessageSender;
   lastMessage: string;
   timestamp: string;
   unread: boolean;
@@ -18,7 +20,7 @@ interface Message {
 
 export default function ChatsScreen() {
   const colors = Colors.light;
-
+  
   // Dummy messages data
   const [messages] = useState<Message[]>([
     {
@@ -28,8 +30,8 @@ export default function ChatsScreen() {
         name: 'Alex Thompson',
         avatar: 'https://randomuser.me/api/portraits/men/32.jpg',
       },
-      lastMessage: 'Looking forward to our coffee chat tomorrow!',
-      timestamp: '10:30 AM',
+      lastMessage: 'Great meeting you yesterday! Looking forward to our next coffee chat.',
+      timestamp: '2:30 PM',
       unread: true,
     },
     {
@@ -39,7 +41,7 @@ export default function ChatsScreen() {
         name: 'Sophia Wang',
         avatar: 'https://randomuser.me/api/portraits/women/44.jpg',
       },
-      lastMessage: 'That cafe on Main St sounds perfect. See you at 2pm?',
+      lastMessage: 'Let me know if Monday works for you. Coffee Bean on 5th Ave?',
       timestamp: 'Yesterday',
       unread: false,
     },
@@ -50,9 +52,9 @@ export default function ChatsScreen() {
         name: 'Marcus Johnson',
         avatar: 'https://randomuser.me/api/portraits/men/67.jpg',
       },
-      lastMessage: 'Thanks for the advice on that project!',
+      lastMessage: 'Thanks for the design feedback! Would love to discuss more.',
       timestamp: 'Yesterday',
-      unread: false,
+      unread: true,
     },
     {
       id: '4',
@@ -61,9 +63,9 @@ export default function ChatsScreen() {
         name: 'Jasmine Rodriguez',
         avatar: 'https://randomuser.me/api/portraits/women/29.jpg',
       },
-      lastMessage: 'I can share some insights about digital marketing over coffee',
-      timestamp: 'Mon',
-      unread: true,
+      lastMessage: 'I just sent you the marketing materials we discussed.',
+      timestamp: 'Monday',
+      unread: false,
     },
     {
       id: '5',
@@ -72,8 +74,8 @@ export default function ChatsScreen() {
         name: 'David Chen',
         avatar: 'https://randomuser.me/api/portraits/men/94.jpg',
       },
-      lastMessage: 'Let me know if you want to discuss data science further',
-      timestamp: 'Sun',
+      lastMessage: 'Are we still on for Wednesday at The Roastery?',
+      timestamp: 'Last week',
       unread: false,
     },
   ]);
@@ -81,10 +83,13 @@ export default function ChatsScreen() {
   const renderMessageItem = ({ item }: { item: Message }) => (
     <TouchableOpacity 
       style={[styles.messageItem, { borderBottomColor: colors.border }]}
-      onPress={() => console.log('Message pressed:', item.id)}
+      onPress={() => console.log("Message pressed:", item.id)}
     >
       <View style={styles.avatarContainer}>
-        <Image source={{ uri: item.sender.avatar }} style={styles.avatar} />
+        <Image 
+          source={{ uri: item.sender.avatar }} 
+          style={styles.avatar}
+        />
         {item.unread && <View style={[styles.unreadBadge, { backgroundColor: colors.primary }]} />}
       </View>
       <View style={styles.messageContent}>
@@ -95,7 +100,10 @@ export default function ChatsScreen() {
         <Text 
           style={[
             styles.messageText, 
-            { color: item.unread ? colors.text : colors.secondaryText, fontFamily: item.unread ? 'K2D-Medium' : 'K2D-Regular' },
+            { 
+              color: item.unread ? colors.text : colors.secondaryText, 
+              fontFamily: item.unread ? 'K2D-Medium' : 'K2D-Regular'
+            },
             item.unread && styles.unreadText
           ]}
           numberOfLines={1}
@@ -119,12 +127,12 @@ export default function ChatsScreen() {
           Connect with your coffee chat partners
         </Text>
       </View>
-
+      
       {messages.length > 0 ? (
         <FlatList
           data={messages}
-          keyExtractor={(item) => item.id}
           renderItem={renderMessageItem}
+          keyExtractor={(item) => item.id}
           contentContainerStyle={styles.messagesList}
         />
       ) : (
@@ -143,10 +151,10 @@ export default function ChatsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
   },
   header: {
-    marginBottom: 16,
+    padding: 16,
+    paddingBottom: 8,
   },
   headerContent: {
     flexDirection: 'row',
@@ -155,22 +163,21 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   title: {
-    fontFamily: 'K2D-Bold',
     fontSize: 24,
+  },
+  subtitle: {
+    fontSize: 16,
   },
   newMessageButton: {
     padding: 8,
   },
-  subtitle: {
-    fontFamily: 'K2D-Regular',
-    fontSize: 16,
-  },
   messagesList: {
-    paddingBottom: 20,
+    padding: 16,
   },
   messageItem: {
     flexDirection: 'row',
-    paddingVertical: 16,
+    alignItems: 'center',
+    paddingVertical: 12,
     borderBottomWidth: 1,
   },
   avatarContainer: {
@@ -189,10 +196,11 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     right: 0,
     top: 0,
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
   },
   messageContent: {
     flex: 1,
-    justifyContent: 'center',
   },
   messageHeader: {
     flexDirection: 'row',
@@ -201,19 +209,17 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   senderName: {
-    fontFamily: 'K2D-SemiBold',
     fontSize: 16,
   },
   timestamp: {
-    fontFamily: 'K2D-Regular',
-    fontSize: 14,
+    fontSize: 12,
   },
   messageText: {
-    fontFamily: 'K2D-Regular',
-    fontSize: 15,
+    fontSize: 14,
+    lineHeight: 20,
   },
   unreadText: {
-    fontFamily: 'K2D-Medium',
+    fontWeight: '500',
   },
   emptyContainer: {
     flex: 1,
@@ -222,14 +228,12 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   emptyText: {
-    fontFamily: 'K2D-SemiBold',
     fontSize: 18,
     marginTop: 16,
     marginBottom: 8,
   },
   emptySubtext: {
-    fontFamily: 'K2D-Regular',
-    fontSize: 16,
+    fontSize: 14,
     textAlign: 'center',
   },
 });
