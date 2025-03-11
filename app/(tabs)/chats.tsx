@@ -1,114 +1,173 @@
-
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, FlatList, TouchableOpacity, Image } from 'react-native';
+import { Text, View, StyleSheet, FlatList, TouchableOpacity, Image, SafeAreaView } from 'react-native';
 import Colors from '@/constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
 
-interface MessageSender {
-  id: string;
-  name: string;
-  avatar: string;
-}
-
 interface Message {
   id: string;
-  sender: MessageSender;
-  lastMessage: string;
-  timestamp: string;
+  text: string;
+  sender: string;
+  time: string;
   unread: boolean;
+}
+
+interface Conversation {
+  id: string;
+  person: {
+    id: string;
+    name: string;
+    photo: string;
+    occupation: string;
+  };
+  lastMessage: Message;
+  matched: boolean;
 }
 
 export default function ChatsScreen() {
   const colors = Colors.light;
-  
-  // Dummy messages data
-  const [messages] = useState<Message[]>([
+
+  const [conversations, setConversations] = useState<Conversation[]>([
     {
       id: '1',
-      sender: {
-        id: 'user1',
+      person: {
+        id: '1',
         name: 'Alex Thompson',
-        avatar: 'https://randomuser.me/api/portraits/men/32.jpg',
+        photo: 'https://randomuser.me/api/portraits/men/32.jpg',
+        occupation: 'Software Engineer',
       },
-      lastMessage: 'Great meeting you yesterday! Looking forward to our next coffee chat.',
-      timestamp: '2:30 PM',
-      unread: true,
+      lastMessage: {
+        id: '101',
+        text: 'Great meeting you today! Looking forward to our next coffee chat.',
+        sender: 'Alex',
+        time: '10:30 AM',
+        unread: true,
+      },
+      matched: true,
     },
     {
       id: '2',
-      sender: {
-        id: 'user2',
+      person: {
+        id: '2',
         name: 'Sophia Wang',
-        avatar: 'https://randomuser.me/api/portraits/women/44.jpg',
+        photo: 'https://randomuser.me/api/portraits/women/44.jpg',
+        occupation: 'UX/UI Designer',
       },
-      lastMessage: 'Let me know if Monday works for you. Coffee Bean on 5th Ave?',
-      timestamp: 'Yesterday',
-      unread: false,
+      lastMessage: {
+        id: '102',
+        text: 'I\'d love to hear more about your experience at Design Studio.',
+        sender: 'You',
+        time: 'Yesterday',
+        unread: false,
+      },
+      matched: true,
     },
     {
       id: '3',
-      sender: {
-        id: 'user3',
+      person: {
+        id: '3',
         name: 'Marcus Johnson',
-        avatar: 'https://randomuser.me/api/portraits/men/67.jpg',
+        photo: 'https://randomuser.me/api/portraits/men/67.jpg',
+        occupation: 'Product Manager',
       },
-      lastMessage: 'Thanks for the design feedback! Would love to discuss more.',
-      timestamp: 'Yesterday',
-      unread: true,
+      lastMessage: {
+        id: '103',
+        text: 'Would Thursday at 3pm at Coffee House work for you?',
+        sender: 'Marcus',
+        time: '2 days ago',
+        unread: true,
+      },
+      matched: true,
     },
     {
       id: '4',
-      sender: {
-        id: 'user4',
+      person: {
+        id: '4',
         name: 'Jasmine Rodriguez',
-        avatar: 'https://randomuser.me/api/portraits/women/29.jpg',
+        photo: 'https://randomuser.me/api/portraits/women/29.jpg',
+        occupation: 'Marketing Specialist',
       },
-      lastMessage: 'I just sent you the marketing materials we discussed.',
-      timestamp: 'Monday',
-      unread: false,
+      lastMessage: {
+        id: '104',
+        text: 'Just sent you the marketing resources we discussed. Hope they help!',
+        sender: 'Jasmine',
+        time: '1 week ago',
+        unread: false,
+      },
+      matched: true,
     },
     {
       id: '5',
-      sender: {
-        id: 'user5',
+      person: {
+        id: '5',
         name: 'David Chen',
-        avatar: 'https://randomuser.me/api/portraits/men/94.jpg',
+        photo: 'https://randomuser.me/api/portraits/men/94.jpg',
+        occupation: 'Data Scientist',
       },
-      lastMessage: 'Are we still on for Wednesday at The Roastery?',
-      timestamp: 'Last week',
-      unread: false,
+      lastMessage: {
+        id: '105',
+        text: 'You: Thanks for the coffee chat! I learned a lot about machine learning applications.',
+        sender: 'You',
+        time: '2 weeks ago',
+        unread: false,
+      },
+      matched: true,
     },
   ]);
 
-  const renderMessageItem = ({ item }: { item: Message }) => (
-    <TouchableOpacity 
-      style={[styles.messageItem, { borderBottomColor: colors.border }]}
-      onPress={() => console.log("Message pressed:", item.id)}
+  const handleMessagePress = (id: string) => {
+    console.log('Message pressed:', id);
+
+    // Mark as read
+    setConversations(
+      conversations.map(conv => 
+        conv.id === id && conv.lastMessage.unread 
+          ? { ...conv, lastMessage: { ...conv.lastMessage, unread: false } } 
+          : conv
+      )
+    );
+  };
+
+  const renderItem = ({ item }: { item: Conversation }) => (
+    <TouchableOpacity
+      style={[
+        styles.conversationItem,
+        { borderBottomColor: colors.border }
+      ]}
+      onPress={() => handleMessagePress(item.id)}
     >
       <View style={styles.avatarContainer}>
-        <Image 
-          source={{ uri: item.sender.avatar }} 
-          style={styles.avatar}
-        />
-        {item.unread && <View style={[styles.unreadBadge, { backgroundColor: colors.primary }]} />}
+        <Image source={{ uri: item.person.photo }} style={styles.avatar} />
+        {item.lastMessage.unread && (
+          <View style={[styles.unreadBadge, { backgroundColor: colors.primary }]} />
+        )}
       </View>
-      <View style={styles.messageContent}>
-        <View style={styles.messageHeader}>
-          <Text style={[styles.senderName, { color: colors.text, fontFamily: 'K2D-SemiBold' }]}>{item.sender.name}</Text>
-          <Text style={[styles.timestamp, { color: colors.secondaryText, fontFamily: 'K2D-Regular' }]}>{item.timestamp}</Text>
+
+      <View style={styles.conversationContent}>
+        <View style={styles.conversationHeader}>
+          <Text style={[styles.personName, { color: colors.text, fontFamily: 'K2D-SemiBold' }]}>
+            {item.person.name}
+          </Text>
+          <Text style={[styles.messageTime, { color: colors.secondaryText, fontFamily: 'K2D-Regular' }]}>
+            {item.lastMessage.time}
+          </Text>
         </View>
+
+        <Text style={[styles.occupation, { color: colors.secondaryText, fontFamily: 'K2D-Regular' }]}>
+          {item.person.occupation}
+        </Text>
+
         <Text 
           style={[
-            styles.messageText, 
+            styles.messagePreview, 
             { 
-              color: item.unread ? colors.text : colors.secondaryText, 
-              fontFamily: item.unread ? 'K2D-Medium' : 'K2D-Regular'
-            },
-            item.unread && styles.unreadText
+              color: item.lastMessage.unread ? colors.text : colors.secondaryText,
+              fontFamily: item.lastMessage.unread ? 'K2D-Medium' : 'K2D-Regular'
+            }
           ]}
           numberOfLines={1}
+          ellipsizeMode="tail"
         >
-          {item.lastMessage}
+          {item.lastMessage.text}
         </Text>
       </View>
     </TouchableOpacity>
@@ -119,31 +178,21 @@ export default function ChatsScreen() {
       <View style={styles.header}>
         <View style={styles.headerContent}>
           <Text style={[styles.title, { color: colors.text, fontFamily: 'K2D-Bold' }]}>Messages</Text>
-          <TouchableOpacity style={styles.newMessageButton}>
-            <Ionicons name="create-outline" size={24} color={colors.primary} />
+          <TouchableOpacity style={styles.filterButton}>
+            <Ionicons name="filter" size={24} color={colors.primary} />
           </TouchableOpacity>
         </View>
         <Text style={[styles.subtitle, { color: colors.secondaryText, fontFamily: 'K2D-Regular' }]}>
-          Connect with your coffee chat partners
+          Connect with your professional network
         </Text>
       </View>
-      
-      {messages.length > 0 ? (
-        <FlatList
-          data={messages}
-          renderItem={renderMessageItem}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.messagesList}
-        />
-      ) : (
-        <View style={styles.emptyContainer}>
-          <Ionicons name="chatbubbles-outline" size={60} color={colors.secondaryText} />
-          <Text style={[styles.emptyText, { color: colors.text, fontFamily: 'K2D-SemiBold' }]}>No messages yet</Text>
-          <Text style={[styles.emptySubtext, { color: colors.secondaryText, fontFamily: 'K2D-Regular' }]}>
-            Start matching with professionals to begin conversations
-          </Text>
-        </View>
-      )}
+
+      <FlatList
+        data={conversations}
+        renderItem={renderItem}
+        keyExtractor={item => item.id}
+        contentContainerStyle={{ paddingBottom: 20 }}
+      />
     </SafeAreaView>
   );
 }
@@ -151,10 +200,10 @@ export default function ChatsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    padding: 16,
   },
   header: {
-    padding: 16,
-    paddingBottom: 8,
+    marginBottom: 16,
   },
   headerContent: {
     flexDirection: 'row',
@@ -167,73 +216,54 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 16,
+    marginBottom: 16,
   },
-  newMessageButton: {
+  filterButton: {
     padding: 8,
   },
-  messagesList: {
-    padding: 16,
-  },
-  messageItem: {
+  conversationItem: {
     flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 12,
+    paddingVertical: 16,
     borderBottomWidth: 1,
   },
   avatarContainer: {
     position: 'relative',
-    marginRight: 12,
+    marginRight: 16,
   },
   avatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
   },
   unreadBadge: {
     position: 'absolute',
+    right: 0,
+    top: 0,
     width: 12,
     height: 12,
     borderRadius: 6,
-    right: 0,
-    top: 0,
-    borderWidth: 2,
-    borderColor: '#FFFFFF',
   },
-  messageContent: {
+  conversationContent: {
     flex: 1,
+    justifyContent: 'center',
   },
-  messageHeader: {
+  conversationHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 4,
   },
-  senderName: {
+  personName: {
     fontSize: 16,
   },
-  timestamp: {
+  messageTime: {
     fontSize: 12,
   },
-  messageText: {
+  occupation: {
     fontSize: 14,
-    lineHeight: 20,
+    marginBottom: 4,
   },
-  unreadText: {
-    fontWeight: '500',
-  },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  emptyText: {
-    fontSize: 18,
-    marginTop: 16,
-    marginBottom: 8,
-  },
-  emptySubtext: {
+  messagePreview: {
     fontSize: 14,
-    textAlign: 'center',
   },
 });
