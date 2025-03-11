@@ -5,8 +5,8 @@ import Constants from 'expo-constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Base URL for your API - fallback to mock API if not configured
-const API_BASE_URL = Constants.expoConfig?.extra?.API_URL || 
-                    'https://mock-api.cupcircle.com';
+const API_BASE_URL = Constants.expoConfig?.extra?.apiUrl || 
+                    'https://api.cupcircle.com';
 
 // Flag to use mock data when API is unavailable
 let useMockData = true;
@@ -15,7 +15,7 @@ let useMockData = true;
 export const initApiClient = async () => {
   try {
     // Test API connection
-    const response = await fetch(`${API_BASE_URL}/health-check`, {
+    const response = await fetch(`${API_BASE_URL}/api/health-check`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -44,7 +44,7 @@ export const apiQuery = async (endpoint: string, params?: any) => {
       throw new Error('MOCK_DATA_REQUIRED');
     }
     
-    const response = await fetch(`${API_BASE_URL}/${endpoint}`, {
+    const response = await fetch(`${API_BASE_URL}/api/${endpoint}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
