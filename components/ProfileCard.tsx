@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { View, Text, Image, StyleSheet, Dimensions, TouchableOpacity, ScrollView, TextInput, ActivityIndicator } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import Button from './ui/Button';
@@ -106,6 +107,10 @@ export default function ProfileCard({
   const [userData, setUserData] = useState<UserProfileData>(profile);
   const [isSaving, setIsSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [birthdayDate, setBirthdayDate] = useState<Date | null>(
+    userData.birthday ? new Date(userData.birthday) : null
+  );
   
   // Function to handle edit button press
   const handleEdit = () => {
@@ -490,17 +495,42 @@ export default function ProfileCard({
           {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
 
           <Text style={[styles.label, { color: colors.secondaryText }]}>Birthday*</Text>
-          <TextInput
+          <TouchableOpacity
             style={[
               styles.input,
-              { backgroundColor: colors.background, color: colors.text, borderColor: errors.birthday ? 'red' : colors.border }
+              styles.datePickerButton,
+              { backgroundColor: colors.background, borderColor: errors.birthday ? 'red' : colors.border }
             ]}
-            value={userData.birthday}
-            onChangeText={(value) => handleChange('birthday', value)}
-            placeholder="MM/DD/YYYY"
-            placeholderTextColor={colors.secondaryText}
-          />
+            onPress={() => {
+              // Show date picker when pressed
+              setShowDatePicker(true);
+            }}
+          >
+            <Text style={{ color: userData.birthday ? colors.text : colors.secondaryText, fontFamily: 'K2D-Regular' }}>
+              {userData.birthday || "Select your birthday"}
+            </Text>
+            <Ionicons name="calendar-outline" size={20} color={colors.secondaryText} />
+          </TouchableOpacity>
           {errors.birthday && <Text style={styles.errorText}>{errors.birthday}</Text>}
+          
+          {/* Date Picker Modal */}
+          {showDatePicker && (
+            <DateTimePicker
+              value={birthdayDate || new Date(2000, 0, 1)}
+              mode="date"
+              display="spinner"
+              onChange={(event, selectedDate) => {
+                setShowDatePicker(false);
+                if (selectedDate) {
+                  setBirthdayDate(selectedDate);
+                  // Format date as MM/DD/YYYY
+                  const formattedDate = `${selectedDate.getMonth() + 1}/${selectedDate.getDate()}/${selectedDate.getFullYear()}`;
+                  handleChange('birthday', formattedDate);
+                }
+              }}
+              maximumDate={new Date()} // Cannot select future dates
+            />
+          )}
 
           <Text style={[styles.label, { color: colors.secondaryText }]}>Occupation*</Text>
           <TextInput
@@ -851,6 +881,11 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     fontFamily: 'K2D-Regular',
     fontSize: 16,
+  },
+  datePickerButton: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   textArea: {
     minHeight: 100,
