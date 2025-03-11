@@ -176,9 +176,9 @@ export default function OnboardingScreen() {
             <TouchableOpacity 
               style={[
                 styles.nextButton, 
-                { backgroundColor: colors.primary },
+                { backgroundColor: colors.primary, flex: step === 1 ? 2 : 1 }, 
                 loading && { opacity: 0.7 }
-              ]} 
+              ]}
               onPress={handleNext}
               disabled={loading}
             >
@@ -187,6 +187,7 @@ export default function OnboardingScreen() {
               </Text>
               {loading && <Ionicons name="sync" size={18} color="white" style={styles.loadingIcon} />}
             </TouchableOpacity>
+
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -317,7 +318,6 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     justifyContent: 'center',
     alignItems: 'center',
-    flex: step === 1 ? 2 : 1,
     flexDirection: 'row',
   },
   nextButtonText: {
