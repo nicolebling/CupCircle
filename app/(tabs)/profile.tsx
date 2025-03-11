@@ -1,58 +1,51 @@
 
-import React, { useState, useEffect, useContext } from 'react';
-import { SafeAreaView, StyleSheet, Alert } from 'react-native';
-import { useColorScheme } from '@/hooks/useColorScheme';
+import React, { useState, useEffect } from 'react';
+import { SafeAreaView, StyleSheet, Alert, View, Text, TouchableOpacity } from 'react-native';
 import Colors from '@/constants/Colors';
 import UserProfileCard, { UserProfileData } from '@/components/UserProfileCard';
 import { useProfileManager, ProfileFormData } from '@/hooks/useProfileManager';
-import { AuthContext } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function ProfileScreen() {
-  const colorScheme = useColorScheme();
   const colors = Colors.light;
-  
+  const { user } = useAuth();
   const [isEditMode, setIsEditMode] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  
-  // Get user ID from auth context
-  const { user } = useContext(AuthContext);
-  const userId = user?.id || "";
-  const { profile, error, isLoading: profileLoading, fetchProfile, updateProfile } = useProfileManager(userId);
-  
-  // Local profile data for the UI
   const [profileData, setProfileData] = useState<UserProfileData>({
     name: '',
-    photo: 'https://randomuser.me/api/portraits/women/32.jpg',
-    birthday: '',
-    age: 0,
+    age: undefined,
+    photo: undefined,
     occupation: '',
-    experienceLevel: '',
     industries: [],
     skills: [],
     experience: '',
     education: '',
     bio: '',
-    city: 'New York City',
+    city: '',
     neighborhoods: [],
     favoriteCafes: [],
     interests: [],
   });
   
-  // Fetch profile data when component mounts
-  useEffect(() => {
-    fetchProfile();
-  }, []);
+  const userId = user?.id || '';
+  const { profile, isLoading: profileLoading, error, fetchProfile, updateProfile } = useProfileManager(userId);
   
-  // Update local state when profile data is loaded
+  useEffect(() => {
+    if (userId) {
+      fetchProfile();
+    }
+  }, [userId]);
+  
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Update form data when profile is loaded
   useEffect(() => {
     if (profile) {
       setProfileData({
         name: profile.name || '',
-        photo: profile.photo || 'https://randomuser.me/api/portraits/women/32.jpg',
-        birthday: '', // Convert from age if needed
-        age: profile.age || 0,
+        age: profile.age,
+        photo: profile.photo,
         occupation: profile.occupation || '',
-        experienceLevel: '', // Map from industry_categories if applicable
         industries: profile.industry_categories || [],
         skills: profile.skills || [],
         experience: '', // Not directly mapped
@@ -98,6 +91,25 @@ export default function ProfileScreen() {
   
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={styles.header}>
+        <View style={styles.headerContent}>
+          <Text style={[styles.title, { color: colors.text, fontFamily: 'K2D-Bold' }]}>My Profile</Text>
+          <TouchableOpacity 
+            style={styles.editButton} 
+            onPress={() => setIsEditMode(!isEditMode)}
+          >
+            <Ionicons 
+              name={isEditMode ? "close" : "create-outline"} 
+              size={24} 
+              color={colors.primary} 
+            />
+          </TouchableOpacity>
+        </View>
+        <Text style={[styles.subtitle, { color: colors.secondaryText, fontFamily: 'K2D-Regular' }]}>
+          Manage your professional details
+        </Text>
+      </View>
+      
       <UserProfileCard 
         isEditMode={isEditMode}
         isLoading={isLoading || profileLoading}
@@ -113,5 +125,24 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
+  },
+  header: {
+    marginBottom: 16,
+  },
+  headerContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  title: {
+    fontSize: 24,
+  },
+  subtitle: {
+    fontSize: 16,
+    marginBottom: 16,
+  },
+  editButton: {
+    padding: 8,
   },
 });
