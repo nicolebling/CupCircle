@@ -41,6 +41,21 @@ export default function LoginScreen() {
 
   const handleLogin = async () => {
     if (!validateForm()) return;
+    
+    setIsLoading(true);
+    try {
+      console.log('Attempting login with credentials:', email);
+      await signIn(email, password);
+      console.log('Login successful');
+    } catch (error) {
+      console.error('Login failed:', error);
+      setErrors({
+        email: '',
+        password: 'Invalid email or password. Please try again.'
+      });
+    } finally {
+      setIsLoading(false);
+    }
 
     setIsLoading(true);
     try {
@@ -99,12 +114,20 @@ export default function LoginScreen() {
             </Text>
           </TouchableOpacity>
 
+          {errors.password && (
+            <Text style={{ color: 'red', marginBottom: 10, textAlign: 'center' }}>
+              {errors.password}
+            </Text>
+          )}
           <Button
             title="Log In"
             onPress={handleLogin}
             style={styles.loginButton}
             loading={isLoading}
           />
+          <Text style={{ textAlign: 'center', marginTop: 10, color: colors.secondaryText }}>
+            Test credentials: john@example.com / password123
+          </Text>
 
           <View style={styles.dividerContainer}>
             <View style={[styles.divider, { backgroundColor: colors.border }]} />

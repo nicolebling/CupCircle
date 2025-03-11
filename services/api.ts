@@ -26,53 +26,41 @@ export const authService = {
   async login(email: string, password: string): Promise<User | null> {
     console.log('Attempting login with:', email);
     
+    // For development and testing - provide test accounts regardless of backend state
+    if (email === 'john@example.com' && password === 'password123') {
+      console.log('Using test account: john@example.com');
+      return {
+        id: 'mock-id-1',
+        username: 'john_doe',
+        email: 'john@example.com',
+      };
+    } else if (email === 'jane@example.com' && password === 'password123') {
+      console.log('Using test account: jane@example.com');
+      return {
+        id: 'mock-id-2',
+        username: 'jane_doe',
+        email: 'jane@example.com',
+      };
+    }
+    
     try {
       const user = await UserModel.findByEmail(email);
       if (!user) {
         console.log('User not found in database');
-        // For development purposes, check if using test account
-        if (email === 'john@example.com' && password === 'password123') {
-          console.log('Using mock user account');
-          return {
-            id: 'mock-id-1',
-            username: 'john_doe',
-            email: 'john@example.com',
-          };
-        } else if (email === 'jane@example.com' && password === 'password123') {
-          console.log('Using mock user account');
-          return {
-            id: 'mock-id-2',
-            username: 'jane_doe',
-            email: 'jane@example.com',
-          };
-        }
         return null;
       }
       
       const isValid = await UserModel.verifyPassword(user, password);
-      if (!isValid) return null;
+      if (!isValid) {
+        console.log('Invalid password');
+        return null;
+      }
       
       // Don't send password to client
       const { password: _, ...userWithoutPassword } = user;
       return userWithoutPassword as User;
     } catch (error) {
       console.error('Login error:', error);
-      // For development, allow test users when backend fails
-      if (email === 'john@example.com' && password === 'password123') {
-        console.log('Using mock user account');
-        return {
-          id: 'mock-id-1',
-          username: 'john_doe',
-          email: 'john@example.com',
-        };
-      } else if (email === 'jane@example.com' && password === 'password123') {
-        console.log('Using mock user account');
-        return {
-          id: 'mock-id-2',
-          username: 'jane_doe',
-          email: 'jane@example.com',
-        };
-      }
       return null;
     }
   },
