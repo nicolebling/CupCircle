@@ -1,234 +1,249 @@
 
-import { User, UserModel } from '../models/User';
-import { Profile, ProfileModel } from '../models/Profile';
-import { Availability, AvailabilityModel } from '../models/Availability';
-import { Match, MatchModel, MatchStatus } from '../models/Match';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Profile } from '../models/Profile';
 
-// Authentication methods
+// Base URL for API
+const API_URL = process.env.EXPO_PUBLIC_API_URL || 'https://cupcircle-api.yourusername.replit.app';
+console.log('Using API URL:', API_URL);
+
+// Auth service
 export const authService = {
-  // Register a new user
-  async register(username: string, email: string, password: string): Promise<User> {
-    console.log('Registering user:', email);
+  // Login function
+  async login(email: string, password: string) {
     try {
-      return UserModel.create(username, email, password);
+      // For development, use mockAuthService if API is not available
+      if (!API_URL.includes('replit.dev')) {
+        console.log('Using mock auth service');
+        return mockAuthService.login(email, password);
+      }
+      
+      const response = await fetch(`${API_URL}/api/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+      
+      if (!response.ok) {
+        return null;
+      }
+      
+      return await response.json();
     } catch (error) {
-      console.error('Registration error:', error);
-      // For development, create a mock user when backend fails
-      return {
-        id: 'mock-id-' + Date.now(),
-        username,
-        email
-      };
+      console.error('Login error:', error);
+      // Fallback to mock during development
+      return mockAuthService.login(email, password);
     }
   },
-
-  // Login user
-  async login(email: string, password: string): Promise<User | null> {
-    console.log('Attempting login with:', email);
-    
-    // For development and testing - provide test accounts regardless of backend state
-    if (email === 'john@example.com' && password === 'password123') {
-      console.log('Using test account: john@example.com');
-      return {
-        id: 'mock-id-1',
-        username: 'john_doe',
-        email: 'john@example.com',
-      };
-    } else if (email === 'jane@example.com' && password === 'password123') {
-      console.log('Using test account: jane@example.com');
-      return {
-        id: 'mock-id-2',
-        username: 'jane_doe',
-        email: 'jane@example.com',
-      };
-    }
-    
+  
+  // Register function
+  async register(username: string, email: string, password: string) {
     try {
-      const user = await UserModel.findByEmail(email);
-      if (!user) {
-        console.log('User not found in database');
+      // For development, use mockAuthService if API is not available
+      if (!API_URL.includes('replit.dev')) {
+        console.log('Using mock auth service');
+        return mockAuthService.register(username, email, password);
+      }
+      
+      const response = await fetch(`${API_URL}/api/auth/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, email, password }),
+      });
+      
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Registration failed');
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Register error:', error);
+      // Fallback to mock during development
+      return mockAuthService.register(username, email, password);
+    }
+  }
+};
+
+// Profile service
+export const profileService = {
+  // Get profile by user ID
+  async getProfileByUserId(userId: string) {
+    try {
+      if (!userId) return null;
+      
+      // For development, use mockProfileService if API is not available
+      if (!API_URL.includes('replit.dev')) {
+        console.log('Using mock profile service');
+        return mockProfileService.getProfileByUserId(userId);
+      }
+      
+      const response = await fetch(`${API_URL}/api/profile/${userId}`);
+      
+      if (!response.ok) {
         return null;
       }
       
-      const isValid = await UserModel.verifyPassword(user, password);
-      if (!isValid) {
-        console.log('Invalid password');
-        return null;
+      return await response.json();
+    } catch (error) {
+      console.error('Failed to load user profile', error);
+      // Fallback to mock during development
+      return mockProfileService.getProfileByUserId(userId);
+    }
+  },
+  
+  // Save profile (create or update)
+  async saveProfile(profileData: Partial<Profile> & { user_id: string }) {
+    try {
+      // For development, use mockProfileService if API is not available
+      if (!API_URL.includes('replit.dev')) {
+        console.log('Using mock profile service');
+        return mockProfileService.saveProfile(profileData);
       }
       
-      // Don't send password to client
-      const { password: _, ...userWithoutPassword } = user;
-      return userWithoutPassword as User;
+      const response = await fetch(`${API_URL}/api/profile`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(profileData),
+      });
+      
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to save profile');
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Failed to save profile', error);
+      // Fallback to mock during development
+      return mockProfileService.saveProfile(profileData);
+    }
+  }
+};
+
+// Mock auth service (for development)
+export const mockAuthService = {
+  // Login function
+  async login(email: string, password: string) {
+    try {
+      // For development, accept any login
+      return {
+        id: '1',
+        username: 'demouser',
+        email: email
+      };
     } catch (error) {
       console.error('Login error:', error);
       return null;
     }
   },
-
-  // Get user by ID
-  async getUserById(id: string): Promise<User | null> {
+  
+  // Register function
+  async register(username: string, email: string, password: string) {
     try {
-      return UserModel.findById(id);
-    } catch (error) {
-      console.error('Get user error:', error);
-      // For development, return mock user
-      if (id.includes('mock-id')) {
-        return {
-          id,
-          username: id === 'mock-id-1' ? 'john_doe' : 'jane_doe',
-          email: id === 'mock-id-1' ? 'john@example.com' : 'jane@example.com',
-        };
-      }
-      return null;
-    }
-  }
-};
-
-// Profile methods
-export const profileService = {
-  // Create or update profile
-  async saveProfile(profile: Omit<Profile, 'id' | 'created_at' | 'updated_at'>): Promise<Profile> {
-    try {
-      const existingProfile = await ProfileModel.findByUserId(profile.user_id);
-      
-      if (existingProfile) {
-        return ProfileModel.update(existingProfile.id, profile);
-      } else {
-        return ProfileModel.create(profile);
-      }
-    } catch (error) {
-      console.error('Save profile error:', error);
-      console.log('Using mock profile service');
-      // For development, return mock profile
       return {
-        id: 'mock-profile-' + Date.now(),
-        user_id: profile.user_id,
-        name: profile.name || 'Mock User',
-        photo: profile.photo || 'https://randomuser.me/api/portraits/men/32.jpg',
-        occupation: profile.occupation || 'Software Engineer',
-        bio: profile.bio || 'This is a mock profile for development',
-        interests: profile.interests || ['React Native', 'Mobile Development', 'JavaScript'],
-        created_at: new Date(),
-        updated_at: new Date()
+        id: Date.now().toString(),
+        username,
+        email
       };
-    }
-  },
-
-  // Get profile by user ID
-  async getProfileByUserId(userId: string): Promise<Profile | null> {
-    try {
-      return ProfileModel.findByUserId(userId);
     } catch (error) {
-      console.error('Get profile error:', error);
-      console.log('Using mock profile service');
-      // For development, return mock profiles for test users
-      if (userId === 'mock-id-1' || userId.includes('mock-id-1')) {
-        return {
-          id: 'mock-profile-1',
-          user_id: userId,
-          name: 'John Doe',
-          photo: 'https://randomuser.me/api/portraits/men/32.jpg',
-          occupation: 'Software Engineer',
-          bio: 'Experienced developer with a passion for mobile apps',
-          interests: ['React Native', 'Node.js', 'JavaScript'],
-          created_at: new Date(),
-          updated_at: new Date()
-        };
-      } else if (userId === 'mock-id-2' || userId.includes('mock-id-2')) {
-        return {
-          id: 'mock-profile-2',
-          user_id: userId,
-          name: 'Jane Smith',
-          photo: 'https://randomuser.me/api/portraits/women/44.jpg',
-          occupation: 'UX Designer',
-          bio: 'Creative designer focused on user experience',
-          interests: ['UI/UX', 'Figma', 'User Research'],
-          created_at: new Date(),
-          updated_at: new Date()
-        };
-      }
+      console.error('Register error:', error);
+      throw error;
+    }
+  }
+};
+
+// Mock profile service (for development)
+export const mockProfileService = {
+  // Mock data for development
+  MOCK_PROFILES: [
+    {
+      id: '1',
+      user_id: '1',
+      name: 'Alex Thompson',
+      age: 28,
+      photo: 'https://randomuser.me/api/portraits/men/32.jpg',
+      occupation: 'Software Engineer',
+      bio: 'Passionate about building scalable web applications and mentoring junior developers.',
+      industry_categories: ['Technology', 'Software Development'],
+      skills: ['React', 'Node.js', 'TypeScript'],
+      neighborhoods: ['Downtown', 'Tech District'],
+      favorite_cafes: ['Coffee House', 'Bean There'],
+      interests: ['Coding', 'Hiking', 'Photography']
+    },
+    {
+      id: '2',
+      user_id: '2',
+      name: 'Sophia Wang',
+      age: 31,
+      photo: 'https://randomuser.me/api/portraits/women/44.jpg',
+      occupation: 'UX/UI Designer',
+      bio: 'Creative designer with a strong focus on user-centered design.',
+      industry_categories: ['Design', 'Technology'],
+      skills: ['UI Design', 'User Research', 'Figma'],
+      neighborhoods: ['Arts District', 'Midtown'],
+      favorite_cafes: ['The Roastery', 'Morning Brew'],
+      interests: ['Design', 'Art', 'Photography']
+    }
+  ],
+  
+  // Get profile by user ID
+  async getProfileByUserId(userId: string) {
+    try {
+      if (!userId) return null;
+      
+      const storedProfiles = await AsyncStorage.getItem('@profiles');
+      const profiles = storedProfiles ? JSON.parse(storedProfiles) : this.MOCK_PROFILES;
+      return profiles.find((profile: any) => profile.user_id === userId) || null;
+    } catch (error) {
+      console.error('Failed to load user profile', error);
       return null;
     }
   },
-
-  // Get profiles for matching
-  async getProfilesForMatching(userId: string, limit: number = 10): Promise<Profile[]> {
+  
+  // Save profile (create or update)
+  async saveProfile(profileData: any) {
     try {
-      return ProfileModel.getProfilesForMatching(userId, limit);
+      const { user_id } = profileData;
+      
+      // Get existing profiles
+      const storedProfiles = await AsyncStorage.getItem('@profiles');
+      const profiles = storedProfiles ? JSON.parse(storedProfiles) : this.MOCK_PROFILES;
+      
+      // Check if profile exists
+      const existingIndex = profiles.findIndex((p: any) => p.user_id === user_id);
+      
+      if (existingIndex >= 0) {
+        // Update existing profile
+        profiles[existingIndex] = {
+          ...profiles[existingIndex],
+          ...profileData,
+          updated_at: new Date().toISOString()
+        };
+      } else {
+        // Create new profile
+        profiles.push({
+          id: Date.now().toString(),
+          user_id,
+          ...profileData,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        });
+      }
+      
+      // Save updated profiles
+      await AsyncStorage.setItem('@profiles', JSON.stringify(profiles));
+      
+      // Return the saved profile
+      return profiles.find((p: any) => p.user_id === user_id);
     } catch (error) {
-      console.error('Get profiles for matching error:', error);
-      console.log('Using mock profile service');
-      // For development, return mock profiles
-      return [
-        {
-          id: 'mock-profile-3',
-          user_id: 'mock-id-3',
-          name: 'Alex Thompson',
-          photo: 'https://randomuser.me/api/portraits/men/32.jpg',
-          occupation: 'Software Engineer',
-          bio: 'Passionate about building scalable web applications',
-          interests: ['React', 'Node.js', 'Cloud Architecture'],
-          created_at: new Date(),
-          updated_at: new Date()
-        },
-        {
-          id: 'mock-profile-4',
-          user_id: 'mock-id-4',
-          name: 'Sophia Wang',
-          photo: 'https://randomuser.me/api/portraits/women/44.jpg',
-          occupation: 'UX/UI Designer',
-          bio: 'Creative designer with a strong focus on user-centered design',
-          interests: ['User Research', 'Wireframing', 'Figma'],
-          created_at: new Date(),
-          updated_at: new Date()
-        }
-      ];
+      console.error('Failed to save profile', error);
+      throw error;
     }
-  }
-};
-
-// Availability methods
-export const availabilityService = {
-  // Create new availability slot
-  async createAvailability(availability: Omit<Availability, 'id' | 'created_at' | 'updated_at'>): Promise<Availability> {
-    return AvailabilityModel.create(availability);
-  },
-
-  // Get availability slots for a user
-  async getUserAvailability(userId: string): Promise<Availability[]> {
-    return AvailabilityModel.getByUserId(userId);
-  },
-
-  // Update availability slot
-  async updateAvailability(id: string, data: Partial<Availability>): Promise<Availability> {
-    return AvailabilityModel.update(id, data);
-  },
-
-  // Delete availability slot
-  async deleteAvailability(id: string): Promise<boolean> {
-    return AvailabilityModel.delete(id);
-  }
-};
-
-// Match methods
-export const matchService = {
-  // Create new match
-  async createMatch(match: Omit<Match, 'id' | 'created_at' | 'updated_at'>): Promise<Match> {
-    return MatchModel.create(match);
-  },
-
-  // Get matches for a user
-  async getUserMatches(userId: string): Promise<Match[]> {
-    return MatchModel.getByUserId(userId);
-  },
-
-  // Update match status
-  async updateMatchStatus(id: string, status: MatchStatus): Promise<Match> {
-    return MatchModel.updateStatus(id, status);
-  },
-
-  // Update match details
-  async updateMatch(id: string, data: Partial<Match>): Promise<Match> {
-    return MatchModel.update(id, data);
   }
 };

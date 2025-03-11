@@ -1,0 +1,43 @@
+Uncaught Error
+Failed to fetch
+Call Stack
+
+Source Map
+This call stack is not symbolicated. Some features are unavailable such as viewing the function name or tapping to open files.
+window.fetch
+https://6201942e-be1e-4a3e-9295-82806adbf31b-00-2wf65zoqewps5.spock.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:218642
+query
+https://6201942e-be1e-4a3e-9295-82806adbf31b-00-2wf65zoqewps5.spock.replit.dev/node_modules/expo-router/entry.bundle:47267:30
+ProfileModel.findByUserId
+https://6201942e-be1e-4a3e-9295-82806adbf31b-00-2wf65zoqewps5.spock.replit.dev/node_modules/expo-router/entry.bundle:48227:48
+Object.getProfileByUserId
+https://6201942e-be1e-4a3e-9295-82806adbf31b-00-2wf65zoqewps5.spock.replit.dev/node_modules/expo-router/entry.bundle:47166:36
+fetchProfile
+https://6201942e-be1e-4a3e-9295-82806adbf31b-00-2wf65zoqewps5.spock.replit.dev/node_modules/expo-router/entry.bundle:103239:55
+eval
+http://6201942e-be1e-4a3e-9295-82806adbf31b-00-2wf65zoqewps5.spock.replit.dev/app/(tabs)/profile.bundle//&platform=web&hot=false&transform.routerRoot=app&dev=true&minify=false&modulesOnly=true&runModule=false&shallow=true:56:9
+commitHookEffectListMount
+https://6201942e-be1e-4a3e-9295-82806adbf31b-00-2wf65zoqewps5.spock.replit.dev/node_modules/expo-router/entry.bundle:126413:32
+commitPassiveMountOnFiber
+https://6201942e-be1e-4a3e-9295-82806adbf31b-00-2wf65zoqewps5.spock.replit.dev/node_modules/expo-router/entry.bundle:127906:19
+commitPassiveMountEffects_complete
+https://6201942e-be1e-4a3e-9295-82806adbf31b-00-2wf65zoqewps5.spock.replit.dev/node_modules/expo-router/entry.bundle:127878:15
+commitPassiveMountEffects_begin
+https://6201942e-be1e-4a3e-9295-82806adbf31b-00-2wf65zoqewps5.spock.replit.dev/node_modules/expo-router/entry.bundle:127868:13
+commitPassiveMountEffects
+https://6201942e-be1e-4a3e-9295-82806adbf31b-00-2wf65zoqewps5.spock.replit.dev/node_modules/expo-router/entry.bundle:127858:9
+flushPassiveEffectsImpl
+https://6201942e-be1e-4a3e-9295-82806adbf31b-00-2wf65zoqewps5.spock.replit.dev/node_modules/expo-router/entry.bundle:129741:9
+flushPassiveEffects
+https://6201942e-be1e-4a3e-9295-82806adbf31b-00-2wf65zoqewps5.spock.replit.dev/node_modules/expo-router/entry.bundle:129694:20
+commitRootImpl
+https://6201942e-be1e-4a3e-9295-82806adbf31b-00-2wf65zoqewps5.spock.replit.dev/node_modules/expo-router/entry.bundle:129653:11
+commitRoot
+https://6201942e-be1e-4a3e-9295-82806adbf31b-00-2wf65zoqewps5.spock.replit.dev/node_modules/expo-router/entry.bundle:129436:11
+performSyncWorkOnRoot
+https://6201942e-be1e-4a3e-9295-82806adbf31b-00-2wf65zoqewps5.spock.replit.dev/node_modules/expo-router/entry.bundle:128945:9
+flushSyncCallbacks
+https://6201942e-be1e-4a3e-9295-82806adbf31b-00-2wf65zoqewps5.spock.replit.dev/node_modules/expo-router/entry.bundle:116915:28
+<unknown>
+https://6201942e-be1e-4a3e-9295-82806adbf31b-00-2wf65zoqewps5.spock.replit.dev/node_modules/expo-router/entry.bundle:128550:19
+Showing all frames

@@ -1,142 +1,153 @@
-
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, FlatList, TouchableOpacity, Image } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, TextInput, SafeAreaView } from 'react-native';
 import Colors from '@/constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
+import { useAuth } from '@/contexts/AuthContext';
 
-// Dummy message interface
-interface Message {
-  id: string;
-  sender: {
-    id: string;
-    name: string;
-    avatar: string;
-  };
-  lastMessage: string;
-  timestamp: string;
-  unread: boolean;
-}
+// Mock conversation data
+const MOCK_CONVERSATIONS = [
+  {
+    id: '1',
+    user: {
+      id: '101',
+      name: 'Alex Thompson',
+      photo: 'https://randomuser.me/api/portraits/men/32.jpg',
+      occupation: 'Software Engineer'
+    },
+    lastMessage: {
+      text: 'Looking forward to our coffee chat tomorrow!',
+      timestamp: '09:45 AM',
+      isRead: true
+    },
+    unreadCount: 0
+  },
+  {
+    id: '2',
+    user: {
+      id: '102',
+      name: 'Sophia Wang',
+      photo: 'https://randomuser.me/api/portraits/women/44.jpg',
+      occupation: 'UX/UI Designer'
+    },
+    lastMessage: {
+      text: 'Do you have any recommendations for cafes downtown?',
+      timestamp: 'Yesterday',
+      isRead: false
+    },
+    unreadCount: 2
+  },
+  {
+    id: '3',
+    user: {
+      id: '103',
+      name: 'Marcus Johnson',
+      photo: 'https://randomuser.me/api/portraits/men/67.jpg',
+      occupation: 'Product Manager'
+    },
+    lastMessage: {
+      text: 'Thanks for the advice! It was really helpful.',
+      timestamp: 'Apr 12',
+      isRead: true
+    },
+    unreadCount: 0
+  },
+];
 
 export default function ChatsScreen() {
   const colors = Colors.light;
-  
-  // Dummy messages data
-  const [messages] = useState<Message[]>([
-    {
-      id: '1',
-      sender: {
-        id: 'user1',
-        name: 'Alex Thompson',
-        avatar: 'https://randomuser.me/api/portraits/men/32.jpg',
-      },
-      lastMessage: 'Looking forward to our coffee chat tomorrow!',
-      timestamp: '10:30 AM',
-      unread: true,
-    },
-    {
-      id: '2',
-      sender: {
-        id: 'user2',
-        name: 'Sophia Wang',
-        avatar: 'https://randomuser.me/api/portraits/women/44.jpg',
-      },
-      lastMessage: 'That cafe on Main St sounds perfect. See you at 2pm?',
-      timestamp: 'Yesterday',
-      unread: false,
-    },
-    {
-      id: '3',
-      sender: {
-        id: 'user3',
-        name: 'Marcus Johnson',
-        avatar: 'https://randomuser.me/api/portraits/men/67.jpg',
-      },
-      lastMessage: 'Thanks for the advice on that project!',
-      timestamp: 'Yesterday',
-      unread: false,
-    },
-    {
-      id: '4',
-      sender: {
-        id: 'user4',
-        name: 'Jasmine Rodriguez',
-        avatar: 'https://randomuser.me/api/portraits/women/29.jpg',
-      },
-      lastMessage: 'I can share some insights about digital marketing over coffee',
-      timestamp: 'Mon',
-      unread: true,
-    },
-    {
-      id: '5',
-      sender: {
-        id: 'user5',
-        name: 'David Chen',
-        avatar: 'https://randomuser.me/api/portraits/men/94.jpg',
-      },
-      lastMessage: 'Let me know if you want to discuss data science further',
-      timestamp: 'Sun',
-      unread: false,
-    },
-  ]);
+  const { user } = useAuth();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [conversations, setConversations] = useState(MOCK_CONVERSATIONS);
+  const [filteredConversations, setFilteredConversations] = useState(conversations);
 
-  const renderMessageItem = ({ item }: { item: Message }) => (
+  useEffect(() => {
+    // Filter conversations based on search query
+    if (searchQuery.trim() === '') {
+      setFilteredConversations(conversations);
+    } else {
+      const filtered = conversations.filter(conv => 
+        conv.user.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredConversations(filtered);
+    }
+  }, [searchQuery, conversations]);
+
+  const renderConversationItem = ({ item }: { item: typeof MOCK_CONVERSATIONS[0] }) => (
     <TouchableOpacity 
-      style={[styles.messageItem, { borderBottomColor: colors.border }]}
-      onPress={() => console.log('Message pressed:', item.id)}
+      style={[styles.conversationItem, { borderBottomColor: colors.border }]}
     >
       <View style={styles.avatarContainer}>
-        <Image source={{ uri: item.sender.avatar }} style={styles.avatar} />
-        {item.unread && <View style={[styles.unreadBadge, { backgroundColor: colors.primary }]} />}
+        <Image source={{ uri: item.user.photo }} style={styles.avatar} />
+        {item.unreadCount > 0 && (
+          <View style={[styles.badgeContainer, { backgroundColor: colors.primary }]}>
+            <Text style={styles.badgeText}>{item.unreadCount}</Text>
+          </View>
+        )}
       </View>
-      <View style={styles.messageContent}>
-        <View style={styles.messageHeader}>
-          <Text style={[styles.senderName, { color: colors.text }]}>{item.sender.name}</Text>
-          <Text style={[styles.timestamp, { color: colors.secondaryText }]}>{item.timestamp}</Text>
+
+      <View style={styles.conversationContent}>
+        <View style={styles.conversationHeader}>
+          <Text style={[styles.userName, { color: colors.text }]}>{item.user.name}</Text>
+          <Text style={[styles.timestamp, { color: colors.secondaryText }]}>
+            {item.lastMessage.timestamp}
+          </Text>
         </View>
-        <Text 
-          style={[
-            styles.messageText, 
-            { color: item.unread ? colors.text : colors.secondaryText },
-            item.unread && styles.unreadText
-          ]}
-          numberOfLines={1}
-        >
-          {item.lastMessage}
-        </Text>
+
+        <View style={styles.messagePreviewContainer}>
+          <Text 
+            style={[
+              styles.messagePreview, 
+              { color: item.unreadCount > 0 ? colors.text : colors.secondaryText },
+              item.unreadCount > 0 && styles.unreadMessage
+            ]}
+            numberOfLines={1}
+          >
+            {item.lastMessage.text}
+          </Text>
+        </View>
       </View>
     </TouchableOpacity>
+  );
+
+  const EmptyListComponent = () => (
+    <View style={styles.emptyContainer}>
+      <Ionicons name="chatbubble-ellipses-outline" size={64} color={colors.secondaryText} />
+      <Text style={[styles.emptyTitle, { color: colors.text }]}>No conversations yet</Text>
+      <Text style={[styles.emptySubtitle, { color: colors.secondaryText }]}>
+        {searchQuery ? 'No matches found for your search' : 'Start matching with professionals to begin chatting'}
+      </Text>
+    </View>
   );
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.header}>
-        <View style={styles.headerContent}>
-          <Text style={[styles.title, { color: colors.text }]}>Messages</Text>
-          <TouchableOpacity style={styles.newMessageButton}>
-            <Ionicons name="create-outline" size={24} color={colors.primary} />
-          </TouchableOpacity>
-        </View>
-        <Text style={[styles.subtitle, { color: colors.secondaryText }]}>
-          Connect with your coffee chat partners
-        </Text>
+        <Text style={[styles.title, { color: colors.text }]}>Messages</Text>
       </View>
 
-      {messages.length > 0 ? (
-        <FlatList
-          data={messages}
-          keyExtractor={(item) => item.id}
-          renderItem={renderMessageItem}
-          contentContainerStyle={styles.messagesList}
+      <View style={[styles.searchContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
+        <Ionicons name="search" size={20} color={colors.secondaryText} />
+        <TextInput
+          style={[styles.searchInput, { color: colors.text }]}
+          placeholder="Search conversations..."
+          placeholderTextColor={colors.secondaryText}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
         />
-      ) : (
-        <View style={styles.emptyContainer}>
-          <Ionicons name="chatbubbles-outline" size={60} color={colors.secondaryText} />
-          <Text style={[styles.emptyText, { color: colors.text }]}>No messages yet</Text>
-          <Text style={[styles.emptySubtext, { color: colors.secondaryText }]}>
-            Start matching with professionals to begin conversations
-          </Text>
-        </View>
-      )}
+        {searchQuery !== '' && (
+          <TouchableOpacity onPress={() => setSearchQuery('')}>
+            <Ionicons name="close-circle" size={20} color={colors.secondaryText} />
+          </TouchableOpacity>
+        )}
+      </View>
+
+      <FlatList
+        data={filteredConversations}
+        keyExtractor={item => item.id}
+        renderItem={renderConversationItem}
+        contentContainerStyle={filteredConversations.length === 0 ? { flex: 1 } : null}
+        ListEmptyComponent={EmptyListComponent}
+      />
     </SafeAreaView>
   );
 }
@@ -144,34 +155,34 @@ export default function ChatsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
   },
   header: {
-    marginBottom: 16,
-  },
-  headerContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 4,
+    padding: 16,
+    paddingBottom: 8,
   },
   title: {
     fontFamily: 'K2D-Bold',
     fontSize: 24,
   },
-  newMessageButton: {
-    padding: 8,
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: 16,
+    marginBottom: 16,
+    paddingHorizontal: 12,
+    height: 44,
+    borderRadius: 22,
+    borderWidth: 1,
   },
-  subtitle: {
+  searchInput: {
+    flex: 1,
+    marginLeft: 8,
     fontFamily: 'K2D-Regular',
     fontSize: 16,
   },
-  messagesList: {
-    paddingBottom: 20,
-  },
-  messageItem: {
+  conversationItem: {
     flexDirection: 'row',
-    paddingVertical: 16,
+    padding: 16,
     borderBottomWidth: 1,
   },
   avatarContainer: {
@@ -179,56 +190,69 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   avatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 54,
+    height: 54,
+    borderRadius: 27,
   },
-  unreadBadge: {
+  badgeContainer: {
     position: 'absolute',
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    right: 0,
     top: 0,
+    right: 0,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  messageContent: {
+  badgeText: {
+    color: 'white',
+    fontSize: 12,
+    fontFamily: 'K2D-Bold',
+  },
+  conversationContent: {
     flex: 1,
     justifyContent: 'center',
   },
-  messageHeader: {
+  conversationHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 4,
   },
-  senderName: {
+  userName: {
     fontFamily: 'K2D-SemiBold',
     fontSize: 16,
   },
   timestamp: {
     fontFamily: 'K2D-Regular',
-    fontSize: 14,
+    fontSize: 12,
   },
-  messageText: {
+  messagePreviewContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  messagePreview: {
     fontFamily: 'K2D-Regular',
-    fontSize: 15,
+    fontSize: 14,
+    flex: 1,
   },
-  unreadText: {
+  unreadMessage: {
     fontFamily: 'K2D-Medium',
   },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: 32,
   },
-  emptyText: {
+  emptyTitle: {
     fontFamily: 'K2D-SemiBold',
-    fontSize: 18,
+    fontSize: 20,
     marginTop: 16,
     marginBottom: 8,
+    textAlign: 'center',
   },
-  emptySubtext: {
+  emptySubtitle: {
     fontFamily: 'K2D-Regular',
     fontSize: 16,
     textAlign: 'center',

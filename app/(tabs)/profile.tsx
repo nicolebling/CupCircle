@@ -1,44 +1,118 @@
 
-import React, { useState } from 'react';
-import { SafeAreaView, StyleSheet } from 'react-native';
-import { useColorScheme } from '@/hooks/useColorScheme';
+import React, { useState, useEffect } from 'react';
+import { SafeAreaView, StyleSheet, Alert, View, Text, TouchableOpacity } from 'react-native';
 import Colors from '@/constants/Colors';
 import UserProfileCard, { UserProfileData } from '@/components/UserProfileCard';
+import { useProfileManager, ProfileFormData } from '@/hooks/useProfileManager';
+import { useAuth } from '@/contexts/AuthContext';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function ProfileScreen() {
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
-  
+  const colors = Colors.light;
+  const { user } = useAuth();
   const [isEditMode, setIsEditMode] = useState(false);
-  
-  // Sample profile data
-  const [profileData] = useState<UserProfileData>({
-    name: 'Emma Rodriguez',
-    photo: 'https://randomuser.me/api/portraits/women/32.jpg',
-    birthday: '04/15/1990',
-    age: 33,
-    occupation: 'Product Designer',
-    experienceLevel: 'Senior Level',
-    industries: ['Technology', 'Design', 'E-commerce'],
-    skills: ['UI/UX', 'Figma', 'User Research', 'Prototyping'],
-    experience: '8 years at various tech companies focusing on product design',
-    education: 'BFA in Graphic Design, School of Visual Arts',
-    bio: 'Creative designer passionate about creating intuitive and accessible digital products. Love connecting with other professionals over a cup of coffee to discuss design trends and collaboration opportunities.',
-    city: 'New York City',
-    neighborhoods: ['SoHo', 'Williamsburg', 'Chelsea'],
-    favoriteCafes: ['Think Coffee', 'Blue Bottle', 'Stumptown'],
-    interests: ['Design Thinking', 'Typography', 'Photography', 'Art Exhibitions', 'Coffee Brewing'],
+  const [profileData, setProfileData] = useState<UserProfileData>({
+    name: '',
+    age: undefined,
+    photo: undefined,
+    occupation: '',
+    industries: [],
+    skills: [],
+    experience: '',
+    education: '',
+    bio: '',
+    city: '',
+    neighborhoods: [],
+    favoriteCafes: [],
+    interests: [],
   });
   
-  const handleSaveProfile = (updatedData: UserProfileData) => {
-    console.log('Profile updated:', updatedData);
-    setIsEditMode(false);
+  const userId = user?.id || '';
+  const { profile, isLoading: profileLoading, error, fetchProfile, updateProfile } = useProfileManager(userId);
+  
+  useEffect(() => {
+    if (userId) {
+      fetchProfile();
+    }
+  }, [userId]);
+  
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Update form data when profile is loaded
+  useEffect(() => {
+    if (profile) {
+      setProfileData({
+        name: profile.name || '',
+        age: profile.age,
+        photo: profile.photo,
+        occupation: profile.occupation || '',
+        industries: profile.industry_categories || [],
+        skills: profile.skills || [],
+        experience: '', // Not directly mapped
+        education: '', // Not directly mapped
+        bio: profile.bio || '',
+        city: 'New York City', // Default or from location
+        neighborhoods: profile.neighborhoods || [],
+        favoriteCafes: profile.favorite_cafes || [],
+        interests: profile.interests || [],
+      });
+      setIsLoading(false);
+    }
+  }, [profile]);
+  
+  // Error handling
+  useEffect(() => {
+    if (error) {
+      Alert.alert('Error', error);
+    }
+  }, [error]);
+  
+  const handleSaveProfile = async (updatedData: UserProfileData) => {
+    // Convert UI format to database format
+    const profileFormData: ProfileFormData = {
+      name: updatedData.name,
+      age: updatedData.age,
+      occupation: updatedData.occupation,
+      photo: updatedData.photo,
+      bio: updatedData.bio,
+      industry_categories: updatedData.industries,
+      skills: updatedData.skills,
+      neighborhoods: updatedData.neighborhoods,
+      favorite_cafes: updatedData.favoriteCafes,
+      interests: updatedData.interests,
+    };
+    
+    const success = await updateProfile(profileFormData);
+    if (success) {
+      setIsEditMode(false);
+      Alert.alert('Success', 'Profile updated successfully');
+    }
   };
   
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={styles.header}>
+        <View style={styles.headerContent}>
+          <Text style={[styles.title, { color: colors.text, fontFamily: 'K2D-Bold' }]}>My Profile</Text>
+          <TouchableOpacity 
+            style={styles.editButton} 
+            onPress={() => setIsEditMode(!isEditMode)}
+          >
+            <Ionicons 
+              name={isEditMode ? "close" : "create-outline"} 
+              size={24} 
+              color={colors.primary} 
+            />
+          </TouchableOpacity>
+        </View>
+        <Text style={[styles.subtitle, { color: colors.secondaryText, fontFamily: 'K2D-Regular' }]}>
+          Manage your professional details
+        </Text>
+      </View>
+      
       <UserProfileCard 
         isEditMode={isEditMode}
+        isLoading={isLoading || profileLoading}
         initialData={profileData}
         onSave={handleSaveProfile}
         onCancel={() => setIsEditMode(false)}
@@ -51,5 +125,24 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
+  },
+  header: {
+    marginBottom: 16,
+  },
+  headerContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  title: {
+    fontSize: 24,
+  },
+  subtitle: {
+    fontSize: 16,
+    marginBottom: 16,
+  },
+  editButton: {
+    padding: 8,
   },
 });

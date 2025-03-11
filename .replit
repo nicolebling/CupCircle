@@ -5,11 +5,15 @@ modules = ["nodejs-20", "postgresql-16"]
 channel = "stable-24_05"
 
 [[ports]]
+localPort = 3000
+externalPort = 3000
+
+[[ports]]
 localPort = 8081
 externalPort = 80
 
 [workflows]
-runButton = "Dev Server"
+runButton = "Run All"
 
 [[workflows.workflow]]
 name = "Dev Server"
@@ -50,3 +54,22 @@ mode = "sequential"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npx eas build --platform android --profile preview"
+
+[[workflows.workflow]]
+name = "API Server"
+author = 38320710
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node api/server.js"
+
+[[workflows.workflow]]
+name = "Run All"
+author = 38320710
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run dev & node api/server.js"
+
+[deployment]
+run = ["sh", "-c", "node api/server.js"]

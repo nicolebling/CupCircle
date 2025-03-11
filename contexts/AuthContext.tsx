@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -63,20 +62,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       // Get user from database
       const authenticatedUser = await authService.login(email, password);
-      
+
       if (!authenticatedUser) {
         throw new Error('Invalid email or password');
       }
-      
-      let profile = null;
-      try {
-        // Get user profile - this might fail if database is unavailable
-        profile = await profileService.getProfileByUserId(authenticatedUser.id);
-      } catch (error) {
-        console.log('Failed to fetch profile, using mock profile data');
-        // Profile will be handled by the mock data in profileService
-      }
-      
+
+      // Get user profile
+      const profile = await profileService.getProfileByUserId(authenticatedUser.id);
+
       // Combine user and profile data
       const userProfile: UserProfile = {
         id: authenticatedUser.id,
@@ -88,7 +81,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         bio: profile?.bio,
         interests: profile?.interests,
       };
-      
+
       await AsyncStorage.setItem('@user', JSON.stringify(userProfile));
       setUser(userProfile);
       router.replace('/(tabs)');
@@ -105,13 +98,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       // Register new user
       const newUser = await authService.register(username, email, password);
-      
+
       // Create user profile
       await profileService.saveProfile({
         user_id: newUser.id,
         name: name,
       });
-      
+
       // Create user profile object
       const userProfile: UserProfile = {
         id: newUser.id,
@@ -119,10 +112,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         email: newUser.email,
         name: name,
       };
-      
+
       await AsyncStorage.setItem('@user', JSON.stringify(userProfile));
       setUser(userProfile);
-      router.replace('/(tabs)');
+      // Don't redirect to tabs, let the component handle redirection to onboarding
     } catch (error) {
       console.error('Registration failed', error);
       throw error;
@@ -140,22 +133,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.error('Logout failed', error);
     }
   };
-  
+
   const updateUser = async (userData: Partial<UserProfile>) => {
     try {
       if (!user) return;
-      
+
       // Update profile in database
       if (user.id) {
         const profileData: any = {};
-        
+
         // Map user profile fields to profile model fields
         if (userData.name) profileData.name = userData.name;
         if (userData.photo) profileData.photo = userData.photo;
         if (userData.occupation) profileData.occupation = userData.occupation;
         if (userData.bio) profileData.bio = userData.bio;
         if (userData.interests) profileData.interests = userData.interests;
-        
+
         if (Object.keys(profileData).length > 0) {
           await profileService.saveProfile({
             user_id: user.id,
@@ -163,7 +156,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           });
         }
       }
-      
+
       // Update local user state
       const updatedUser = { ...user, ...userData };
       await AsyncStorage.setItem('@user', JSON.stringify(updatedUser));
