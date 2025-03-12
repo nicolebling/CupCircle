@@ -1,89 +1,168 @@
-import React from 'react';
-import { SafeAreaView, ScrollView, StyleSheet, View, Text, TouchableOpacity, Alert } from 'react-native';
+
+import React, { useState } from 'react';
+import { SafeAreaView, ScrollView, StyleSheet, View, Text, TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useColorScheme } from '@/hooks/useColorScheme';
+import Colors from '@/constants/Colors';
 import { useAuth } from '@/contexts/AuthContext';
 import { router } from 'expo-router';
-import Colors from '@/constants/Colors';
-import { Ionicons } from '@expo/vector-icons';
 
 export default function SettingsScreen() {
-  const { user, signOut } = useAuth();
+  const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme];
+  const { signOut } = useAuth();
 
+  const [notifications, setNotifications] = useState(true);
+  const [darkMode, setDarkMode] = useState(false);
+
+  // Toggle functions
+  const handleNotificationsToggle = () => {
+    setNotifications(!notifications);
+  };
+
+  const handleDarkModeToggle = () => {
+    setDarkMode(!darkMode);
+  };
+
+  // Return to profile
+  const handleBackPress = () => {
+    router.back();
+  };
+
+  // Handle logout
   const handleLogout = async () => {
     try {
       await signOut();
-      router.replace('/(auth)/login');
+      // The router navigation is handled in AuthContext
     } catch (error) {
-      console.log('Logout error:', error);
-      Alert.alert('Error', 'Failed to log out. Please try again.');
+      console.error('Logout error:', error);
     }
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
+          <Ionicons name="chevron-back" size={24} color={colors.text} />
+        </TouchableOpacity>
+        <Text style={[styles.title, { color: colors.text }]}>Settings</Text>
+        <View style={styles.spacer} />
+      </View>
+
+      <ScrollView style={styles.content}>
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Account Settings</Text>
-
-          <TouchableOpacity style={styles.menuItem}>
-            <Ionicons name="person-outline" size={24} color={Colors.tintColor} />
-            <Text style={styles.menuItemText}>Edit Profile</Text>
-            <Ionicons name="chevron-forward" size={20} color="#ccc" />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.menuItem}>
-            <Ionicons name="notifications-outline" size={24} color={Colors.tintColor} />
-            <Text style={styles.menuItemText}>Notifications</Text>
-            <Ionicons name="chevron-forward" size={20} color="#ccc" />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.menuItem}>
-            <Ionicons name="lock-closed-outline" size={24} color={Colors.tintColor} />
-            <Text style={styles.menuItemText}>Privacy</Text>
-            <Ionicons name="chevron-forward" size={20} color="#ccc" />
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Preferences</Text>
-
-          <TouchableOpacity style={styles.menuItem}>
-            <Ionicons name="color-palette-outline" size={24} color={Colors.tintColor} />
-            <Text style={styles.menuItemText}>Appearance</Text>
-            <Ionicons name="chevron-forward" size={20} color="#ccc" />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.menuItem}>
-            <Ionicons name="globe-outline" size={24} color={Colors.tintColor} />
-            <Text style={styles.menuItemText}>Language</Text>
-            <Ionicons name="chevron-forward" size={20} color="#ccc" />
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Support</Text>
-
-          <TouchableOpacity style={styles.menuItem}>
-            <Ionicons name="help-circle-outline" size={24} color={Colors.tintColor} />
-            <Text style={styles.menuItemText}>Help Center</Text>
-            <Ionicons name="chevron-forward" size={20} color="#ccc" />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.menuItem}>
-            <Ionicons name="information-circle-outline" size={24} color={Colors.tintColor} />
-            <Text style={styles.menuItemText}>About</Text>
-            <Ionicons name="chevron-forward" size={20} color="#ccc" />
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Account</Text>
+          
           <TouchableOpacity 
-            style={styles.logoutButton}
-            onPress={handleLogout}
+            style={[styles.settingItem, { borderColor: colors.border }]}
           >
-            <Ionicons name="log-out-outline" size={24} color="white" />
-            <Text style={styles.logoutText}>Log Out</Text>
+            <View style={styles.settingContent}>
+              <Ionicons name="person-outline" size={22} color={colors.text} />
+              <Text style={[styles.settingText, { color: colors.text }]}>Edit Profile</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color={colors.secondaryText} />
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={[styles.settingItem, { borderColor: colors.border }]}
+          >
+            <View style={styles.settingContent}>
+              <Ionicons name="key-outline" size={22} color={colors.text} />
+              <Text style={[styles.settingText, { color: colors.text }]}>Change Password</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color={colors.secondaryText} />
           </TouchableOpacity>
         </View>
+        
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Preferences</Text>
+          
+          <View style={[styles.settingItem, { borderColor: colors.border }]}>
+            <View style={styles.settingContent}>
+              <Ionicons name="notifications-outline" size={22} color={colors.text} />
+              <Text style={[styles.settingText, { color: colors.text }]}>Notifications</Text>
+            </View>
+            <TouchableOpacity 
+              style={[
+                styles.toggle, 
+                notifications ? { backgroundColor: colors.primary } : { backgroundColor: colors.border }
+              ]}
+              onPress={handleNotificationsToggle}
+            >
+              <View 
+                style={[
+                  styles.toggleKnob, 
+                  notifications ? { right: 2 } : { left: 2 },
+                  { backgroundColor: 'white' }
+                ]} 
+              />
+            </TouchableOpacity>
+          </View>
+          
+          <View style={[styles.settingItem, { borderColor: colors.border }]}>
+            <View style={styles.settingContent}>
+              <Ionicons name="moon-outline" size={22} color={colors.text} />
+              <Text style={[styles.settingText, { color: colors.text }]}>Dark Mode</Text>
+            </View>
+            <TouchableOpacity 
+              style={[
+                styles.toggle, 
+                darkMode ? { backgroundColor: colors.primary } : { backgroundColor: colors.border }
+              ]}
+              onPress={handleDarkModeToggle}
+            >
+              <View 
+                style={[
+                  styles.toggleKnob, 
+                  darkMode ? { right: 2 } : { left: 2 },
+                  { backgroundColor: 'white' }
+                ]} 
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
+        
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Support</Text>
+          
+          <TouchableOpacity 
+            style={[styles.settingItem, { borderColor: colors.border }]}
+          >
+            <View style={styles.settingContent}>
+              <Ionicons name="help-circle-outline" size={22} color={colors.text} />
+              <Text style={[styles.settingText, { color: colors.text }]}>Help Center</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color={colors.secondaryText} />
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={[styles.settingItem, { borderColor: colors.border }]}
+          >
+            <View style={styles.settingContent}>
+              <Ionicons name="document-text-outline" size={22} color={colors.text} />
+              <Text style={[styles.settingText, { color: colors.text }]}>Terms of Service</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color={colors.secondaryText} />
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={[styles.settingItem, { borderColor: colors.border }]}
+          >
+            <View style={styles.settingContent}>
+              <Ionicons name="shield-outline" size={22} color={colors.text} />
+              <Text style={[styles.settingText, { color: colors.text }]}>Privacy Policy</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color={colors.secondaryText} />
+          </TouchableOpacity>
+        </View>
+        
+        <TouchableOpacity 
+          style={[styles.logoutButton, { borderColor: colors.border }]}
+          onPress={handleLogout}
+        >
+          <Ionicons name="log-out-outline" size={22} color="#FF3B30" />
+          <Text style={styles.logoutText}>Log Out</Text>
+        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );
@@ -92,42 +171,79 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 20,
+  },
+  backButton: {
+    padding: 4,
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    fontFamily: 'K2D-Bold',
+  },
+  spacer: {
+    width: 32,
+  },
+  content: {
+    flex: 1,
+    paddingHorizontal: 16,
   },
   section: {
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    marginBottom: 24,
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 15,
+    fontWeight: '600',
+    marginBottom: 12,
+    fontFamily: 'K2D-SemiBold',
   },
-  menuItem: {
+  settingItem: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#f9f9f9',
   },
-  menuItemText: {
-    flex: 1,
-    marginLeft: 15,
+  settingContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  settingText: {
     fontSize: 16,
+    marginLeft: 12,
+    fontFamily: 'K2D-Regular',
+  },
+  toggle: {
+    width: 50,
+    height: 28,
+    borderRadius: 14,
+    justifyContent: 'center',
+  },
+  toggleKnob: {
+    position: 'absolute',
+    width: 24,
+    height: 24,
+    borderRadius: 12,
   },
   logoutButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: Colors.tintColor,
-    padding: 15,
-    borderRadius: 10,
+    paddingVertical: 16,
+    marginVertical: 20,
+    borderRadius: 12,
+    borderWidth: 1,
   },
   logoutText: {
-    color: 'white',
+    color: '#FF3B30',
     fontSize: 16,
-    fontWeight: '600',
-    marginLeft: 10,
+    fontFamily: 'K2D-SemiBold',
+    marginLeft: 8,
   },
 });

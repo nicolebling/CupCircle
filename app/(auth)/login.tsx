@@ -44,10 +44,11 @@ export default function LoginScreen() {
       >
         <View style={styles.content}>
           <View style={styles.header}>
-            {/* Placeholder image since logo.png is missing */}
-            <View style={[styles.logo, { backgroundColor: '#3498db', borderRadius: 50 }]}>
-              <Text style={{ color: 'white', fontSize: 24, fontWeight: 'bold' }}>C</Text>
-            </View>
+            <Image 
+              source={require('@/assets/images/logo.png')} 
+              style={styles.logo} 
+              resizeMode="contain"
+            />
             <Text style={[styles.title, { color: colors.text }]}>CupCircle</Text>
             <Text style={[styles.subtitle, { color: colors.secondaryText }]}>
               Where every cup connects
