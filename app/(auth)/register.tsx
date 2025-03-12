@@ -6,10 +6,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function RegisterScreen() {
-  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -22,7 +20,7 @@ export default function RegisterScreen() {
     setError('');
 
     // Simple validation
-    if (!username || !email || !password || !confirmPassword || !name) {
+    if (!email || !password || !confirmPassword) {
       setError('All fields are required');
       return;
     }
@@ -34,7 +32,8 @@ export default function RegisterScreen() {
 
     setLoading(true);
     try {
-      await signUp(username, email, password, name);
+      // Pass empty strings for username and name as they're no longer collected
+      await signUp('', email, password, '');
       router.replace('/(auth)/onboarding');
     } catch (err: any) {
       setError(err.message || 'Registration failed');
@@ -62,34 +61,7 @@ export default function RegisterScreen() {
             </View>
           ) : null}
 
-          <View style={styles.inputContainer}>
-            <Text style={[styles.label, { color: colors.text }]}>Username</Text>
-            <View style={[styles.inputWrapper, { backgroundColor: colors.card, borderColor: colors.border }]}>
-              <Ionicons name="person-outline" size={20} color={colors.secondaryText} style={styles.inputIcon} />
-              <TextInput
-                style={[styles.input, { color: colors.text }]}
-                placeholder="Enter username"
-                placeholderTextColor={colors.secondaryText}
-                value={username}
-                onChangeText={setUsername}
-                autoCapitalize="none"
-              />
-            </View>
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={[styles.label, { color: colors.text }]}>Full Name</Text>
-            <View style={[styles.inputWrapper, { backgroundColor: colors.card, borderColor: colors.border }]}>
-              <Ionicons name="person" size={20} color={colors.secondaryText} style={styles.inputIcon} />
-              <TextInput
-                style={[styles.input, { color: colors.text }]}
-                placeholder="Enter your full name"
-                placeholderTextColor={colors.secondaryText}
-                value={name}
-                onChangeText={setName}
-              />
-            </View>
-          </View>
+          
 
           <View style={styles.inputContainer}>
             <Text style={[styles.label, { color: colors.text }]}>Email Address</Text>
