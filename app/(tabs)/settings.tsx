@@ -1,293 +1,169 @@
-
 import React, { useState } from 'react';
-import { 
-  SafeAreaView, 
-  ScrollView, 
-  StyleSheet, 
-  View, 
-  Text, 
-  TouchableOpacity, 
-  Alert,
-  Switch,
-  TextInput
-} from 'react-native';
-import { useAuth } from '@/contexts/AuthContext';
+import { SafeAreaView, ScrollView, StyleSheet, View, Text, TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import Colors from '@/constants/Colors';
-import { Ionicons } from '@expo/vector-icons';
+import { useAuth } from '@/contexts/AuthContext';
 import { router } from 'expo-router';
 
 export default function SettingsScreen() {
-  const { signOut, user } = useAuth();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
-  
+  const { logout } = useAuth();
+
   const [notifications, setNotifications] = useState(true);
-  const [isPasswordDialogVisible, setIsPasswordDialogVisible] = useState(false);
-  const [isEmailDialogVisible, setIsEmailDialogVisible] = useState(false);
-  
-  // Form values
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [newEmail, setNewEmail] = useState('');
-  
-  const handleBack = () => {
+  const [darkMode, setDarkMode] = useState(false);
+
+  // Toggle functions
+  const handleNotificationsToggle = () => {
+    setNotifications(!notifications);
+  };
+
+  const handleDarkModeToggle = () => {
+    setDarkMode(!darkMode);
+  };
+
+  // Return to profile
+  const handleBackPress = () => {
     router.back();
   };
-  
-  const handleNotificationToggle = (value) => {
-    setNotifications(value);
-    Alert.alert(
-      value ? "Notifications enabled" : "Notifications disabled",
-      value ? "You will now receive notifications" : "You will no longer receive notifications"
-    );
-  };
-  
-  const handlePasswordUpdate = () => {
-    if (!currentPassword || !newPassword) {
-      Alert.alert("Error", "Please fill in all fields");
-      return;
+
+  // Handle logout
+  const handleLogout = async () => {
+    try {
+      await logout();
+      router.replace('/(auth)/login');
+    } catch (error) {
+      console.error('Logout error:', error);
     }
-    
-    // Implement actual password update logic here
-    Alert.alert("Success", "Password updated successfully");
-    setIsPasswordDialogVisible(false);
-    setCurrentPassword('');
-    setNewPassword('');
   };
-  
-  const handleEmailUpdate = () => {
-    if (!newEmail) {
-      Alert.alert("Error", "Please enter your new email");
-      return;
-    }
-    
-    // Implement actual email update logic here
-    Alert.alert("Success", "Email updated successfully");
-    setIsEmailDialogVisible(false);
-    setNewEmail('');
-  };
-  
-  const handleLogout = () => {
-    Alert.alert(
-      "Logout",
-      "Are you sure you want to logout?",
-      [
-        {
-          text: "Cancel",
-          style: "cancel"
-        },
-        {
-          text: "Logout",
-          onPress: () => signOut()
-        }
-      ]
-    );
-  };
-  
-  const SettingsCard = ({ title, icon, children }) => (
-    <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
-      <View style={styles.cardHeader}>
-        <View style={styles.titleContainer}>
-          <Ionicons name={icon} size={22} color={colors.primary} style={styles.icon} />
-          <Text style={[styles.cardTitle, { color: colors.text }]}>{title}</Text>
-        </View>
-      </View>
-      <View style={styles.cardContent}>
-        {children}
-      </View>
-    </View>
-  );
-  
-  const SettingsButton = ({ title, onPress, rightIcon = "chevron-forward" }) => (
-    <TouchableOpacity 
-      style={[styles.settingsButton, { borderColor: colors.border }]} 
-      onPress={onPress}
-    >
-      <Text style={[styles.settingsButtonText, { color: colors.text }]}>{title}</Text>
-      <Ionicons name={rightIcon} size={18} color={colors.secondaryText} />
-    </TouchableOpacity>
-  );
-  
-  // Dialog for Password Change
-  const PasswordDialog = () => (
-    isPasswordDialogVisible ? (
-      <View style={[styles.dialog, { backgroundColor: colors.card }]}>
-        <View style={styles.dialogHeader}>
-          <Text style={[styles.dialogTitle, { color: colors.text }]}>Change Password</Text>
-          <TouchableOpacity onPress={() => setIsPasswordDialogVisible(false)}>
-            <Ionicons name="close" size={24} color={colors.text} />
-          </TouchableOpacity>
-        </View>
-        
-        <Text style={[styles.dialogDescription, { color: colors.secondaryText }]}>
-          Enter your current password and a new password to update your credentials.
-        </Text>
-        
-        <View style={styles.formGroup}>
-          <Text style={[styles.label, { color: colors.text }]}>Current Password</Text>
-          <TextInput
-            style={[styles.input, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }]}
-            secureTextEntry
-            value={currentPassword}
-            onChangeText={setCurrentPassword}
-            placeholder="Enter current password"
-            placeholderTextColor={colors.secondaryText}
-          />
-        </View>
-        
-        <View style={styles.formGroup}>
-          <Text style={[styles.label, { color: colors.text }]}>New Password</Text>
-          <TextInput
-            style={[styles.input, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }]}
-            secureTextEntry
-            value={newPassword}
-            onChangeText={setNewPassword}
-            placeholder="Enter new password"
-            placeholderTextColor={colors.secondaryText}
-          />
-        </View>
-        
-        <View style={styles.dialogFooter}>
-          <TouchableOpacity 
-            style={[styles.cancelButton, { borderColor: colors.border }]} 
-            onPress={() => setIsPasswordDialogVisible(false)}
-          >
-            <Text style={[styles.cancelButtonText, { color: colors.text }]}>Cancel</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={[styles.submitButton, { backgroundColor: colors.primary }]} 
-            onPress={handlePasswordUpdate}
-          >
-            <Text style={styles.submitButtonText}>Update</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    ) : null
-  );
-  
-  // Dialog for Email Change
-  const EmailDialog = () => (
-    isEmailDialogVisible ? (
-      <View style={[styles.dialog, { backgroundColor: colors.card }]}>
-        <View style={styles.dialogHeader}>
-          <Text style={[styles.dialogTitle, { color: colors.text }]}>Change Email</Text>
-          <TouchableOpacity onPress={() => setIsEmailDialogVisible(false)}>
-            <Ionicons name="close" size={24} color={colors.text} />
-          </TouchableOpacity>
-        </View>
-        
-        <Text style={[styles.dialogDescription, { color: colors.secondaryText }]}>
-          Enter your new email to update your credentials.
-        </Text>
-        
-        <View style={styles.formGroup}>
-          <Text style={[styles.label, { color: colors.text }]}>New Email</Text>
-          <TextInput
-            style={[styles.input, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }]}
-            keyboardType="email-address"
-            value={newEmail}
-            onChangeText={setNewEmail}
-            placeholder="Enter new email"
-            placeholderTextColor={colors.secondaryText}
-          />
-        </View>
-        
-        <View style={styles.dialogFooter}>
-          <TouchableOpacity 
-            style={[styles.cancelButton, { borderColor: colors.border }]} 
-            onPress={() => setIsEmailDialogVisible(false)}
-          >
-            <Text style={[styles.cancelButtonText, { color: colors.text }]}>Cancel</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={[styles.submitButton, { backgroundColor: colors.primary }]} 
-            onPress={handleEmailUpdate}
-          >
-            <Text style={styles.submitButtonText}>Update</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    ) : null
-  );
-  
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={handleBack}>
+        <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
           <Ionicons name="chevron-back" size={24} color={colors.text} />
         </TouchableOpacity>
         <Text style={[styles.headerTitle, { color: colors.text }]}>Settings</Text>
-        <View style={styles.placeholderButton} />
+        <View style={styles.spacer} />
       </View>
-      
-      <ScrollView style={styles.scrollView}>
-        <SettingsCard title="Notifications" icon="notifications-outline">
-          <View style={styles.settingRow}>
-            <Text style={[styles.settingText, { color: colors.text }]}>Enable notifications</Text>
-            <Switch
-              value={notifications}
-              onValueChange={handleNotificationToggle}
-              trackColor={{ false: '#767577', true: colors.primary + '50' }}
-              thumbColor={notifications ? colors.primary : '#f4f3f4'}
-            />
+
+      <ScrollView style={styles.content}>
+        {/* Notifications Section */}
+        <View style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <View style={styles.sectionHeader}>
+            <Ionicons name="notifications-outline" size={22} color={colors.primary} />
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Notifications</Text>
           </View>
-        </SettingsCard>
-        
-        <SettingsCard title="Subscribe" icon="diamond-outline">
-          <SettingsButton 
-            title="Subscribe to the Circle" 
-            onPress={() => Alert.alert("Coming Soon", "This feature is coming soon!")}
-          />
-        </SettingsCard>
-        
-        <SettingsCard title="Privacy & Security" icon="shield-outline">
-          <SettingsButton 
-            title="Change Password" 
-            onPress={() => setIsPasswordDialogVisible(true)}
-          />
-          <SettingsButton 
-            title="Change Email" 
-            onPress={() => setIsEmailDialogVisible(true)}
-          />
-        </SettingsCard>
-        
-        <SettingsCard title="Community" icon="people-outline">
-          <SettingsButton 
-            title="Safety & Community Guidelines" 
-            onPress={() => Alert.alert("Guidelines", "Our community guidelines ensure a respectful and productive environment for all users.")}
-          />
-          <SettingsButton 
-            title="Support Center" 
-            onPress={() => Alert.alert("Support", "Need help? Contact our support team via email or in-app chat.")}
-          />
-        </SettingsCard>
-        
-        <SettingsCard title="Legal" icon="document-text-outline">
-          <SettingsButton 
-            title="Privacy Policy" 
-            onPress={() => Alert.alert("Privacy Policy", "Our privacy policy details how we collect, use, and protect your personal information.")}
-          />
-          <SettingsButton 
-            title="Terms of Service" 
-            onPress={() => Alert.alert("Terms of Service", "By using our app, you agree to abide by our terms of service.")}
-          />
-        </SettingsCard>
-        
+
+          <View style={styles.setting}>
+            <Text style={[styles.settingLabel, { color: colors.text }]}>Enable notifications</Text>
+            <TouchableOpacity 
+              style={[
+                styles.toggle, 
+                notifications ? { backgroundColor: colors.primary } : { backgroundColor: colors.border }
+              ]}
+              onPress={handleNotificationsToggle}
+            >
+              <View style={[
+                styles.toggleCircle, 
+                notifications ? { right: 2 } : { left: 2 },
+                { backgroundColor: colors.background }
+              ]} />
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Subscription Section */}
+        <View style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <View style={styles.sectionHeader}>
+            <Ionicons name="diamond-outline" size={22} color={colors.primary} />
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Subscription</Text>
+          </View>
+
+          <TouchableOpacity 
+            style={[styles.menuItem, { borderColor: colors.border }]}
+          >
+            <Text style={[styles.menuItemText, { color: colors.text }]}>Subscribe to the Circle</Text>
+            <Ionicons name="chevron-forward" size={18} color={colors.secondaryText} />
+          </TouchableOpacity>
+        </View>
+
+        {/* Privacy & Security Section */}
+        <View style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <View style={styles.sectionHeader}>
+            <Ionicons name="shield-outline" size={22} color={colors.primary} />
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Privacy & Security</Text>
+          </View>
+
+          <TouchableOpacity 
+            style={[styles.menuItem, { borderColor: colors.border }]}
+          >
+            <Text style={[styles.menuItemText, { color: colors.text }]}>Change Password</Text>
+            <Ionicons name="chevron-forward" size={18} color={colors.secondaryText} />
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={[styles.menuItem, { borderColor: colors.border }]}
+          >
+            <Text style={[styles.menuItemText, { color: colors.text }]}>Change Email</Text>
+            <Ionicons name="chevron-forward" size={18} color={colors.secondaryText} />
+          </TouchableOpacity>
+        </View>
+
+        {/* Community Section */}
+        <View style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <View style={styles.sectionHeader}>
+            <Ionicons name="people-outline" size={22} color={colors.primary} />
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Community</Text>
+          </View>
+
+          <TouchableOpacity 
+            style={[styles.menuItem, { borderColor: colors.border }]}
+          >
+            <Text style={[styles.menuItemText, { color: colors.text }]}>Safety & Community Guidelines</Text>
+            <Ionicons name="chevron-forward" size={18} color={colors.secondaryText} />
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={[styles.menuItem, { borderColor: colors.border }]}
+          >
+            <Text style={[styles.menuItemText, { color: colors.text }]}>Support Center</Text>
+            <Ionicons name="chevron-forward" size={18} color={colors.secondaryText} />
+          </TouchableOpacity>
+        </View>
+
+        {/* Legal Section */}
+        <View style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <View style={styles.sectionHeader}>
+            <Ionicons name="document-text-outline" size={22} color={colors.primary} />
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Legal</Text>
+          </View>
+
+          <TouchableOpacity 
+            style={[styles.menuItem, { borderColor: colors.border }]}
+          >
+            <Text style={[styles.menuItemText, { color: colors.text }]}>Privacy Policy</Text>
+            <Ionicons name="chevron-forward" size={18} color={colors.secondaryText} />
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={[styles.menuItem, { borderColor: colors.border }]}
+          >
+            <Text style={[styles.menuItemText, { color: colors.text }]}>Terms of Service</Text>
+            <Ionicons name="chevron-forward" size={18} color={colors.secondaryText} />
+          </TouchableOpacity>
+        </View>
+
+        {/* Logout Button */}
         <TouchableOpacity 
-          style={[styles.logoutButton, { borderColor: colors.border }]} 
+          style={[styles.logoutButton, { borderColor: colors.border }]}
           onPress={handleLogout}
         >
-          <Ionicons name="log-out-outline" size={20} color={"#FF3B30"} />
-          <Text style={[styles.logoutText, { color: "#FF3B30" }]}>Logout</Text>
+          <Ionicons name="log-out-outline" size={22} color="#FF3B30" />
+          <Text style={styles.logoutText}>Logout</Text>
         </TouchableOpacity>
       </ScrollView>
-      
-      {/* Dialogs */}
-      <PasswordDialog />
-      <EmailDialog />
     </SafeAreaView>
   );
 }
@@ -304,63 +180,67 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   backButton: {
-    padding: 8,
+    padding: 4,
   },
   headerTitle: {
     fontSize: 20,
-    fontFamily: 'K2D-SemiBold',
+    fontFamily: 'K2D-Bold',
   },
-  placeholderButton: {
-    width: 40,
+  spacer: {
+    width: 24,
   },
-  scrollView: {
+  content: {
     flex: 1,
-    padding: 16,
+    paddingHorizontal: 16,
   },
-  card: {
+  section: {
     borderRadius: 12,
     marginBottom: 16,
     borderWidth: 1,
     overflow: 'hidden',
   },
-  cardHeader: {
-    padding: 16,
-    borderBottomWidth: 0,
-  },
-  titleContainer: {
+  sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
+    padding: 16,
   },
-  icon: {
-    marginRight: 8,
-  },
-  cardTitle: {
+  sectionTitle: {
     fontSize: 18,
     fontFamily: 'K2D-SemiBold',
+    marginLeft: 12,
   },
-  cardContent: {
-    padding: 8,
-  },
-  settingsButton: {
+  setting: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 14,
     paddingHorizontal: 16,
-    borderBottomWidth: 1,
+    paddingBottom: 16,
   },
-  settingsButtonText: {
+  settingLabel: {
     fontSize: 16,
     fontFamily: 'K2D-Regular',
   },
-  settingRow: {
+  toggle: {
+    width: 50,
+    height: 30,
+    borderRadius: 15,
+    justifyContent: 'center',
+  },
+  toggleCircle: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    position: 'absolute',
+  },
+  menuItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 14,
     paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderTopWidth: 1,
   },
-  settingText: {
+  menuItemText: {
     fontSize: 16,
     fontFamily: 'K2D-Regular',
   },
@@ -368,87 +248,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 14,
-    marginVertical: 16,
+    padding: 16,
+    marginVertical: 20,
     borderRadius: 12,
     borderWidth: 1,
   },
   logoutText: {
+    color: '#FF3B30',
     fontSize: 16,
-    fontFamily: 'K2D-Medium',
-    marginLeft: 8,
-  },
-  dialog: {
-    position: 'absolute',
-    top: 100,
-    left: 20,
-    right: 20,
-    borderRadius: 12,
-    padding: 16,
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-  },
-  dialogHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  dialogTitle: {
-    fontSize: 20,
     fontFamily: 'K2D-SemiBold',
-  },
-  dialogDescription: {
-    fontSize: 14,
-    marginBottom: 16,
-  },
-  formGroup: {
-    marginBottom: 16,
-  },
-  label: {
-    fontSize: 14,
-    marginBottom: 8,
-    fontFamily: 'K2D-Medium',
-  },
-  input: {
-    height: 48,
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    fontFamily: 'K2D-Regular',
-  },
-  dialogFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 16,
-  },
-  cancelButton: {
-    flex: 1,
-    height: 48,
-    borderRadius: 8,
-    borderWidth: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 8,
-  },
-  cancelButtonText: {
-    fontFamily: 'K2D-Medium',
-    fontSize: 16,
-  },
-  submitButton: {
-    flex: 1,
-    height: 48,
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
     marginLeft: 8,
-  },
-  submitButtonText: {
-    color: 'white',
-    fontFamily: 'K2D-Medium',
-    fontSize: 16,
   },
 });
