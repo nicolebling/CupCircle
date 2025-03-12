@@ -1,7 +1,8 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { authService, profileService } from '../services/api';
+import { authService } from '../services/api';
+import { profileService } from '../services/api';
 
 type User = {
   id: string;
