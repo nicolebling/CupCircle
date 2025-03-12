@@ -65,6 +65,8 @@ app.post('/api/auth/register', async (req, res) => {
     
     // Check if email already exists
     const existingUser = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+
+     console.log('Registration attempt:', req.body);
     
     if (existingUser.rows.length > 0) {
       return res.status(400).json({ error: 'Email already exists' });

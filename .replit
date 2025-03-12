@@ -20,12 +20,8 @@ externalPort = 3001
 localPort = 8083
 externalPort = 3002
 
-[[ports]]
-localPort = 8084
-externalPort = 3003
-
 [workflows]
-runButton = "Run Full Stack"
+runButton = "Start API Server"
 
 [[workflows.workflow]]
 name = "Dev Server"
@@ -90,14 +86,6 @@ author = 34949249
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "node api/server.js"
-
-[[workflows.workflow]]
-name = "Run Full Stack"
-author = 38320710
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "cd api && node server.js & npx expo start --web"
 
 [deployment]
 run = ["sh", "-c", "npm run start"]
