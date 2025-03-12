@@ -23,6 +23,8 @@ import { z } from "zod";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
+import { z } from "zod";
+
 // Profile form schema
 const profileSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
