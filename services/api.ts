@@ -4,7 +4,7 @@ import { Profile } from '../models/Profile';
 
 // Base URL for API
 // Get the API URL from environment or use the Replit domain
-const API_URL = process.env.EXPO_PUBLIC_API_URL || `https://${process.env.REPLIT_DEV_DOMAIN}/api`;
+const API_URL = process.env.EXPO_PUBLIC_API_URL || `https://${process.env.REPLIT_DEV_DOMAIN}`;
 console.log('Using API URL:', API_URL);
 
 // Auth service
@@ -12,11 +12,7 @@ export const authService = {
   // Login function
   async login(email: string, password: string) {
     try {
-      // For development, use mockAuthService if API is not available
-      if (!API_URL.includes('replit.dev')) {
-        console.log('Using mock auth service');
-        return mockAuthService.login(email, password);
-      }
+      console.log(`Making login request to: ${API_URL}/api/auth/login`);
       
       const response = await fetch(`${API_URL}/api/auth/login`, {
         method: 'POST',
@@ -26,33 +22,32 @@ export const authService = {
         body: JSON.stringify({ email, password }),
       });
       
+      console.log('Login response status:', response.status);
+      
       if (!response.ok) {
-        return null;
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        console.error('Login response error:', errorData);
+        throw new Error(errorData.error || 'Login failed');
       }
       
-      return await response.json();
+      const userData = await response.json();
+      console.log('Login successful, user data received');
+      return userData;
     } catch (error) {
       console.error('Login error:', error);
-      // Fallback to mock during development
-      return mockAuthService.login(email, password);
+      throw error;
     }
   },
   
   // Register function
-  async register(email: string, password: string) {
+  async register(email: string, password: string, username: string) {
     try {
-      // For development, use mockAuthService if API is not available
-      if (!API_URL.includes('replit.dev')) {
-        console.log('Using mock auth service');
-        return mockAuthService.register(email, password);
-      }
-      
       const response = await fetch(`${API_URL}/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, username }),
       });
       
       if (!response.ok) {
@@ -63,8 +58,7 @@ export const authService = {
       return await response.json();
     } catch (error) {
       console.error('Register error:', error);
-      // Fallback to mock during development
-      return mockAuthService.register(email, password);
+      throw error;
     }
   }
 };
@@ -76,35 +70,27 @@ export const profileService = {
     try {
       if (!userId) return null;
       
-      // For development, use mockProfileService if API is not available
-      if (!API_URL.includes('replit.dev')) {
-        console.log('Using mock profile service');
-        return mockProfileService.getProfileByUserId(userId);
-      }
-      
       const response = await fetch(`${API_URL}/api/profile/${userId}`);
       
+      if (response.status === 404) {
+        return null; // Profile not found
+      }
+      
       if (!response.ok) {
-        return null;
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to load profile');
       }
       
       return await response.json();
     } catch (error) {
       console.error('Failed to load user profile', error);
-      // Fallback to mock during development
-      return mockProfileService.getProfileByUserId(userId);
+      throw error;
     }
   },
   
   // Save profile (create or update)
   async saveProfile(profileData: Partial<Profile> & { user_id: string }) {
     try {
-      // For development, use mockProfileService if API is not available
-      if (!API_URL.includes('replit.dev')) {
-        console.log('Using mock profile service');
-        return mockProfileService.saveProfile(profileData);
-      }
-      
       const response = await fetch(`${API_URL}/api/profile`, {
         method: 'POST',
         headers: {
@@ -121,8 +107,7 @@ export const profileService = {
       return await response.json();
     } catch (error) {
       console.error('Failed to save profile', error);
-      // Fallback to mock during development
-      return mockProfileService.saveProfile(profileData);
+      throw error;
     }
   }
 };
