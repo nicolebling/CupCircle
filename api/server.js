@@ -63,11 +63,6 @@ app.post('/api/auth/register', async (req, res) => {
   try {
     const { email, password, username } = req.body;
     
-    // Validate input
-    if (!email || !password || !username) {
-      return res.status(400).json({ error: 'Email, password, and username are required' });
-    }
-    
     // Check if email already exists
     const existingUser = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
     
@@ -82,57 +77,19 @@ app.post('/api/auth/register', async (req, res) => {
       return res.status(400).json({ error: 'Username already exists' });
     }
     
-    // Start a transaction to ensure both user and profile are created
-    const client = await pool.connect();
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
     
-    try {
-      await client.query('BEGIN');
-      
-      // Hash password
-      const hashedPassword = await bcrypt.hash(password, 10);
-      
-      // Insert new user
-      const userResult = await client.query(
-        'INSERT INTO users (email, password, username) VALUES ($1, $2, $3) RETURNING id, email, username',
-        [email, hashedPassword, username]
-      );
-      
-      const newUser = userResult.rows[0];
-      
-      // Create an empty profile for the user
-      await client.query(
-        `INSERT INTO profiles(
-          user_id, name, bio, occupation, industry_categories, skills, 
-          neighborhoods, favorite_cafes, interests
-        ) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
-        [
-          newUser.id,
-          username,  // Use username as initial name
-          '',        // Empty bio
-          '',        // Empty occupation
-          [],        // Empty industry_categories
-          [],        // Empty skills
-          [],        // Empty neighborhoods
-          [],        // Empty favorite_cafes
-          []         // Empty interests
-        ]
-      );
-      
-      await client.query('COMMIT');
-      
-      return res.status(201).json(newUser);
-    } catch (err) {
-      await client.query('ROLLBACK');
-      console.error('Transaction error during registration:', err);
-      throw err; // Re-throw to be caught by the outer catch
-    } finally {
-      client.release();
-    }
+    // Insert new user
+    const result = await pool.query(
+      'INSERT INTO users (email, password, username) VALUES ($1, $2, $3) RETURNING id, email, username',
+      [email, hashedPassword, username]
+    );
+    
+    return res.status(201).json(result.rows[0]);
   } catch (error) {
     console.error('Register error:', error);
-    // Provide more specific error message
-    const errorMessage = error.detail || error.message || 'Server error';
-    return res.status(500).json({ error: errorMessage });
+    return res.status(500).json({ error: 'Server error' });
   }
 });
 
