@@ -1,17 +1,17 @@
+
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, SafeAreaView, KeyboardAvoidingView, Platform, Image } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, SafeAreaView, KeyboardAvoidingView, Platform } from 'react-native';
 import { Link, router } from 'expo-router';
 import Colors from '@/constants/Colors';
 import { useAuth } from '@/contexts/AuthContext';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function RegisterScreen() {
-  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -22,8 +22,8 @@ export default function RegisterScreen() {
     setError('');
 
     // Simple validation
-    if (!username || !email || !password || !confirmPassword || !name) {
-      setError('All fields are required');
+    if (!email || !password) {
+      setError('Email and password are required');
       return;
     }
 
@@ -32,10 +32,15 @@ export default function RegisterScreen() {
       return;
     }
 
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters');
+      return;
+    }
+
     setLoading(true);
     try {
-      await signUp(username, email, password, name);
-      router.replace('/(auth)/onboarding');
+      await signUp(email, password);
+      // Navigation is handled inside signUp function in AuthContext
     } catch (err: any) {
       setError(err.message || 'Registration failed');
     } finally {
@@ -62,112 +67,95 @@ export default function RegisterScreen() {
             </View>
           ) : null}
 
-          <View style={styles.inputContainer}>
-            <Text style={[styles.label, { color: colors.text }]}>Username</Text>
-            <View style={[styles.inputWrapper, { backgroundColor: colors.card, borderColor: colors.border }]}>
-              <Ionicons name="person-outline" size={20} color={colors.secondaryText} style={styles.inputIcon} />
-              <TextInput
-                style={[styles.input, { color: colors.text }]}
-                placeholder="Enter username"
-                placeholderTextColor={colors.secondaryText}
-                value={username}
-                onChangeText={setUsername}
-                autoCapitalize="none"
-              />
-            </View>
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={[styles.label, { color: colors.text }]}>Full Name</Text>
-            <View style={[styles.inputWrapper, { backgroundColor: colors.card, borderColor: colors.border }]}>
-              <Ionicons name="person" size={20} color={colors.secondaryText} style={styles.inputIcon} />
-              <TextInput
-                style={[styles.input, { color: colors.text }]}
-                placeholder="Enter your full name"
-                placeholderTextColor={colors.secondaryText}
-                value={name}
-                onChangeText={setName}
-              />
-            </View>
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={[styles.label, { color: colors.text }]}>Email Address</Text>
-            <View style={[styles.inputWrapper, { backgroundColor: colors.card, borderColor: colors.border }]}>
-              <Ionicons name="mail-outline" size={20} color={colors.secondaryText} style={styles.inputIcon} />
-              <TextInput
-                style={[styles.input, { color: colors.text }]}
-                placeholder="Enter email address"
-                placeholderTextColor={colors.secondaryText}
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-              />
-            </View>
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={[styles.label, { color: colors.text }]}>Password</Text>
-            <View style={[styles.inputWrapper, { backgroundColor: colors.card, borderColor: colors.border }]}>
-              <Ionicons name="lock-closed-outline" size={20} color={colors.secondaryText} style={styles.inputIcon} />
-              <TextInput
-                style={[styles.input, { color: colors.text }]}
-                placeholder="Enter password"
-                placeholderTextColor={colors.secondaryText}
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry={!showPassword}
-              />
-              <TouchableOpacity 
-                style={styles.eyeIcon} 
-                onPress={() => setShowPassword(!showPassword)}
-              >
-                <Ionicons 
-                  name={showPassword ? "eye-off-outline" : "eye-outline"} 
-                  size={20} 
-                  color={colors.secondaryText} 
+          <View style={styles.form}>
+            <View style={styles.inputContainer}>
+              <Text style={[styles.label, { color: colors.text }]}>Email</Text>
+              <View style={[styles.inputWrapper, { backgroundColor: colors.card, borderColor: colors.border }]}>
+                <Ionicons name="mail-outline" size={20} color={colors.secondaryText} style={styles.inputIcon} />
+                <TextInput
+                  style={[styles.input, { color: colors.text }]}
+                  placeholder="Enter email"
+                  placeholderTextColor={colors.secondaryText}
+                  value={email}
+                  onChangeText={setEmail}
+                  autoCapitalize="none"
+                  keyboardType="email-address"
                 />
-              </TouchableOpacity>
+              </View>
             </View>
-          </View>
 
-          <View style={styles.inputContainer}>
-            <Text style={[styles.label, { color: colors.text }]}>Confirm Password</Text>
-            <View style={[styles.inputWrapper, { backgroundColor: colors.card, borderColor: colors.border }]}>
-              <Ionicons name="lock-closed-outline" size={20} color={colors.secondaryText} style={styles.inputIcon} />
-              <TextInput
-                style={[styles.input, { color: colors.text }]}
-                placeholder="Confirm password"
-                placeholderTextColor={colors.secondaryText}
-                value={confirmPassword}
-                onChangeText={setConfirmPassword}
-                secureTextEntry={!showPassword}
-              />
+            <View style={styles.inputContainer}>
+              <Text style={[styles.label, { color: colors.text }]}>Password</Text>
+              <View style={[styles.inputWrapper, { backgroundColor: colors.card, borderColor: colors.border }]}>
+                <Ionicons name="lock-closed-outline" size={20} color={colors.secondaryText} style={styles.inputIcon} />
+                <TextInput
+                  style={[styles.input, { color: colors.text }]}
+                  placeholder="Enter password"
+                  placeholderTextColor={colors.secondaryText}
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry={!showPassword}
+                />
+                <TouchableOpacity 
+                  style={styles.passwordVisibilityButton}
+                  onPress={() => setShowPassword(!showPassword)}
+                >
+                  <Ionicons 
+                    name={showPassword ? 'eye-off-outline' : 'eye-outline'} 
+                    size={20} 
+                    color={colors.secondaryText}
+                  />
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
 
-          <TouchableOpacity 
-            style={[styles.registerButton, { backgroundColor: colors.primary }, loading && { opacity: 0.7 }]} 
-            onPress={handleRegister}
-            disabled={loading}
-          >
-            {loading ? (
-              <Ionicons name="sync" size={24} color="white" style={styles.spinner} />
-            ) : (
-              <Text style={styles.registerButtonText}>Register</Text>
-            )}
-          </TouchableOpacity>
+            <View style={styles.inputContainer}>
+              <Text style={[styles.label, { color: colors.text }]}>Confirm Password</Text>
+              <View style={[styles.inputWrapper, { backgroundColor: colors.card, borderColor: colors.border }]}>
+                <Ionicons name="lock-closed-outline" size={20} color={colors.secondaryText} style={styles.inputIcon} />
+                <TextInput
+                  style={[styles.input, { color: colors.text }]}
+                  placeholder="Confirm password"
+                  placeholderTextColor={colors.secondaryText}
+                  value={confirmPassword}
+                  onChangeText={setConfirmPassword}
+                  secureTextEntry={!showConfirmPassword}
+                />
+                <TouchableOpacity 
+                  style={styles.passwordVisibilityButton}
+                  onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  <Ionicons 
+                    name={showConfirmPassword ? 'eye-off-outline' : 'eye-outline'} 
+                    size={20} 
+                    color={colors.secondaryText}
+                  />
+                </TouchableOpacity>
+              </View>
+            </View>
 
-          <View style={styles.footer}>
-            <Text style={[styles.footerText, { color: colors.secondaryText }]}>
-              Already have an account?
-            </Text>
-            <Link href="/(auth)/login" asChild>
-              <TouchableOpacity>
-                <Text style={[styles.loginLink, { color: colors.primary }]}>Log In</Text>
-              </TouchableOpacity>
-            </Link>
+            <TouchableOpacity 
+              style={[styles.button, { backgroundColor: colors.primary }]}
+              onPress={handleRegister}
+              disabled={loading}
+            >
+              <Text style={styles.buttonText}>
+                {loading ? 'Creating Account...' : 'Create Account'}
+              </Text>
+            </TouchableOpacity>
+
+            <View style={styles.footer}>
+              <Text style={[styles.footerText, { color: colors.secondaryText }]}>
+                Already have an account?
+              </Text>
+              <Link href="/(auth)/login" asChild>
+                <TouchableOpacity>
+                  <Text style={[styles.registerLink, { color: colors.primary }]}>
+                    Log In
+                  </Text>
+                </TouchableOpacity>
+              </Link>
+            </View>
           </View>
         </View>
       </KeyboardAvoidingView>
@@ -178,90 +166,95 @@ export default function RegisterScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 50,
   },
   content: {
     flex: 1,
+    padding: 24,
     justifyContent: 'center',
   },
   logoContainer: {
     alignItems: 'center',
-    marginBottom: 30,
+    marginBottom: 40,
   },
   logoText: {
+    fontSize: 32,
     fontFamily: 'K2D-Bold',
-    fontSize: 24,
-    marginTop: 10,
+    color: '#F97415',
   },
   title: {
-    fontFamily: 'K2D-Bold',
     fontSize: 24,
+    fontFamily: 'K2D-Bold',
+    marginBottom: 24,
     textAlign: 'center',
-    marginBottom: 20,
   },
   errorContainer: {
-    marginBottom: 10,
-    alignItems: 'center',
+    backgroundColor: '#FFEBEE',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 16,
   },
   errorText: {
-    color: 'red',
+    color: '#D32F2F',
+    fontFamily: 'K2D-Regular',
+    fontSize: 14,
+    textAlign: 'center',
+  },
+  form: {
+    width: '100%',
   },
   inputContainer: {
-    marginBottom: 15,
+    marginBottom: 16,
   },
   label: {
-    fontFamily: 'K2D-Medium',
-    marginBottom: 5,
+    fontSize: 14,
+    fontFamily: 'K2D-SemiBold',
+    marginBottom: 8,
   },
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    borderRadius: 5,
     borderWidth: 1,
+    borderRadius: 8,
+    height: 50,
+    paddingHorizontal: 12,
   },
   inputIcon: {
-    marginRight: 10,
+    marginRight: 12,
   },
   input: {
     flex: 1,
+    height: '100%',
     fontFamily: 'K2D-Regular',
+    fontSize: 16,
   },
-  eyeIcon: {
-    position: 'absolute',
-    right: 10,
-    top: '50%',
-    transform: [{ translateY: -10 }],
+  passwordVisibilityButton: {
+    padding: 8,
   },
-  registerButton: {
+  button: {
     height: 50,
-    borderRadius: 5,
+    borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: 16,
   },
-  registerButtonText: {
+  buttonText: {
     color: 'white',
-    fontFamily: 'K2D-Bold',
-    fontSize: 18,
-  },
-  spinner: {
-    marginRight: 10,
+    fontSize: 16,
+    fontFamily: 'K2D-SemiBold',
   },
   footer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: 30,
+    alignItems: 'center',
+    marginTop: 24,
+    gap: 5,
   },
   footerText: {
+    fontSize: 14,
     fontFamily: 'K2D-Regular',
-    fontSize: 16,
-    marginRight: 5,
   },
-  loginLink: {
+  registerLink: {
+    fontSize: 14,
     fontFamily: 'K2D-SemiBold',
-    fontSize: 16,
   },
 });
