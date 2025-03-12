@@ -3,7 +3,7 @@ const fetch = require('node-fetch');
 require('dotenv').config();
 
 // Get API URL from environment
-const apiUrl = process.env.EXPO_PUBLIC_API_URL || `https://${process.env.REPLIT_DEV_DOMAIN}`;
+const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 
 console.log('=== API Connection Test ===');
 console.log('API URL:', apiUrl);
