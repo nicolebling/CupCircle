@@ -14,6 +14,18 @@ export const authService = {
     try {
       console.log(`Making login request to: ${API_URL}/api/auth/login`);
       
+      // First check if API is available
+      try {
+        const healthCheck = await fetch(`${API_URL}/`);
+        if (!healthCheck.ok) {
+          console.error('API health check failed:', healthCheck.status);
+          throw new Error('API server unavailable. Please try again later.');
+        }
+      } catch (networkError) {
+        console.error('API connection error:', networkError);
+        throw new Error('Cannot connect to API server. Please check your network connection or try again later.');
+      }
+      
       const response = await fetch(`${API_URL}/api/auth/login`, {
         method: 'POST',
         headers: {
@@ -25,14 +37,24 @@ export const authService = {
       console.log('Login response status:', response.status);
       
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
-        console.error('Login response error:', errorData);
-        throw new Error(errorData.error || 'Login failed');
+        try {
+          const errorData = await response.json();
+          console.error('Login response error:', errorData);
+          throw new Error(errorData.error || 'Login failed');
+        } catch (jsonError) {
+          console.error('Failed to parse error response:', jsonError);
+          throw new Error(`Login failed with status ${response.status}`);
+        }
       }
       
-      const userData = await response.json();
-      console.log('Login successful, user data received');
-      return userData;
+      try {
+        const userData = await response.json();
+        console.log('Login successful, user data received');
+        return userData;
+      } catch (jsonError) {
+        console.error('Failed to parse user data:', jsonError);
+        throw new Error('Received invalid response from server');
+      }
     } catch (error) {
       console.error('Login error:', error);
       throw error;

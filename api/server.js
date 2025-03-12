@@ -112,7 +112,16 @@ app.post("/api/auth/register", async (req, res) => {
 
 // Profile routes
 app.get("/", (req, res) => {
-  res.json({ message: "API server is running" });
+  res.json({ 
+    message: "API server is running",
+    status: "online",
+    timestamp: new Date().toISOString(),
+    env: {
+      nodeEnv: process.env.NODE_ENV,
+      port: port,
+      apiUrl: process.env.EXPO_PUBLIC_API_URL || `https://${process.env.REPLIT_DEV_DOMAIN}`
+    }
+  });
 });
 
 app.get("/profile", (req, res) => {
