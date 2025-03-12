@@ -3,8 +3,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Profile } from '../models/Profile';
 
 // Base URL for API
-// Get the API URL from environment or use the Replit domain
-const API_URL = process.env.EXPO_PUBLIC_API_URL || `https://${process.env.REPLIT_DEV_DOMAIN}`;
+// Get the API URL from environment, app.json extras, or use the Replit domain
+import Constants from 'expo-constants';
+
+const API_URL = process.env.EXPO_PUBLIC_API_URL || 
+                (Constants.expoConfig?.extra?.API_URL) || 
+                `https://${process.env.REPLIT_DEV_DOMAIN}`;
 console.log('Using API URL:', API_URL);
 
 // Auth service
