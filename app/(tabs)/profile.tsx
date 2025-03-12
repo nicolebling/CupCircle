@@ -1,297 +1,546 @@
+
 import React, { useState, useEffect } from "react";
 import {
-  SafeAreaView,
-  StyleSheet,
-  Alert,
   View,
   Text,
-  TouchableOpacity,
+  StyleSheet,
   ScrollView,
-  TextInput,
+  TouchableOpacity,
   Image,
+  TextInput,
+  Platform,
+  KeyboardAvoidingView,
   ActivityIndicator,
 } from "react-native";
-import Colors from "@/constants/Colors";
-import UserProfileCard, { UserProfileData } from "@/components/UserProfileCard";
-import { useProfileManager, ProfileFormData } from "@/hooks/useProfileManager";
 import { useAuth } from "@/contexts/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
+import Colors from "@/constants/Colors";
+import InterestSelector from "@/components/InterestSelector";
+import IndustrySelector from "@/components/IndustrySelector";
 import { router } from "expo-router";
-import { useColorScheme } from "@/hooks/useColorScheme";
+import * as ImagePicker from "expo-image-picker";
+import { z } from "zod";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { useQueryClient, useMutation } from "@tanstack/react-query";
-import * as ImagePicker from 'expo-image-picker';
 
-
-// Profile schema
-const insertProfileSchema = z.object({
-  name: z.string().nonempty("Name is required"),
-  birthday: z.string().nonempty("Birthday is required"),
-  occupation: z.string().nonempty("Occupation is required"),
-  bio: z.string().max(500, "Bio cannot exceed 500 characters"),
-  education: z.string().nonempty("Education is required"),
-  photo: z.string().nonempty("Profile photo is required"),
+// Profile form schema
+const profileSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  occupation: z.string().optional(),
+  bio: z.string().optional(),
+  age: z.number().min(18).optional().nullable(),
+  photo: z.string().optional(),
+  interests: z.array(z.string()).optional(),
+  industry_categories: z.array(z.string()).optional(),
+  skills: z.array(z.string()).optional(),
+  neighborhoods: z.array(z.string()).optional(),
+  favorite_cafes: z.array(z.string()).optional(),
 });
 
-export default function ProfileScreen({ navigation }) {
-  const [isEditing, setIsEditing] = useState(false);
-  const queryClient = useQueryClient();
+type ProfileFormValues = z.infer<typeof profileSchema>;
 
-  // Fetch profile data
-  const { data: profile, isLoading } = useQuery(["profile"], async () => {
-    const res = await fetch("/api/profile");
-    return res.json();
-  });
+export default function ProfileScreen() {
+  const { user, updateUser, isLoading: authLoading } = useAuth();
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const colors = Colors.light;
 
-  // Form setup
   const {
     control,
     handleSubmit,
     setValue,
     formState: { errors },
-  } = useForm({
-    resolver: zodResolver(insertProfileSchema),
+    reset
+  } = useForm<ProfileFormValues>({
+    resolver: zodResolver(profileSchema),
     defaultValues: {
-      name: "",
-      birthday: "",
-      occupation: "",
-      bio: "",
-      education: "",
-      photo: "",
+      name: user?.name || "",
+      occupation: user?.occupation || "",
+      bio: user?.bio || "",
+      age: user?.age || null,
+      photo: user?.photo || "https://randomuser.me/api/portraits/lego/1.jpg",
+      interests: user?.interests || [],
+      industry_categories: user?.industry_categories || [],
+      skills: user?.skills || [],
+      neighborhoods: user?.neighborhoods || [],
+      favorite_cafes: user?.favorite_cafes || [],
     },
   });
 
   useEffect(() => {
-    if (profile) {
-      setValue("name", profile.name);
-      setValue("birthday", profile.birthday);
-      setValue("occupation", profile.occupation);
-      setValue("bio", profile.bio);
-      setValue("education", profile.education);
-      setValue("photo", profile.photo);
-    }
-  }, [profile]);
-
-  // Mutation to update profile
-  const updateProfile = useMutation(
-    async (data) => {
-      const res = await fetch("/api/profile", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+    if (user) {
+      reset({
+        name: user.name || "",
+        occupation: user.occupation || "",
+        bio: user.bio || "",
+        age: user.age || null,
+        photo: user.photo || "https://randomuser.me/api/portraits/lego/1.jpg",
+        interests: user.interests || [],
+        industry_categories: user.industry_categories || [],
+        skills: user.skills || [],
+        neighborhoods: user.neighborhoods || [],
+        favorite_cafes: user.favorite_cafes || [],
       });
-      if (!res.ok) throw new Error("Profile update failed");
-      return res.json();
-    },
-    {
-      onSuccess: (data) => {
-        queryClient.setQueryData(["profile"], data);
-        setIsEditing(false);
-      },
-    },
-  );
+    }
+  }, [user, reset]);
 
-  // Image Picker for Profile Picture
+  const toggleEditMode = () => {
+    setIsEditMode(!isEditMode);
+  };
+
+  const onSaveProfile = async (data: ProfileFormValues) => {
+    setIsLoading(true);
+    try {
+      await updateUser(data);
+      setIsEditMode(false);
+    } catch (error) {
+      console.error("Failed to save profile", error);
+      alert("Failed to save profile. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
+    const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [1, 1],
-      quality: 1,
+      quality: 0.5,
     });
 
-    if (!result.canceled) {
-      setValue("photo", result.uri);
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      setValue("photo", result.assets[0].uri);
     }
   };
 
-  // Submit Handler
-  const onSubmit = async (data) => {
-    await updateProfile.mutateAsync(data);
-  };
-
-  if (isLoading) {
+  if (authLoading || !user) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#E76F51" />
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      {/* Logo Animation */}
-      {/* <RotatingCircles /> */} {/* This component is missing */}
-
-      <Text style={styles.title}>CupCircle</Text>
-      <Text style={styles.subtitle}>Where every cup connects</Text>
-
-      {isEditing ? (
-        <View style={styles.card}>
-          {/* Profile Image Upload */}
-          <TouchableOpacity onPress={pickImage} style={styles.imageContainer}>
-            {profile?.photo ? (
-              <Image source={{ uri: profile.photo }} style={styles.image} />
-            ) : (
-              <Text style={styles.uploadText}>Upload Photo</Text>
-            )}
-          </TouchableOpacity>
-
-          {/* Input Fields */}
-          <Controller
-            control={control}
-            name="name"
-            render={({ field }) => (
-              <TextInput
-                style={styles.input}
-                placeholder="Name"
-                value={field.value}
-                onChangeText={field.onChange}
-              />
-            )}
-          />
-          {errors.name && (
-            <Text style={styles.errorText}>{errors.name.message}</Text>
-          )}
-
-          <Controller
-            control={control}
-            name="birthday"
-            render={({ field }) => (
-              <TextInput
-                style={styles.input}
-                placeholder="Birthday (YYYY-MM-DD)"
-                value={field.value}
-                onChangeText={field.onChange}
-              />
-            )}
-          />
-          {errors.birthday && (
-            <Text style={styles.errorText}>{errors.birthday.message}</Text>
-          )}
-
-          <Controller
-            control={control}
-            name="occupation"
-            render={({ field }) => (
-              <TextInput
-                style={styles.input}
-                placeholder="Occupation"
-                value={field.value}
-                onChangeText={field.onChange}
-              />
-            )}
-          />
-          {errors.occupation && (
-            <Text style={styles.errorText}>{errors.occupation.message}</Text>
-          )}
-
-          <Controller
-            control={control}
-            name="bio"
-            render={({ field }) => (
-              <TextInput
-                style={[styles.input, styles.textArea]}
-                placeholder="Tell us about yourself..."
-                value={field.value}
-                onChangeText={field.onChange}
-                multiline
-              />
-            )}
-          />
-          {errors.bio && (
-            <Text style={styles.errorText}>{errors.bio.message}</Text>
-          )}
-
-          <Controller
-            control={control}
-            name="education"
-            render={({ field }) => (
-              <TextInput
-                style={styles.input}
-                placeholder="Education"
-                value={field.value}
-                onChangeText={field.onChange}
-              />
-            )}
-          />
-          {errors.education && (
-            <Text style={styles.errorText}>{errors.education.message}</Text>
-          )}
-
-          {/* Save Button */}
-          <TouchableOpacity
-            style={styles.button}
-            onPress={handleSubmit(onSubmit)}
-          >
-            <Text style={styles.buttonText}>Save Profile</Text>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
+    >
+      <ScrollView
+        style={[styles.container, { backgroundColor: colors.background }]}
+        contentContainerStyle={styles.contentContainer}
+      >
+        <View style={styles.header}>
+          <Text style={[styles.title, { color: colors.text }]}>My Profile</Text>
+          <TouchableOpacity onPress={toggleEditMode}>
+            <Ionicons
+              name={isEditMode ? "close-outline" : "create-outline"}
+              size={24}
+              color={colors.primary}
+            />
           </TouchableOpacity>
         </View>
-      ) : (
-        <View style={styles.card}>
-          <Image source={{ uri: profile?.photo }} style={styles.image} />
-          <Text style={styles.profileText}>{profile?.name}</Text>
-          <Text style={styles.profileText}>{profile?.occupation}</Text>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => setIsEditing(true)}
-          >
-            <Text style={styles.buttonText}>Edit Profile</Text>
-          </TouchableOpacity>
-        </View>
-      )}
-    </ScrollView>
+
+        {isEditMode ? (
+          // Edit mode
+          <View style={styles.profileForm}>
+            {/* Profile Image */}
+            <TouchableOpacity
+              style={styles.photoContainer}
+              onPress={pickImage}
+              disabled={isLoading}
+            >
+              <Image
+                source={{ uri: user.photo || "https://randomuser.me/api/portraits/lego/1.jpg" }}
+                style={styles.profilePhoto}
+              />
+              <View style={styles.editPhotoOverlay}>
+                <Ionicons name="camera" size={24} color="white" />
+                <Text style={styles.editPhotoText}>Change Photo</Text>
+              </View>
+            </TouchableOpacity>
+
+            {/* Name */}
+            <View style={styles.formGroup}>
+              <Text style={[styles.label, { color: colors.text }]}>Name</Text>
+              <Controller
+                control={control}
+                name="name"
+                render={({ field: { onChange, value } }) => (
+                  <TextInput
+                    style={[
+                      styles.input,
+                      { backgroundColor: colors.card, color: colors.text },
+                    ]}
+                    placeholder="Your name"
+                    placeholderTextColor={colors.secondaryText}
+                    value={value}
+                    onChangeText={onChange}
+                  />
+                )}
+              />
+              {errors.name && (
+                <Text style={styles.errorText}>{errors.name.message}</Text>
+              )}
+            </View>
+
+            {/* Occupation */}
+            <View style={styles.formGroup}>
+              <Text style={[styles.label, { color: colors.text }]}>Occupation</Text>
+              <Controller
+                control={control}
+                name="occupation"
+                render={({ field: { onChange, value } }) => (
+                  <TextInput
+                    style={[
+                      styles.input,
+                      { backgroundColor: colors.card, color: colors.text },
+                    ]}
+                    placeholder="Your occupation"
+                    placeholderTextColor={colors.secondaryText}
+                    value={value}
+                    onChangeText={onChange}
+                  />
+                )}
+              />
+            </View>
+
+            {/* Age */}
+            <View style={styles.formGroup}>
+              <Text style={[styles.label, { color: colors.text }]}>Age</Text>
+              <Controller
+                control={control}
+                name="age"
+                render={({ field: { onChange, value } }) => (
+                  <TextInput
+                    style={[
+                      styles.input,
+                      { backgroundColor: colors.card, color: colors.text },
+                    ]}
+                    placeholder="Your age"
+                    placeholderTextColor={colors.secondaryText}
+                    value={value ? value.toString() : ""}
+                    onChangeText={(text) => {
+                      const parsed = parseInt(text);
+                      onChange(isNaN(parsed) ? null : parsed);
+                    }}
+                    keyboardType="number-pad"
+                  />
+                )}
+              />
+            </View>
+
+            {/* Bio */}
+            <View style={styles.formGroup}>
+              <Text style={[styles.label, { color: colors.text }]}>Bio</Text>
+              <Controller
+                control={control}
+                name="bio"
+                render={({ field: { onChange, value } }) => (
+                  <TextInput
+                    style={[
+                      styles.textarea,
+                      { backgroundColor: colors.card, color: colors.text },
+                    ]}
+                    placeholder="Tell others about yourself"
+                    placeholderTextColor={colors.secondaryText}
+                    multiline
+                    numberOfLines={4}
+                    value={value}
+                    onChangeText={onChange}
+                  />
+                )}
+              />
+            </View>
+
+            {/* Industry Categories */}
+            <View style={styles.formGroup}>
+              <Text style={[styles.label, { color: colors.text }]}>Industries</Text>
+              <Controller
+                control={control}
+                name="industry_categories"
+                render={({ field: { onChange, value } }) => (
+                  <IndustrySelector
+                    selectedIndustries={value || []}
+                    onIndustriesChange={onChange}
+                  />
+                )}
+              />
+            </View>
+
+            {/* Interests */}
+            <View style={styles.formGroup}>
+              <Text style={[styles.label, { color: colors.text }]}>Interests</Text>
+              <Controller
+                control={control}
+                name="interests"
+                render={({ field: { onChange, value } }) => (
+                  <InterestSelector
+                    selectedInterests={value || []}
+                    onInterestsChange={onChange}
+                    maxInterests={10}
+                  />
+                )}
+              />
+            </View>
+
+            {/* Submit Button */}
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                style={[styles.saveButton, { backgroundColor: colors.primary }]}
+                onPress={handleSubmit(onSaveProfile)}
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <ActivityIndicator size="small" color="white" />
+                ) : (
+                  <Text style={styles.saveButtonText}>Save Profile</Text>
+                )}
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={() => setIsEditMode(false)}
+                disabled={isLoading}
+              >
+                <Text style={[styles.cancelButtonText, { color: colors.primary }]}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        ) : (
+          // View mode
+          <View style={styles.profileContainer}>
+            <Image
+              source={{ uri: user.photo || "https://randomuser.me/api/portraits/lego/1.jpg" }}
+              style={styles.profilePhoto}
+            />
+            <Text style={[styles.name, { color: colors.text }]}>{user.name}</Text>
+            {user.age && (
+              <Text style={[styles.infoText, { color: colors.secondaryText }]}>
+                Age: {user.age}
+              </Text>
+            )}
+            {user.occupation && (
+              <View style={styles.occupationContainer}>
+                <Ionicons name="briefcase-outline" size={16} color={colors.primary} />
+                <Text style={[styles.occupation, { color: colors.text }]}>
+                  {user.occupation}
+                </Text>
+              </View>
+            )}
+            {user.bio && (
+              <View style={styles.bioContainer}>
+                <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                  About
+                </Text>
+                <Text style={[styles.bio, { color: colors.text }]}>{user.bio}</Text>
+              </View>
+            )}
+
+            {user.industry_categories && user.industry_categories.length > 0 && (
+              <View style={styles.section}>
+                <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                  Industries
+                </Text>
+                <View style={styles.tagsContainer}>
+                  {user.industry_categories.map((industry, index) => (
+                    <View
+                      key={index}
+                      style={[
+                        styles.tag,
+                        { backgroundColor: colors.primary + "20" },
+                      ]}
+                    >
+                      <Text
+                        style={[styles.tagText, { color: colors.primary }]}
+                      >
+                        {industry}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              </View>
+            )}
+
+            {user.interests && user.interests.length > 0 && (
+              <View style={styles.section}>
+                <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                  Interests
+                </Text>
+                <View style={styles.tagsContainer}>
+                  {user.interests.map((interest, index) => (
+                    <View
+                      key={index}
+                      style={[
+                        styles.tag,
+                        { backgroundColor: colors.primary + "20" },
+                      ]}
+                    >
+                      <Text
+                        style={[styles.tagText, { color: colors.primary }]}
+                      >
+                        {interest}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              </View>
+            )}
+          </View>
+        )}
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
-// Styles
 const styles = StyleSheet.create({
-  container: { alignItems: "center", padding: 20, backgroundColor: "#f5f5f5" },
-  loadingContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
-  title: {
-    fontSize: 32,
-    fontWeight: "bold",
-    color: "#E76F51",
-    marginBottom: 5,
+  container: {
+    flex: 1,
   },
-  subtitle: { fontSize: 16, color: "#757575", marginBottom: 20 },
-  card: {
-    width: "100%",
+  contentContainer: {
     padding: 20,
-    backgroundColor: "#fff",
-    borderRadius: 10,
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+  },
+  profileContainer: {
     alignItems: "center",
   },
-  input: {
+  profileForm: {
     width: "100%",
-    padding: 10,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-    marginBottom: 10,
   },
-  textArea: { height: 80 },
-  button: {
-    backgroundColor: "#E76F51",
-    padding: 10,
-    borderRadius: 5,
+  photoContainer: {
+    alignSelf: "center",
+    marginBottom: 20,
+    position: "relative",
+  },
+  profilePhoto: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+  },
+  editPhotoOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+    borderRadius: 60,
+  },
+  editPhotoText: {
+    color: "white",
+    marginTop: 5,
+    fontSize: 12,
+  },
+  name: {
+    fontSize: 22,
+    fontWeight: "bold",
     marginTop: 10,
   },
-  buttonText: { color: "#fff", fontSize: 16, textAlign: "center" },
-  imageContainer: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: "#ddd",
+  infoText: {
+    fontSize: 16,
+    marginTop: 5,
+  },
+  occupationContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 10,
+  },
+  occupation: {
+    fontSize: 16,
+    marginLeft: 5,
+  },
+  bioContainer: {
+    marginTop: 20,
+    width: "100%",
+  },
+  bio: {
+    fontSize: 16,
+    lineHeight: 24,
+  },
+  section: {
+    marginTop: 20,
+    width: "100%",
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  tagsContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+  },
+  tag: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    marginRight: 8,
+    marginBottom: 8,
+  },
+  tagText: {
+    fontSize: 14,
+  },
+  formGroup: {
+    marginBottom: 20,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: "500",
+    marginBottom: 8,
+  },
+  input: {
+    height: 48,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    fontSize: 16,
+  },
+  textarea: {
+    minHeight: 100,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingTop: 12,
+    fontSize: 16,
+    textAlignVertical: "top",
+  },
+  buttonContainer: {
+    marginTop: 20,
+  },
+  saveButton: {
+    height: 48,
+    borderRadius: 24,
     justifyContent: "center",
     alignItems: "center",
   },
-  image: { width: 100, height: 100, borderRadius: 50 },
-  profileText: { fontSize: 18, fontWeight: "bold", marginVertical: 5 },
-  errorText: { color: "red", fontSize: 12 },
-  uploadText: {
-    textAlign: 'center',
-  }
+  saveButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  cancelButton: {
+    height: 48,
+    borderRadius: 24,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 12,
+  },
+  cancelButtonText: {
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  errorText: {
+    color: "#FF3B30",
+    fontSize: 14,
+    marginTop: 4,
+  },
 });
