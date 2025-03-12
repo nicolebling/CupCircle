@@ -51,7 +51,6 @@ app.post('/api/auth/login', async (req, res) => {
     // Return user data (exclude password)
     return res.json({
       id: user.id,
-      username: user.username,
       email: user.email
     });
   } catch (error) {
@@ -62,7 +61,7 @@ app.post('/api/auth/login', async (req, res) => {
 
 app.post('/api/auth/register', async (req, res) => {
   try {
-    const { username, email, password } = req.body;
+    const { email, password } = req.body;
     
     // Check if email already exists
     const existingUser = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
@@ -76,8 +75,8 @@ app.post('/api/auth/register', async (req, res) => {
     
     // Insert new user
     const result = await pool.query(
-      'INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING id, username, email',
-      [username, email, hashedPassword]
+      'INSERT INTO users (email, password) VALUES ($1, $2) RETURNING id, email',
+      [email, hashedPassword]
     );
     
     return res.status(201).json(result.rows[0]);

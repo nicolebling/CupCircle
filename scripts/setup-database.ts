@@ -52,14 +52,14 @@ async function insertSampleData(pool) {
     
     // Insert users
     const user1 = await client.query(
-      `INSERT INTO users(username, email, password) 
-       VALUES('johndoe', 'john@example.com', '$2a$10$uQFyVSLvxiYB5Vq58Jw5oOTVw3ZOO6f2kCBQZQXYLO25Sd5JrTtei') 
+      `INSERT INTO users(email, password) 
+       VALUES('john@example.com', '$2a$10$uQFyVSLvxiYB5Vq58Jw5oOTVw3ZOO6f2kCBQZQXYLO25Sd5JrTtei') 
        RETURNING id`
     ); // Password: password123
     
     const user2 = await client.query(
-      `INSERT INTO users(username, email, password) 
-       VALUES('janedoe', 'jane@example.com', '$2a$10$uQFyVSLvxiYB5Vq58Jw5oOTVw3ZOO6f2kCBQZQXYLO25Sd5JrTtei') 
+      `INSERT INTO users(email, password) 
+       VALUES('jane@example.com', '$2a$10$uQFyVSLvxiYB5Vq58Jw5oOTVw3ZOO6f2kCBQZQXYLO25Sd5JrTtei') 
        RETURNING id`
     ); // Password: password123
     

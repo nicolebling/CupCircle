@@ -32,8 +32,8 @@ export default function RegisterScreen() {
 
     setLoading(true);
     try {
-      // Pass empty strings for username and name as they're no longer collected
-      await signUp('', email, password, '');
+      // Pass empty string for name as it's no longer collected
+      await signUp(email, password, '');
       router.replace('/(auth)/onboarding');
     } catch (err: any) {
       setError(err.message || 'Registration failed');
