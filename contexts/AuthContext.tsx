@@ -58,8 +58,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signIn = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      console.log("Attempting to sign in with:", email);
-      
       // Get user from database
       const authenticatedUser = await authService.login(email, password);
 
@@ -67,23 +65,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw new Error('Invalid email or password');
       }
 
-      console.log("User authenticated:", authenticatedUser);
-
-      // Get user profile - handle potential errors gracefully
-      let profile = null;
-      try {
-        profile = await profileService.getProfileByUserId(authenticatedUser.id);
-        console.log("Profile retrieved:", profile);
-      } catch (profileError) {
-        console.error("Error fetching profile, continuing with login:", profileError);
-        // Continue with login even if profile fetch fails
-      }
+      // Get user profile
+      const profile = await profileService.getProfileByUserId(authenticatedUser.id);
 
       // Combine user and profile data
       const userProfile: UserProfile = {
         id: authenticatedUser.id,
         email: authenticatedUser.email,
-        name: profile?.name || email.split('@')[0],
+        name: profile?.name,
         photo: profile?.photo,
         occupation: profile?.occupation,
         bio: profile?.bio,
@@ -104,11 +93,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signUp = async (email: string, password: string, name: string) => {
     setIsLoading(true);
     try {
-      // Extract a username from the email (or use the first part of the name without spaces)
-      const username = email.split('@')[0] || name.split(' ')[0].toLowerCase();
-      
       // Register new user
-      const newUser = await authService.register(email, password, username);
+      const newUser = await authService.register(email, password);
 
       // Create user profile
       await profileService.saveProfile({
