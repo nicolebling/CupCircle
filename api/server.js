@@ -19,6 +19,11 @@ const pool = new Pool({
   }
 });
 
+// Log database connection details (without password)
+const connectionString = process.env.DATABASE_URL || '';
+const sanitizedConnectionString = connectionString.replace(/:[^:]*@/, ':****@');
+console.log('Connecting to database:', sanitizedConnectionString);
+
 // Test database connection
 pool.query('SELECT NOW()', (err, res) => {
   if (err) {
