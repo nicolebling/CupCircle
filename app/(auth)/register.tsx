@@ -61,7 +61,7 @@ export default function SignUpScreen() {
     setError("");
 
     // Basic validation
-    if (!name || !email || !password || !confirmPassword) {
+    if (!email || !password || !confirmPassword) {
       setError("All fields are required");
       return;
     }
