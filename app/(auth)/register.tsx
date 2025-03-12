@@ -96,11 +96,6 @@ export default function SignUpScreen() {
           <View style={styles.content}>
             {/* Logo & Branding */}
             <View style={styles.header}>
-              <Image
-                source={require("@/assets/images/logo.png")}
-                style={styles.logo}
-                resizeMode="contain"
-              />
               <Text style={[styles.title, { color: theme.colors.text }]}>
                 CupCircle
               </Text>
@@ -262,11 +257,11 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 32,
-    fontFamily: "SpaceMono",
+    fontFamily: "K2D-Bold",
   },
   subtitle: {
     fontSize: 16,
-    fontFamily: "SpaceMono",
+    fontFamily: "K2D-Regular",
     marginTop: 5,
   },
   formContainer: {
@@ -274,6 +269,23 @@ const styles = StyleSheet.create({
     maxWidth: 400,
     alignSelf: "center",
     marginVertical: 30,
+  },
+  formTitle: {
+    fontSize: 24,
+    fontFamily: "K2D-SemiBold",
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  errorContainer: {
+    backgroundColor: "#ffebee",
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 15,
+  },
+  errorText: {
+    color: "#c62828",
+    fontFamily: "K2D-Regular",
+    textAlign: "center",
   },
   inputContainer: {
     marginBottom: 15,
@@ -285,7 +297,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 15,
     fontSize: 16,
-    fontFamily: "SpaceMono",
+    fontFamily: "K2D-Regular",
   },
   passwordVisibilityButton: {
     position: "absolute",
@@ -302,6 +314,30 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "white",
     fontSize: 16,
-    fontFamily: "SpaceMono",
+    fontFamily: "K2D-Medium",
+  },
+  forgotPasswordButton: {
+    alignSelf: "center",
+    marginTop: 15,
+    padding: 5,
+  },
+  forgotPasswordText: {
+    fontFamily: "K2D-Regular",
+    fontSize: 14,
+  },
+  footer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  footerText: {
+    fontFamily: "K2D-Regular",
+    fontSize: 14,
+    marginRight: 5,
+  },
+  registerLink: {
+    fontSize: 14,
+    fontFamily: "K2D-SemiBold",
   },
 });

@@ -84,11 +84,6 @@ export default function LoginScreen() {
           <View style={styles.content}>
             {/* Logo & Branding */}
             <View style={styles.header}>
-              <Image
-                source={require("@/assets/images/logo.png")}
-                style={styles.logo}
-                resizeMode="contain"
-              />
               <Text style={[styles.title, { color: theme.colors.text }]}>
                 CupCircle
               </Text>
