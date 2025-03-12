@@ -19,107 +19,167 @@ import InterestSelector from "@/components/InterestSelector";
 import IndustrySelector from "@/components/IndustrySelector";
 import { router } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
-import { z } from "zod";
-import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 
-import { z } from "zod";
+// Profile validation schema without zod for now
+const insertProfileSchema = {
+  name: {
+    required: "Name is required",
+    minLength: { value: 2, message: "Name must be at least 2 characters" }
+  },
+  birthday: {
+    required: "Birthday is required",
+  },
+  occupation: {
+    required: "Occupation is required",
+  },
+  bio: {
+    maxLength: { value: 500, message: "Bio cannot exceed 500 characters" }
+  }
+};
 
-// Profile form schema
-const profileSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
-  occupation: z.string().optional(),
-  bio: z.string().optional(),
-  age: z.number().min(18).optional().nullable(),
-  photo: z.string().optional(),
-  interests: z.array(z.string()).optional(),
-  industry_categories: z.array(z.string()).optional(),
-  skills: z.array(z.string()).optional(),
-  neighborhoods: z.array(z.string()).optional(),
-  favorite_cafes: z.array(z.string()).optional(),
-});
-
-type ProfileFormValues = z.infer<typeof profileSchema>;
-
-export default function ProfileScreen() {
-  const { user, updateUser, isLoading: authLoading } = useAuth();
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const colors = Colors.light;
-
-  const {
-    control,
-    handleSubmit,
-    setValue,
-    formState: { errors },
-    reset
-  } = useForm<ProfileFormValues>({
-    resolver: zodResolver(profileSchema),
-    defaultValues: {
-      name: user?.name || "",
-      occupation: user?.occupation || "",
-      bio: user?.bio || "",
-      age: user?.age || null,
-      photo: user?.photo || "https://randomuser.me/api/portraits/lego/1.jpg",
-      interests: user?.interests || [],
-      industry_categories: user?.industry_categories || [],
-      skills: user?.skills || [],
-      neighborhoods: user?.neighborhoods || [],
-      favorite_cafes: user?.favorite_cafes || [],
-    },
+export default function Profile() {
+  const { userId, user } = useAuth();
+  const [profile, setProfile] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    birthday: "",
+    occupation: "",
+    bio: "",
+    photo: "https://via.placeholder.com/150",
+    interests: [],
+    industry_categories: [],
+    neighborhoods: [],
+    favorite_cafes: []
   });
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
-    if (user) {
-      reset({
-        name: user.name || "",
-        occupation: user.occupation || "",
-        bio: user.bio || "",
-        age: user.age || null,
-        photo: user.photo || "https://randomuser.me/api/portraits/lego/1.jpg",
-        interests: user.interests || [],
-        industry_categories: user.industry_categories || [],
-        skills: user.skills || [],
-        neighborhoods: user.neighborhoods || [],
-        favorite_cafes: user.favorite_cafes || [],
-      });
-    }
-  }, [user, reset]);
+    fetchProfile();
+  }, [userId]);
 
-  const toggleEditMode = () => {
-    setIsEditMode(!isEditMode);
-  };
-
-  const onSaveProfile = async (data: ProfileFormValues) => {
-    setIsLoading(true);
+  const fetchProfile = async () => {
     try {
-      await updateUser(data);
-      setIsEditMode(false);
+      setIsLoading(true);
+      
+      // For demo purposes using mock data
+      // In production, this would fetch from your API
+      setTimeout(() => {
+        // Mock profile data for demo purposes
+        const mockProfile = {
+          id: "profile-123",
+          user_id: userId,
+          name: "Jane Doe",
+          birthday: "1990-01-01",
+          occupation: "Software Engineer",
+          bio: "Passionate about technology and coffee",
+          photo: "https://via.placeholder.com/150",
+          interests: ["Tech", "Coffee", "Travel"],
+          industry_categories: ["Technology", "Education"],
+          neighborhoods: ["Downtown", "Midtown"],
+          favorite_cafes: ["Starbucks", "Blue Bottle"]
+        };
+        
+        setProfile(mockProfile);
+        setFormData(mockProfile);
+        setIsLoading(false);
+      }, 1000);
+      
     } catch (error) {
-      console.error("Failed to save profile", error);
-      alert("Failed to save profile. Please try again.");
-    } finally {
+      console.error("Error fetching profile:", error);
       setIsLoading(false);
     }
   };
 
-  const pickImage = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.5,
-    });
+  const validateField = (name, value) => {
+    const fieldSchema = insertProfileSchema[name];
+    if (!fieldSchema) return true;
 
-    if (!result.canceled && result.assets && result.assets.length > 0) {
-      setValue("photo", result.assets[0].uri);
+    if (fieldSchema.required && (!value || value.trim() === "")) {
+      return fieldSchema.required;
+    }
+
+    if (fieldSchema.minLength && value.length < fieldSchema.minLength.value) {
+      return fieldSchema.minLength.message;
+    }
+
+    if (fieldSchema.maxLength && value.length > fieldSchema.maxLength.value) {
+      return fieldSchema.maxLength.message;
+    }
+
+    return true;
+  };
+
+  const handleFieldChange = (name, value) => {
+    setFormData(prev => ({ ...prev, [name]: value }));
+    
+    const validation = validateField(name, value);
+    if (validation !== true) {
+      setErrors(prev => ({ ...prev, [name]: validation }));
+    } else {
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
     }
   };
 
-  if (authLoading || !user) {
+  const handleSubmit = async () => {
+    // Validate all fields
+    const newErrors = {};
+    Object.keys(insertProfileSchema).forEach(field => {
+      const validation = validateField(field, formData[field]);
+      if (validation !== true) {
+        newErrors[field] = validation;
+      }
+    });
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      
+      // For demo purposes
+      // In production, this would call your API to save the profile
+      setTimeout(() => {
+        setProfile(formData);
+        setIsEditing(false);
+        setIsLoading(false);
+      }, 1000);
+      
+    } catch (error) {
+      console.error("Error saving profile:", error);
+      setIsLoading(false);
+    }
+  };
+
+  const handlePhotoSelect = async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
+
+      if (!result.canceled) {
+        handleFieldChange("photo", result.assets[0].uri);
+      }
+    } catch (error) {
+      console.error("Error selecting image:", error);
+    }
+  };
+
+  if (isLoading && !profile) {
     return (
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <ActivityIndicator size="large" color={colors.primary} />
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={Colors.tintColor} />
+        <Text style={styles.loadingText}>Loading profile...</Text>
       </View>
     );
   }
@@ -129,265 +189,192 @@ export default function ProfileScreen() {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={{ flex: 1 }}
     >
-      <ScrollView
-        style={[styles.container, { backgroundColor: colors.background }]}
-        contentContainerStyle={styles.contentContainer}
-      >
+      <ScrollView style={styles.container}>
         <View style={styles.header}>
-          <Text style={[styles.title, { color: colors.text }]}>My Profile</Text>
-          <TouchableOpacity onPress={toggleEditMode}>
-            <Ionicons
-              name={isEditMode ? "close-outline" : "create-outline"}
-              size={24}
-              color={colors.primary}
+          <TouchableOpacity 
+            style={styles.photoContainer}
+            onPress={isEditing ? handlePhotoSelect : undefined}
+          >
+            <Image
+              source={{ uri: formData.photo }}
+              style={styles.profilePhoto}
             />
-          </TouchableOpacity>
-        </View>
-
-        {isEditMode ? (
-          // Edit mode
-          <View style={styles.profileForm}>
-            {/* Profile Image */}
-            <TouchableOpacity
-              style={styles.photoContainer}
-              onPress={pickImage}
-              disabled={isLoading}
-            >
-              <Image
-                source={{ uri: user.photo || "https://randomuser.me/api/portraits/lego/1.jpg" }}
-                style={styles.profilePhoto}
-              />
+            {isEditing && (
               <View style={styles.editPhotoOverlay}>
                 <Ionicons name="camera" size={24} color="white" />
-                <Text style={styles.editPhotoText}>Change Photo</Text>
               </View>
-            </TouchableOpacity>
-
-            {/* Name */}
-            <View style={styles.formGroup}>
-              <Text style={[styles.label, { color: colors.text }]}>Name</Text>
-              <Controller
-                control={control}
-                name="name"
-                render={({ field: { onChange, value } }) => (
-                  <TextInput
-                    style={[
-                      styles.input,
-                      { backgroundColor: colors.card, color: colors.text },
-                    ]}
-                    placeholder="Your name"
-                    placeholderTextColor={colors.secondaryText}
-                    value={value}
-                    onChangeText={onChange}
-                  />
-                )}
-              />
-              {errors.name && (
-                <Text style={styles.errorText}>{errors.name.message}</Text>
-              )}
-            </View>
-
-            {/* Occupation */}
-            <View style={styles.formGroup}>
-              <Text style={[styles.label, { color: colors.text }]}>Occupation</Text>
-              <Controller
-                control={control}
-                name="occupation"
-                render={({ field: { onChange, value } }) => (
-                  <TextInput
-                    style={[
-                      styles.input,
-                      { backgroundColor: colors.card, color: colors.text },
-                    ]}
-                    placeholder="Your occupation"
-                    placeholderTextColor={colors.secondaryText}
-                    value={value}
-                    onChangeText={onChange}
-                  />
-                )}
-              />
-            </View>
-
-            {/* Age */}
-            <View style={styles.formGroup}>
-              <Text style={[styles.label, { color: colors.text }]}>Age</Text>
-              <Controller
-                control={control}
-                name="age"
-                render={({ field: { onChange, value } }) => (
-                  <TextInput
-                    style={[
-                      styles.input,
-                      { backgroundColor: colors.card, color: colors.text },
-                    ]}
-                    placeholder="Your age"
-                    placeholderTextColor={colors.secondaryText}
-                    value={value ? value.toString() : ""}
-                    onChangeText={(text) => {
-                      const parsed = parseInt(text);
-                      onChange(isNaN(parsed) ? null : parsed);
-                    }}
-                    keyboardType="number-pad"
-                  />
-                )}
-              />
-            </View>
-
-            {/* Bio */}
-            <View style={styles.formGroup}>
-              <Text style={[styles.label, { color: colors.text }]}>Bio</Text>
-              <Controller
-                control={control}
-                name="bio"
-                render={({ field: { onChange, value } }) => (
-                  <TextInput
-                    style={[
-                      styles.textarea,
-                      { backgroundColor: colors.card, color: colors.text },
-                    ]}
-                    placeholder="Tell others about yourself"
-                    placeholderTextColor={colors.secondaryText}
-                    multiline
-                    numberOfLines={4}
-                    value={value}
-                    onChangeText={onChange}
-                  />
-                )}
-              />
-            </View>
-
-            {/* Industry Categories */}
-            <View style={styles.formGroup}>
-              <Text style={[styles.label, { color: colors.text }]}>Industries</Text>
-              <Controller
-                control={control}
-                name="industry_categories"
-                render={({ field: { onChange, value } }) => (
-                  <IndustrySelector
-                    selectedIndustries={value || []}
-                    onIndustriesChange={onChange}
-                  />
-                )}
-              />
-            </View>
-
-            {/* Interests */}
-            <View style={styles.formGroup}>
-              <Text style={[styles.label, { color: colors.text }]}>Interests</Text>
-              <Controller
-                control={control}
-                name="interests"
-                render={({ field: { onChange, value } }) => (
-                  <InterestSelector
-                    selectedInterests={value || []}
-                    onInterestsChange={onChange}
-                    maxInterests={10}
-                  />
-                )}
-              />
-            </View>
-
-            {/* Submit Button */}
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity
-                style={[styles.saveButton, { backgroundColor: colors.primary }]}
-                onPress={handleSubmit(onSaveProfile)}
-                disabled={isLoading}
+            )}
+          </TouchableOpacity>
+          
+          {!isEditing ? (
+            <>
+              <Text style={styles.name}>{profile?.name}</Text>
+              <Text style={styles.occupation}>{profile?.occupation}</Text>
+              <TouchableOpacity 
+                style={styles.editButton}
+                onPress={() => setIsEditing(true)}
               >
-                {isLoading ? (
-                  <ActivityIndicator size="small" color="white" />
-                ) : (
-                  <Text style={styles.saveButtonText}>Save Profile</Text>
-                )}
+                <Ionicons name="pencil" size={16} color="white" />
+                <Text style={styles.editButtonText}>Edit Profile</Text>
               </TouchableOpacity>
-              <TouchableOpacity
+            </>
+          ) : (
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>Name</Text>
+              <TextInput
+                style={[styles.input, errors.name && styles.inputError]}
+                value={formData.name}
+                onChangeText={(text) => handleFieldChange("name", text)}
+                placeholder="Your name"
+              />
+              {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
+            </View>
+          )}
+        </View>
+
+        {isEditing ? (
+          <View style={styles.form}>
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>Birthday</Text>
+              <TextInput
+                style={[styles.input, errors.birthday && styles.inputError]}
+                value={formData.birthday}
+                onChangeText={(text) => handleFieldChange("birthday", text)}
+                placeholder="YYYY-MM-DD"
+              />
+              {errors.birthday && <Text style={styles.errorText}>{errors.birthday}</Text>}
+            </View>
+
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>Occupation</Text>
+              <TextInput
+                style={[styles.input, errors.occupation && styles.inputError]}
+                value={formData.occupation}
+                onChangeText={(text) => handleFieldChange("occupation", text)}
+                placeholder="Your occupation"
+              />
+              {errors.occupation && <Text style={styles.errorText}>{errors.occupation}</Text>}
+            </View>
+
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>Bio</Text>
+              <TextInput
+                style={[styles.textArea, errors.bio && styles.inputError]}
+                value={formData.bio}
+                onChangeText={(text) => handleFieldChange("bio", text)}
+                placeholder="Tell us about yourself"
+                multiline
+                numberOfLines={4}
+              />
+              {errors.bio && <Text style={styles.errorText}>{errors.bio}</Text>}
+              <Text style={styles.charCount}>{formData.bio?.length || 0}/500</Text>
+            </View>
+
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>Interests</Text>
+              <InterestSelector
+                selectedInterests={formData.interests || []}
+                onSelectInterest={(interests) => 
+                  setFormData(prev => ({ ...prev, interests }))
+                }
+              />
+            </View>
+
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>Industry Categories</Text>
+              <IndustrySelector
+                selectedIndustries={formData.industry_categories || []}
+                onSelectIndustry={(industry_categories) => 
+                  setFormData(prev => ({ ...prev, industry_categories }))
+                }
+              />
+            </View>
+
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity 
                 style={styles.cancelButton}
-                onPress={() => setIsEditMode(false)}
-                disabled={isLoading}
+                onPress={() => {
+                  setIsEditing(false);
+                  setFormData(profile);
+                  setErrors({});
+                }}
               >
-                <Text style={[styles.cancelButtonText, { color: colors.primary }]}>Cancel</Text>
+                <Text style={styles.cancelButtonText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={styles.saveButton}
+                onPress={handleSubmit}
+              >
+                <Text style={styles.saveButtonText}>Save</Text>
               </TouchableOpacity>
             </View>
           </View>
         ) : (
-          // View mode
-          <View style={styles.profileContainer}>
-            <Image
-              source={{ uri: user.photo || "https://randomuser.me/api/portraits/lego/1.jpg" }}
-              style={styles.profilePhoto}
-            />
-            <Text style={[styles.name, { color: colors.text }]}>{user.name}</Text>
-            {user.age && (
-              <Text style={[styles.infoText, { color: colors.secondaryText }]}>
-                Age: {user.age}
-              </Text>
-            )}
-            {user.occupation && (
-              <View style={styles.occupationContainer}>
-                <Ionicons name="briefcase-outline" size={16} color={colors.primary} />
-                <Text style={[styles.occupation, { color: colors.text }]}>
-                  {user.occupation}
-                </Text>
-              </View>
-            )}
-            {user.bio && (
-              <View style={styles.bioContainer}>
-                <Text style={[styles.sectionTitle, { color: colors.text }]}>
-                  About
-                </Text>
-                <Text style={[styles.bio, { color: colors.text }]}>{user.bio}</Text>
-              </View>
-            )}
+          <View style={styles.profileDetails}>
+            <View style={styles.detailSection}>
+              <Text style={styles.sectionTitle}>About Me</Text>
+              <Text style={styles.bioText}>{profile?.bio || "No bio added yet."}</Text>
+            </View>
 
-            {user.industry_categories && user.industry_categories.length > 0 && (
-              <View style={styles.section}>
-                <Text style={[styles.sectionTitle, { color: colors.text }]}>
-                  Industries
-                </Text>
-                <View style={styles.tagsContainer}>
-                  {user.industry_categories.map((industry, index) => (
-                    <View
-                      key={index}
-                      style={[
-                        styles.tag,
-                        { backgroundColor: colors.primary + "20" },
-                      ]}
-                    >
-                      <Text
-                        style={[styles.tagText, { color: colors.primary }]}
-                      >
-                        {industry}
-                      </Text>
+            <View style={styles.detailSection}>
+              <Text style={styles.sectionTitle}>Interests</Text>
+              <View style={styles.tagContainer}>
+                {profile?.interests && profile.interests.length > 0 ? (
+                  profile.interests.map((interest, index) => (
+                    <View key={index} style={styles.tag}>
+                      <Text style={styles.tagText}>{interest}</Text>
                     </View>
-                  ))}
-                </View>
+                  ))
+                ) : (
+                  <Text style={styles.emptyText}>No interests added yet.</Text>
+                )}
               </View>
-            )}
+            </View>
 
-            {user.interests && user.interests.length > 0 && (
-              <View style={styles.section}>
-                <Text style={[styles.sectionTitle, { color: colors.text }]}>
-                  Interests
-                </Text>
-                <View style={styles.tagsContainer}>
-                  {user.interests.map((interest, index) => (
-                    <View
-                      key={index}
-                      style={[
-                        styles.tag,
-                        { backgroundColor: colors.primary + "20" },
-                      ]}
-                    >
-                      <Text
-                        style={[styles.tagText, { color: colors.primary }]}
-                      >
-                        {interest}
-                      </Text>
+            <View style={styles.detailSection}>
+              <Text style={styles.sectionTitle}>Industries</Text>
+              <View style={styles.tagContainer}>
+                {profile?.industry_categories && profile.industry_categories.length > 0 ? (
+                  profile.industry_categories.map((industry, index) => (
+                    <View key={index} style={styles.tag}>
+                      <Text style={styles.tagText}>{industry}</Text>
                     </View>
-                  ))}
-                </View>
+                  ))
+                ) : (
+                  <Text style={styles.emptyText}>No industries added yet.</Text>
+                )}
               </View>
-            )}
+            </View>
+
+            <View style={styles.detailSection}>
+              <Text style={styles.sectionTitle}>Favorite Neighborhoods</Text>
+              <View style={styles.tagContainer}>
+                {profile?.neighborhoods && profile.neighborhoods.length > 0 ? (
+                  profile.neighborhoods.map((neighborhood, index) => (
+                    <View key={index} style={styles.tag}>
+                      <Text style={styles.tagText}>{neighborhood}</Text>
+                    </View>
+                  ))
+                ) : (
+                  <Text style={styles.emptyText}>No neighborhoods added yet.</Text>
+                )}
+              </View>
+            </View>
+
+            <View style={styles.detailSection}>
+              <Text style={styles.sectionTitle}>Favorite Cafes</Text>
+              <View style={styles.tagContainer}>
+                {profile?.favorite_cafes && profile.favorite_cafes.length > 0 ? (
+                  profile.favorite_cafes.map((cafe, index) => (
+                    <View key={index} style={styles.tag}>
+                      <Text style={styles.tagText}>{cafe}</Text>
+                    </View>
+                  ))
+                ) : (
+                  <Text style={styles.emptyText}>No favorite cafes added yet.</Text>
+                )}
+              </View>
+            </View>
           </View>
         )}
       </ScrollView>
@@ -398,30 +385,25 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "white",
   },
-  contentContainer: {
-    padding: 20,
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
   },
   header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-  },
-  profileContainer: {
-    alignItems: "center",
-  },
-  profileForm: {
-    width: "100%",
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f0f0f0",
   },
   photoContainer: {
-    alignSelf: "center",
-    marginBottom: 20,
-    position: "relative",
+    marginBottom: 15,
   },
   profilePhoto: {
     width: 120,
@@ -430,98 +412,102 @@ const styles = StyleSheet.create({
   },
   editPhotoOverlay: {
     position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
     bottom: 0,
+    right: 0,
+    backgroundColor: Colors.tintColor,
+    borderRadius: 15,
+    width: 30,
+    height: 30,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.5)",
-    borderRadius: 60,
-  },
-  editPhotoText: {
-    color: "white",
-    marginTop: 5,
-    fontSize: 12,
   },
   name: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: "bold",
-    marginTop: 10,
-  },
-  infoText: {
-    fontSize: 16,
-    marginTop: 5,
-  },
-  occupationContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 10,
+    marginBottom: 5,
   },
   occupation: {
     fontSize: 16,
-    marginLeft: 5,
+    color: "#666",
+    marginBottom: 15,
   },
-  bioContainer: {
-    marginTop: 20,
-    width: "100%",
-  },
-  bio: {
-    fontSize: 16,
-    lineHeight: 24,
-  },
-  section: {
-    marginTop: 20,
-    width: "100%",
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 10,
-  },
-  tagsContainer: {
+  editButton: {
     flexDirection: "row",
-    flexWrap: "wrap",
-  },
-  tag: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    backgroundColor: Colors.tintColor,
+    paddingHorizontal: 15,
+    paddingVertical: 8,
     borderRadius: 20,
-    marginRight: 8,
-    marginBottom: 8,
+    alignItems: "center",
   },
-  tagText: {
-    fontSize: 14,
+  editButtonText: {
+    color: "white",
+    marginLeft: 5,
+    fontWeight: "600",
+  },
+  form: {
+    padding: 20,
   },
   formGroup: {
     marginBottom: 20,
   },
   label: {
     fontSize: 16,
-    fontWeight: "500",
+    fontWeight: "600",
     marginBottom: 8,
   },
   input: {
-    height: 48,
+    borderWidth: 1,
+    borderColor: "#ddd",
     borderRadius: 8,
-    paddingHorizontal: 12,
+    padding: 12,
     fontSize: 16,
   },
-  textarea: {
-    minHeight: 100,
+  inputError: {
+    borderColor: "red",
+  },
+  errorText: {
+    color: "red",
+    fontSize: 14,
+    marginTop: 5,
+  },
+  textArea: {
+    borderWidth: 1,
+    borderColor: "#ddd",
     borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingTop: 12,
+    padding: 12,
     fontSize: 16,
+    minHeight: 100,
     textAlignVertical: "top",
   },
+  charCount: {
+    alignSelf: "flex-end",
+    fontSize: 12,
+    color: "#666",
+    marginTop: 5,
+  },
   buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginTop: 20,
   },
+  cancelButton: {
+    flex: 1,
+    backgroundColor: "#f0f0f0",
+    padding: 15,
+    borderRadius: 8,
+    marginRight: 10,
+    alignItems: "center",
+  },
+  cancelButtonText: {
+    fontSize: 16,
+    fontWeight: "600",
+  },
   saveButton: {
-    height: 48,
-    borderRadius: 24,
-    justifyContent: "center",
+    flex: 1,
+    backgroundColor: Colors.tintColor,
+    padding: 15,
+    borderRadius: 8,
+    marginLeft: 10,
     alignItems: "center",
   },
   saveButtonText: {
@@ -529,20 +515,39 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
   },
-  cancelButton: {
-    height: 48,
-    borderRadius: 24,
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 12,
+  profileDetails: {
+    padding: 20,
   },
-  cancelButtonText: {
+  detailSection: {
+    marginBottom: 25,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  bioText: {
     fontSize: 16,
-    fontWeight: "600",
+    lineHeight: 24,
+    color: "#333",
   },
-  errorText: {
-    color: "#FF3B30",
+  tagContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+  },
+  tag: {
+    backgroundColor: "#f0f0f0",
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    margin: 4,
+  },
+  tagText: {
     fontSize: 14,
-    marginTop: 4,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: "#999",
+    fontStyle: "italic",
   },
 });
