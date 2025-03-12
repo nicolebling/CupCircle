@@ -1,5 +1,3 @@
-
-import React from 'react';
 import { SafeAreaView, ScrollView, StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -39,7 +37,7 @@ export default function SettingsScreen() {
 
         <View style={styles.sectionContainer}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>Account</Text>
-          
+
           <TouchableOpacity style={[styles.settingItem, { borderColor: colors.border }]}>
             <View style={styles.settingIconContainer}>
               <Ionicons name="person-outline" size={22} color={colors.primary} />
@@ -65,7 +63,7 @@ export default function SettingsScreen() {
 
         <View style={styles.sectionContainer}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>Preferences</Text>
-          
+
           <View style={[styles.settingItem, { borderColor: colors.border }]}>
             <View style={styles.settingIconContainer}>
               <Ionicons name="notifications-outline" size={22} color={colors.primary} />
@@ -101,7 +99,7 @@ export default function SettingsScreen() {
 
         <View style={styles.sectionContainer}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>About</Text>
-          
+
           <TouchableOpacity style={[styles.settingItem, { borderColor: colors.border }]}>
             <View style={styles.settingIconContainer}>
               <Ionicons name="help-circle-outline" size={22} color={colors.primary} />

@@ -6,6 +6,10 @@ import {
   View,
   Text,
   TouchableOpacity,
+  ScrollView,
+  TextInput,
+  Image,
+  ActivityIndicator,
 } from "react-native";
 import Colors from "@/constants/Colors";
 import UserProfileCard, { UserProfileData } from "@/components/UserProfileCard";
@@ -14,16 +18,22 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
+import * as ImagePicker from 'expo-image-picker';
 
-// Profile Schema
-const insertProfileSchema = {
+
+// Profile schema
+const insertProfileSchema = z.object({
   name: z.string().nonempty("Name is required"),
   birthday: z.string().nonempty("Birthday is required"),
   occupation: z.string().nonempty("Occupation is required"),
   bio: z.string().max(500, "Bio cannot exceed 500 characters"),
   education: z.string().nonempty("Education is required"),
   photo: z.string().nonempty("Profile photo is required"),
-};
+});
 
 export default function ProfileScreen({ navigation }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -113,7 +123,7 @@ export default function ProfileScreen({ navigation }) {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {/* Logo Animation */}
-      <RotatingCircles />
+      {/* <RotatingCircles /> */} {/* This component is missing */}
 
       <Text style={styles.title}>CupCircle</Text>
       <Text style={styles.subtitle}>Where every cup connects</Text>
@@ -281,4 +291,7 @@ const styles = StyleSheet.create({
   image: { width: 100, height: 100, borderRadius: 50 },
   profileText: { fontSize: 18, fontWeight: "bold", marginVertical: 5 },
   errorText: { color: "red", fontSize: 12 },
+  uploadText: {
+    textAlign: 'center',
+  }
 });
