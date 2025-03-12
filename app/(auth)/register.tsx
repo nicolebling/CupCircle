@@ -32,7 +32,6 @@ export default function RegisterScreen() {
 
     setLoading(true);
     try {
-      // Pass empty string for name as it's no longer collected
       await signUp(email, password, '');
       router.replace('/(auth)/onboarding');
     } catch (err: any) {
@@ -156,6 +155,7 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     justifyContent: 'center',
+    padding: 16,
   },
   logoContainer: {
     alignItems: 'center',
