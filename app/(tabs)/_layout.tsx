@@ -80,6 +80,14 @@ export default function TabLayout() {
           ),
         }}
       />
+      
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: 'Settings',
+          href: null, // This ensures the tab doesn't show in the tab bar
+        }}
+      />
     </Tabs>
   );
 }
