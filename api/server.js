@@ -61,7 +61,7 @@ app.post('/api/auth/login', async (req, res) => {
 
 app.post('/api/auth/register', async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, username } = req.body;
     
     // Check if email already exists
     const existingUser = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
@@ -70,13 +70,20 @@ app.post('/api/auth/register', async (req, res) => {
       return res.status(400).json({ error: 'Email already exists' });
     }
     
+    // Check if username already exists
+    const existingUsername = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
+    
+    if (existingUsername.rows.length > 0) {
+      return res.status(400).json({ error: 'Username already exists' });
+    }
+    
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
     
     // Insert new user
     const result = await pool.query(
-      'INSERT INTO users (email, password) VALUES ($1, $2) RETURNING id, email',
-      [email, hashedPassword]
+      'INSERT INTO users (email, password, username) VALUES ($1, $2, $3) RETURNING id, email, username',
+      [email, hashedPassword, username]
     );
     
     return res.status(201).json(result.rows[0]);

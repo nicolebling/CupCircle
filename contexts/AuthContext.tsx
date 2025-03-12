@@ -93,8 +93,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signUp = async (email: string, password: string, name: string) => {
     setIsLoading(true);
     try {
+      // Extract a username from the email (or use the first part of the name without spaces)
+      const username = email.split('@')[0] || name.split(' ')[0].toLowerCase();
+      
       // Register new user
-      const newUser = await authService.register(email, password);
+      const newUser = await authService.register(email, password, username);
 
       // Create user profile
       await profileService.saveProfile({
