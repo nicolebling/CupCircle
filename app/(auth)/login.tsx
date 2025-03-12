@@ -8,13 +8,18 @@ import {
   SafeAreaView,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
   Image,
 } from "react-native";
 import { Link } from "expo-router";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { useAuth } from "@/contexts/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
-import { DarkTheme, DefaultTheme, ThemeProvider } from "@react-navigation/native";
+import {
+  DarkTheme,
+  DefaultTheme,
+  ThemeProvider,
+} from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
@@ -69,7 +74,9 @@ export default function LoginScreen() {
 
   return (
     <ThemeProvider value={theme}>
-      <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <SafeAreaView
+        style={[styles.container, { backgroundColor: theme.colors.background }]}
+      >
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
           style={styles.keyboardAvoidingView}
@@ -82,7 +89,9 @@ export default function LoginScreen() {
                 style={styles.logo}
                 resizeMode="contain"
               />
-              <Text style={[styles.title, { color: theme.colors.text }]}>CupCircle</Text>
+              <Text style={[styles.title, { color: theme.colors.text }]}>
+                CupCircle
+              </Text>
               <Text style={[styles.subtitle, { color: theme.colors.text }]}>
                 Where every cup connects
               </Text>
@@ -90,7 +99,9 @@ export default function LoginScreen() {
 
             {/* Form Container */}
             <View style={styles.formContainer}>
-              <Text style={[styles.formTitle, { color: theme.colors.text }]}>Welcome Back</Text>
+              <Text style={[styles.formTitle, { color: theme.colors.text }]}>
+                Welcome Back
+              </Text>
 
               {/* Error Message */}
               {error ? (
@@ -102,7 +113,13 @@ export default function LoginScreen() {
               {/* Email Input */}
               <View style={styles.inputContainer}>
                 <TextInput
-                  style={[styles.input, { color: theme.colors.text, borderColor: theme.colors.border }]}
+                  style={[
+                    styles.input,
+                    {
+                      color: theme.colors.text,
+                      borderColor: theme.colors.border,
+                    },
+                  ]}
                   placeholder="Email"
                   placeholderTextColor={theme.colors.text}
                   value={email}
@@ -115,7 +132,13 @@ export default function LoginScreen() {
               {/* Password Input */}
               <View style={styles.inputContainer}>
                 <TextInput
-                  style={[styles.input, { color: theme.colors.text, borderColor: theme.colors.border }]}
+                  style={[
+                    styles.input,
+                    {
+                      color: theme.colors.text,
+                      borderColor: theme.colors.border,
+                    },
+                  ]}
                   placeholder="Password"
                   placeholderTextColor={theme.colors.text}
                   value={password}
@@ -136,7 +159,10 @@ export default function LoginScreen() {
 
               {/* Login Button */}
               <TouchableOpacity
-                style={[styles.button, { backgroundColor: theme.colors.primary }]}
+                style={[
+                  styles.button,
+                  { backgroundColor: theme.colors.primary },
+                ]}
                 onPress={handleLogin}
                 disabled={loading}
               >
@@ -148,7 +174,12 @@ export default function LoginScreen() {
               {/* Forgot Password */}
               <Link href="/(auth)/forgot-password" asChild>
                 <TouchableOpacity style={styles.forgotPasswordButton}>
-                  <Text style={[styles.forgotPasswordText, { color: theme.colors.text }]}>
+                  <Text
+                    style={[
+                      styles.forgotPasswordText,
+                      { color: theme.colors.text },
+                    ]}
+                  >
                     Forgot Password?
                   </Text>
                 </TouchableOpacity>
@@ -162,7 +193,12 @@ export default function LoginScreen() {
               </Text>
               <Link href="/(auth)/register" asChild>
                 <TouchableOpacity>
-                  <Text style={[styles.registerLink, { color: theme.colors.primary }]}>
+                  <Text
+                    style={[
+                      styles.registerLink,
+                      { color: theme.colors.primary },
+                    ]}
+                  >
                     Sign Up
                   </Text>
                 </TouchableOpacity>
@@ -200,11 +236,11 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 32,
-    fontFamily: "SpaceMono", // Custom Font
+    fontFamily: "K2D-Bold",
   },
   subtitle: {
     fontSize: 16,
-    fontFamily: "SpaceMono",
+    fontFamily: "K2D-Regular",
     marginTop: 5,
   },
   formContainer: {
@@ -215,7 +251,7 @@ const styles = StyleSheet.create({
   },
   formTitle: {
     fontSize: 24,
-    fontFamily: "SpaceMono",
+    fontFamily: "K2D-SemiBold",
     marginBottom: 20,
     textAlign: "center",
   },
@@ -227,7 +263,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     color: "#c62828",
-    fontFamily: "SpaceMono",
+    fontFamily: "K2D-Regular",
     textAlign: "center",
   },
   inputContainer: {
@@ -240,7 +276,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 15,
     fontSize: 16,
-    fontFamily: "SpaceMono",
+    fontFamily: "K2D-Regular",
   },
   passwordVisibilityButton: {
     position: "absolute",
@@ -257,20 +293,30 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "white",
     fontSize: 16,
-    fontFamily: "SpaceMono",
+    fontFamily: "K2D-Medium",
   },
   forgotPasswordButton: {
     alignSelf: "center",
     marginTop: 15,
     padding: 5,
   },
+  forgotPasswordText: {
+    fontFamily: "K2D-Regular",
+    fontSize: 14,
+  },
   footer: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
+    marginBottom: 20,
+  },
+  footerText: {
+    fontFamily: "K2D-Regular",
+    fontSize: 14,
+    marginRight: 5,
   },
   registerLink: {
     fontSize: 14,
-    fontFamily: "SpaceMono",
+    fontFamily: "K2D-SemiBold",
   },
 });
