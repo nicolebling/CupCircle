@@ -101,8 +101,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signUp = async (email: string, password: string, name: string) => {
     setIsLoading(true);
     try {
-      // Register new user
-      const newUser = await authService.register(email, password);
+      // Extract username from name (first part) or email
+      const username = name.split(' ')[0] || email.split('@')[0];
+      
+      // Register new user with username
+      const newUser = await authService.register(email, password, username);
 
       // Create user profile
       await profileService.saveProfile({

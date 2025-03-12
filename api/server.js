@@ -46,7 +46,7 @@ app.post('/api/auth/login', async (req, res) => {
     
     const user = result.rows[0];
     
-    // Compare passwords (in production, use bcrypt.compare)
+    // Compare passwords
     const isPasswordValid = await bcrypt.compare(password, user.password);
     
     if (!isPasswordValid) {
@@ -56,7 +56,8 @@ app.post('/api/auth/login', async (req, res) => {
     // Return user data (exclude password)
     return res.json({
       id: user.id,
-      email: user.email
+      email: user.email,
+      username: user.username
     });
   } catch (error) {
     console.error('Login error:', error);
@@ -66,12 +67,12 @@ app.post('/api/auth/login', async (req, res) => {
 
 app.post('/api/auth/register', async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, username = '' } = req.body;
+    
+    console.log('Registration attempt:', { email, username });
     
     // Check if email already exists
     const existingUser = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
-
-     console.log('Registration attempt:', req.body);
     
     if (existingUser.rows.length > 0) {
       return res.status(400).json({ error: 'Email already exists' });
@@ -80,15 +81,48 @@ app.post('/api/auth/register', async (req, res) => {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
     
+    // Generate a verification token
+    const verificationToken = require('crypto').randomBytes(32).toString('hex');
+    
     // Insert new user
     const result = await pool.query(
-      'INSERT INTO users (email, password) VALUES ($1, $2) RETURNING id, email',
-      [email, hashedPassword]
+      `INSERT INTO users (email, password, username, is_verified, verification_token) 
+       VALUES ($1, $2, $3, $4, $5) 
+       RETURNING id, email, username, is_verified`,
+      [email, hashedPassword, username || email.split('@')[0], false, verificationToken]
     );
     
     return res.status(201).json(result.rows[0]);
   } catch (error) {
     console.error('Register error:', error);
+    return res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Verification endpoint (for future implementation)
+app.get('/api/auth/verify/:token', async (req, res) => {
+  try {
+    const { token } = req.params;
+    
+    // Find user with this verification token
+    const result = await pool.query(
+      'SELECT * FROM users WHERE verification_token = $1', 
+      [token]
+    );
+    
+    if (result.rows.length === 0) {
+      return res.status(400).json({ error: 'Invalid verification token' });
+    }
+    
+    // Update user to verified
+    await pool.query(
+      'UPDATE users SET is_verified = true, verification_token = NULL WHERE id = $1',
+      [result.rows[0].id]
+    );
+    
+    return res.json({ message: 'Email verified successfully' });
+  } catch (error) {
+    console.error('Verification error:', error);
     return res.status(500).json({ error: 'Server error' });
   }
 });
