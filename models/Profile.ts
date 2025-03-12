@@ -78,39 +78,4 @@ export class ProfileModel {
     );
     return result.rows;
   }
-  
-  // Search profiles by interests or industry
-  static async searchProfiles(searchTerm: string, limit: number = 10): Promise<Profile[]> {
-    const result = await query(
-      `SELECT * FROM profiles 
-       WHERE 
-         interests && ARRAY[$1]::text[] OR
-         industry_categories && ARRAY[$1]::text[] OR
-         name ILIKE $2 OR
-         occupation ILIKE $2 OR
-         bio ILIKE $2
-       LIMIT $3`,
-      [searchTerm, `%${searchTerm}%`, limit]
-    );
-    return result.rows;
-  }
-  
-  // Get recommended profiles based on matching interests
-  static async getRecommendedProfiles(userId: string, limit: number = 5): Promise<Profile[]> {
-    const result = await query(
-      `SELECT p2.* 
-       FROM profiles p1, profiles p2
-       WHERE p1.user_id = $1 
-         AND p2.user_id != $1
-         AND p1.interests && p2.interests
-       ORDER BY ARRAY_LENGTH(ARRAY(
-         SELECT UNNEST(p1.interests) 
-         INTERSECT 
-         SELECT UNNEST(p2.interests)
-       ), 1) DESC
-       LIMIT $2`,
-      [userId, limit]
-    );
-    return result.rows;
-  }
 }
