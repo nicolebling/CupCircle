@@ -254,6 +254,6 @@ app.use((req, res, next) => {
 app.listen(port, "0.0.0.0", () => {
   console.log(`Server running on port ${port}`);
   console.log(
-    `API available at: ${process.env.EXPO_PUBLIC_API_URL || "https://your-replit-domain.replit.app"}`,
+    `API available at: ${process.env.EXPO_PUBLIC_API_URL || "https://cupcircle-api.yourusername.replit.app"}`,
   );
 });

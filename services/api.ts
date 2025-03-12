@@ -3,8 +3,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Profile } from '../models/Profile';
 
 // Base URL for API
-// Get the API URL from environment or use the Replit domain
-const API_URL = process.env.EXPO_PUBLIC_API_URL || `https://${process.env.REPLIT_DEV_DOMAIN}`;
+// Use the environment variable or the configured URL
+const API_URL = process.env.EXPO_PUBLIC_API_URL || "https://cupcircle-api.yourusername.replit.app";
 console.log('Using API URL:', API_URL);
 
 // Auth service

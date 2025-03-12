@@ -3,9 +3,11 @@
 import Constants from "expo-constants";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-// Base URL for your API - fallback to mock API if not configured
+// Base URL for your API - fallback to the correct URL
 const API_BASE_URL =
-  Constants.expoConfig?.extra?.apiUrl || "https://api.cupcircle.com";
+  process.env.EXPO_PUBLIC_API_URL || 
+  Constants.expoConfig?.extra?.apiUrl || 
+  "https://cupcircle-api.yourusername.replit.app";
 
 // Flag to use mock data when API is unavailable
 let useMockData = false;
