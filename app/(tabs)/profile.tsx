@@ -106,7 +106,6 @@ export default function ProfileScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.header}>
         <View style={styles.headerContent}>
-          <Text style={[styles.title, { color: colors.text }]}>My Profile</Text>
           <TouchableOpacity 
             style={[styles.settingsButton, { backgroundColor: colors.card, borderColor: colors.border }]} 
             onPress={navigateToSettings}

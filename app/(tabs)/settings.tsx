@@ -44,7 +44,6 @@ export default function SettingsScreen() {
         <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
           <Ionicons name="chevron-back" size={24} color={colors.text} />
         </TouchableOpacity>
-        <Text style={[styles.headerTitle, { color: colors.text }]}>Settings</Text>
         <View style={styles.spacer} />
       </View>
 
