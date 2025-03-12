@@ -4,7 +4,6 @@ import * as bcrypt from 'bcryptjs';
 
 export interface User {
   id: string;
-  username: string;
   email: string;
   password?: string;
   created_at?: Date;
@@ -12,11 +11,11 @@ export interface User {
 
 export class UserModel {
   // Create a new user
-  static async create(username: string, email: string, password: string): Promise<User> {
+  static async create(email: string, password: string): Promise<User> {
     const hashedPassword = await bcrypt.hash(password, 10);
     const result = await query(
-      'INSERT INTO users(username, email, password) VALUES($1, $2, $3) RETURNING id, username, email, created_at',
-      [username, email, hashedPassword]
+      'INSERT INTO users(email, password) VALUES($1, $2) RETURNING id, email, created_at',
+      [email, hashedPassword]
     );
     return result.rows[0];
   }
@@ -29,7 +28,7 @@ export class UserModel {
 
   // Find user by id
   static async findById(id: string): Promise<User | null> {
-    const result = await query('SELECT id, username, email, created_at FROM users WHERE id = $1', [id]);
+    const result = await query('SELECT id, email, created_at FROM users WHERE id = $1', [id]);
     return result.rows[0] || null;
   }
 

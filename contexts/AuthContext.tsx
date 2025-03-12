@@ -6,13 +6,11 @@ import { profileService } from '../services/api';
 
 type User = {
   id: string;
-  username: string;
   email: string;
 };
 
 type UserProfile = {
   id: string;
-  username: string;
   email: string;
   name?: string;
   photo?: string;
@@ -25,7 +23,7 @@ type AuthContextType = {
   user: UserProfile | null;
   isLoading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (username: string, email: string, password: string, name: string) => Promise<void>;
+  signUp: (email: string, password: string, name: string) => Promise<void>;
   signOut: () => void;
   updateUser: (userData: Partial<UserProfile>) => Promise<void>;
 };
@@ -73,7 +71,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Combine user and profile data
       const userProfile: UserProfile = {
         id: authenticatedUser.id,
-        username: authenticatedUser.username,
         email: authenticatedUser.email,
         name: profile?.name,
         photo: profile?.photo,
@@ -93,11 +90,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const signUp = async (username: string, email: string, password: string, name: string) => {
+  const signUp = async (email: string, password: string, name: string) => {
     setIsLoading(true);
     try {
       // Register new user
-      const newUser = await authService.register(username, email, password);
+      const newUser = await authService.register(email, password);
 
       // Create user profile
       await profileService.saveProfile({
@@ -108,7 +105,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Create user profile object
       const userProfile: UserProfile = {
         id: newUser.id,
-        username: newUser.username,
         email: newUser.email,
         name: name,
       };
