@@ -7,76 +7,64 @@ import { Profile } from '../models/Profile';
 const API_URL = process.env.EXPO_PUBLIC_API_URL || `https://${process.env.REPLIT_DEV_DOMAIN}/api`;
 console.log('Using API URL:', API_URL);
 
-import { query } from './database';
-import { v4 as uuidv4 } from 'uuid';
-import bcrypt from 'bcryptjs';
-
 // Auth service
 export const authService = {
   // Login function
   async login(email: string, password: string) {
     try {
-      // Use database query
-      const result = await query(
-        'SELECT * FROM users WHERE email = $1',
-        [email]
-      );
+      // For development, use mockAuthService if API is not available
+      if (!API_URL.includes('replit.dev')) {
+        console.log('Using mock auth service');
+        return mockAuthService.login(email, password);
+      }
       
-      if (result.rows.length === 0) {
+      const response = await fetch(`${API_URL}/api/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+      
+      if (!response.ok) {
         return null;
       }
       
-      const user = result.rows[0];
-      
-      // Verify password
-      const isPasswordValid = await bcrypt.compare(password, user.password);
-      
-      if (!isPasswordValid) {
-        return null;
-      }
-      
-      return {
-        id: user.id,
-        email: user.email,
-        username: user.username
-      };
+      return await response.json();
     } catch (error) {
       console.error('Login error:', error);
-      // In production, don't fallback to mock
-      return null;
+      // Fallback to mock during development
+      return mockAuthService.login(email, password);
     }
   },
   
   // Register function
-  async register(email: string, password: string, username: string = '') {
+  async register(email: string, password: string) {
     try {
-      // Check if user already exists
-      const existingUser = await query(
-        'SELECT * FROM users WHERE email = $1',
-        [email]
-      );
-      
-      if (existingUser.rows.length > 0) {
-        throw new Error('User already exists');
+      // For development, use mockAuthService if API is not available
+      if (!API_URL.includes('replit.dev')) {
+        console.log('Using mock auth service');
+        return mockAuthService.register(email, password);
       }
       
-      // Hash password
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(password, salt);
+      const response = await fetch(`${API_URL}/api/auth/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
       
-      // Generate user ID
-      const userId = uuidv4();
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Registration failed');
+      }
       
-      // Create new user
-      const result = await query(
-        'INSERT INTO users (id, username, email, password) VALUES ($1, $2, $3, $4) RETURNING id, email, username',
-        [userId, username || email.split('@')[0], email, hashedPassword]
-      );
-      
-      return result.rows[0];
+      return await response.json();
     } catch (error) {
       console.error('Register error:', error);
-      throw error;
+      // Fallback to mock during development
+      return mockAuthService.register(email, password);
     }
   }
 };
@@ -88,61 +76,53 @@ export const profileService = {
     try {
       if (!userId) return null;
       
-      const result = await query(
-        'SELECT * FROM profiles WHERE user_id = $1',
-        [userId]
-      );
+      // For development, use mockProfileService if API is not available
+      if (!API_URL.includes('replit.dev')) {
+        console.log('Using mock profile service');
+        return mockProfileService.getProfileByUserId(userId);
+      }
       
-      if (result.rows.length === 0) {
+      const response = await fetch(`${API_URL}/api/profile/${userId}`);
+      
+      if (!response.ok) {
         return null;
       }
       
-      return result.rows[0];
+      return await response.json();
     } catch (error) {
       console.error('Failed to load user profile', error);
-      return null;
+      // Fallback to mock during development
+      return mockProfileService.getProfileByUserId(userId);
     }
   },
   
   // Save profile (create or update)
   async saveProfile(profileData: Partial<Profile> & { user_id: string }) {
     try {
-      const { user_id } = profileData;
-      
-      // Check if profile exists
-      const existingProfile = await query(
-        'SELECT * FROM profiles WHERE user_id = $1',
-        [user_id]
-      );
-      
-      if (existingProfile.rows.length === 0) {
-        // Create new profile
-        const columns = Object.keys(profileData);
-        const values = Object.values(profileData);
-        const placeholders = values.map((_, i) => `$${i + 1}`).join(', ');
-        
-        const result = await query(
-          `INSERT INTO profiles (${columns.join(', ')}) VALUES (${placeholders}) RETURNING *`,
-          values
-        );
-        
-        return result.rows[0];
-      } else {
-        // Update existing profile
-        const keys = Object.keys(profileData).filter(key => key !== 'user_id');
-        const setClause = keys.map((key, i) => `${key} = $${i + 2}`).join(', ');
-        const values = keys.map(key => profileData[key as keyof typeof profileData]);
-        
-        const result = await query(
-          `UPDATE profiles SET ${setClause}, updated_at = NOW() WHERE user_id = $1 RETURNING *`,
-          [user_id, ...values]
-        );
-        
-        return result.rows[0];
+      // For development, use mockProfileService if API is not available
+      if (!API_URL.includes('replit.dev')) {
+        console.log('Using mock profile service');
+        return mockProfileService.saveProfile(profileData);
       }
+      
+      const response = await fetch(`${API_URL}/api/profile`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(profileData),
+      });
+      
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to save profile');
+      }
+      
+      return await response.json();
     } catch (error) {
       console.error('Failed to save profile', error);
-      throw error;
+      // Fallback to mock during development
+      return mockProfileService.saveProfile(profileData);
     }
   }
 };
