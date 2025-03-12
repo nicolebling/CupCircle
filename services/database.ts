@@ -4,19 +4,13 @@ import { Pool } from 'pg';
 // Configuration from environment variable
 const connectionString = process.env.DATABASE_URL;
 
-// Create a new PostgreSQL pool with Supabase configuration
+// Create a new PostgreSQL pool
 const pool = new Pool({
   connectionString,
   ssl: {
-    rejectUnauthorized: false // Required for Supabase connections
+    rejectUnauthorized: false // Required for some PostgreSQL hosts
   }
 });
-
-// Log the connection (without sensitive info)
-if (connectionString) {
-  const sanitizedConnectionString = connectionString.replace(/:[^:]*@/, ':****@');
-  console.log('Database service connecting to:', sanitizedConnectionString);
-}
 
 // Export a query helper function
 export async function query(text: string, params?: any[]) {

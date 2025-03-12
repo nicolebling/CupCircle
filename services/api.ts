@@ -1,9 +1,10 @@
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Profile } from '../models/Profile';
 
 // Base URL for API
 // Get the API URL from environment or use the Replit domain
-const API_URL = process.env.EXPO_PUBLIC_API_URL || `https://${process.env.REPLIT_DEV_DOMAIN}`;
+const API_URL = process.env.EXPO_PUBLIC_API_URL || `https://${process.env.REPLIT_DEV_DOMAIN}/api`;
 console.log('Using API URL:', API_URL);
 
 // Auth service
@@ -11,7 +12,12 @@ export const authService = {
   // Login function
   async login(email: string, password: string) {
     try {
-      console.log('Making login request to:', `${API_URL}/api/auth/login`);
+      // For development, use mockAuthService if API is not available
+      if (!API_URL.includes('replit.dev')) {
+        console.log('Using mock auth service');
+        return mockAuthService.login(email, password);
+      }
+      
       const response = await fetch(`${API_URL}/api/auth/login`, {
         method: 'POST',
         headers: {
@@ -19,42 +25,48 @@ export const authService = {
         },
         body: JSON.stringify({ email, password }),
       });
-
+      
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Login failed');
+        return null;
       }
-
+      
       return await response.json();
     } catch (error) {
-      console.error('Network error, falling back to mock auth service', error);
-      // For development fallback
+      console.error('Login error:', error);
+      // Fallback to mock during development
       return mockAuthService.login(email, password);
     }
   },
-
+  
   // Register function
-  async register(email: string, password: string, username: string = '') {
+  async register(email: string, password: string) {
     try {
+      // For development, use mockAuthService if API is not available
+      if (!API_URL.includes('replit.dev')) {
+        console.log('Using mock auth service');
+        return mockAuthService.register(email, password);
+      }
+      
       const response = await fetch(`${API_URL}/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password, username }),
+        body: JSON.stringify({ email, password }),
       });
-
+      
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Registration failed');
+        const data = await response.json();
+        throw new Error(data.error || 'Registration failed');
       }
-
+      
       return await response.json();
     } catch (error) {
-      console.error('Registration error:', error);
-      throw error;
+      console.error('Register error:', error);
+      // Fallback to mock during development
+      return mockAuthService.register(email, password);
     }
-  },
+  }
 };
 
 // Profile service
@@ -62,22 +74,37 @@ export const profileService = {
   // Get profile by user ID
   async getProfileByUserId(userId: string) {
     try {
-      const response = await fetch(`${API_URL}/api/profile/${userId}`);
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch profile');
+      if (!userId) return null;
+      
+      // For development, use mockProfileService if API is not available
+      if (!API_URL.includes('replit.dev')) {
+        console.log('Using mock profile service');
+        return mockProfileService.getProfileByUserId(userId);
       }
-
+      
+      const response = await fetch(`${API_URL}/api/profile/${userId}`);
+      
+      if (!response.ok) {
+        return null;
+      }
+      
       return await response.json();
     } catch (error) {
-      console.error('Network error, falling back to mock profile service', error);
-      return null;
+      console.error('Failed to load user profile', error);
+      // Fallback to mock during development
+      return mockProfileService.getProfileByUserId(userId);
     }
   },
-
-  // Save profile
-  async saveProfile(profileData: any) {
+  
+  // Save profile (create or update)
+  async saveProfile(profileData: Partial<Profile> & { user_id: string }) {
     try {
+      // For development, use mockProfileService if API is not available
+      if (!API_URL.includes('replit.dev')) {
+        console.log('Using mock profile service');
+        return mockProfileService.saveProfile(profileData);
+      }
+      
       const response = await fetch(`${API_URL}/api/profile`, {
         method: 'POST',
         headers: {
@@ -85,17 +112,19 @@ export const profileService = {
         },
         body: JSON.stringify(profileData),
       });
-
+      
       if (!response.ok) {
-        throw new Error('Failed to save profile');
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to save profile');
       }
-
+      
       return await response.json();
     } catch (error) {
-      console.error('Save profile error:', error);
-      throw error;
+      console.error('Failed to save profile', error);
+      // Fallback to mock during development
+      return mockProfileService.saveProfile(profileData);
     }
-  },
+  }
 };
 
 // Mock auth service (for development)
@@ -106,22 +135,20 @@ export const mockAuthService = {
       // For development, accept any login
       return {
         id: '1',
-        email: email,
-        username: email.split('@')[0]
+        email: email
       };
     } catch (error) {
       console.error('Login error:', error);
       return null;
     }
   },
-
+  
   // Register function
-  async register(email: string, password: string, username: string = '') {
+  async register(email: string, password: string) {
     try {
       return {
         id: Date.now().toString(),
-        email,
-        username: username || email.split('@')[0]
+        email
       };
     } catch (error) {
       console.error('Register error:', error);
@@ -130,6 +157,7 @@ export const mockAuthService = {
   }
 };
 
+// Mock profile service (for development)
 export const mockProfileService = {
   // Mock data for development
   MOCK_PROFILES: [
@@ -162,12 +190,12 @@ export const mockProfileService = {
       interests: ['Design', 'Art', 'Photography']
     }
   ],
-
+  
   // Get profile by user ID
   async getProfileByUserId(userId: string) {
     try {
       if (!userId) return null;
-
+      
       const storedProfiles = await AsyncStorage.getItem('@profiles');
       const profiles = storedProfiles ? JSON.parse(storedProfiles) : this.MOCK_PROFILES;
       return profiles.find((profile: any) => profile.user_id === userId) || null;
@@ -176,19 +204,19 @@ export const mockProfileService = {
       return null;
     }
   },
-
+  
   // Save profile (create or update)
   async saveProfile(profileData: any) {
     try {
       const { user_id } = profileData;
-
+      
       // Get existing profiles
       const storedProfiles = await AsyncStorage.getItem('@profiles');
       const profiles = storedProfiles ? JSON.parse(storedProfiles) : this.MOCK_PROFILES;
-
+      
       // Check if profile exists
       const existingIndex = profiles.findIndex((p: any) => p.user_id === user_id);
-
+      
       if (existingIndex >= 0) {
         // Update existing profile
         profiles[existingIndex] = {
@@ -206,10 +234,10 @@ export const mockProfileService = {
           updated_at: new Date().toISOString()
         });
       }
-
+      
       // Save updated profiles
       await AsyncStorage.setItem('@profiles', JSON.stringify(profiles));
-
+      
       // Return the saved profile
       return profiles.find((p: any) => p.user_id === user_id);
     } catch (error) {

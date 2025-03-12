@@ -58,22 +58,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signIn = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      console.log('Attempting to sign in with:', email);
-      
       // Get user from database
       const authenticatedUser = await authService.login(email, password);
 
       if (!authenticatedUser) {
-        console.error('Authentication failed: No user returned');
         throw new Error('Invalid email or password');
       }
-      
-      console.log('Authentication successful, user ID:', authenticatedUser.id);
 
       // Get user profile
       const profile = await profileService.getProfileByUserId(authenticatedUser.id);
-      
-      console.log('Retrieved profile:', profile ? 'Success' : 'Not found');
 
       // Combine user and profile data
       const userProfile: UserProfile = {
@@ -86,7 +79,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         interests: profile?.interests,
       };
 
-      console.log('Saving user profile to storage and redirecting');
       await AsyncStorage.setItem('@user', JSON.stringify(userProfile));
       setUser(userProfile);
       router.replace('/(tabs)');
@@ -101,11 +93,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signUp = async (email: string, password: string, name: string) => {
     setIsLoading(true);
     try {
-      // Extract username from name (first part) or email
-      const username = name.split(' ')[0] || email.split('@')[0];
-      
-      // Register new user with username
-      const newUser = await authService.register(email, password, username);
+      // Register new user
+      const newUser = await authService.register(email, password);
 
       // Create user profile
       await profileService.saveProfile({
