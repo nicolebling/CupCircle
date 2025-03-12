@@ -1,15 +1,14 @@
+
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, SafeAreaView, KeyboardAvoidingView, Platform, Image } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, SafeAreaView, KeyboardAvoidingView, Platform } from 'react-native';
 import { Link, router } from 'expo-router';
 import Colors from '@/constants/Colors';
 import { useAuth } from '@/contexts/AuthContext';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function RegisterScreen() {
-  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -22,8 +21,8 @@ export default function RegisterScreen() {
     setError('');
 
     // Simple validation
-    if (!username || !email || !password || !confirmPassword || !name) {
-      setError('All fields are required');
+    if (!email || !password) {
+      setError('Email and password are required');
       return;
     }
 
@@ -32,10 +31,15 @@ export default function RegisterScreen() {
       return;
     }
 
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters');
+      return;
+    }
+
     setLoading(true);
     try {
-      await signUp(username, email, password, name);
-      router.replace('/(auth)/onboarding');
+      await signUp(email, password);
+      // Navigation is handled inside signUp function in AuthContext
     } catch (err: any) {
       setError(err.message || 'Registration failed');
     } finally {
@@ -63,46 +67,17 @@ export default function RegisterScreen() {
           ) : null}
 
           <View style={styles.inputContainer}>
-            <Text style={[styles.label, { color: colors.text }]}>Username</Text>
-            <View style={[styles.inputWrapper, { backgroundColor: colors.card, borderColor: colors.border }]}>
-              <Ionicons name="person-outline" size={20} color={colors.secondaryText} style={styles.inputIcon} />
-              <TextInput
-                style={[styles.input, { color: colors.text }]}
-                placeholder="Enter username"
-                placeholderTextColor={colors.secondaryText}
-                value={username}
-                onChangeText={setUsername}
-                autoCapitalize="none"
-              />
-            </View>
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={[styles.label, { color: colors.text }]}>Full Name</Text>
-            <View style={[styles.inputWrapper, { backgroundColor: colors.card, borderColor: colors.border }]}>
-              <Ionicons name="person" size={20} color={colors.secondaryText} style={styles.inputIcon} />
-              <TextInput
-                style={[styles.input, { color: colors.text }]}
-                placeholder="Enter your full name"
-                placeholderTextColor={colors.secondaryText}
-                value={name}
-                onChangeText={setName}
-              />
-            </View>
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={[styles.label, { color: colors.text }]}>Email Address</Text>
+            <Text style={[styles.label, { color: colors.text }]}>Email</Text>
             <View style={[styles.inputWrapper, { backgroundColor: colors.card, borderColor: colors.border }]}>
               <Ionicons name="mail-outline" size={20} color={colors.secondaryText} style={styles.inputIcon} />
               <TextInput
                 style={[styles.input, { color: colors.text }]}
-                placeholder="Enter email address"
+                placeholder="Enter email"
                 placeholderTextColor={colors.secondaryText}
                 value={email}
                 onChangeText={setEmail}
-                keyboardType="email-address"
                 autoCapitalize="none"
+                keyboardType="email-address"
               />
             </View>
           </View>
@@ -113,18 +88,18 @@ export default function RegisterScreen() {
               <Ionicons name="lock-closed-outline" size={20} color={colors.secondaryText} style={styles.inputIcon} />
               <TextInput
                 style={[styles.input, { color: colors.text }]}
-                placeholder="Enter password"
+                placeholder="Create password"
                 placeholderTextColor={colors.secondaryText}
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry={!showPassword}
               />
               <TouchableOpacity 
-                style={styles.eyeIcon} 
+                style={styles.passwordVisibilityButton}
                 onPress={() => setShowPassword(!showPassword)}
               >
                 <Ionicons 
-                  name={showPassword ? "eye-off-outline" : "eye-outline"} 
+                  name={showPassword ? 'eye-off' : 'eye'} 
                   size={20} 
                   color={colors.secondaryText} 
                 />
@@ -148,15 +123,13 @@ export default function RegisterScreen() {
           </View>
 
           <TouchableOpacity 
-            style={[styles.registerButton, { backgroundColor: colors.primary }, loading && { opacity: 0.7 }]} 
+            style={[styles.button, { backgroundColor: colors.primary }]}
             onPress={handleRegister}
             disabled={loading}
           >
-            {loading ? (
-              <Ionicons name="sync" size={24} color="white" style={styles.spinner} />
-            ) : (
-              <Text style={styles.registerButtonText}>Register</Text>
-            )}
+            <Text style={styles.buttonText}>
+              {loading ? 'Creating Account...' : 'Create Account'}
+            </Text>
           </TouchableOpacity>
 
           <View style={styles.footer}>
@@ -165,7 +138,9 @@ export default function RegisterScreen() {
             </Text>
             <Link href="/(auth)/login" asChild>
               <TouchableOpacity>
-                <Text style={[styles.loginLink, { color: colors.primary }]}>Log In</Text>
+                <Text style={[styles.registerLink, { color: colors.primary }]}>
+                  Log In
+                </Text>
               </TouchableOpacity>
             </Link>
           </View>
@@ -178,12 +153,14 @@ export default function RegisterScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 50,
   },
   content: {
     flex: 1,
+    padding: 20,
     justifyContent: 'center',
+    maxWidth: 500,
+    width: '100%',
+    alignSelf: 'center',
   },
   logoContainer: {
     alignItems: 'center',
@@ -191,77 +168,76 @@ const styles = StyleSheet.create({
   },
   logoText: {
     fontFamily: 'K2D-Bold',
-    fontSize: 24,
-    marginTop: 10,
+    fontSize: 32,
+    color: '#F97415',
   },
   title: {
-    fontFamily: 'K2D-Bold',
     fontSize: 24,
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  errorContainer: {
-    marginBottom: 10,
-    alignItems: 'center',
-  },
-  errorText: {
-    color: 'red',
-  },
-  inputContainer: {
-    marginBottom: 15,
+    fontFamily: 'K2D-SemiBold',
+    marginBottom: 24,
   },
   label: {
+    fontSize: 16,
     fontFamily: 'K2D-Medium',
-    marginBottom: 5,
+    marginBottom: 8,
+  },
+  inputContainer: {
+    marginBottom: 20,
   },
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    borderRadius: 5,
     borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 12,
   },
   inputIcon: {
     marginRight: 10,
   },
   input: {
     flex: 1,
-    fontFamily: 'K2D-Regular',
-  },
-  eyeIcon: {
-    position: 'absolute',
-    right: 10,
-    top: '50%',
-    transform: [{ translateY: -10 }],
-  },
-  registerButton: {
     height: 50,
-    borderRadius: 5,
+    fontFamily: 'K2D-Regular',
+    fontSize: 16,
+  },
+  passwordVisibilityButton: {
+    padding: 8,
+  },
+  button: {
+    height: 50,
+    borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 20,
+    marginVertical: 20,
   },
-  registerButtonText: {
+  buttonText: {
+    fontSize: 16,
+    fontFamily: 'K2D-SemiBold',
     color: 'white',
-    fontFamily: 'K2D-Bold',
-    fontSize: 18,
   },
-  spinner: {
-    marginRight: 10,
+  errorContainer: {
+    backgroundColor: '#FFE5E5',
+    padding: 10,
+    borderRadius: 8,
+    marginBottom: 20,
+  },
+  errorText: {
+    color: '#D00000',
+    fontSize: 14,
+    fontFamily: 'K2D-Regular',
   },
   footer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: 30,
+    alignItems: 'center',
+    gap: 5,
   },
   footerText: {
+    fontSize: 14,
     fontFamily: 'K2D-Regular',
-    fontSize: 16,
-    marginRight: 5,
   },
-  loginLink: {
+  registerLink: {
+    fontSize: 14,
     fontFamily: 'K2D-SemiBold',
-    fontSize: 16,
   },
 });
