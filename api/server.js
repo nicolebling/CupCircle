@@ -32,27 +32,34 @@ app.post("/api/auth/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    console.log("Login attempt for:", email);
+
     const result = await pool.query("SELECT * FROM users WHERE email = $1", [
       email,
     ]);
 
     if (result.rows.length === 0) {
+      console.log("User not found:", email);
       return res.status(401).json({ error: "Invalid credentials" });
     }
 
     const user = result.rows[0];
 
-    // Compare passwords (in production, use bcrypt.compare)
+    // Compare passwords with bcrypt
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
+      console.log("Invalid password for:", email);
       return res.status(401).json({ error: "Invalid credentials" });
     }
 
+    console.log("User logged in successfully:", email);
+    
     // Return user data (exclude password)
     return res.json({
       id: user.id,
       email: user.email,
+      username: user.username
     });
   } catch (error) {
     console.error("Login error:", error);
@@ -62,7 +69,7 @@ app.post("/api/auth/login", async (req, res) => {
 
 app.post("/api/auth/register", async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, name } = req.body;
 
     // Check if email already exists
     const existingUser = await pool.query(
@@ -74,6 +81,9 @@ app.post("/api/auth/register", async (req, res) => {
       return res.status(400).json({ error: "Email already exists" });
     }
 
+    // Generate username from email if not provided
+    const username = req.body.username || email.split('@')[0];
+    
     // Check if username already exists
     const existingUsername = await pool.query(
       "SELECT * FROM users WHERE username = $1",

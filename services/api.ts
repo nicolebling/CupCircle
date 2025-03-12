@@ -12,6 +12,8 @@ export const authService = {
   // Login function
   async login(email: string, password: string) {
     try {
+      console.log(`Making login request to: ${API_URL}/api/auth/login`);
+      
       const response = await fetch(`${API_URL}/api/auth/login`, {
         method: 'POST',
         headers: {
@@ -20,12 +22,17 @@ export const authService = {
         body: JSON.stringify({ email, password }),
       });
       
+      console.log('Login response status:', response.status);
+      
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Login failed');
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        console.error('Login response error:', errorData);
+        throw new Error(errorData.error || 'Login failed');
       }
       
-      return await response.json();
+      const userData = await response.json();
+      console.log('Login successful, user data received');
+      return userData;
     } catch (error) {
       console.error('Login error:', error);
       throw error;

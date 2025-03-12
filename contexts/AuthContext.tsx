@@ -58,6 +58,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signIn = async (email: string, password: string) => {
     setIsLoading(true);
     try {
+      console.log("Attempting to sign in with:", email);
+      
       // Get user from database
       const authenticatedUser = await authService.login(email, password);
 
@@ -65,14 +67,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw new Error('Invalid email or password');
       }
 
-      // Get user profile
-      const profile = await profileService.getProfileByUserId(authenticatedUser.id);
+      console.log("User authenticated:", authenticatedUser);
+
+      // Get user profile - handle potential errors gracefully
+      let profile = null;
+      try {
+        profile = await profileService.getProfileByUserId(authenticatedUser.id);
+        console.log("Profile retrieved:", profile);
+      } catch (profileError) {
+        console.error("Error fetching profile, continuing with login:", profileError);
+        // Continue with login even if profile fetch fails
+      }
 
       // Combine user and profile data
       const userProfile: UserProfile = {
         id: authenticatedUser.id,
         email: authenticatedUser.email,
-        name: profile?.name,
+        name: profile?.name || email.split('@')[0],
         photo: profile?.photo,
         occupation: profile?.occupation,
         bio: profile?.bio,
