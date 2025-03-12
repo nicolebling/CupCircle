@@ -1,16 +1,19 @@
 
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, StyleSheet, Alert, View, Text, TouchableOpacity } from 'react-native';
+import { SafeAreaView, StyleSheet, Alert, View, Text, TouchableOpacity, Modal } from 'react-native';
 import Colors from '@/constants/Colors';
 import UserProfileCard, { UserProfileData } from '@/components/UserProfileCard';
 import { useProfileManager, ProfileFormData } from '@/hooks/useProfileManager';
 import { useAuth } from '@/contexts/AuthContext';
 import { Ionicons } from '@expo/vector-icons';
+import { useColorScheme } from '@/hooks/useColorScheme';
 
 export default function ProfileScreen() {
-  const colors = Colors.light;
-  const { user } = useAuth();
+  const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme];
+  const { user, signOut } = useAuth();
   const [isEditMode, setIsEditMode] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const [profileData, setProfileData] = useState<UserProfileData>({
     name: '',
     age: undefined,
@@ -95,8 +98,49 @@ export default function ProfileScreen() {
     }
   };
   
+  const handleSignOut = () => {
+    Alert.alert(
+      "Sign Out",
+      "Are you sure you want to sign out?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel"
+        },
+        { 
+          text: "Sign Out", 
+          onPress: () => signOut(),
+          style: "destructive"
+        }
+      ]
+    );
+    setShowSettings(false);
+  };
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={styles.header}>
+        <View style={{ flex: 1 }} />
+        <TouchableOpacity 
+          style={styles.settingsButton}
+          onPress={() => setShowSettings(!showSettings)}
+        >
+          <Ionicons name="settings-outline" size={24} color={colors.text} />
+        </TouchableOpacity>
+      </View>
+      
+      {/* Settings Modal */}
+      {showSettings && (
+        <View style={[styles.settingsMenu, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <TouchableOpacity 
+            style={styles.settingsOption}
+            onPress={handleSignOut}
+          >
+            <Ionicons name="log-out-outline" size={20} color={colors.error || "#ff3b30"} />
+            <Text style={[styles.settingsOptionText, { color: colors.error || "#ff3b30" }]}>Sign Out</Text>
+          </TouchableOpacity>
+        </View>
+      )}
       
       <UserProfileCard 
         isEditMode={isEditMode}
@@ -115,7 +159,11 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   header: {
-    marginBottom: 16,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    marginBottom: 12,
+    paddingHorizontal: 8,
   },
   headerContent: {
     flexDirection: 'row',
@@ -132,5 +180,35 @@ const styles = StyleSheet.create({
   },
   editButton: {
     padding: 8,
+  },
+  settingsButton: {
+    padding: 8,
+    borderRadius: 20,
+  },
+  settingsMenu: {
+    position: 'absolute',
+    top: 60,
+    right: 24,
+    width: 150,
+    padding: 8,
+    borderRadius: 8,
+    zIndex: 1000,
+    borderWidth: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  settingsOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
+    borderRadius: 4,
+  },
+  settingsOptionText: {
+    fontSize: 16,
+    fontFamily: 'K2D-Medium',
+    marginLeft: 10,
   },
 });
