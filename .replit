@@ -17,7 +17,7 @@ localPort = 8082
 externalPort = 3001
 
 [workflows]
-runButton = "Start API Server"
+runButton = "Start Dev Environment"
 
 [[workflows.workflow]]
 name = "Dev Server"
@@ -81,7 +81,15 @@ author = 34949249
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "node api/server.js"
+args = "npm run start-api"
+
+[[workflows.workflow]]
+name = "Start Dev Environment"
+author = 38320710
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run dev"
 
 [deployment]
 run = ["sh", "-c", "npm run start"]

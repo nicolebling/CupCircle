@@ -1,162 +1,284 @@
+import React, { useState, useEffect } from "react";
+import {
+  SafeAreaView,
+  StyleSheet,
+  Alert,
+  View,
+  Text,
+  TouchableOpacity,
+} from "react-native";
+import Colors from "@/constants/Colors";
+import UserProfileCard, { UserProfileData } from "@/components/UserProfileCard";
+import { useProfileManager, ProfileFormData } from "@/hooks/useProfileManager";
+import { useAuth } from "@/contexts/AuthContext";
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
+import { useColorScheme } from "@/hooks/useColorScheme";
 
-import React, { useState, useEffect } from 'react';
-import { SafeAreaView, StyleSheet, Alert, View, Text, TouchableOpacity } from 'react-native';
-import Colors from '@/constants/Colors';
-import UserProfileCard, { UserProfileData } from '@/components/UserProfileCard';
-import { useProfileManager, ProfileFormData } from '@/hooks/useProfileManager';
-import { useAuth } from '@/contexts/AuthContext';
-import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
-import { useColorScheme } from '@/hooks/useColorScheme';
+// Profile Schema
+const insertProfileSchema = {
+  name: z.string().nonempty("Name is required"),
+  birthday: z.string().nonempty("Birthday is required"),
+  occupation: z.string().nonempty("Occupation is required"),
+  bio: z.string().max(500, "Bio cannot exceed 500 characters"),
+  education: z.string().nonempty("Education is required"),
+  photo: z.string().nonempty("Profile photo is required"),
+};
 
-export default function ProfileScreen() {
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
-  const { user } = useAuth();
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [profileData, setProfileData] = useState<UserProfileData>({
-    name: '',
-    age: undefined,
-    photo: undefined,
-    occupation: '',
-    industries: [],
-    skills: [],
-    experience: '',
-    education: '',
-    bio: '',
-    city: '',
-    neighborhoods: [],
-    favoriteCafes: [],
-    interests: [],
+export default function ProfileScreen({ navigation }) {
+  const [isEditing, setIsEditing] = useState(false);
+  const queryClient = useQueryClient();
+
+  // Fetch profile data
+  const { data: profile, isLoading } = useQuery(["profile"], async () => {
+    const res = await fetch("/api/profile");
+    return res.json();
   });
-  
-  const userId = user?.id || '';
-  const { profile, isLoading: profileLoading, error, fetchProfile, updateProfile } = useProfileManager(userId);
-  
-  useEffect(() => {
-    if (userId) {
-      fetchProfile();
-    }
-  }, [userId]);
-  
-  const [isLoading, setIsLoading] = useState(true);
-  
-  // Update form data when profile is loaded
+
+  // Form setup
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(insertProfileSchema),
+    defaultValues: {
+      name: "",
+      birthday: "",
+      occupation: "",
+      bio: "",
+      education: "",
+      photo: "",
+    },
+  });
+
   useEffect(() => {
     if (profile) {
-      setProfileData({
-        name: profile.name || '',
-        age: profile.age,
-        photo: profile.photo,
-        occupation: profile.occupation || '',
-        industries: profile.industry_categories || [],
-        skills: profile.skills || [],
-        experience: '', // Not directly mapped
-        education: '', // Not directly mapped
-        bio: profile.bio || '',
-        city: 'New York City', // Default or from location
-        neighborhoods: profile.neighborhoods || [],
-        favoriteCafes: profile.favorite_cafes || [],
-        interests: profile.interests || [],
-      });
-      setIsLoading(false);
+      setValue("name", profile.name);
+      setValue("birthday", profile.birthday);
+      setValue("occupation", profile.occupation);
+      setValue("bio", profile.bio);
+      setValue("education", profile.education);
+      setValue("photo", profile.photo);
     }
   }, [profile]);
-  
-  // Error handling
-  useEffect(() => {
-    if (error) {
-      Alert.alert('Error', error);
-    }
-  }, [error]);
-  
-  const handleSaveProfile = async (updatedData: UserProfileData) => {
-    // If not in edit mode, toggle to edit mode
-    if (!isEditMode) {
-      setIsEditMode(true);
-      return;
-    }
-    
-    // Convert UI format to database format
-    const profileFormData: ProfileFormData = {
-      name: updatedData.name,
-      age: updatedData.age,
-      occupation: updatedData.occupation,
-      photo: updatedData.photo,
-      bio: updatedData.bio,
-      industry_categories: updatedData.industries,
-      skills: updatedData.skills,
-      neighborhoods: updatedData.neighborhoods,
-      favorite_cafes: updatedData.favoriteCafes,
-      interests: updatedData.interests,
-    };
-    
-    const success = await updateProfile(profileFormData);
-    if (success) {
-      setIsEditMode(false);
-      Alert.alert('Success', 'Profile updated successfully');
+
+  // Mutation to update profile
+  const updateProfile = useMutation(
+    async (data) => {
+      const res = await fetch("/api/profile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) throw new Error("Profile update failed");
+      return res.json();
+    },
+    {
+      onSuccess: (data) => {
+        queryClient.setQueryData(["profile"], data);
+        setIsEditing(false);
+      },
+    },
+  );
+
+  // Image Picker for Profile Picture
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setValue("photo", result.uri);
     }
   };
-  
-  const navigateToSettings = () => {
-    router.push('/(tabs)/settings');
+
+  // Submit Handler
+  const onSubmit = async (data) => {
+    await updateProfile.mutateAsync(data);
   };
-  
+
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#E76F51" />
+      </View>
+    );
+  }
+
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={styles.header}>
-        <View style={styles.headerContent}>
-          <TouchableOpacity 
-            style={[styles.settingsButton, { backgroundColor: colors.card, borderColor: colors.border }]} 
-            onPress={navigateToSettings}
+    <ScrollView contentContainerStyle={styles.container}>
+      {/* Logo Animation */}
+      <RotatingCircles />
+
+      <Text style={styles.title}>CupCircle</Text>
+      <Text style={styles.subtitle}>Where every cup connects</Text>
+
+      {isEditing ? (
+        <View style={styles.card}>
+          {/* Profile Image Upload */}
+          <TouchableOpacity onPress={pickImage} style={styles.imageContainer}>
+            {profile?.photo ? (
+              <Image source={{ uri: profile.photo }} style={styles.image} />
+            ) : (
+              <Text style={styles.uploadText}>Upload Photo</Text>
+            )}
+          </TouchableOpacity>
+
+          {/* Input Fields */}
+          <Controller
+            control={control}
+            name="name"
+            render={({ field }) => (
+              <TextInput
+                style={styles.input}
+                placeholder="Name"
+                value={field.value}
+                onChangeText={field.onChange}
+              />
+            )}
+          />
+          {errors.name && (
+            <Text style={styles.errorText}>{errors.name.message}</Text>
+          )}
+
+          <Controller
+            control={control}
+            name="birthday"
+            render={({ field }) => (
+              <TextInput
+                style={styles.input}
+                placeholder="Birthday (YYYY-MM-DD)"
+                value={field.value}
+                onChangeText={field.onChange}
+              />
+            )}
+          />
+          {errors.birthday && (
+            <Text style={styles.errorText}>{errors.birthday.message}</Text>
+          )}
+
+          <Controller
+            control={control}
+            name="occupation"
+            render={({ field }) => (
+              <TextInput
+                style={styles.input}
+                placeholder="Occupation"
+                value={field.value}
+                onChangeText={field.onChange}
+              />
+            )}
+          />
+          {errors.occupation && (
+            <Text style={styles.errorText}>{errors.occupation.message}</Text>
+          )}
+
+          <Controller
+            control={control}
+            name="bio"
+            render={({ field }) => (
+              <TextInput
+                style={[styles.input, styles.textArea]}
+                placeholder="Tell us about yourself..."
+                value={field.value}
+                onChangeText={field.onChange}
+                multiline
+              />
+            )}
+          />
+          {errors.bio && (
+            <Text style={styles.errorText}>{errors.bio.message}</Text>
+          )}
+
+          <Controller
+            control={control}
+            name="education"
+            render={({ field }) => (
+              <TextInput
+                style={styles.input}
+                placeholder="Education"
+                value={field.value}
+                onChangeText={field.onChange}
+              />
+            )}
+          />
+          {errors.education && (
+            <Text style={styles.errorText}>{errors.education.message}</Text>
+          )}
+
+          {/* Save Button */}
+          <TouchableOpacity
+            style={styles.button}
+            onPress={handleSubmit(onSubmit)}
           >
-            <Ionicons name="settings-outline" size={20} color={colors.text} />
+            <Text style={styles.buttonText}>Save Profile</Text>
           </TouchableOpacity>
         </View>
-      </View>
-      
-      <UserProfileCard 
-        isEditMode={isEditMode}
-        isLoading={isLoading || profileLoading}
-        initialData={profileData}
-        onSave={handleSaveProfile}
-        onCancel={() => setIsEditMode(false)}
-      />
-    </SafeAreaView>
+      ) : (
+        <View style={styles.card}>
+          <Image source={{ uri: profile?.photo }} style={styles.image} />
+          <Text style={styles.profileText}>{profile?.name}</Text>
+          <Text style={styles.profileText}>{profile?.occupation}</Text>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => setIsEditing(true)}
+          >
+            <Text style={styles.buttonText}>Edit Profile</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+    </ScrollView>
   );
 }
 
+// Styles
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-  },
-  header: {
-    marginBottom: 16,
-  },
-  headerContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 4,
-  },
+  container: { alignItems: "center", padding: 20, backgroundColor: "#f5f5f5" },
+  loadingContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
   title: {
-    fontSize: 24,
-    fontFamily: 'K2D-Bold',
+    fontSize: 32,
+    fontWeight: "bold",
+    color: "#E76F51",
+    marginBottom: 5,
   },
-  subtitle: {
-    fontSize: 16,
-    marginBottom: 16,
+  subtitle: { fontSize: 16, color: "#757575", marginBottom: 20 },
+  card: {
+    width: "100%",
+    padding: 20,
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    alignItems: "center",
   },
-  editButton: {
-    padding: 8,
-  },
-  settingsButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
+  input: {
+    width: "100%",
+    padding: 10,
     borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 5,
+    marginBottom: 10,
   },
+  textArea: { height: 80 },
+  button: {
+    backgroundColor: "#E76F51",
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10,
+  },
+  buttonText: { color: "#fff", fontSize: 16, textAlign: "center" },
+  imageContainer: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: "#ddd",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  image: { width: 100, height: 100, borderRadius: 50 },
+  profileText: { fontSize: 18, fontWeight: "bold", marginVertical: 5 },
+  errorText: { color: "red", fontSize: 12 },
 });

@@ -60,33 +60,6 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
-app.post('/api/auth/register', async (req, res) => {
-  try {
-    const { username, email, password } = req.body;
-    
-    // Check if email already exists
-    const existingUser = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
-    
-    if (existingUser.rows.length > 0) {
-      return res.status(400).json({ error: 'Email already exists' });
-    }
-    
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
-    
-    // Insert new user
-    const result = await pool.query(
-      'INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING id, username, email',
-      [username, email, hashedPassword]
-    );
-    
-    return res.status(201).json(result.rows[0]);
-  } catch (error) {
-    console.error('Register error:', error);
-    return res.status(500).json({ error: 'Server error' });
-  }
-});
-
 // Profile routes
 app.get('/', (req, res) => {
   res.json({ message: 'API server is running' });
