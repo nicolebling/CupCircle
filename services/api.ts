@@ -12,11 +12,7 @@ export const authService = {
   // Login function
   async login(email: string, password: string) {
     try {
-      // For development, use mockAuthService if API is not available
-      if (!API_URL.includes('replit.dev')) {
-        console.log('Using mock auth service');
-        return mockAuthService.login(email, password);
-      }
+      console.log('Making login request to:', `${API_URL}/api/auth/login`);
       
       const response = await fetch(`${API_URL}/api/auth/login`, {
         method: 'POST',
@@ -27,25 +23,28 @@ export const authService = {
       });
       
       if (!response.ok) {
+        console.error('Login failed with status:', response.status);
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Error details:', errorData);
         return null;
       }
       
       return await response.json();
     } catch (error) {
       console.error('Login error:', error);
-      // Fallback to mock during development
-      return mockAuthService.login(email, password);
+      // Only fallback to mock if there's a network error
+      if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+        console.warn('Network error, falling back to mock auth service');
+        return mockAuthService.login(email, password);
+      }
+      throw error;
     }
   },
   
   // Register function
   async register(email: string, password: string) {
     try {
-      // For development, use mockAuthService if API is not available
-      if (!API_URL.includes('replit.dev')) {
-        console.log('Using mock auth service');
-        return mockAuthService.register(email, password);
-      }
+      console.log('Making registration request to:', `${API_URL}/api/auth/register`);
       
       const response = await fetch(`${API_URL}/api/auth/register`, {
         method: 'POST',
@@ -56,15 +55,21 @@ export const authService = {
       });
       
       if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Registration failed');
+        console.error('Registration failed with status:', response.status);
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Error details:', errorData);
+        throw new Error(errorData.error || 'Registration failed');
       }
       
       return await response.json();
     } catch (error) {
       console.error('Register error:', error);
-      // Fallback to mock during development
-      return mockAuthService.register(email, password);
+      // Only fallback to mock if there's a network error
+      if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+        console.warn('Network error, falling back to mock auth service');
+        return mockAuthService.register(email, password);
+      }
+      throw error;
     }
   }
 };
@@ -76,34 +81,35 @@ export const profileService = {
     try {
       if (!userId) return null;
       
-      // For development, use mockProfileService if API is not available
-      if (!API_URL.includes('replit.dev')) {
-        console.log('Using mock profile service');
-        return mockProfileService.getProfileByUserId(userId);
-      }
-      
+      console.log('Fetching profile for user ID:', userId);
       const response = await fetch(`${API_URL}/api/profile/${userId}`);
       
       if (!response.ok) {
+        console.error('Profile fetch failed with status:', response.status);
+        // Only fall back to mock for 404 (profile not found yet)
+        if (response.status === 404) {
+          console.warn('Profile not found, returning null');
+          return null;
+        }
         return null;
       }
       
       return await response.json();
     } catch (error) {
-      console.error('Failed to load user profile', error);
-      // Fallback to mock during development
-      return mockProfileService.getProfileByUserId(userId);
+      console.error('Failed to load user profile:', error);
+      // Only fallback to mock if there's a network error
+      if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+        console.warn('Network error, falling back to mock profile service');
+        return mockProfileService.getProfileByUserId(userId);
+      }
+      return null;
     }
   },
   
   // Save profile (create or update)
   async saveProfile(profileData: Partial<Profile> & { user_id: string }) {
     try {
-      // For development, use mockProfileService if API is not available
-      if (!API_URL.includes('replit.dev')) {
-        console.log('Using mock profile service');
-        return mockProfileService.saveProfile(profileData);
-      }
+      console.log('Saving profile for user ID:', profileData.user_id);
       
       const response = await fetch(`${API_URL}/api/profile`, {
         method: 'POST',
@@ -114,15 +120,21 @@ export const profileService = {
       });
       
       if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Failed to save profile');
+        console.error('Profile save failed with status:', response.status);
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Error details:', errorData);
+        throw new Error(errorData.error || 'Failed to save profile');
       }
       
       return await response.json();
     } catch (error) {
-      console.error('Failed to save profile', error);
-      // Fallback to mock during development
-      return mockProfileService.saveProfile(profileData);
+      console.error('Failed to save profile:', error);
+      // Only fallback to mock if there's a network error
+      if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+        console.warn('Network error, falling back to mock profile service');
+        return mockProfileService.saveProfile(profileData);
+      }
+      throw error;
     }
   }
 };

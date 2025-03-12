@@ -214,8 +214,18 @@ app.use((req, res, next) => {
   next();
 });
 
+// Better error handling middleware
+app.use((err, req, res, next) => {
+  console.error('API Error:', err);
+  res.status(500).json({ 
+    error: 'Server error', 
+    message: err.message,
+    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+  });
+});
+
 // Start server
 app.listen(port, '0.0.0.0', () => {
   console.log(`Server running on port ${port}`);
-  console.log(`API available at: ${process.env.EXPO_PUBLIC_API_URL || 'https://your-replit-domain.replit.app'}`);
+  console.log(`API available at: ${process.env.EXPO_PUBLIC_API_URL || `https://${process.env.REPLIT_DEV_DOMAIN}`}`);
 });
