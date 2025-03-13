@@ -219,7 +219,7 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
 
       const { data, error } = await supabase
         .from('profiles')
-        .upsert(profileData, { onConflict: 'replace' }) // Changed to 'replace' to handle the duplicate key
+        .upsert(profileData, { onConflict: 'id' }) 
         .select();
 
       if (error) {
