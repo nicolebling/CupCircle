@@ -49,41 +49,73 @@ export default function SignUpScreen() {
 
   //supabase signupwithEmail
   async function signUpWithEmail() {
-    console.log("Attempting to sign up with:", email)
     setLoading(true)
-    const {
-      data,
-      error,
-    } = await supabase.auth.signUp({
-      email: email,
-      password: password,
-    })
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email: email,
+        password: password,
+      })
 
-    if (error) {
-      console.error("Signup error:", error.message)
-      Alert.alert(error.message)
-    } else {
-      console.log("Signup successful:", data)
-      const session = data.session
-      const user = data.user
-
-      console.log("User created:", user)
-      console.log("Session created:", session)
-      console.log("User metadata:", user?.user_metadata)
-      console.log("Authentication method:", user?.app_metadata)
-
-      if (!session) {
-        console.log("Email verification required - no session created yet")
-        Alert.alert('Please check your inbox for email verification!')
+      if (error) {
+        console.error("Signup error:", error.message)
+        Alert.alert('Error', error.message)
       } else {
-        console.log("User authenticated immediately")
-        // Add a short delay to ensure the session is properly set
-        setTimeout(() => {
-          // Redirect to profile setup after successful signup
-          Alert.alert('Account created!', 'Please complete your profile to get started.');
-          router.replace('/(auth)/profile-setup')
-        }, 500);
+        console.log("Signup successful:", data)
+        console.log("User created:", data.user)
+        console.log("Session created:", data.session)
+        console.log("User metadata:", data.user?.user_metadata)
+        console.log("Authentication method:", data.user?.app_metadata)
+
+        // Create profile for the new user
+        if (data.user) {
+          try {
+            // Check if profile already exists
+            const { data: existingProfile, error: checkError } = await supabase
+              .from('profiles')
+              .select('id')
+              .eq('id', data.user.id)
+              .single();
+
+            if (checkError && checkError.code !== 'PGRST116') {
+              // PGRST116 means not found, which is expected
+              console.error("Error checking for existing profile:", checkError);
+            }
+
+            // Only create profile if it doesn't exist
+            if (!existingProfile) {
+              const { data: profileData, error: profileError } = await supabase
+                .from('profiles')
+                .insert([
+                  { 
+                    id: data.user.id,
+                    username: email.split('@')[0], // Default username from email
+                    avatar_url: null,
+                    website: null
+                  }
+                ])
+                .select();
+
+              if (profileError) {
+                console.error("Profile creation error:", profileError);
+                console.error("Profile error details:", JSON.stringify(profileError));
+                // Don't sign out - just continue to profile setup
+                console.log("Continuing to profile setup despite profile creation error");
+              }
+            } else {
+              console.log("Profile already exists, continuing to profile setup");
+            }
+          } catch (profileCreationError) {
+            console.error("Exception during profile creation:", profileCreationError);
+            // Don't sign out - just continue to profile setup
+            console.log("Continuing to profile setup despite exception");
+          }
+        }
+
+        router.replace('/(auth)/profile-setup');
       }
+    } catch (e) {
+      console.error("Signup exception:", e)
+      Alert.alert('Sign Up Error', 'An unexpected error occurred. Please try again.')
     }
     setLoading(false)
   }
