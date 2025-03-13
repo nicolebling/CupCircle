@@ -1,6 +1,6 @@
 
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View, Animated } from 'react-native';
+import React, { useEffect } from 'react';
+import { StyleSheet, Text, TouchableOpacity, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 type ToastProps = {
@@ -8,7 +8,7 @@ type ToastProps = {
   message: string;
   type?: 'success' | 'error' | 'info';
   onDismiss?: () => void;
-  duration?: number; // in milliseconds
+  duration?: number;
 };
 
 export default function Toast({ 
@@ -16,18 +16,26 @@ export default function Toast({
   message, 
   type = 'info', 
   onDismiss,
-  duration = 2000 // Shorter display time for less disruption
+  duration = 1500 
 }: ToastProps) {
+  const translateY = new Animated.Value(100);
   const opacity = new Animated.Value(0);
   
   useEffect(() => {
     if (visible) {
-      // Fade in
-      Animated.timing(opacity, {
-        toValue: 0.9,
-        duration: 150,
-        useNativeDriver: true,
-      }).start();
+      // Slide in from bottom
+      Animated.parallel([
+        Animated.timing(translateY, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        Animated.timing(opacity, {
+          toValue: 1,
+          duration: 150,
+          useNativeDriver: true,
+        })
+      ]).start();
       
       // Auto hide after duration
       const timer = setTimeout(() => {
@@ -39,11 +47,18 @@ export default function Toast({
   }, [visible]);
   
   const hideToast = () => {
-    Animated.timing(opacity, {
-      toValue: 0,
-      duration: 150,
-      useNativeDriver: true,
-    }).start(() => {
+    Animated.parallel([
+      Animated.timing(translateY, {
+        toValue: 100,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(opacity, {
+        toValue: 0,
+        duration: 150,
+        useNativeDriver: true,
+      })
+    ]).start(() => {
       if (onDismiss) onDismiss();
     });
   };
@@ -76,13 +91,14 @@ export default function Toast({
         { 
           backgroundColor: getBackgroundColor(),
           opacity,
+          transform: [{ translateY }]
         }
       ]}
     >
       <Ionicons name={getIcon()} size={16} color="white" style={styles.icon} />
       <Text numberOfLines={1} ellipsizeMode="tail" style={styles.message}>{message}</Text>
       <TouchableOpacity onPress={hideToast} hitSlop={{top: 15, bottom: 15, left: 15, right: 15}}>
-        <Ionicons name="close" size={16} color="white" />
+        <Ionicons name="close" size={14} color="white" />
       </TouchableOpacity>
     </Animated.View>
   );
@@ -91,10 +107,10 @@ export default function Toast({
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
-    bottom: 50,
-    left: 20,
-    right: 20,
-    paddingVertical: 8,
+    bottom: 40,
+    left: 16,
+    right: 16, 
+    paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 20,
     flexDirection: 'row',
@@ -105,18 +121,18 @@ const styles = StyleSheet.create({
       width: 0,
       height: 1,
     },
-    shadowOpacity: 0.12,
-    shadowRadius: 2,
+    shadowOpacity: 0.1,
+    shadowRadius: 1,
     elevation: 2,
     zIndex: 999,
-    maxHeight: 40,
+    maxHeight: 34,
   },
   icon: {
     marginRight: 8,
   },
   message: {
     color: 'white',
-    fontSize: 13,
+    fontSize: 12,
     flex: 1,
   },
 });

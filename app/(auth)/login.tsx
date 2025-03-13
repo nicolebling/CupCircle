@@ -163,12 +163,7 @@ export default function LoginScreen() {
                 Welcome Back
               </Text>
 
-              {/* Error Message */}
-              {error ? (
-                <View style={styles.errorContainer}>
-                  <Text style={styles.errorText}>{error}</Text>
-                </View>
-              ) : null}
+              {/* Error messages are now handled by toast notifications */}
 
               {/* Email Input */}
               <View style={styles.inputContainer}>

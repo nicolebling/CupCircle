@@ -202,12 +202,7 @@ export default function SignUpScreen() {
                 Create Account
               </Text>
 
-              {/* Error Message */}
-              {error ? (
-                <View style={styles.errorContainer}>
-                  <Text style={styles.errorText}>{error}</Text>
-                </View>
-              ) : null}
+              {/* Error messages are now handled by toast notifications */}
 
               {/* Email Input */}
               <View style={styles.inputContainer}>
