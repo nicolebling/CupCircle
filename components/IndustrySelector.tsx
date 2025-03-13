@@ -38,8 +38,7 @@ export default function IndustrySelector({
   const [tempSelected, setTempSelected] = useState<string[]>([]);
 
   useEffect(() => {
-    // Ensure selected is always an array
-    setTempSelected(Array.isArray(selected) ? selected : []);
+    setTempSelected(selected || []);
   }, [selected]);
 
   const toggleIndustry = (industry: string) => {
@@ -68,13 +67,13 @@ export default function IndustrySelector({
         style={[styles.selector, { backgroundColor: colors.background, borderColor: colors.border }]} 
         onPress={() => setModalVisible(true)}
       >
-        <Text style={[styles.selectorText, { color: Array.isArray(selected) && selected.length ? colors.text : colors.secondaryText }]}>
-          {Array.isArray(selected) && selected.length ? selected.join(', ') : 'Select industries (max 3)'}
+        <Text style={[styles.selectorText, { color: selected && selected.length ? colors.text : colors.secondaryText }]}>
+          {selected && selected.length ? selected.join(', ') : 'Select industries (max 3)'}
         </Text>
         <Ionicons name="chevron-down" size={20} color={colors.secondaryText} />
       </TouchableOpacity>
 
-      {Array.isArray(selected) && selected.length > 0 && (
+      {selected && selected.length > 0 && (
         <View style={styles.selectedContainer}>
           {selected.map((industry, index) => (
             <View 

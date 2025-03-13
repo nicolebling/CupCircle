@@ -160,7 +160,7 @@ export default function InterestSelector({
         onPress={() => setModalVisible(true)}
       >
         <View style={styles.selectorContent}>
-          {Array.isArray(selected) && selected.length > 0 ? (
+          {selected && selected.length > 0 ? (
             <Text style={[styles.selectorText, { color: colors.text }]} numberOfLines={1} ellipsizeMode="tail">
               {selected.map(i => `${getInterestEmoji(i)} ${i}`).join(', ')}
             </Text>

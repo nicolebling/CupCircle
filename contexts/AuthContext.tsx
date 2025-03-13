@@ -15,6 +15,8 @@ type Profile = {
   id: string;
   username?: string;
   full_name?: string;
+  avatar_url?: string;
+  website?: string;
   name?: string;
   occupation?: string;
   photo_url?: string;
@@ -149,31 +151,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       if (!user || !profile) return;
 
-      // Log the update attempt for debugging
-      console.log("Updating profile with data:", userData);
-      
-      // Remove any fields that no longer exist in the database
-      const { website, avatar_url, ...validUserData } = userData as any;
-      
-      const updatedProfile = {...profile, ...validUserData};
+      const updatedProfile = {...profile, ...userData};
       const { error } = await supabase
         .from('profiles')
-        .update(validUserData)
+        .update(userData)
         .eq('id', profile.id);
-        
       if (error){
         console.error("Error updating profile", error);
-        console.error("Error details:", JSON.stringify(error));
         throw error;
       }
-      
-      console.log("Profile updated successfully");
       setProfile(updatedProfile);
-      await AsyncStorage.setItem('@user', JSON.stringify({...user, ...validUserData}))
+      await AsyncStorage.setItem('@user', JSON.stringify({...user, ...userData}))
 
     } catch (error) {
       console.error('Update user failed', error);
-      console.error('Error details:', JSON.stringify(error));
       throw error;
     }
   };

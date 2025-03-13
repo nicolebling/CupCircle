@@ -39,6 +39,7 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
   const [experienceLevel, setExperienceLevel] = useState('');
   const [education, setEducation] = useState('');
   const [city, setCity] = useState('');
+  const [website, setWebsite] = useState('');
   const [industryCategories, setIndustryCategories] = useState<string[]>([]);
   const [skills, setSkills] = useState<string[]>([]);
   const [neighborhoods, setNeighborhoods] = useState<string[]>([]);
@@ -55,7 +56,6 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
   const fetchProfile = async () => {
     try {
       setLoading(true);
-      console.log('Fetching profile for user ID:', userId);
 
       const { data, error } = await supabase
         .from('profiles')
@@ -68,25 +68,22 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
         throw error;
       }
 
-      console.log('Profile fetched:', data);
-
       if (data) {
         setName(data.name || '');
         setUsername(data.username || '');
-        setAvatar(data.photo_url || '');
+        setAvatar(data.avatar_url || '');
         setOccupation(data.occupation || '');
         setBio(data.bio || '');
         setAge(data.age ? data.age.toString() : '');
         setExperienceLevel(data.experience_level || '');
         setEducation(data.education || '');
         setCity(data.city || '');
+        setWebsite(data.website || '');
         setIndustryCategories(data.industry_categories || []);
         setSkills(data.skills || []);
         setNeighborhoods(data.neighborhoods || []);
         setFavoriteCafes(data.favorite_cafes || []);
         setInterests(data.interests || []);
-
-        console.log('Profile data loaded into form state');
       }
     } catch (error) {
       console.error('Failed to fetch profile:', error);
@@ -147,9 +144,11 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
       const fileExt = filename?.split('.').pop();
       const filePath = `${userId}/${Date.now()}.${fileExt}`;
 
+      // Convert image to blob
       const response = await fetch(uri);
       const blob = await response.blob();
 
+      // Upload to Supabase Storage
       const { error: uploadError } = await supabase.storage
         .from('avatars')
         .upload(filePath, blob);
@@ -158,6 +157,7 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
         throw uploadError;
       }
 
+      // Get public URL
       const { data } = supabase.storage
         .from('avatars')
         .getPublicUrl(filePath);
@@ -194,12 +194,12 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
 
       const ageNumber = age ? parseInt(age) : null;
 
-      console.log('Preparing to save profile for user ID:', userId);
-
       const profileData = {
         id: userId,
         name,
         username,
+        avatar_url: avatar,
+        website,
         occupation,
         photo_url: avatar,
         bio,
@@ -215,29 +215,21 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
         updated_at: new Date(),
       };
 
-      console.log('Profile data being sent:', JSON.stringify(profileData, null, 2));
-
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('profiles')
-        .upsert(profileData, { onConflict: 'replace' }) // Changed to 'replace' to handle the duplicate key
-        .select();
+        .upsert(profileData, { onConflict: 'id' });
 
       if (error) {
-        console.error('Supabase error response:', error);
-        console.error('Error details:', JSON.stringify(error)); 
-        Alert.alert('Profile Save Error', error?.message || 'Failed to save profile. Please try again.'); 
         throw error;
       }
 
-      console.log('Profile saved successfully:', data);
       Alert.alert('Success', 'Your profile has been saved');
+
+      // Redirect to the matching page
       router.replace('/(tabs)/matching');
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error saving profile:', error);
       setError('Failed to save profile. Please try again.');
-      if (error.code === '23505') {
-        Alert.alert('Duplicate Key Error', 'A profile with this ID already exists. Please contact support.');
-      }
     } finally {
       setLoading(false);
     }
@@ -270,6 +262,7 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
             </View>
           ) : null}
 
+          {/* Profile Image */}
           <TouchableOpacity style={styles.avatarContainer} onPress={pickImage}>
             {avatar ? (
               <View style={styles.avatarWrapper}>
@@ -285,6 +278,7 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
             </Text>
           </TouchableOpacity>
 
+          {/* Basic Information */}
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, isDark && styles.textDark]}>Basic Information</Text>
 
@@ -307,6 +301,18 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
                 onChangeText={setUsername}
                 placeholder="Choose a username"
                 placeholderTextColor={isDark ? '#999' : '#777'}
+              />
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={[styles.label, isDark && styles.textDark]}>Website</Text>
+              <TextInput
+                style={[styles.input, isDark && styles.inputDark]}
+                value={website}
+                onChangeText={setWebsite}
+                placeholder="Your website or portfolio"
+                placeholderTextColor={isDark ? '#999' : '#777'}
+                keyboardType="url"
               />
             </View>
 
@@ -334,6 +340,7 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
             </View>
           </View>
 
+          {/* Professional Information */}
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, isDark && styles.textDark]}>Professional Information</Text>
 
@@ -403,6 +410,7 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
             </View>
           </View>
 
+          {/* Personal Information */}
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, isDark && styles.textDark]}>Personal Information</Text>
 
