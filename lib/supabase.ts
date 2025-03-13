@@ -47,5 +47,21 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: false,
+    onAuthStateChange: (event, session) => {
+      console.log(`Supabase auth event: ${event}`, session)
+      
+      if (event === 'SIGNED_IN') {
+        console.log('User signed in!', session?.user)
+      } else if (event === 'SIGNED_OUT') {
+        console.log('User signed out!')
+      } else if (event === 'TOKEN_REFRESHED') {
+        console.log('Token refreshed!')
+      } else if (event === 'USER_UPDATED') {
+        console.log('User updated!', session?.user)
+      }
+    }
   },
 });
+
+// Log Supabase configuration status
+console.log(`Supabase initialized with URL: ${supabaseUrl ? 'Set' : 'Missing'}, Key: ${supabaseAnonKey ? 'Set' : 'Missing'}`)

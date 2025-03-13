@@ -61,12 +61,19 @@ export default function LoginScreen() {
 
   async function signInWithEmail() {
     setLoading(true)
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email: email,
       password: password,
     })
 
-    if (error) Alert.alert(error.message)
+    if (error) {
+      console.error("Login error:", error.message)
+      Alert.alert(error.message)
+    } else {
+      console.log("Login successful:", data)
+      console.log("User session:", data.session)
+      console.log("User data:", data.user)
+    }
     setLoading(false)
   }
 

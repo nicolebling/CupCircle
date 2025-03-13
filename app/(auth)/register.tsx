@@ -49,17 +49,36 @@ export default function SignUpScreen() {
 
   //supabase signupwithEmail
   async function signUpWithEmail() {
+    console.log("Attempting to sign up with:", email)
     setLoading(true)
     const {
-      data: { session },
+      data,
       error,
     } = await supabase.auth.signUp({
       email: email,
       password: password,
     })
 
-    if (error) Alert.alert(error.message)
-    if (!session) Alert.alert('Please check your inbox for email verification!')
+    if (error) {
+      console.error("Signup error:", error.message)
+      Alert.alert(error.message)
+    } else {
+      console.log("Signup successful:", data)
+      const session = data.session
+      const user = data.user
+      
+      console.log("User created:", user)
+      console.log("Session created:", session)
+      console.log("User metadata:", user?.user_metadata)
+      console.log("Authentication method:", user?.app_metadata)
+      
+      if (!session) {
+        console.log("Email verification required - no session created yet")
+        Alert.alert('Please check your inbox for email verification!')
+      } else {
+        console.log("User authenticated immediately")
+      }
+    }
     setLoading(false)
   }
 
