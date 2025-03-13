@@ -9,7 +9,7 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "extra": {
-      "API_URL": "https://cupcircle-api.cosanitty.replit.app"
+      "API_URL": "http://0.0.0.0:3000"
     },
     "ios": {
       "supportsTablet": true

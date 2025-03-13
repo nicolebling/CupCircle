@@ -12,11 +12,8 @@ export const authService = {
   // Login function
   async login(email: string, password: string) {
     try {
-      // For development, use mockAuthService if API is not available
-      if (!API_URL.includes('replit.dev')) {
-        console.log('Using mock auth service');
-        return mockAuthService.login(email, password);
-      }
+      // For testing, always try to use the real API first
+      console.log('Attempting to use real API service');
       
       const response = await fetch(`${API_URL}/api/auth/login`, {
         method: 'POST',
@@ -76,11 +73,8 @@ export const profileService = {
     try {
       if (!userId) return null;
       
-      // For development, use mockProfileService if API is not available
-      if (!API_URL.includes('replit.dev')) {
-        console.log('Using mock profile service');
-        return mockProfileService.getProfileByUserId(userId);
-      }
+      // For testing, always try to use the real API first
+      console.log('Attempting to use real API service for profile');
       
       const response = await fetch(`${API_URL}/api/profile/${userId}`);
       
