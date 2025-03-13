@@ -219,13 +219,13 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
 
       const { data, error } = await supabase
         .from('profiles')
-        .upsert(profileData, { onConflict: 'id' })
+        .upsert(profileData, { onConflict: 'replace' }) // Changed to 'replace' to handle the duplicate key
         .select();
 
       if (error) {
         console.error('Supabase error response:', error);
-        console.error('Error details:', JSON.stringify(error)); //Added detailed error logging
-        Alert.alert('Profile Save Error', error?.message || 'Failed to save profile. Please try again.'); //Improved error message
+        console.error('Error details:', JSON.stringify(error)); 
+        Alert.alert('Profile Save Error', error?.message || 'Failed to save profile. Please try again.'); 
         throw error;
       }
 
@@ -235,6 +235,9 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
     } catch (error: any) {
       console.error('Error saving profile:', error);
       setError('Failed to save profile. Please try again.');
+      if (error.code === '23505') {
+        Alert.alert('Duplicate Key Error', 'A profile with this ID already exists. Please contact support.');
+      }
     } finally {
       setLoading(false);
     }

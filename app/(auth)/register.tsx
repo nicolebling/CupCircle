@@ -66,32 +66,48 @@ export default function SignUpScreen() {
         console.log("User metadata:", data.user?.user_metadata)
         console.log("Authentication method:", data.user?.app_metadata)
 
-        // Create initial profile for user
+        // Create profile for the new user
         if (data.user) {
           try {
-            const { error: profileError } = await supabase
+            // Check if profile already exists
+            const { data: existingProfile, error: checkError } = await supabase
               .from('profiles')
-              .insert({
-                id: data.user.id,
-                full_name: name,
-                username: email.split('@')[0]
-              })
+              .select('id')
+              .eq('id', data.user.id)
+              .single();
 
-            if (profileError) {
-              console.error("Profile creation error:", profileError)
-              console.error("Profile error details:", JSON.stringify(profileError))
-              Alert.alert('Sign Up Error', 'Could not create user profile. Please try again.')
-              // Clean up auth user if profile creation fails
-              await supabase.auth.signOut()
-              setLoading(false)
-              return
+            if (checkError && checkError.code !== 'PGRST116') {
+              // PGRST116 means not found, which is expected
+              console.error("Error checking for existing profile:", checkError);
+            }
+
+            // Only create profile if it doesn't exist
+            if (!existingProfile) {
+              const { data: profileData, error: profileError } = await supabase
+                .from('profiles')
+                .insert([
+                  { 
+                    id: data.user.id,
+                    username: email.split('@')[0], // Default username from email
+                    avatar_url: null,
+                    website: null
+                  }
+                ])
+                .select();
+
+              if (profileError) {
+                console.error("Profile creation error:", profileError);
+                console.error("Profile error details:", JSON.stringify(profileError));
+                // Don't sign out - just continue to profile setup
+                console.log("Continuing to profile setup despite profile creation error");
+              }
+            } else {
+              console.log("Profile already exists, continuing to profile setup");
             }
           } catch (profileCreationError) {
-            console.error("Exception during profile creation:", profileCreationError)
-            Alert.alert('Sign Up Error', 'Error during profile setup. Please try again.')
-            await supabase.auth.signOut()
-            setLoading(false)
-            return
+            console.error("Exception during profile creation:", profileCreationError);
+            // Don't sign out - just continue to profile setup
+            console.log("Continuing to profile setup despite exception");
           }
         }
 

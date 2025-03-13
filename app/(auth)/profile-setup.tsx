@@ -56,7 +56,9 @@ export default function ProfileSetupScreen() {
             .insert({
               id: user.id,
               username: user.email?.split('@')[0] || 'user',
-              full_name: ''
+              full_name: '',
+              website: '', // Add website column
+              avatar_url: '' // Add avatar_url column
             });
 
           if (insertError) {
