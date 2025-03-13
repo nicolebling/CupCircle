@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -29,7 +28,7 @@ type ProfileFormProps = {
 export default function ProfileForm({ userId, isNewUser = true }: ProfileFormProps) {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
-  
+
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState('');
   const [username, setUsername] = useState('');
@@ -47,28 +46,28 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
   const [favoriteCafes, setFavoriteCafes] = useState<string[]>([]);
   const [interests, setInterests] = useState<string[]>([]);
   const [error, setError] = useState('');
-  
+
   useEffect(() => {
     if (!isNewUser) {
       fetchProfile();
     }
   }, [userId, isNewUser]);
-  
+
   const fetchProfile = async () => {
     try {
       setLoading(true);
-      
+
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
         .single();
-      
+
       if (error) {
         console.error('Error fetching profile:', error);
         throw error;
       }
-      
+
       if (data) {
         setName(data.name || '');
         setUsername(data.username || '');
@@ -93,37 +92,37 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
       setLoading(false);
     }
   };
-  
+
   const handleAddSkill = (skill: string) => {
     if (skill.trim() && !skills.includes(skill.trim())) {
       setSkills([...skills, skill.trim()]);
     }
   };
-  
+
   const handleRemoveSkill = (index: number) => {
     setSkills(skills.filter((_, i) => i !== index));
   };
-  
+
   const handleAddNeighborhood = (neighborhood: string) => {
     if (neighborhood.trim() && !neighborhoods.includes(neighborhood.trim())) {
       setNeighborhoods([...neighborhoods, neighborhood.trim()]);
     }
   };
-  
+
   const handleRemoveNeighborhood = (index: number) => {
     setNeighborhoods(neighborhoods.filter((_, i) => i !== index));
   };
-  
+
   const handleAddCafe = (cafe: string) => {
     if (cafe.trim() && !favoriteCafes.includes(cafe.trim())) {
       setFavoriteCafes([...favoriteCafes, cafe.trim()]);
     }
   };
-  
+
   const handleRemoveCafe = (index: number) => {
     setFavoriteCafes(favoriteCafes.filter((_, i) => i !== index));
   };
-  
+
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -131,38 +130,38 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
       aspect: [1, 1],
       quality: 0.8,
     });
-    
+
     if (!result.canceled && result.assets && result.assets.length > 0) {
       uploadImage(result.assets[0].uri);
     }
   };
-  
+
   const uploadImage = async (uri: string) => {
     try {
       setLoading(true);
-      
+
       const filename = uri.split('/').pop();
       const fileExt = filename?.split('.').pop();
       const filePath = `${userId}/${Date.now()}.${fileExt}`;
-      
+
       // Convert image to blob
       const response = await fetch(uri);
       const blob = await response.blob();
-      
+
       // Upload to Supabase Storage
       const { error: uploadError } = await supabase.storage
         .from('avatars')
         .upload(filePath, blob);
-      
+
       if (uploadError) {
         throw uploadError;
       }
-      
+
       // Get public URL
       const { data } = supabase.storage
         .from('avatars')
         .getPublicUrl(filePath);
-      
+
       setAvatar(data.publicUrl);
     } catch (error) {
       console.error('Error uploading image:', error);
@@ -171,30 +170,30 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
       setLoading(false);
     }
   };
-  
+
   const validateForm = () => {
     if (!name.trim()) {
       setError('Name is required');
       return false;
     }
-    
+
     if (age && isNaN(Number(age))) {
       setError('Age must be a number');
       return false;
     }
-    
+
     return true;
   };
-  
+
   const saveProfile = async () => {
     if (!validateForm()) return;
-    
+
     try {
       setLoading(true);
       setError('');
-      
+
       const ageNumber = age ? parseInt(age) : null;
-      
+
       const profileData = {
         id: userId,
         name,
@@ -215,17 +214,17 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
         interests,
         updated_at: new Date(),
       };
-      
+
       const { error } = await supabase
         .from('profiles')
         .upsert(profileData, { onConflict: 'id' });
-      
+
       if (error) {
         throw error;
       }
-      
+
       Alert.alert('Success', 'Your profile has been saved');
-      
+
       // Redirect to the matching page
       router.replace('/(tabs)/matching');
     } catch (error) {
@@ -235,7 +234,7 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
       setLoading(false);
     }
   };
-  
+
   if (loading && !isNewUser) {
     return (
       <View style={styles.loadingContainer}>
@@ -244,7 +243,7 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
       </View>
     );
   }
-  
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -255,14 +254,14 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
           <Text style={[styles.title, isDark && styles.titleDark]}>
             {isNewUser ? 'Complete Your Profile' : 'Edit Profile'}
           </Text>
-          
+
           {error ? (
             <View style={styles.errorContainer}>
               <Ionicons name="alert-circle" size={24} color="#c62828" style={styles.errorIcon} />
               <Text style={styles.errorText}>{error}</Text>
             </View>
           ) : null}
-          
+
           {/* Profile Image */}
           <TouchableOpacity style={styles.avatarContainer} onPress={pickImage}>
             {avatar ? (
@@ -278,11 +277,11 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
               {avatar ? 'Change Photo' : 'Add Photo'}
             </Text>
           </TouchableOpacity>
-          
+
           {/* Basic Information */}
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, isDark && styles.textDark]}>Basic Information</Text>
-            
+
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isDark && styles.textDark]}>Name*</Text>
               <TextInput
@@ -293,7 +292,7 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
                 placeholderTextColor={isDark ? '#999' : '#777'}
               />
             </View>
-            
+
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isDark && styles.textDark]}>Username</Text>
               <TextInput
@@ -304,7 +303,7 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
                 placeholderTextColor={isDark ? '#999' : '#777'}
               />
             </View>
-            
+
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isDark && styles.textDark]}>Website</Text>
               <TextInput
@@ -316,7 +315,7 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
                 keyboardType="url"
               />
             </View>
-            
+
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isDark && styles.textDark]}>Age</Text>
               <TextInput
@@ -328,7 +327,7 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
                 keyboardType="number-pad"
               />
             </View>
-            
+
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isDark && styles.textDark]}>City</Text>
               <TextInput
@@ -340,11 +339,11 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
               />
             </View>
           </View>
-          
+
           {/* Professional Information */}
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, isDark && styles.textDark]}>Professional Information</Text>
-            
+
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isDark && styles.textDark]}>Occupation</Text>
               <TextInput
@@ -355,7 +354,7 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
                 placeholderTextColor={isDark ? '#999' : '#777'}
               />
             </View>
-            
+
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isDark && styles.textDark]}>Experience Level</Text>
               <ExperienceLevelSelector
@@ -364,7 +363,7 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
                 isDark={isDark}
               />
             </View>
-            
+
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isDark && styles.textDark]}>Education</Text>
               <TextInput
@@ -375,7 +374,7 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
                 placeholderTextColor={isDark ? '#999' : '#777'}
               />
             </View>
-            
+
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isDark && styles.textDark]}>Industry Categories</Text>
               <IndustrySelector
@@ -384,7 +383,7 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
                 isDark={isDark}
               />
             </View>
-            
+
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isDark && styles.textDark]}>Skills</Text>
               <View style={styles.tagsContainer}>
@@ -410,11 +409,11 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
               </View>
             </View>
           </View>
-          
+
           {/* Personal Information */}
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, isDark && styles.textDark]}>Personal Information</Text>
-            
+
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isDark && styles.textDark]}>Bio</Text>
               <TextInput
@@ -427,7 +426,7 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
                 numberOfLines={4}
               />
             </View>
-            
+
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isDark && styles.textDark]}>Interests</Text>
               <InterestSelector
@@ -436,7 +435,7 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
                 isDark={isDark}
               />
             </View>
-            
+
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isDark && styles.textDark]}>Favorite Neighborhoods</Text>
               <View style={styles.tagsContainer}>
@@ -461,7 +460,7 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
                 />
               </View>
             </View>
-            
+
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isDark && styles.textDark]}>Favorite Cafes</Text>
               <View style={styles.tagsContainer}>
@@ -487,7 +486,7 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
               </View>
             </View>
           </View>
-          
+
           <TouchableOpacity
             style={styles.button}
             onPress={saveProfile}

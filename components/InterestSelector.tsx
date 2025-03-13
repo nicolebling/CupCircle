@@ -108,7 +108,7 @@ interface InterestSelectorProps {
 }
 
 export default function InterestSelector({ 
-  selectedInterests, 
+  selectedInterests = [], 
   onInterestsChange,
   maxInterests = 10
 }: InterestSelectorProps) {

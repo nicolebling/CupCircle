@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal, FlatList, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -32,14 +31,14 @@ export default function IndustrySelector({
 }: IndustrySelectorProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
-  
+
   const [modalVisible, setModalVisible] = useState(false);
   const [tempSelected, setTempSelected] = useState<string[]>([]);
-  
+
   useEffect(() => {
     setTempSelected(selectedIndustries);
   }, [selectedIndustries]);
-  
+
   const toggleIndustry = (industry: string) => {
     if (tempSelected.includes(industry)) {
       setTempSelected(tempSelected.filter(item => item !== industry));
@@ -49,29 +48,29 @@ export default function IndustrySelector({
       }
     }
   };
-  
+
   const handleSave = () => {
     onIndustriesChange(tempSelected);
     setModalVisible(false);
   };
-  
+
   const handleCancel = () => {
     setTempSelected(selectedIndustries);
     setModalVisible(false);
   };
-  
+
   return (
     <View>
       <TouchableOpacity 
         style={[styles.selector, { backgroundColor: colors.background, borderColor: colors.border }]} 
         onPress={() => setModalVisible(true)}
       >
-        <Text style={[styles.selectorText, { color: selectedIndustries.length ? colors.text : colors.secondaryText }]}>
-          {selectedIndustries.length ? selectedIndustries.join(', ') : 'Select industries (max 3)'}
+        <Text style={[styles.selectorText, { color: selectedIndustries?.length ? colors.text : colors.secondaryText }]}>
+          {selectedIndustries?.length ? selectedIndustries.join(', ') : 'Select industries (max 3)'}
         </Text>
         <Ionicons name="chevron-down" size={20} color={colors.secondaryText} />
       </TouchableOpacity>
-      
+
       {selectedIndustries.length > 0 && (
         <View style={styles.selectedContainer}>
           {selectedIndustries.map((industry, index) => (
@@ -86,7 +85,7 @@ export default function IndustrySelector({
           ))}
         </View>
       )}
-      
+
       <Modal
         visible={modalVisible}
         transparent={true}
@@ -103,7 +102,7 @@ export default function IndustrySelector({
                 {tempSelected.length}/{maxSelections} selected
               </Text>
             </View>
-            
+
             <FlatList
               data={INDUSTRIES}
               keyExtractor={(item) => item}
@@ -138,7 +137,7 @@ export default function IndustrySelector({
               }}
               contentContainerStyle={styles.industriesList}
             />
-            
+
             <View style={styles.modalFooter}>
               <TouchableOpacity 
                 style={[styles.modalButton, styles.cancelButton, { borderColor: colors.border }]} 
@@ -232,7 +231,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    alignSelf: 'flex-start', // Make width fit content
+    alignSelf: 'flex-start', 
   },
   columnWrapper: {
     justifyContent: 'flex-start',
