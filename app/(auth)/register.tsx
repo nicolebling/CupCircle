@@ -77,8 +77,9 @@ export default function SignUpScreen() {
         Alert.alert('Please check your inbox for email verification!')
       } else {
         console.log("User authenticated immediately")
-        // Redirect to matching page after successful signup with immediate authentication
-        router.replace('/(tabs)/matching')
+        // Redirect to profile setup after successful signup
+        Alert.alert('Account created!', 'Please complete your profile to get started.');
+        router.replace('/(auth)/profile-setup')
       }
     }
     setLoading(false)
