@@ -490,6 +490,7 @@ export default function ProfileCard({
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>Personal Information</Text>
 
+          {/* Name */}
           <Text style={[styles.label, { color: colors.secondaryText }]}>Name*</Text>
           <TextInput
             style={[
@@ -503,7 +504,8 @@ export default function ProfileCard({
           />
           {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
 
-          <Text style={[styles.label, { color: colors.secondaryText }]}>Birthday*</Text>
+           {/* Date of Birth */}
+          <Text style={[styles.label, { color: colors.secondaryText }]}>Date of Birth*</Text>
           <TextInput
             style={[
               styles.input,
@@ -516,30 +518,65 @@ export default function ProfileCard({
           />
           {errors.birthday && <Text style={styles.errorText}>{errors.birthday}</Text>}
 
-          <Text style={[styles.label, { color: colors.secondaryText }]}>Occupation*</Text>
+          {/* Occupation */}
+            <Text style={[styles.label, { color: colors.secondaryText }]}>Occupation*</Text>
+            <TextInput
+              style={[
+                styles.input,
+                { backgroundColor: colors.background, color: colors.text, borderColor: errors.occupation ? 'red' : colors.border }
+              ]}
+              value={userData.occupation}
+              onChangeText={(value) => handleChange('occupation', value)}
+              placeholder="Your job title"
+              placeholderTextColor={colors.secondaryText}
+            />
+            {errors.occupation && <Text style={styles.errorText}>{errors.occupation}</Text>}
+
+        {/* Interests */}
+        <View style={styles.label}>
+          <Text style={[styles.label, { color: colors.secondaryText }]}>Interests</Text>
+          <InterestSelector
+            selectedInterests={userData.interests || []}
+            onInterestsChange={(interests) => handleChange('interests', interests)}
+            maxInterests={10}
+          />
+
+          {/* About me */}
+          <Text style={[styles.label, { color: colors.secondaryText }]}>About Me*</Text>
           <TextInput
             style={[
-              styles.input,
-              { backgroundColor: colors.background, color: colors.text, borderColor: errors.occupation ? 'red' : colors.border }
+              styles.textArea,
+              { backgroundColor: colors.background, color: colors.text, borderColor: errors.bio ? 'red' : colors.border }
             ]}
-            value={userData.occupation}
-            onChangeText={(value) => handleChange('occupation', value)}
-            placeholder="Your job title"
+            value={userData.bio}
+            onChangeText={(value) => handleChange('bio', value)}
+            placeholder="Tell others about yourself (max 500 characters)"
             placeholderTextColor={colors.secondaryText}
+            multiline
+            numberOfLines={5}
+            maxLength={500}
           />
-          {errors.occupation && <Text style={styles.errorText}>{errors.occupation}</Text>}
+          <Text style={[styles.characterCount, { color: colors.secondaryText }]}>
+            {userData.bio ? userData.bio.length : 0}/500
+          </Text>
+          {errors.bio && <Text style={styles.errorText}>{errors.bio}</Text>}
+          </View>
+          
         </View>
+ 
 
         {/* Professional Details */}
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>Professional Details</Text>
-
+          
+          {/* Experience Level */}
           <Text style={[styles.label, { color: colors.secondaryText }]}>Experience Level</Text>
           <ExperienceLevelSelector
             selectedLevel={userData.experienceLevel || ''}
             onLevelChange={(level) => handleChange('experienceLevel', level)}
           />
-
+          
+          {/* Experience */}
           <Text style={[styles.label, { color: colors.secondaryText }]}>Experience</Text>
           <TextInput
             style={[
@@ -553,7 +590,8 @@ export default function ProfileCard({
             multiline
             numberOfLines={4}
           />
-
+          
+          {/* Education */}
           <Text style={[styles.label, { color: colors.secondaryText }]}>Education</Text>
           <TextInput
             style={[
@@ -566,6 +604,7 @@ export default function ProfileCard({
             placeholderTextColor={colors.secondaryText}
           />
           
+          {/* Industries */}
           <Text style={[styles.label, { color: colors.secondaryText }]}>Industries (select up to 3)</Text>
           <IndustrySelector
             selectedIndustries={userData.industries || []}
@@ -590,6 +629,7 @@ export default function ProfileCard({
             placeholderTextColor={colors.secondaryText}
           />
           
+          {/* Favorite Cafes */}
           <Text style={[styles.label, { color: colors.secondaryText }]}>Favorite Cafes</Text>
           <TextInput
             style={[
@@ -601,38 +641,6 @@ export default function ProfileCard({
             placeholder="Coffee House, Bean There, etc. (comma separated)"
             placeholderTextColor={colors.secondaryText}
           />
-        </View>
-        
-        {/* Interests */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>Interests</Text>
-          <InterestSelector
-            selectedInterests={userData.interests || []}
-            onInterestsChange={(interests) => handleChange('interests', interests)}
-            maxInterests={10}
-          />
-        </View>
-
-        {/* Bio */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>About Me*</Text>
-          <TextInput
-            style={[
-              styles.textArea,
-              { backgroundColor: colors.background, color: colors.text, borderColor: errors.bio ? 'red' : colors.border }
-            ]}
-            value={userData.bio}
-            onChangeText={(value) => handleChange('bio', value)}
-            placeholder="Tell others about yourself (max 500 characters)"
-            placeholderTextColor={colors.secondaryText}
-            multiline
-            numberOfLines={5}
-            maxLength={500}
-          />
-          <Text style={[styles.characterCount, { color: colors.secondaryText }]}>
-            {userData.bio ? userData.bio.length : 0}/500
-          </Text>
-          {errors.bio && <Text style={styles.errorText}>{errors.bio}</Text>}
         </View>
 
         {/* Save Button */}
