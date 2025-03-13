@@ -226,6 +226,11 @@ export default function LoginScreen() {
                 </Text>
               </TouchableOpacity>
 
+              {/* Error Message */}
+              {error ? (
+                <Text style={styles.errorMessage}>{error}</Text>
+              ) : null}
+
               {/* Forgot Password */}
               <Link href="/(auth)/forgot-password" asChild>
                 <TouchableOpacity style={styles.forgotPasswordButton}>
@@ -259,7 +264,6 @@ export default function LoginScreen() {
                 </TouchableOpacity>
               </Link>
             </View>
-            <Toast visible={toastVisible} message={toastMessage} /> {/* Toast added here */}
           </View>
         </KeyboardAvoidingView>
         <StatusBar style="auto" />
@@ -402,5 +406,12 @@ const styles = StyleSheet.create({
   toastText: {
     color: 'white',
     fontSize: 16,
+  },
+  errorMessage: {
+    color: '#f44336',
+    textAlign: 'center',
+    marginTop: 10,
+    fontSize: 14,
+    fontFamily: "K2D-Regular",
   },
 });
