@@ -12,6 +12,11 @@ import {
 } from "react-native";
 import { Link } from "expo-router";
 import { useColorScheme } from "@/hooks/useColorScheme";
+
+// Add console debugging
+console.log('Register page loaded');
+console.log('API_URL:', process.env.EXPO_PUBLIC_API_URL);
+
 import { useAuth } from "@/contexts/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
 import {

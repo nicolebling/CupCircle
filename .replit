@@ -17,7 +17,7 @@ localPort = 8082
 externalPort = 3001
 
 [workflows]
-runButton = "Start API Server"
+runButton = "Run Server and App"
 
 [[workflows.workflow]]
 name = "Dev Server"
@@ -87,6 +87,19 @@ args = "node api/server.js"
 name = "Run Full App"
 mode = "sequential"
 author = 38320710
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node api/server.js"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npx expo start --web"
+
+[[workflows.workflow]]
+name = "Run Server and App"
+author = 38320710
+mode = "parallel"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"

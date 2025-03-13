@@ -38,11 +38,8 @@ export const authService = {
   // Register function
   async register(email: string, password: string) {
     try {
-      // For development, use mockAuthService if API is not available
-      if (!API_URL.includes('replit.dev')) {
-        console.log('Using mock auth service');
-        return mockAuthService.register(email, password);
-      }
+      // For testing, always try to use the real API first
+      console.log('Attempting to use real API service for registration');
       
       const response = await fetch(`${API_URL}/api/auth/register`, {
         method: 'POST',
@@ -93,11 +90,8 @@ export const profileService = {
   // Save profile (create or update)
   async saveProfile(profileData: Partial<Profile> & { user_id: string }) {
     try {
-      // For development, use mockProfileService if API is not available
-      if (!API_URL.includes('replit.dev')) {
-        console.log('Using mock profile service');
-        return mockProfileService.saveProfile(profileData);
-      }
+      // For testing, always try to use the real API first
+      console.log('Attempting to use real API service for profile saving');
       
       const response = await fetch(`${API_URL}/api/profile`, {
         method: 'POST',
@@ -109,6 +103,7 @@ export const profileService = {
       
       if (!response.ok) {
         const data = await response.json();
+        console.error('Profile API error response:', data);
         throw new Error(data.error || 'Failed to save profile');
       }
       
