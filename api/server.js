@@ -61,28 +61,39 @@ app.post('/api/auth/login', async (req, res) => {
 
 app.post('/api/auth/register', async (req, res) => {
   try {
+    console.log('Register endpoint hit with body:', req.body);
     const { email, password } = req.body;
     
+    if (!email || !password) {
+      console.error('Missing email or password in request');
+      return res.status(400).json({ error: 'Email and password are required' });
+    }
+    
     // Check if email already exists
+    console.log('Checking if email exists:', email);
     const existingUser = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
     
     if (existingUser.rows.length > 0) {
+      console.log('Email already exists');
       return res.status(400).json({ error: 'Email already exists' });
     }
     
     // Hash password
+    console.log('Hashing password');
     const hashedPassword = await bcrypt.hash(password, 10);
     
     // Insert new user
+    console.log('Inserting new user');
     const result = await pool.query(
       'INSERT INTO users (email, password) VALUES ($1, $2) RETURNING id, email',
       [email, hashedPassword]
     );
     
+    console.log('User registered successfully:', result.rows[0]);
     return res.status(201).json(result.rows[0]);
   } catch (error) {
-    console.error('Register error:', error);
-    return res.status(500).json({ error: 'Server error' });
+    console.error('Register error details:', error.message, error.stack);
+    return res.status(500).json({ error: `Server error: ${error.message}` });
   }
 });
 

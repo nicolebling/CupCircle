@@ -2,7 +2,7 @@
 const fetch = require('node-fetch');
 
 // Get the API URL
-const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000';
+const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://0.0.0.0:3000';
 
 async function testAuth() {
   try {
@@ -13,6 +13,9 @@ async function testAuth() {
     const username = `user${Date.now()}`;
     
     // Register a new user
+    console.log(`Attempting to register at: ${API_URL}/api/auth/register`);
+    console.log(`Data: ${JSON.stringify({ email, password })}`);
+    
     const registerResponse = await fetch(`${API_URL}/api/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -20,8 +23,16 @@ async function testAuth() {
     });
     
     if (!registerResponse.ok) {
-      const error = await registerResponse.json();
-      throw new Error(`Registration failed: ${error.error || 'Unknown error'}`);
+      console.log(`Status code: ${registerResponse.status}`);
+      let errorText;
+      try {
+        const error = await registerResponse.json();
+        errorText = error.error || 'Unknown error';
+      } catch (e) {
+        errorText = await registerResponse.text() || 'No error details available';
+      }
+      console.log(`Error response: ${errorText}`);
+      throw new Error(`Registration failed: ${errorText}`);
     }
     
     const newUser = await registerResponse.json();
