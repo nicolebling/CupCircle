@@ -13,7 +13,7 @@ import {
   ScrollView,
   Image,
 } from "react-native";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { useAuth } from "@/contexts/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
@@ -73,6 +73,9 @@ export default function LoginScreen() {
       console.log("Login successful:", data)
       console.log("User session:", data.session)
       console.log("User data:", data.user)
+      
+      // Redirect to matching page after successful login
+      router.replace('/(tabs)/matching')
     }
     setLoading(false)
   }

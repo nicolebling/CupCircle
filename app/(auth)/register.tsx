@@ -11,7 +11,7 @@ import {
   Platform,
   Image,
 } from "react-native";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { useAuth } from "@/contexts/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
@@ -77,6 +77,8 @@ export default function SignUpScreen() {
         Alert.alert('Please check your inbox for email verification!')
       } else {
         console.log("User authenticated immediately")
+        // Redirect to matching page after successful signup with immediate authentication
+        router.replace('/(tabs)/matching')
       }
     }
     setLoading(false)
