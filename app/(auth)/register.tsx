@@ -81,28 +81,25 @@ export default function SignUpScreen() {
               console.error("Error checking for existing profile:", checkError);
             }
 
-            // Only create profile if it doesn't exist
-            if (!existingProfile) {
-              const { data: profileData, error: profileError } = await supabase
-                .from('profiles')
-                .insert([
-                  { 
-                    id: data.user.id,
-                    username: email.split('@')[0], // Default username from email
-                    avatar_url: null,
-                    website: null
-                  }
-                ])
-                .select();
+            // Use upsert instead of checking and inserting
+            const { data: profileData, error: profileError } = await supabase
+              .from('profiles')
+              .upsert({
+                id: data.user.id,
+                username: email.split('@')[0], // Default username from email
+                avatar_url: null,
+                website: null
+              }, 
+              { onConflict: 'id', ignoreDuplicates: true })
+              .select();
 
-              if (profileError) {
-                console.error("Profile creation error:", profileError);
-                console.error("Profile error details:", JSON.stringify(profileError));
-                // Don't sign out - just continue to profile setup
-                console.log("Continuing to profile setup despite profile creation error");
-              }
+            if (profileError) {
+              console.error("Profile creation error:", profileError);
+              console.error("Profile error details:", JSON.stringify(profileError));
+              // Don't sign out - just continue to profile setup
+              console.log("Continuing to profile setup despite profile creation error");
             } else {
-              console.log("Profile already exists, continuing to profile setup");
+              console.log("Profile upserted successfully");
             }
           } catch (profileCreationError) {
             console.error("Exception during profile creation:", profileCreationError);
