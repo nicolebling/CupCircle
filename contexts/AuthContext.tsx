@@ -1,7 +1,8 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { authService, profileService } from '../services/api';
+import { authService } from '../services/api';
+import { profileService } from '../services/api';
 
 type User = {
   id: string;
@@ -92,14 +93,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signUp = async (email: string, password: string, name: string) => {
     setIsLoading(true);
     try {
-      console.log('Starting registration process for:', email);
-      
       // Register new user
       const newUser = await authService.register(email, password);
-      console.log('User registered successfully:', newUser);
-      console.log('User ID type:', typeof newUser.id);
 
-      // Create user profile object without creating profile yet
+      // Create user profile
+      await profileService.saveProfile({
+        user_id: newUser.id,
+        name: name,
+      });
+
+      // Create user profile object
       const userProfile: UserProfile = {
         id: newUser.id,
         email: newUser.email,
@@ -107,12 +110,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       };
 
       await AsyncStorage.setItem('@user', JSON.stringify(userProfile));
-      console.log('User data saved to AsyncStorage');
       setUser(userProfile);
       // Don't redirect to tabs, let the component handle redirection to onboarding
-    } catch (error: any) {
-      console.error('Registration failed with error:', error.message);
-      console.error('Full error:', error);
+    } catch (error) {
+      console.error('Registration failed', error);
       throw error;
     } finally {
       setIsLoading(false);

@@ -9,7 +9,7 @@ const API_BASE_URL = Constants.expoConfig?.extra?.apiUrl ||
                     'https://api.cupcircle.com';
 
 // Flag to use mock data when API is unavailable
-let useMockData = false;
+let useMockData = true;
 
 // Initialize service
 export const initApiClient = async () => {

@@ -12,8 +12,6 @@ app.use(express.json());
 app.use(cors());
 
 // Database connection
-console.log('Database URL (first 20 chars):', process.env.DATABASE_URL ? `${process.env.DATABASE_URL.substring(0, 20)}...` : 'NOT SET');
-
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: {
@@ -63,62 +61,34 @@ app.post('/api/auth/login', async (req, res) => {
 
 app.post('/api/auth/register', async (req, res) => {
   try {
-    console.log('Register endpoint hit with body:', req.body);
     const { email, password } = req.body;
     
-    if (!email || !password) {
-      console.error('Missing email or password in request');
-      return res.status(400).json({ error: 'Email and password are required' });
-    }
-    
     // Check if email already exists
-    console.log('Checking if email exists:', email);
     const existingUser = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
     
     if (existingUser.rows.length > 0) {
-      console.log('Email already exists');
       return res.status(400).json({ error: 'Email already exists' });
     }
     
     // Hash password
-    console.log('Hashing password');
     const hashedPassword = await bcrypt.hash(password, 10);
     
     // Insert new user
-    console.log('Inserting new user');
-    try {
-      const result = await pool.query(
-        'INSERT INTO users (email, password) VALUES ($1, $2) RETURNING id, email',
-        [email, hashedPassword]
-      );
-      
-      console.log('User registered successfully:', result.rows[0]);
-      return res.status(201).json(result.rows[0]);
-    } catch (dbError) {
-      console.error('Database insertion error:', dbError.message);
-      console.error('Error code:', dbError.code);
-      console.error('Error detail:', dbError.detail);
-      
-      // Check if this is a relation not found error (table doesn't exist)
-      if (dbError.code === '42P01') {
-        return res.status(500).json({ error: 'Database table does not exist. Run the setup script.' });
-      }
-      
-      throw dbError; // Re-throw for outer catch
-    }
+    const result = await pool.query(
+      'INSERT INTO users (email, password) VALUES ($1, $2) RETURNING id, email',
+      [email, hashedPassword]
+    );
+    
+    return res.status(201).json(result.rows[0]);
   } catch (error) {
-    console.error('Register error details:', error.message, error.stack);
-    return res.status(500).json({ error: `Server error: ${error.message}` });
+    console.error('Register error:', error);
+    return res.status(500).json({ error: 'Server error' });
   }
 });
 
-// Health check and basic routes
+// Profile routes
 app.get('/', (req, res) => {
   res.json({ message: 'API server is running' });
-});
-
-app.get('/api/health-check', (req, res) => {
-  res.json({ status: 'ok', message: 'API server is healthy' });
 });
 
 app.get('/profile', (req, res) => {
