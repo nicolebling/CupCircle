@@ -16,7 +16,7 @@ export default function Toast({
   message, 
   type = 'info', 
   onDismiss,
-  duration = 2000 // Reduced from 3000 to 2000 for quicker fade
+  duration = 3000
 }: ToastProps) {
   const opacity = new Animated.Value(0);
   
@@ -24,8 +24,8 @@ export default function Toast({
     if (visible) {
       // Fade in
       Animated.timing(opacity, {
-        toValue: 0.9, // Reduced from 1 to 0.9 for more subtle appearance
-        duration: 200, // Reduced from 300 to 200 for quicker appearance
+        toValue: 1,
+        duration: 300,
         useNativeDriver: true,
       }).start();
       
@@ -41,7 +41,7 @@ export default function Toast({
   const hideToast = () => {
     Animated.timing(opacity, {
       toValue: 0,
-      duration: 200, // Reduced from 300 to 200 for quicker fade
+      duration: 300,
       useNativeDriver: true,
     }).start(() => {
       if (onDismiss) onDismiss();
@@ -53,10 +53,10 @@ export default function Toast({
   // Set colors based on type
   const getBackgroundColor = () => {
     switch (type) {
-      case 'success': return 'rgba(76, 175, 80, 0.9)'; // More transparent success
-      case 'error': return 'rgba(244, 67, 54, 0.9)'; // More transparent error
-      case 'info': return 'rgba(33, 150, 243, 0.9)'; // More transparent info
-      default: return 'rgba(33, 150, 243, 0.9)';
+      case 'success': return '#4caf50';
+      case 'error': return '#f44336';
+      case 'info': return '#2196f3';
+      default: return '#2196f3';
     }
   };
   
@@ -94,38 +94,39 @@ export default function Toast({
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
-    bottom: 60,
-    left: 16,
-    right: 16,
+    bottom: 80,
+    left: 20,
+    right: 20,
+    padding: 16,
+    borderRadius: 8,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    borderRadius: 8,
-    padding: 12,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 2,
     },
-    shadowOpacity: 0.15, // Reduced shadow opacity
+    shadowOpacity: 0.25,
     shadowRadius: 3.84,
-    elevation: 3, // Reduced elevation
-    zIndex: 999,
+    elevation: 5,
+    zIndex: 1000,
   },
   content: {
-    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
+    flex: 1,
   },
   icon: {
-    marginRight: 8,
+    marginRight: 10,
   },
   message: {
     color: 'white',
     fontSize: 14,
+    fontFamily: 'K2D-Regular',
     flex: 1,
   },
   closeButton: {
-    padding: 4,
-  }
+    paddingLeft: 10,
+  },
 });
