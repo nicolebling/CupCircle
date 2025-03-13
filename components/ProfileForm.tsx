@@ -39,7 +39,6 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
   const [experienceLevel, setExperienceLevel] = useState('');
   const [education, setEducation] = useState('');
   const [city, setCity] = useState('');
-  // Removed website state as it's no longer in the schema
   const [industryCategories, setIndustryCategories] = useState<string[]>([]);
   const [skills, setSkills] = useState<string[]>([]);
   const [neighborhoods, setNeighborhoods] = useState<string[]>([]);
@@ -74,7 +73,6 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
       if (data) {
         setName(data.name || '');
         setUsername(data.username || '');
-        // Use photo_url instead of avatar_url
         setAvatar(data.photo_url || '');
         setOccupation(data.occupation || '');
         setBio(data.bio || '');
@@ -82,13 +80,12 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
         setExperienceLevel(data.experience_level || '');
         setEducation(data.education || '');
         setCity(data.city || '');
-        // Remove setting website as it's no longer in the schema
         setIndustryCategories(data.industry_categories || []);
         setSkills(data.skills || []);
         setNeighborhoods(data.neighborhoods || []);
         setFavoriteCafes(data.favorite_cafes || []);
         setInterests(data.interests || []);
-        
+
         console.log('Profile data loaded into form state');
       }
     } catch (error) {
@@ -150,11 +147,9 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
       const fileExt = filename?.split('.').pop();
       const filePath = `${userId}/${Date.now()}.${fileExt}`;
 
-      // Convert image to blob
       const response = await fetch(uri);
       const blob = await response.blob();
 
-      // Upload to Supabase Storage
       const { error: uploadError } = await supabase.storage
         .from('avatars')
         .upload(filePath, blob);
@@ -163,7 +158,6 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
         throw uploadError;
       }
 
-      // Get public URL
       const { data } = supabase.storage
         .from('avatars')
         .getPublicUrl(filePath);
@@ -200,15 +194,12 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
 
       const ageNumber = age ? parseInt(age) : null;
 
-      // Log what we're about to save
       console.log('Preparing to save profile for user ID:', userId);
 
       const profileData = {
         id: userId,
         name,
         username,
-        // Removed avatar_url as it's no longer in the schema
-        // Removed website as it's no longer in the schema
         occupation,
         photo_url: avatar,
         bio,
@@ -223,7 +214,7 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
         interests,
         updated_at: new Date(),
       };
-      
+
       console.log('Profile data being sent:', JSON.stringify(profileData, null, 2));
 
       const { data, error } = await supabase
@@ -233,16 +224,15 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
 
       if (error) {
         console.error('Supabase error response:', error);
+        console.error('Error details:', JSON.stringify(error)); //Added detailed error logging
+        Alert.alert('Profile Save Error', error?.message || 'Failed to save profile. Please try again.'); //Improved error message
         throw error;
       }
 
       console.log('Profile saved successfully:', data);
       Alert.alert('Success', 'Your profile has been saved');
-
-      // Redirect to the matching page
-      console.log('Redirecting to matching page');
       router.replace('/(tabs)/matching');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving profile:', error);
       setError('Failed to save profile. Please try again.');
     } finally {
@@ -277,7 +267,6 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
             </View>
           ) : null}
 
-          {/* Profile Image */}
           <TouchableOpacity style={styles.avatarContainer} onPress={pickImage}>
             {avatar ? (
               <View style={styles.avatarWrapper}>
@@ -293,7 +282,6 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
             </Text>
           </TouchableOpacity>
 
-          {/* Basic Information */}
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, isDark && styles.textDark]}>Basic Information</Text>
 
@@ -319,8 +307,6 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
               />
             </View>
 
-            {/* Website field removed as it's no longer in the schema */}
-
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isDark && styles.textDark]}>Age</Text>
               <TextInput
@@ -345,7 +331,6 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
             </View>
           </View>
 
-          {/* Professional Information */}
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, isDark && styles.textDark]}>Professional Information</Text>
 
@@ -415,7 +400,6 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
             </View>
           </View>
 
-          {/* Personal Information */}
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, isDark && styles.textDark]}>Personal Information</Text>
 
