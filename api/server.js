@@ -12,6 +12,8 @@ app.use(express.json());
 app.use(cors());
 
 // Database connection
+console.log('Database URL (first 20 chars):', process.env.DATABASE_URL ? `${process.env.DATABASE_URL.substring(0, 20)}...` : 'NOT SET');
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: {
@@ -84,13 +86,26 @@ app.post('/api/auth/register', async (req, res) => {
     
     // Insert new user
     console.log('Inserting new user');
-    const result = await pool.query(
-      'INSERT INTO users (email, password) VALUES ($1, $2) RETURNING id, email',
-      [email, hashedPassword]
-    );
-    
-    console.log('User registered successfully:', result.rows[0]);
-    return res.status(201).json(result.rows[0]);
+    try {
+      const result = await pool.query(
+        'INSERT INTO users (email, password) VALUES ($1, $2) RETURNING id, email',
+        [email, hashedPassword]
+      );
+      
+      console.log('User registered successfully:', result.rows[0]);
+      return res.status(201).json(result.rows[0]);
+    } catch (dbError) {
+      console.error('Database insertion error:', dbError.message);
+      console.error('Error code:', dbError.code);
+      console.error('Error detail:', dbError.detail);
+      
+      // Check if this is a relation not found error (table doesn't exist)
+      if (dbError.code === '42P01') {
+        return res.status(500).json({ error: 'Database table does not exist. Run the setup script.' });
+      }
+      
+      throw dbError; // Re-throw for outer catch
+    }
   } catch (error) {
     console.error('Register error details:', error.message, error.stack);
     return res.status(500).json({ error: `Server error: ${error.message}` });
