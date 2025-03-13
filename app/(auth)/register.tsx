@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import {
+  Alert,
   View,
   Text,
   StyleSheet,
@@ -22,6 +23,7 @@ import {
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
+import { supabase } from '@/lib/supabase'
 
 // Prevent splash screen from hiding until assets are loaded
 SplashScreen.preventAutoHideAsync();
@@ -44,6 +46,22 @@ export default function SignUpScreen() {
   const [fontsLoaded] = useFonts({
     SpaceMono: require("@/assets/fonts/SpaceMono-Regular.ttf"),
   });
+
+  //supabase signupwithEmail
+  async function signUpWithEmail() {
+    setLoading(true)
+    const {
+      data: { session },
+      error,
+    } = await supabase.auth.signUp({
+      email: email,
+      password: password,
+    })
+
+    if (error) Alert.alert(error.message)
+    if (!session) Alert.alert('Please check your inbox for email verification!')
+    setLoading(false)
+  }
 
   // Hide splash screen when fonts are ready
   React.useEffect(() => {
@@ -198,7 +216,7 @@ export default function SignUpScreen() {
                   styles.button,
                   { backgroundColor: theme.colors.primary },
                 ]}
-                onPress={handleSignUp}
+                onPress={signUpWithEmail}
                 disabled={loading}
               >
                 <Text style={styles.buttonText}>

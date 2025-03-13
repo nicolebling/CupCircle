@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import {
+  Alert,
   View,
+  AppState,
   Text,
   StyleSheet,
   TextInput,
@@ -23,6 +25,20 @@ import {
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
+import { supabase } from '@/lib/supabase'
+
+
+// Tells Supabase Auth to continuously refresh the session automatically if
+// the app is in the foreground. When this is added, you will continue to receive
+// `onAuthStateChange` events with the `TOKEN_REFRESHED` or `SIGNED_OUT` event
+// if the user's session is terminated. This should only be registered once.
+AppState.addEventListener('change', (state) => {
+  if (state === 'active') {
+    supabase.auth.startAutoRefresh()
+  } else {
+    supabase.auth.stopAutoRefresh()
+  }
+})
 
 // Prevent splash screen from hiding until assets are loaded
 SplashScreen.preventAutoHideAsync();
@@ -43,6 +59,18 @@ export default function LoginScreen() {
     SpaceMono: require("@/assets/fonts/SpaceMono-Regular.ttf"),
   });
 
+  async function signInWithEmail() {
+    setLoading(true)
+    const { error } = await supabase.auth.signInWithPassword({
+      email: email,
+      password: password,
+    })
+
+    if (error) Alert.alert(error.message)
+    setLoading(false)
+  }
+
+ 
   // Hide splash screen when fonts are ready
   React.useEffect(() => {
     if (fontsLoaded) {
@@ -158,7 +186,7 @@ export default function LoginScreen() {
                   styles.button,
                   { backgroundColor: theme.colors.primary },
                 ]}
-                onPress={handleLogin}
+                onPress={() => signInWithEmail()}
                 disabled={loading}
               >
                 <Text style={styles.buttonText}>
@@ -194,7 +222,7 @@ export default function LoginScreen() {
                       { color: theme.colors.primary },
                     ]}
                   >
-                    Sign Up
+                    Register
                   </Text>
                 </TouchableOpacity>
               </Link>
@@ -211,6 +239,11 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  verticallySpaced: {
+    paddingTop: 4,
+    paddingBottom: 4,
+    alignSelf: 'stretch',
   },
   keyboardAvoidingView: {
     flex: 1,
