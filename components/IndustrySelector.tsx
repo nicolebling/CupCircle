@@ -19,15 +19,17 @@ const INDUSTRIES = [
 const { width } = Dimensions.get('window');
 
 type IndustrySelectorProps = {
-  selectedIndustries: string[];
-  onIndustriesChange: (industries: string[]) => void;
+  selected: string[];
+  onChange: (industries: string[]) => void;
   maxSelections?: number;
+  isDark?: boolean;
 };
 
 export default function IndustrySelector({ 
-  selectedIndustries, 
-  onIndustriesChange, 
-  maxSelections = 3 
+  selected, 
+  onChange, 
+  maxSelections = 3,
+  isDark = false
 }: IndustrySelectorProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
@@ -36,8 +38,8 @@ export default function IndustrySelector({
   const [tempSelected, setTempSelected] = useState<string[]>([]);
 
   useEffect(() => {
-    setTempSelected(selectedIndustries);
-  }, [selectedIndustries]);
+    setTempSelected(selected || []);
+  }, [selected]);
 
   const toggleIndustry = (industry: string) => {
     if (tempSelected.includes(industry)) {
@@ -50,12 +52,12 @@ export default function IndustrySelector({
   };
 
   const handleSave = () => {
-    onIndustriesChange(tempSelected);
+    onChange(tempSelected);
     setModalVisible(false);
   };
 
   const handleCancel = () => {
-    setTempSelected(selectedIndustries);
+    setTempSelected(selected || []);
     setModalVisible(false);
   };
 
@@ -65,15 +67,15 @@ export default function IndustrySelector({
         style={[styles.selector, { backgroundColor: colors.background, borderColor: colors.border }]} 
         onPress={() => setModalVisible(true)}
       >
-        <Text style={[styles.selectorText, { color: selectedIndustries?.length ? colors.text : colors.secondaryText }]}>
-          {selectedIndustries?.length ? selectedIndustries.join(', ') : 'Select industries (max 3)'}
+        <Text style={[styles.selectorText, { color: selected && selected.length ? colors.text : colors.secondaryText }]}>
+          {selected && selected.length ? selected.join(', ') : 'Select industries (max 3)'}
         </Text>
         <Ionicons name="chevron-down" size={20} color={colors.secondaryText} />
       </TouchableOpacity>
 
-      {selectedIndustries.length > 0 && (
+      {selected && selected.length > 0 && (
         <View style={styles.selectedContainer}>
-          {selectedIndustries.map((industry, index) => (
+          {selected.map((industry, index) => (
             <View 
               key={index} 
               style={[styles.selectedBubble, { backgroundColor: colors.primary + '20' }]}

@@ -102,15 +102,17 @@ const INTERESTS = [
 ];
 
 interface InterestSelectorProps {
-  selectedInterests: string[];
-  onInterestsChange: (interests: string[]) => void;
+  selected: string[];
+  onChange: (interests: string[]) => void;
   maxInterests?: number;
+  isDark?: boolean;
 }
 
 export default function InterestSelector({ 
-  selectedInterests = [], 
-  onInterestsChange,
-  maxInterests = 10
+  selected = [], 
+  onChange,
+  maxInterests = 10,
+  isDark = false
 }: InterestSelectorProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
@@ -130,13 +132,13 @@ export default function InterestSelector({
   const toggleInterest = (interest: string) => {
     let newSelectedInterests;
     
-    if (selectedInterests.includes(interest)) {
+    if (selected.includes(interest)) {
       // Remove the interest
-      newSelectedInterests = selectedInterests.filter(i => i !== interest);
+      newSelectedInterests = selected.filter(i => i !== interest);
     } else {
       // Add the interest if under the limit
-      if (selectedInterests.length < maxInterests) {
-        newSelectedInterests = [...selectedInterests, interest];
+      if (selected.length < maxInterests) {
+        newSelectedInterests = [...selected, interest];
       } else {
         // Show alert or toast that max limit is reached
         console.log(`Maximum of ${maxInterests} interests allowed`);
@@ -144,7 +146,7 @@ export default function InterestSelector({
       }
     }
     
-    onInterestsChange(newSelectedInterests);
+    onChange(newSelectedInterests);
   };
   
   const getInterestEmoji = (interest: string) => {
@@ -158,9 +160,9 @@ export default function InterestSelector({
         onPress={() => setModalVisible(true)}
       >
         <View style={styles.selectorContent}>
-          {selectedInterests.length > 0 ? (
+          {selected && selected.length > 0 ? (
             <Text style={[styles.selectorText, { color: colors.text }]} numberOfLines={1} ellipsizeMode="tail">
-              {selectedInterests.map(i => `${getInterestEmoji(i)} ${i}`).join(', ')}
+              {selected.map(i => `${getInterestEmoji(i)} ${i}`).join(', ')}
             </Text>
           ) : (
             <Text style={[styles.selectorText, { color: colors.secondaryText }]}>
@@ -181,7 +183,7 @@ export default function InterestSelector({
           <View style={[styles.modalContent, { backgroundColor: colors.background }]}>
             <View style={styles.modalHeader}>
               <Text style={[styles.modalTitle, { color: colors.text }]}>
-                Select Interests ({selectedInterests.length}/{maxInterests})
+                Select Interests ({selected.length}/{maxInterests})
               </Text>
               <TouchableOpacity onPress={() => setModalVisible(false)}>
                 <Ionicons name="close" size={24} color={colors.text} />
@@ -209,7 +211,7 @@ export default function InterestSelector({
                 Selected:
               </Text>
               <View style={styles.tagsContainer}>
-                {selectedInterests.map(interest => (
+                {selected.map(interest => (
                   <TouchableOpacity
                     key={interest}
                     style={[styles.tag, { backgroundColor: colors.primary + '20', borderColor: colors.primary }]}
@@ -228,7 +230,7 @@ export default function InterestSelector({
               data={filteredInterests}
               keyExtractor={(item) => item}
               renderItem={({ item }) => {
-                const isSelected = selectedInterests.includes(item);
+                const isSelected = selected.includes(item);
                 return (
                   <TouchableOpacity
                     style={[
