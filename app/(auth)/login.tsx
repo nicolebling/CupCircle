@@ -68,29 +68,35 @@ export default function LoginScreen() {
 
     if (error) {
       console.error("Login error:", error.message)
-      Alert.alert(error.message)
+      Alert.alert('Login Error', error.message)
     } else {
       console.log("Login successful:", data)
       console.log("User session:", data.session)
       console.log("User data:", data.user)
 
-      // Check if the user has a profile
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', data.user.id)
-        .single();
+      try {
+        // Check if the user has a profile
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', data.user.id)
+          .single();
 
-      if (profileError && profileError.code !== 'PGRST116') {
-        console.error("Error checking profile:", profileError);
-      }
+        if (profileError && profileError.code !== 'PGRST116') {
+          console.error("Error checking profile:", profileError);
+        }
 
-      // Redirect to profile setup if user doesn't have a profile, otherwise to matching
-      if (!profileData) {
-        Alert.alert('Welcome back!', 'Please complete your profile to continue.');
+        // Redirect to profile setup if user doesn't have a profile, otherwise to matching
+        if (!profileData) {
+          Alert.alert('Welcome back!', 'Please complete your profile to continue.');
+          router.replace('/(auth)/profile-setup');
+        } else {
+          router.replace('/(tabs)/matching');
+        }
+      } catch (checkError) {
+        console.error("Error in profile check:", checkError);
+        // If there's an error checking the profile, just go to profile setup to be safe
         router.replace('/(auth)/profile-setup');
-      } else {
-        router.replace('/(tabs)/matching');
       }
     }
     setLoading(false)
