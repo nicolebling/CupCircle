@@ -3,8 +3,24 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Profile } from '../models/Profile';
 
 // Base URL for API
-// Get the API URL from environment or use the configured API URL
-const API_URL = process.env.EXPO_PUBLIC_API_URL || Constants?.expoConfig?.extra?.API_URL || 'http://cupcircle-api.cosanitty.replit.app';
+// First try environment variables, then app.json config, then fallback
+import Constants from 'expo-constants';
+
+// Fix the HTTP/HTTPS protocol - always use HTTPS for Replit domains
+const formatUrl = (url) => {
+  if (url && url.includes('replit')) {
+    // Force HTTPS for Replit domains
+    return url.replace('http://', 'https://');
+  }
+  return url;
+};
+
+const API_URL = formatUrl(
+  process.env.EXPO_PUBLIC_API_URL || 
+  (Constants?.expoConfig?.extra?.API_URL) || 
+  'https://cupcircle-api.cosanitty.replit.app'
+);
+
 console.log('Using API URL:', API_URL);
 
 // Auth service
@@ -42,14 +58,20 @@ export const authService = {
       console.log('Attempting to use real API service for registration');
       console.log('Registration endpoint:', `${API_URL}/api/auth/register`);
       
+      // Use a timeout to prevent hanging requests
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10-second timeout
+      
       const response = await fetch(`${API_URL}/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ email, password }),
+        signal: controller.signal
       });
       
+      clearTimeout(timeoutId);
       console.log('Registration response status:', response.status);
       
       if (!response.ok) {
@@ -69,6 +91,13 @@ export const authService = {
       return userData;
     } catch (error) {
       console.error('Register error:', error);
+      
+      // Check if it's a certificate error (common with HTTP/HTTPS issues)
+      const errorMessage = error.toString();
+      if (errorMessage.includes('certificate') || errorMessage.includes('SSL')) {
+        console.error('Certificate error detected. Make sure your API URL uses HTTPS.');
+      }
+      
       console.log('Falling back to mock auth service');
       // Fallback to mock during development
       const mockUser = mockAuthService.register(email, password);
