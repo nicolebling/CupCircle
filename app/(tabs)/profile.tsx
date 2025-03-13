@@ -18,6 +18,8 @@ export default function ProfileScreen() {
   const isDark = colorScheme === 'dark';
 
   useEffect(() => {
+    console.log("ProfileScreen mounted, fetching user profile...");
+    console.log("Current user from Auth context:", user);
     fetchUserProfile();
   }, []);
 
@@ -25,9 +27,12 @@ export default function ProfileScreen() {
     try {
       setLoading(true);
       if (!user) {
+        console.log("No user found in AuthContext");
         Alert.alert('Not logged in', 'Please log in to view your profile');
         return;
       }
+
+      console.log("Fetching profile for user ID:", user.id);
 
       // Fetch profile from Supabase
       const { data, error } = await supabase
@@ -36,6 +41,9 @@ export default function ProfileScreen() {
         .eq('id', user.id)
         .single();
 
+      console.log("Supabase response - data:", JSON.stringify(data, null, 2));
+      console.log("Supabase response - error:", error ? JSON.stringify(error, null, 2) : "No error");
+
       if (error) {
         console.error('Error fetching profile:', error);
         Alert.alert('Error', 'Failed to load profile information');
@@ -43,6 +51,7 @@ export default function ProfileScreen() {
       }
 
       if (data) {
+        console.log("Profile data found, transforming to UserProfileData");
         // Transform the data to match UserProfileData structure
         const userProfileData: UserProfileData = {
           name: data.full_name || data.name || '',
@@ -54,7 +63,10 @@ export default function ProfileScreen() {
           neighborhoods: data.neighborhoods || [],
           favoriteCafes: data.favorite_cafes || []
         };
+        console.log("Transformed UserProfileData:", JSON.stringify(userProfileData, null, 2));
         setProfileData(userProfileData);
+      } else {
+        console.log("No profile data found for this user");
       }
     } catch (error) {
       console.error('Failed to fetch profile:', error);
@@ -84,11 +96,14 @@ export default function ProfileScreen() {
         favorite_cafes: updatedData.favoriteCafes
       };
       
+      console.log("Saving profile updates:", JSON.stringify(profileUpdateData, null, 2));
+      
       const { error } = await supabase
         .from('profiles')
         .upsert({ id: user?.id, ...profileUpdateData }, { onConflict: 'id' });
       
       if (error) {
+        console.error("Error saving profile:", JSON.stringify(error, null, 2));
         throw error;
       }
       
@@ -107,17 +122,10 @@ export default function ProfileScreen() {
     setIsEditing(false);
   };
 
-  if (loading && !profileData) {
-    return (
-      <SafeAreaView style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#0097FB" />
-        <Text style={styles.loadingText}>Loading your profile...</Text>
-      </SafeAreaView>
-    );
-  }
-
   return (
     <SafeAreaView style={[styles.container, isDark && styles.containerDark]}>
+      <StatusBar style={isDark ? "light" : "dark"} />
+      
       <View style={styles.header}>
         <Text style={[styles.title, isDark && styles.titleDark]}>My Profile</Text>
         {!isEditing && (
@@ -127,7 +135,12 @@ export default function ProfileScreen() {
         )}
       </View>
       
-      {profileData && (
+      {loading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#0097FB" />
+          <Text style={styles.loadingText}>Loading your profile...</Text>
+        </View>
+      ) : profileData ? (
         <UserProfileCard
           initialData={profileData}
           isEditMode={isEditing}
@@ -135,6 +148,18 @@ export default function ProfileScreen() {
           onSave={handleSaveProfile}
           onCancel={handleCancelEdit}
         />
+      ) : (
+        <View style={styles.emptyStateContainer}>
+          <Text style={[styles.emptyStateText, isDark && styles.emptyStateTextDark]}>
+            No profile information found. Please complete your profile setup.
+          </Text>
+          <TouchableOpacity 
+            style={styles.setupButton}
+            onPress={handleEditProfile}
+          >
+            <Text style={styles.setupButtonText}>Set Up Profile</Text>
+          </TouchableOpacity>
+        </View>
       )}
       
       {!isEditing && (
@@ -146,8 +171,6 @@ export default function ProfileScreen() {
           <Text style={styles.signOutText}>Sign Out</Text>
         </TouchableOpacity>
       )}
-      
-      <StatusBar style={isDark ? "light" : "dark"} />
     </SafeAreaView>
   );
 }
@@ -201,4 +224,30 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginLeft: 8,
   },
+  emptyStateContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  emptyStateText: {
+    fontSize: 16,
+    textAlign: 'center',
+    marginBottom: 20,
+    color: '#555',
+  },
+  emptyStateTextDark: {
+    color: '#aaa',
+  },
+  setupButton: {
+    backgroundColor: '#0097FB',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+  },
+  setupButtonText: {
+    color: '#ffffff',
+    fontWeight: 'bold',
+    fontSize: 16,
+  }
 });
