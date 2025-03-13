@@ -43,12 +43,24 @@ AppState.addEventListener('change', (state) => {
 // Prevent splash screen from hiding until assets are loaded
 SplashScreen.preventAutoHideAsync();
 
+// Toast Component
+const Toast = ({ visible, message }) => {
+  if (!visible) return null;
+  return (
+    <View style={styles.toastContainer}>
+      <Text style={styles.toastText}>{message}</Text>
+    </View>
+  );
+};
+
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
 
   const { signIn } = useAuth();
   const colorScheme = useColorScheme();
@@ -60,22 +72,35 @@ export default function LoginScreen() {
   });
 
   async function signInWithEmail() {
-    setLoading(true)
+    setLoading(true);
+    setError("");
+    setToastMessage("");
+    setToastVisible(false);
+
+    if (!email || !password) {
+      setError("Email and password are required");
+      setToastMessage("Email and password are required");
+      setToastVisible(true);
+      setLoading(false);
+      return;
+    }
+
     const { data, error } = await supabase.auth.signInWithPassword({
       email: email,
       password: password,
-    })
+    });
 
     if (error) {
-      console.error("Login error:", error.message)
-      Alert.alert('Login Error', error.message)
+      console.error("Login error:", error.message);
+      setError(error.message);
+      setToastMessage(error.message);
+      setToastVisible(true);
     } else {
-      console.log("Login successful:", data)
-      console.log("User session:", data.session)
-      console.log("User data:", data.user)
+      console.log("Login successful:", data);
+      console.log("User session:", data.session);
+      console.log("User data:", data.user);
 
       try {
-        // Check if the user has a profile
         const { data: profileData, error: profileError } = await supabase
           .from('profiles')
           .select('*')
@@ -86,7 +111,6 @@ export default function LoginScreen() {
           console.error("Error checking profile:", profileError);
         }
 
-        // Redirect to profile setup if user doesn't have a profile, otherwise to matching
         if (!profileData) {
           Alert.alert('Welcome back!', 'Please complete your profile to continue.');
           router.replace('/(auth)/profile-setup');
@@ -95,11 +119,10 @@ export default function LoginScreen() {
         }
       } catch (checkError) {
         console.error("Error in profile check:", checkError);
-        // If there's an error checking the profile, just go to profile setup to be safe
         router.replace('/(auth)/profile-setup');
       }
     }
-    setLoading(false)
+    setLoading(false);
   }
 
 
@@ -113,24 +136,6 @@ export default function LoginScreen() {
   if (!fontsLoaded) {
     return null;
   }
-
-  // Handle Login
-  const handleLogin = async () => {
-    setError("");
-    if (!email || !password) {
-      setError("Email and password are required");
-      return;
-    }
-
-    setLoading(true);
-    try {
-      await signIn(email, password);
-    } catch (err: any) {
-      setError(err.message || "Login failed");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <ThemeProvider value={theme}>
@@ -259,6 +264,7 @@ export default function LoginScreen() {
                 </TouchableOpacity>
               </Link>
             </View>
+            <Toast visible={toastVisible} message={toastMessage} /> {/* Toast added here */}
           </View>
         </KeyboardAvoidingView>
         <StatusBar style="auto" />
@@ -386,5 +392,20 @@ const styles = StyleSheet.create({
   registerLink: {
     fontSize: 14,
     fontFamily: "K2D-SemiBold",
+  },
+  toastContainer: {
+    backgroundColor: '#f44336', // Red background
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 10,
+    alignItems: 'center',
+    position: 'absolute',
+    bottom: 20,
+    left: 20,
+    right: 20,
+  },
+  toastText: {
+    color: 'white',
+    fontSize: 16,
   },
 });

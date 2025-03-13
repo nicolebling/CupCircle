@@ -15,6 +15,7 @@ import { Link, router } from "expo-router";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { useAuth } from "@/contexts/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
+import Toast from "@/components/ui/Toast";
 import {
   DarkTheme,
   DefaultTheme,
@@ -37,6 +38,8 @@ export default function SignUpScreen() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
 
   const { signUp } = useAuth();
   const colorScheme = useColorScheme();
@@ -58,7 +61,8 @@ export default function SignUpScreen() {
 
       if (error) {
         console.error("Signup error:", error.message)
-        Alert.alert('Error', error.message)
+        setToastMessage(error.message);
+        setToastVisible(true);
       } else {
         console.log("Signup successful:", data)
         console.log("User created:", data.user)
@@ -115,7 +119,8 @@ export default function SignUpScreen() {
       }
     } catch (e) {
       console.error("Signup exception:", e)
-      Alert.alert('Sign Up Error', 'An unexpected error occurred. Please try again.')
+      setToastMessage('An unexpected error occurred. Please try again.');
+      setToastVisible(true);
     }
     setLoading(false)
   }
@@ -137,15 +142,24 @@ export default function SignUpScreen() {
 
     // Basic validation
     if (!email || !password || !confirmPassword) {
-      setError("All fields are required");
+      const errorMsg = "All fields are required";
+      setError(errorMsg);
+      setToastMessage(errorMsg);
+      setToastVisible(true);
       return;
     }
     if (password !== confirmPassword) {
-      setError("Passwords do not match");
+      const errorMsg = "Passwords do not match";
+      setError(errorMsg);
+      setToastMessage(errorMsg);
+      setToastVisible(true);
       return;
     }
     if (password.length < 6) {
-      setError("Password must be at least 6 characters long");
+      const errorMsg = "Password must be at least 6 characters long";
+      setError(errorMsg);
+      setToastMessage(errorMsg);
+      setToastVisible(true);
       return;
     }
 
@@ -153,7 +167,10 @@ export default function SignUpScreen() {
     try {
       await signUp(name, email, password);
     } catch (err: any) {
-      setError(err.message || "Sign-up failed");
+      const errorMsg = err.message || "Sign-up failed";
+      setError(errorMsg);
+      setToastMessage(errorMsg);
+      setToastVisible(true);
     } finally {
       setLoading(false);
     }
@@ -303,6 +320,12 @@ export default function SignUpScreen() {
           </View>
         </KeyboardAvoidingView>
         <StatusBar style="auto" />
+      <Toast 
+          visible={toastVisible} 
+          message={toastMessage} 
+          type="error" 
+          onDismiss={() => setToastVisible(false)} 
+        />
       </SafeAreaView>
     </ThemeProvider>
   );
