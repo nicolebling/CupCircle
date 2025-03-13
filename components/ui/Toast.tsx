@@ -1,6 +1,6 @@
 
-import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, Animated, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 type ToastProps = {
@@ -16,7 +16,7 @@ export default function Toast({
   message, 
   type = 'info', 
   onDismiss,
-  duration = 3000
+  duration = 2000 // Shorter display time for less disruption
 }: ToastProps) {
   const opacity = new Animated.Value(0);
   
@@ -24,8 +24,8 @@ export default function Toast({
     if (visible) {
       // Fade in
       Animated.timing(opacity, {
-        toValue: 1,
-        duration: 300,
+        toValue: 0.9,
+        duration: 150,
         useNativeDriver: true,
       }).start();
       
@@ -41,7 +41,7 @@ export default function Toast({
   const hideToast = () => {
     Animated.timing(opacity, {
       toValue: 0,
-      duration: 300,
+      duration: 150,
       useNativeDriver: true,
     }).start(() => {
       if (onDismiss) onDismiss();
@@ -53,10 +53,10 @@ export default function Toast({
   // Set colors based on type
   const getBackgroundColor = () => {
     switch (type) {
-      case 'success': return '#4caf50';
-      case 'error': return '#f44336';
-      case 'info': return '#2196f3';
-      default: return '#2196f3';
+      case 'success': return 'rgba(76, 175, 80, 0.85)';
+      case 'error': return 'rgba(244, 67, 54, 0.85)';
+      case 'info': return 'rgba(33, 150, 243, 0.85)';
+      default: return 'rgba(33, 150, 243, 0.85)';
     }
   };
   
@@ -79,13 +79,10 @@ export default function Toast({
         }
       ]}
     >
-      <View style={styles.content}>
-        <Ionicons name={getIcon()} size={24} color="white" style={styles.icon} />
-        <Text style={styles.message}>{message}</Text>
-      </View>
-      
-      <TouchableOpacity onPress={hideToast} style={styles.closeButton}>
-        <Ionicons name="close" size={20} color="white" />
+      <Ionicons name={getIcon()} size={16} color="white" style={styles.icon} />
+      <Text numberOfLines={1} ellipsizeMode="tail" style={styles.message}>{message}</Text>
+      <TouchableOpacity onPress={hideToast} hitSlop={{top: 15, bottom: 15, left: 15, right: 15}}>
+        <Ionicons name="close" size={16} color="white" />
       </TouchableOpacity>
     </Animated.View>
   );
@@ -94,39 +91,32 @@ export default function Toast({
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
-    bottom: 80,
+    bottom: 50,
     left: 20,
     right: 20,
-    padding: 16,
-    borderRadius: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 20,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 1,
     },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-    zIndex: 1000,
-  },
-  content: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
+    shadowOpacity: 0.12,
+    shadowRadius: 2,
+    elevation: 2,
+    zIndex: 999,
+    maxHeight: 40,
   },
   icon: {
-    marginRight: 10,
+    marginRight: 8,
   },
   message: {
     color: 'white',
-    fontSize: 14,
-    fontFamily: 'K2D-Regular',
+    fontSize: 13,
     flex: 1,
-  },
-  closeButton: {
-    paddingLeft: 10,
   },
 });
