@@ -10,7 +10,6 @@ async function testAuth() {
     // Test user data
     const email = `test${Date.now()}@example.com`;
     const password = 'password123';
-    const username = `user${Date.now()}`;
     
     // Register a new user
     console.log(`Attempting to register at: ${API_URL}/api/auth/register`);
