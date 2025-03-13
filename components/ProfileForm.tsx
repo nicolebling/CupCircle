@@ -39,7 +39,7 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
   const [experienceLevel, setExperienceLevel] = useState('');
   const [education, setEducation] = useState('');
   const [city, setCity] = useState('');
-  const [website, setWebsite] = useState('');
+  // Removed website state as it's no longer in the schema
   const [industryCategories, setIndustryCategories] = useState<string[]>([]);
   const [skills, setSkills] = useState<string[]>([]);
   const [neighborhoods, setNeighborhoods] = useState<string[]>([]);
@@ -56,6 +56,7 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
   const fetchProfile = async () => {
     try {
       setLoading(true);
+      console.log('Fetching profile for user ID:', userId);
 
       const { data, error } = await supabase
         .from('profiles')
@@ -68,22 +69,27 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
         throw error;
       }
 
+      console.log('Profile fetched:', data);
+
       if (data) {
         setName(data.name || '');
         setUsername(data.username || '');
-        setAvatar(data.avatar_url || '');
+        // Use photo_url instead of avatar_url
+        setAvatar(data.photo_url || '');
         setOccupation(data.occupation || '');
         setBio(data.bio || '');
         setAge(data.age ? data.age.toString() : '');
         setExperienceLevel(data.experience_level || '');
         setEducation(data.education || '');
         setCity(data.city || '');
-        setWebsite(data.website || '');
+        // Remove setting website as it's no longer in the schema
         setIndustryCategories(data.industry_categories || []);
         setSkills(data.skills || []);
         setNeighborhoods(data.neighborhoods || []);
         setFavoriteCafes(data.favorite_cafes || []);
         setInterests(data.interests || []);
+        
+        console.log('Profile data loaded into form state');
       }
     } catch (error) {
       console.error('Failed to fetch profile:', error);
@@ -194,12 +200,15 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
 
       const ageNumber = age ? parseInt(age) : null;
 
+      // Log what we're about to save
+      console.log('Preparing to save profile for user ID:', userId);
+
       const profileData = {
         id: userId,
         name,
         username,
-        avatar_url: avatar,
-        website,
+        // Removed avatar_url as it's no longer in the schema
+        // Removed website as it's no longer in the schema
         occupation,
         photo_url: avatar,
         bio,
@@ -214,18 +223,24 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
         interests,
         updated_at: new Date(),
       };
+      
+      console.log('Profile data being sent:', JSON.stringify(profileData, null, 2));
 
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('profiles')
-        .upsert(profileData, { onConflict: 'id' });
+        .upsert(profileData, { onConflict: 'id' })
+        .select();
 
       if (error) {
+        console.error('Supabase error response:', error);
         throw error;
       }
 
+      console.log('Profile saved successfully:', data);
       Alert.alert('Success', 'Your profile has been saved');
 
       // Redirect to the matching page
+      console.log('Redirecting to matching page');
       router.replace('/(tabs)/matching');
     } catch (error) {
       console.error('Error saving profile:', error);
@@ -304,17 +319,7 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
               />
             </View>
 
-            <View style={styles.inputGroup}>
-              <Text style={[styles.label, isDark && styles.textDark]}>Website</Text>
-              <TextInput
-                style={[styles.input, isDark && styles.inputDark]}
-                value={website}
-                onChangeText={setWebsite}
-                placeholder="Your website or portfolio"
-                placeholderTextColor={isDark ? '#999' : '#777'}
-                keyboardType="url"
-              />
-            </View>
+            {/* Website field removed as it's no longer in the schema */}
 
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isDark && styles.textDark]}>Age</Text>
