@@ -14,12 +14,12 @@ async function testAuth() {
     
     // Register a new user
     console.log(`Attempting to register at: ${API_URL}/api/auth/register`);
-    console.log(`Data: ${JSON.stringify({ email, password, username })}`);
+    console.log(`Data: ${JSON.stringify({ email, password })}`);
     
     const registerResponse = await fetch(`${API_URL}/api/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password, username }),
+      body: JSON.stringify({ email, password }),
     });
     
     if (!registerResponse.ok) {

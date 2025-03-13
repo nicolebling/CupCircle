@@ -64,7 +64,7 @@ app.post('/api/auth/login', async (req, res) => {
 app.post('/api/auth/register', async (req, res) => {
   try {
     console.log('Register endpoint hit with body:', req.body);
-    const { email, password, username } = req.body;
+    const { email, password } = req.body;
     
     if (!email || !password) {
       console.error('Missing email or password in request');
@@ -84,16 +84,12 @@ app.post('/api/auth/register', async (req, res) => {
     console.log('Hashing password');
     const hashedPassword = await bcrypt.hash(password, 10);
     
-    // Generate a username if not provided
-    const usernameToUse = username || email.split('@')[0];
-    console.log('Using username:', usernameToUse);
-    
     // Insert new user
     console.log('Inserting new user');
     try {
       const result = await pool.query(
-        'INSERT INTO users (email, password, username) VALUES ($1, $2, $3) RETURNING id, email, username',
-        [email, hashedPassword, usernameToUse]
+        'INSERT INTO users (email, password) VALUES ($1, $2) RETURNING id, email',
+        [email, hashedPassword]
       );
       
       console.log('User registered successfully:', result.rows[0]);

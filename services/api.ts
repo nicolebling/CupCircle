@@ -39,23 +39,20 @@ export const authService = {
   },
   
   // Register function
-  async register(email: string, password: string, username?: string) {
+  async register(email: string, password: string) {
     try {
       // For development, use mockAuthService if API is not available
       if (!API_URL.includes('replit.dev')) {
         console.log('Using mock auth service');
-        return mockAuthService.register(email, password, username);
+        return mockAuthService.register(email, password);
       }
-      
-      // Generate a username if not provided
-      const usernameToUse = username || email.split('@')[0];
       
       const response = await fetch(`${API_URL}/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password, username: usernameToUse }),
+        body: JSON.stringify({ email, password }),
       });
       
       if (!response.ok) {
@@ -138,8 +135,7 @@ export const mockAuthService = {
       // For development, accept any login
       return {
         id: '1',
-        email: email,
-        username: email.split('@')[0]
+        email: email
       };
     } catch (error) {
       console.error('Login error:', error);
@@ -148,13 +144,11 @@ export const mockAuthService = {
   },
   
   // Register function
-  async register(email: string, password: string, username?: string) {
+  async register(email: string, password: string) {
     try {
-      const usernameToUse = username || email.split('@')[0];
       return {
         id: Date.now().toString(),
-        email,
-        username: usernameToUse
+        email
       };
     } catch (error) {
       console.error('Register error:', error);
