@@ -1,3 +1,4 @@
+
 {
   "expo": {
     "name": "CupCircle",
@@ -9,7 +10,7 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "extra": {
-      "API_URL": "http://0.0.0.0:3000"
+      "API_URL": "http://cupcircle-api.cosanitty.replit.app"
     },
     "ios": {
       "supportsTablet": true

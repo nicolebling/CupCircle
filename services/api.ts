@@ -4,7 +4,7 @@ import { Profile } from '../models/Profile';
 
 // Base URL for API
 // Get the API URL from environment or use the Replit domain
-const API_URL = process.env.EXPO_PUBLIC_API_URL || `https://${process.env.REPLIT_DEV_DOMAIN}/api`;
+const API_URL = process.env.EXPO_PUBLIC_API_URL || `http://${process.env.REPLIT_DEV_DOMAIN}`;
 console.log('Using API URL:', API_URL);
 
 // Auth service
@@ -57,6 +57,7 @@ export const authService = {
       return await response.json();
     } catch (error) {
       console.error('Register error:', error);
+      console.log('Falling back to mock auth service');
       // Fallback to mock during development
       return mockAuthService.register(email, password);
     }
@@ -215,12 +216,13 @@ export const mockProfileService = {
         };
       } else {
         // Create new profile
+        const timestamp = new Date().toISOString();
         profiles.push({
           id: Date.now().toString(),
           user_id,
           ...profileData,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          created_at: timestamp,
+          updated_at: timestamp
         });
       }
       
