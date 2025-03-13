@@ -504,8 +504,8 @@ export default function ProfileCard({
           />
           {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
 
-           {/* Date of Birth */}
-          <Text style={[styles.label, { color: colors.secondaryText }]}>Date of Birth*</Text>
+           {/* Year of Birth */}
+          <Text style={[styles.label, { color: colors.secondaryText }]}>Year of Birth*</Text>
           <TextInput
             style={[
               styles.input,
@@ -513,7 +513,7 @@ export default function ProfileCard({
             ]}
             value={userData.birthday}
             onChangeText={(value) => handleChange('birthday', value)}
-            placeholder="MM/DD/YYYY"
+            placeholder="1990"
             placeholderTextColor={colors.secondaryText}
           />
           {errors.birthday && <Text style={styles.errorText}>{errors.birthday}</Text>}
@@ -536,8 +536,8 @@ export default function ProfileCard({
         <View style={styles.label}>
           <Text style={[styles.label, { color: colors.secondaryText }]}>Interests</Text>
           <InterestSelector
-            selectedInterests={userData.interests || []}
-            onInterestsChange={(interests) => handleChange('interests', interests)}
+            selected={userData.interests || []}
+            onChange={(interests) => handleChange('interests', interests)}
             maxInterests={10}
           />
 
@@ -572,8 +572,8 @@ export default function ProfileCard({
           {/* Experience Level */}
           <Text style={[styles.label, { color: colors.secondaryText }]}>Experience Level</Text>
           <ExperienceLevelSelector
-            selectedLevel={userData.experienceLevel || ''}
-            onLevelChange={(level) => handleChange('experienceLevel', level)}
+            selected={userData.experienceLevel || ''}
+            onChange={(level) => handleChange('experienceLevel', level)}
           />
           
           {/* Experience */}
@@ -607,9 +607,10 @@ export default function ProfileCard({
           {/* Industries */}
           <Text style={[styles.label, { color: colors.secondaryText }]}>Industries (select up to 3)</Text>
           <IndustrySelector
-            selectedIndustries={userData.industries || []}
-            onIndustriesChange={(industries) => handleChange('industries', industries)}
+            selected={userData.industries || []}
+            onChange={(industries) => handleChange('industries', industries)}
             maxSelections={3}
+            
           />
         </View>
 

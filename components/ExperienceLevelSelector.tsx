@@ -17,12 +17,12 @@ const EXPERIENCE_LEVELS = [
 ];
 
 type ExperienceLevelSelectorProps = {
-  value: string;
+  selected: string;
   onChange: (level: string) => void;
 };
 
 export default function ExperienceLevelSelector({ 
-  value, 
+  selected, 
   onChange 
 }: ExperienceLevelSelectorProps) {
   const colorScheme = useColorScheme();
@@ -31,7 +31,7 @@ export default function ExperienceLevelSelector({
   const [modalVisible, setModalVisible] = useState(false);
   
   // Find the selected level's coffee theme
-  const selectedLevelData = EXPERIENCE_LEVELS.find(item => item.level === value);
+  const selectedLevelData = EXPERIENCE_LEVELS.find(item => item.level === selected);
   
   // Handle selection
   const handleSelect = (level: string) => {
@@ -40,11 +40,11 @@ export default function ExperienceLevelSelector({
   };
   
   const getDisplayText = () => {
-    if (!value) return 'Select your experience level';
+    if (!selected) return 'Select your experience level';
     
     return selectedLevelData 
       ? `${selectedLevelData.level} (${selectedLevelData.coffeeTheme})` 
-      : value;
+      : selected;
   };
   
   return (
@@ -53,7 +53,7 @@ export default function ExperienceLevelSelector({
         style={[styles.selector, { backgroundColor: colors.background, borderColor: colors.border }]} 
         onPress={() => setModalVisible(true)}
       >
-        <Text style={[styles.selectorText, { color: value ? colors.text : colors.secondaryText }]}>
+        <Text style={[styles.selectorText, { color: selected ? colors.text : colors.secondaryText }]}>
           {getDisplayText()}
         </Text>
         <Ionicons name="chevron-down" size={20} color={colors.secondaryText} />
@@ -80,7 +80,7 @@ export default function ExperienceLevelSelector({
               data={EXPERIENCE_LEVELS}
               keyExtractor={(item) => item.level}
               renderItem={({ item }) => {
-                const isSelected = value === item.level;
+                const isSelected = selected === item.level;
                 const coffeeColor = getCoffeeColor(item.level, colors.primary);
                 
                 return (

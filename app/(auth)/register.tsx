@@ -294,6 +294,8 @@ export default function SignUpScreen() {
               </TouchableOpacity>
             </View>
 
+            
+
             {/* Already Have an Account? */}
             <View style={styles.footer}>
               <Text style={[styles.footerText, { color: theme.colors.text }]}>
