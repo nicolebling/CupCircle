@@ -1,4 +1,3 @@
-
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Profile } from '../models/Profile';
 
@@ -23,6 +22,60 @@ const API_URL = formatUrl(
 
 console.log('Using API URL:', API_URL);
 
+// Helper function to test if the API is reachable
+export const testApiConnection = async () => {
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5-second timeout
+
+    const response = await fetch(`${API_URL}/api/health-check`, {
+      signal: controller.signal
+    });
+
+    clearTimeout(timeoutId);
+    return response.ok;
+  } catch (error) {
+    console.error('API connection test failed:', error);
+    return false;
+  }
+};
+
+// Helper function for API queries
+export const apiQuery = async (endpoint: string, params?: any) => {
+  try {
+    // First test if API is reachable
+    const isApiReachable = await testApiConnection();
+    if (!isApiReachable) {
+      console.log('API is not reachable, using mock data');
+      throw new Error('MOCK_DATA_REQUIRED');
+    }
+
+    const response = await fetch(`${API_URL}${endpoint}`, {
+      method: 'GET', // Default to GET
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      ...(params && { body: JSON.stringify(params) })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'API request failed');
+    }
+
+    return await response.json();
+  } catch (error) {
+    if (error.message === 'MOCK_DATA_REQUIRED') {
+      // Handle mock data here if needed
+      console.log('Using mock data for:', endpoint);
+      return []; // Or return appropriate mock data
+    }
+    console.error('API query failed:', error);
+    throw error;
+  }
+};
+
+
 // Auth service
 export const authService = {
   // Login function
@@ -30,7 +83,7 @@ export const authService = {
     try {
       // For testing, always try to use the real API first
       console.log('Attempting to use real API service');
-      
+
       const response = await fetch(`${API_URL}/api/auth/login`, {
         method: 'POST',
         headers: {
@@ -38,11 +91,11 @@ export const authService = {
         },
         body: JSON.stringify({ email, password }),
       });
-      
+
       if (!response.ok) {
         return null;
       }
-      
+
       return await response.json();
     } catch (error) {
       console.error('Login error:', error);
@@ -50,18 +103,18 @@ export const authService = {
       return mockAuthService.login(email, password);
     }
   },
-  
+
   // Register function
   async register(email: string, password: string) {
     try {
       // For testing, always try to use the real API first
       console.log('Attempting to use real API service for registration');
       console.log('Registration endpoint:', `${API_URL}/api/auth/register`);
-      
+
       // Use a timeout to prevent hanging requests
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000); // 10-second timeout
-      
+
       const response = await fetch(`${API_URL}/api/auth/register`, {
         method: 'POST',
         headers: {
@@ -70,10 +123,10 @@ export const authService = {
         body: JSON.stringify({ email, password }),
         signal: controller.signal
       });
-      
+
       clearTimeout(timeoutId);
       console.log('Registration response status:', response.status);
-      
+
       if (!response.ok) {
         const errorText = await response.text();
         console.error('Registration API error:', errorText);
@@ -85,19 +138,19 @@ export const authService = {
         }
         throw new Error(errorData.error || 'Registration failed');
       }
-      
+
       const userData = await response.json();
       console.log('Registration successful with real API:', userData);
       return userData;
     } catch (error) {
       console.error('Register error:', error);
-      
+
       // Check if it's a certificate error (common with HTTP/HTTPS issues)
       const errorMessage = error.toString();
       if (errorMessage.includes('certificate') || errorMessage.includes('SSL')) {
         console.error('Certificate error detected. Make sure your API URL uses HTTPS.');
       }
-      
+
       console.log('Falling back to mock auth service');
       // Fallback to mock during development
       const mockUser = mockAuthService.register(email, password);
@@ -113,16 +166,16 @@ export const profileService = {
   async getProfileByUserId(userId: string) {
     try {
       if (!userId) return null;
-      
+
       // For testing, always try to use the real API first
       console.log('Attempting to use real API service for profile');
-      
+
       const response = await fetch(`${API_URL}/api/profile/${userId}`);
-      
+
       if (!response.ok) {
         return null;
       }
-      
+
       return await response.json();
     } catch (error) {
       console.error('Failed to load user profile', error);
@@ -130,13 +183,13 @@ export const profileService = {
       return mockProfileService.getProfileByUserId(userId);
     }
   },
-  
+
   // Save profile (create or update)
   async saveProfile(profileData: Partial<Profile> & { user_id: string }) {
     try {
       // For testing, always try to use the real API first
       console.log('Attempting to use real API service for profile saving');
-      
+
       const response = await fetch(`${API_URL}/api/profile`, {
         method: 'POST',
         headers: {
@@ -144,13 +197,13 @@ export const profileService = {
         },
         body: JSON.stringify(profileData),
       });
-      
+
       if (!response.ok) {
         const data = await response.json();
         console.error('Profile API error response:', data);
         throw new Error(data.error || 'Failed to save profile');
       }
-      
+
       return await response.json();
     } catch (error) {
       console.error('Failed to save profile', error);
@@ -175,7 +228,7 @@ export const mockAuthService = {
       return null;
     }
   },
-  
+
   // Register function
   async register(email: string, password: string) {
     try {
@@ -223,12 +276,12 @@ export const mockProfileService = {
       interests: ['Design', 'Art', 'Photography']
     }
   ],
-  
+
   // Get profile by user ID
   async getProfileByUserId(userId: string) {
     try {
       if (!userId) return null;
-      
+
       const storedProfiles = await AsyncStorage.getItem('@profiles');
       const profiles = storedProfiles ? JSON.parse(storedProfiles) : this.MOCK_PROFILES;
       return profiles.find((profile: any) => profile.user_id === userId) || null;
@@ -237,19 +290,19 @@ export const mockProfileService = {
       return null;
     }
   },
-  
+
   // Save profile (create or update)
   async saveProfile(profileData: any) {
     try {
       const { user_id } = profileData;
-      
+
       // Get existing profiles
       const storedProfiles = await AsyncStorage.getItem('@profiles');
       const profiles = storedProfiles ? JSON.parse(storedProfiles) : this.MOCK_PROFILES;
-      
+
       // Check if profile exists
       const existingIndex = profiles.findIndex((p: any) => p.user_id === user_id);
-      
+
       if (existingIndex >= 0) {
         // Update existing profile
         profiles[existingIndex] = {
@@ -268,10 +321,10 @@ export const mockProfileService = {
           updated_at: timestamp
         });
       }
-      
+
       // Save updated profiles
       await AsyncStorage.setItem('@profiles', JSON.stringify(profiles));
-      
+
       // Return the saved profile
       return profiles.find((p: any) => p.user_id === user_id);
     } catch (error) {

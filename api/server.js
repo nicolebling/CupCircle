@@ -112,9 +112,13 @@ app.post('/api/auth/register', async (req, res) => {
   }
 });
 
-// Profile routes
+// Health check and basic routes
 app.get('/', (req, res) => {
   res.json({ message: 'API server is running' });
+});
+
+app.get('/api/health-check', (req, res) => {
+  res.json({ status: 'ok', message: 'API server is healthy' });
 });
 
 app.get('/profile', (req, res) => {
