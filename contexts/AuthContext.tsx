@@ -97,6 +97,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Register new user
       const newUser = await authService.register(email, password);
       console.log('User registered successfully:', newUser);
+      console.log('User ID type:', typeof newUser.id);
 
       // Create user profile object without creating profile yet
       const userProfile: UserProfile = {

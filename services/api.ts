@@ -3,8 +3,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Profile } from '../models/Profile';
 
 // Base URL for API
-// Get the API URL from environment or use the Replit domain
-const API_URL = process.env.EXPO_PUBLIC_API_URL || `http://${process.env.REPLIT_DEV_DOMAIN}`;
+// Get the API URL from environment or use the configured API URL
+const API_URL = process.env.EXPO_PUBLIC_API_URL || Constants?.expoConfig?.extra?.API_URL || 'http://cupcircle-api.cosanitty.replit.app';
 console.log('Using API URL:', API_URL);
 
 // Auth service
@@ -40,6 +40,7 @@ export const authService = {
     try {
       // For testing, always try to use the real API first
       console.log('Attempting to use real API service for registration');
+      console.log('Registration endpoint:', `${API_URL}/api/auth/register`);
       
       const response = await fetch(`${API_URL}/api/auth/register`, {
         method: 'POST',
@@ -49,17 +50,30 @@ export const authService = {
         body: JSON.stringify({ email, password }),
       });
       
+      console.log('Registration response status:', response.status);
+      
       if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Registration failed');
+        const errorText = await response.text();
+        console.error('Registration API error:', errorText);
+        let errorData;
+        try {
+          errorData = JSON.parse(errorText);
+        } catch (e) {
+          errorData = { error: 'Unknown registration error' };
+        }
+        throw new Error(errorData.error || 'Registration failed');
       }
       
-      return await response.json();
+      const userData = await response.json();
+      console.log('Registration successful with real API:', userData);
+      return userData;
     } catch (error) {
       console.error('Register error:', error);
       console.log('Falling back to mock auth service');
       // Fallback to mock during development
-      return mockAuthService.register(email, password);
+      const mockUser = mockAuthService.register(email, password);
+      console.log('Created mock user:', mockUser);
+      return mockUser;
     }
   }
 };
