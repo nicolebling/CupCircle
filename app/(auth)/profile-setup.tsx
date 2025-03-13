@@ -48,24 +48,27 @@ export default function ProfileSetupScreen() {
           return;
         }
 
-        // Use upsert instead of checking and inserting
-        console.log("Creating/updating profile for user:", user.id);
-        const { error: upsertError } = await supabase
-          .from('profiles')
-          .upsert({
-            id: user.id,
-            username: user.email?.split('@')[0] || 'user',
-            full_name: '',
-            website: '',
-            avatar_url: ''
-          }, 
-          { onConflict: 'id', ignoreDuplicates: false });
+        // If profile doesn't exist, create an empty one
+        if (!data) {
+          console.log("Creating new profile for user:", user.id);
+          const { error: insertError } = await supabase
+            .from('profiles')
+            .insert({
+              id: user.id,
+              username: user.email?.split('@')[0] || 'user',
+              full_name: '',
+              website: '', // Add website column
+              avatar_url: '' // Add avatar_url column
+            });
 
-        if (upsertError) {
-          console.error("Error upserting profile:", upsertError);
-          Alert.alert('Profile Error', 'Could not set up your profile. Please try again.');
+          if (insertError) {
+            console.error("Error creating initial profile:", insertError);
+            Alert.alert('Profile Error', 'Could not create your profile. Please try again.');
+          } else {
+            console.log("Initial profile created successfully");
+          }
         } else {
-          console.log("Profile upserted successfully");
+          console.log("User already has a profile");
         }
       } catch (e) {
         console.error("Exception checking/creating profile:", e);
