@@ -73,14 +73,14 @@ export default function LoginScreen() {
       console.log("Login successful:", data)
       console.log("User session:", data.session)
       console.log("User data:", data.user)
-      
+
       // Redirect to matching page after successful login
       router.replace('/(tabs)/matching')
     }
     setLoading(false)
   }
 
- 
+
   // Hide splash screen when fonts are ready
   React.useEffect(() => {
     if (fontsLoaded) {
@@ -295,14 +295,22 @@ const styles = StyleSheet.create({
   },
   errorContainer: {
     backgroundColor: "#ffebee",
-    padding: 10,
-    borderRadius: 5,
+    padding: 12,
+    borderRadius: 10,
     marginBottom: 15,
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderLeftWidth: 4,
+    borderLeftColor: '#c62828',
+  },
+  errorIcon: {
+    marginRight: 10,
   },
   errorText: {
-    color: "#c62828",
+    color: '#c62828',
     fontFamily: "K2D-Regular",
-    textAlign: "center",
+    flex: 1,
+    fontSize: 14,
   },
   inputContainer: {
     marginBottom: 15,

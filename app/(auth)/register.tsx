@@ -66,12 +66,12 @@ export default function SignUpScreen() {
       console.log("Signup successful:", data)
       const session = data.session
       const user = data.user
-      
+
       console.log("User created:", user)
       console.log("Session created:", session)
       console.log("User metadata:", user?.user_metadata)
       console.log("Authentication method:", user?.app_metadata)
-      
+
       if (!session) {
         console.log("Email verification required - no session created yet")
         Alert.alert('Please check your inbox for email verification!')
@@ -317,14 +317,22 @@ const styles = StyleSheet.create({
   },
   errorContainer: {
     backgroundColor: "#ffebee",
-    padding: 10,
-    borderRadius: 5,
+    padding: 12,
+    borderRadius: 10,
     marginBottom: 15,
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderLeftWidth: 4,
+    borderLeftColor: '#c62828',
+  },
+  errorIcon: {
+    marginRight: 10,
   },
   errorText: {
-    color: "#c62828",
+    color: '#c62828',
     fontFamily: "K2D-Regular",
-    textAlign: "center",
+    flex: 1,
+    fontSize: 14,
   },
   inputContainer: {
     marginBottom: 15,
