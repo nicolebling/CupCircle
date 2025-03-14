@@ -65,8 +65,6 @@ export default function RootLayout() {
           <Stack.Screen name="(auth)" options={{ headerShown: false }} />
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="+not-found" options={{ title: 'Not Found' }} />
-          {/* Profile setup is now optional */}
-          <Stack.Screen name="profile-setup" options={{ title: 'Complete Profile' }} />
         </Stack>
         <StatusBar style="auto" />
       </ThemeProvider>
