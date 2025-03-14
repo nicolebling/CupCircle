@@ -312,6 +312,8 @@ export default function ProfileCard({
     return true;
   };
 
+  const { user } = useAuth();
+
   const saveProfile = async () => {
     if (!validateForm()) return;
 
@@ -319,7 +321,6 @@ export default function ProfileCard({
       setLoading(true);
       setError("");
       
-      const { user } = useAuth();
       if (!user?.id) {
         setError("User not authenticated");
         return;
