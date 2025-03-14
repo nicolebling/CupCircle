@@ -392,17 +392,17 @@ export default function ProfileCard({
                 <Text style={[styles.label, { color: colors.secondaryText }]}>Experience Level</Text>
                 <View style={styles.coffeeExperienceContainer}>
                   <Text style={[styles.value, { color: colors.text }]}>
-                    {profile.experienceLevel}
+                    {profile.experienceLevel || ''}
                   </Text>
                   {/* Display coffee theme based on experience level */}
                   <View style={[styles.coffeeBadge, { 
-                    backgroundColor: getCoffeeColor(profile.experienceLevel) + '20' 
+                    backgroundColor: getCoffeeColor(profile.experienceLevel || '') + '20' 
                   }]}>
-                    <Ionicons name="cafe" size={14} color={getCoffeeColor(profile.experienceLevel)} />
+                    <Ionicons name="cafe" size={14} color={getCoffeeColor(profile.experienceLevel || '')} />
                     <Text style={[styles.coffeeBadgeText, { 
-                      color: getCoffeeColor(profile.experienceLevel) 
+                      color: getCoffeeColor(profile.experienceLevel || '') 
                     }]}>
-                      {getCoffeeTheme(profile.experienceLevel)}
+                      {getCoffeeTheme(profile.experienceLevel || '')}
                     </Text>
                   </View>
                 </View>
