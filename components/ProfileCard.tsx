@@ -106,6 +106,35 @@ export default function ProfileCard({
   const colors = Colors[colorScheme];
 
   const [userData, setUserData] = useState<UserProfileData>(profile);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const { data: session } = await supabase.auth.getSession();
+        if (!session?.user) return;
+
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
+
+        if (error) {
+          console.error('Error fetching profile:', error);
+          return;
+        }
+
+        console.log('Profile data fetched:', data);
+        setUserData(data);
+      } catch (error) {
+        console.error('Error in fetchProfile:', error);
+      }
+    };
+
+    if (isUserProfile && !isEditMode) {
+      fetchProfile();
+    }
+  }, [isUserProfile, isEditMode, supabase]);
   const [isSaving, setIsSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false); // Added loading state
