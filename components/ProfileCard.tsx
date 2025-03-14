@@ -142,7 +142,6 @@ export default function ProfileCard({
   const [userData, setUserData] = useState<UserProfileData>(profile);
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState("");
-  const [username, setUsername] = useState("");
   const [avatar, setAvatar] = useState("");
   const [occupation, setOccupation] = useState("");
   const [bio, setBio] = useState("");
@@ -326,7 +325,6 @@ export default function ProfileCard({
       const profileData = {
         id: userId,
         name,
-        username,
         occupation,
         photo_url: avatar,
         bio,
