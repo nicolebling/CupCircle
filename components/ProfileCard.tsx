@@ -101,7 +101,6 @@ type ProfileCardProps = {
   onCancel?: () => void;
   onLike?: () => void;
   onSkip?: () => void;
-  supabase: any; //Added supabase client prop
   userId: string;
   isNewUser?: boolean;
 };
@@ -133,7 +132,6 @@ export default function ProfileCard({
   onCancel,
   onLike,
   onSkip,
-  supabase = null, // Added supabase client prop
   userId,
   isNewUser = true,
 }: ProfileCardProps) {
@@ -280,9 +278,6 @@ export default function ProfileCard({
 
       const response = await fetch(uri);
       const blob = await response.blob();
-
-      // Import supabase client from lib
-      const { supabase } = await import('@/lib/supabase');
 
       const { error: uploadError } = await supabase.storage
         .from("avatars")
@@ -432,45 +427,6 @@ export default function ProfileCard({
     return Object.keys(newErrors).length === 0;
   };
 
-  // const handleSave = async () => {
-  //   if (!validateForm()) return;
-
-  //   setLoading(true); // Set loading state to true
-  //   setError('');     // Clear any previous errors
-
-  //   try {
-  //     const profileData = {
-  //       id: profile.id,
-  //       name: userData.name,
-  //       photo_url: userData.photo,
-  //       bio: userData.bio,
-  //       occupation: userData.occupation,
-  //       industry_categories: userData.industries,
-  //       interests: userData.interests,
-  //       neighborhoods: userData.neighborhoods,
-  //       favorite_cafes: userData.favoriteCafes,
-  //       updated_at: new Date()
-  //     };
-
-  //     const { data, error: supabaseError } = await supabase
-  //       .from('profiles')
-  //       .upsert(profileData)
-  //       .select()
-  //       .single();
-
-  //     if (supabaseError) {
-  //       throw supabaseError;
-  //     }
-
-  //     console.log('Profile saved successfully:', data);
-  //     onSave?.(userData); // Pass updated userData
-  //   } catch (err) {
-  //     console.error('Error saving profile:', err);
-  //     setError('Failed to save profile. Please try again.');
-  //   } finally {
-  //     setLoading(false); // Set loading state to false
-  //   }
-  // };
 
   // For matching view
   if (!isUserProfile && !isEditMode && !isOnboarding) {
@@ -1143,25 +1099,6 @@ export default function ProfileCard({
           />
 
           {/* Experience */}
-          {/* <Text style={[styles.label, { color: colors.secondaryText }]}>
-            Experience
-          </Text>
-          <TextInput
-            style={[
-              styles.textArea,
-              {
-                backgroundColor: colors.background,
-                color: colors.text,
-                borderColor: colors.border,
-              },
-            ]}
-            value={userData.experience}
-            onChangeText={(value) => handleChange("experience", value)}
-            placeholder="Your professional experience"
-            placeholderTextColor={colors.secondaryText}
-            multiline
-            numberOfLines={4}
-          /> */}
 
           {/* Education */}
           <Text style={[styles.label, { color: colors.secondaryText }]}>
@@ -1198,7 +1135,7 @@ export default function ProfileCard({
           <Text style={[styles.sectionTitle, { color: colors.text }]}>
             Location Preferences
           </Text>
-         
+
           {/* Neighborhoods */}
           <View>
             <Text style={[styles.label, { color: colors.secondaryText }]}>Neighborhoods</Text>
@@ -1233,7 +1170,7 @@ export default function ProfileCard({
           </View>
            </View>
 
-          
+
         {/* Cafes */}
          <View>
              <Text style={[styles.label, { color: colors.secondaryText }]}>Favorite Cafes</Text>
@@ -1491,10 +1428,13 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     marginRight: 8,
     marginBottom: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   tagText: {
     fontFamily: "K2D-Medium",
     fontSize: 12,
+    marginRight: 4,
   },
   input: {
     height: 48,
@@ -1571,6 +1511,8 @@ const styles = StyleSheet.create({
   },
   tagInput: {
     flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
   },
   avatarContainer: {
     alignItems: 'center',
