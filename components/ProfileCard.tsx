@@ -326,15 +326,15 @@ export default function ProfileCard({
       setLoading(true);
       setError("");
       
-      const { data: session } = await supabase.auth.getSession();
-      if (!session?.user?.id) {
-        console.error("No authenticated session found");
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user?.id) {
+        console.error("No authenticated user found:", userError?.message);
         setError("Please sign in to save your profile");
         return;
       }
 
-      console.log("Current session:", session);
-      console.log("Using user ID:", session.user.id);
+      console.log("Current user:", user);
+      console.log("Using user ID:", user.id);
 
       const ageNumber = age ? parseInt(age) : null;
       console.log("Parsed age:", ageNumber);
