@@ -109,9 +109,17 @@ export default function ProfileCard({
 
   useEffect(() => {
     const fetchProfile = async () => {
+      if (!supabase) {
+        console.error('Supabase client not initialized');
+        return;
+      }
+
       try {
-        const { data: session } = await supabase.auth.getSession();
-        if (!session?.user) return;
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.user) {
+          console.log('No active session');
+          return;
+        }
 
         const { data, error } = await supabase
           .from('profiles')
