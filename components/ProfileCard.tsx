@@ -23,6 +23,7 @@ import { Ionicons } from "@expo/vector-icons";
 import IndustrySelector from "./IndustrySelector";
 import ExperienceLevelSelector from "./ExperienceLevelSelector";
 import InterestSelector from "./InterestSelector";
+import { useAuth } from "@/contexts/AuthContext";
 
 const { width } = Dimensions.get("window");
 
@@ -317,10 +318,16 @@ export default function ProfileCard({
     try {
       setLoading(true);
       setError("");
+      
+      const { user } = useAuth();
+      if (!user?.id) {
+        setError("User not authenticated");
+        return;
+      }
 
       const ageNumber = age ? parseInt(age) : null;
 
-      console.log("Preparing to save profile for user ID:", userId);
+      console.log("Preparing to save profile for user ID:", user.id);
 
       const profileData = {
         id: userId,
