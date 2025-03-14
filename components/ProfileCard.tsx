@@ -138,6 +138,7 @@ export default function ProfileCard({
   isNewUser = true,
 }: ProfileCardProps) {
   const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme];
   const isDark = colorScheme === "dark";
 
   const [userData, setUserData] = useState<UserProfileData>(profile);
@@ -416,7 +417,7 @@ export default function ProfileCard({
 
     if (!userData.name) newErrors.name = "Name is required";
     if (isUserProfile && !userData.birthday)
-      newErrors.birthday = "Birthday is required";
+      newErrors.age = "Age is required";
     if (!userData.occupation) newErrors.occupation = "Occupation is required";
     if (!userData.bio) newErrors.bio = "Bio is required";
     if (userData.bio.length > 500)
@@ -1031,16 +1032,16 @@ export default function ProfileCard({
                 borderColor: errors.name ? "red" : colors.border,
               },
             ]}
-            value={userData.name}
-            onChangeText={(value) => handleChange("name", value)}
-            placeholder="Your full name"
+            value={name}
+            onChangeText={setName}
+            placeholder="Your name"
             placeholderTextColor={colors.secondaryText}
           />
           {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
 
-          {/* Year of Birth */}
+          {/* Age */}
           <Text style={[styles.label, { color: colors.secondaryText }]}>
-            Year of Birth*
+            Age*
           </Text>
           <TextInput
             style={[
@@ -1051,9 +1052,9 @@ export default function ProfileCard({
                 borderColor: errors.birthday ? "red" : colors.border,
               },
             ]}
-            value={userData.birthday}
-            onChangeText={(value) => handleChange("birthday", value)}
-            placeholder="1990"
+            value={age}
+            onChangeText={setAge}
+            placeholder="Your Age"
             placeholderTextColor={colors.secondaryText}
           />
           {errors.birthday && (
@@ -1073,9 +1074,9 @@ export default function ProfileCard({
                 borderColor: errors.occupation ? "red" : colors.border,
               },
             ]}
-            value={userData.occupation}
-            onChangeText={(value) => handleChange("occupation", value)}
-            placeholder="Your job title"
+            value={occupation}
+            onChangeText={setOccupation}
+            placeholder="Your Occupation"
             placeholderTextColor={colors.secondaryText}
           />
           {errors.occupation && (
@@ -1088,8 +1089,8 @@ export default function ProfileCard({
               Interests
             </Text>
             <InterestSelector
-              selected={userData.interests || []}
-              onChange={(interests) => handleChange("interests", interests)}
+              selected={interests || []}
+              onChange={setInterests}
               maxInterests={10}
             />
 
@@ -1106,8 +1107,8 @@ export default function ProfileCard({
                   borderColor: errors.bio ? "red" : colors.border,
                 },
               ]}
-              value={userData.bio}
-              onChangeText={(value) => handleChange("bio", value)}
+              value={bio}
+              onChangeText={setBio}
               placeholder="Tell others about yourself (max 500 characters)"
               placeholderTextColor={colors.secondaryText}
               multiline
@@ -1134,12 +1135,12 @@ export default function ProfileCard({
             Experience Level
           </Text>
           <ExperienceLevelSelector
-            selected={userData.experienceLevel || ""}
-            onChange={(level) => handleChange("experienceLevel", level)}
+            selected={experienceLevel || ""}
+            onChange={setExperienceLevel}
           />
 
           {/* Experience */}
-          <Text style={[styles.label, { color: colors.secondaryText }]}>
+          {/* <Text style={[styles.label, { color: colors.secondaryText }]}>
             Experience
           </Text>
           <TextInput
@@ -1157,7 +1158,7 @@ export default function ProfileCard({
             placeholderTextColor={colors.secondaryText}
             multiline
             numberOfLines={4}
-          />
+          /> */}
 
           {/* Education */}
           <Text style={[styles.label, { color: colors.secondaryText }]}>
@@ -1172,8 +1173,8 @@ export default function ProfileCard({
                 borderColor: colors.border,
               },
             ]}
-            value={userData.education}
-            onChangeText={(value) => handleChange("education", value)}
+            value={education}
+            onChangeText={setEducation}
             placeholder="Your education background"
             placeholderTextColor={colors.secondaryText}
           />
@@ -1183,8 +1184,8 @@ export default function ProfileCard({
             Industries (select up to 3)
           </Text>
           <IndustrySelector
-            selected={userData.industries || []}
-            onChange={(industries) => handleChange("industries", industries)}
+            selected={industryCategories || []}
+            onChange={setIndustryCategories}
             maxSelections={3}
           />
         </View>
@@ -1194,64 +1195,74 @@ export default function ProfileCard({
           <Text style={[styles.sectionTitle, { color: colors.text }]}>
             Location Preferences
           </Text>
+         
+          {/* Neighborhoods */}
+          <View>
+            <Text style={[styles.label, { color: colors.secondaryText }]}>Neighborhoods</Text>
+            <View style={styles.tagsContainer}>
+              {neighborhoods.map((neighborhood, index) => (
+                <View key={index} style={styles.tag}>
+                  <Text style={styles.tagText}>{neighborhood}</Text>
+                  <TouchableOpacity onPress={() => handleRemoveNeighborhood(index)}>
+                    <Ionicons name="close-circle" size={18} color="#fff" />
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </View>
+            <View style={styles.tagInput}>
+              <TextInput
+                style={[
+                  styles.input,
+                  {
+                    backgroundColor: colors.background,
+                    color: colors.text,
+                    borderColor: colors.border,
+                  },
+                ]}
+                placeholder="Add a neighborhood"
+                placeholderTextColor={isDark ? '#999' : '#777'}
+                onSubmitEditing={(e) => {
+                  handleAddNeighborhood(e.nativeEvent.text);
+                  e.currentTarget.clear();
+                }}
+              />
+            </View>
+          </View>
+           </View>
 
-          <Text style={[styles.label, { color: colors.secondaryText }]}>
-            Neighborhoods
-          </Text>
-          <TextInput
-            style={[
-              styles.input,
-              {
-                backgroundColor: colors.background,
-                color: colors.text,
-                borderColor: colors.border,
-              },
-            ]}
-            value={
-              userData.neighborhoods ? userData.neighborhoods.join(", ") : ""
-            }
-            onChangeText={(value) =>
-              handleChange(
-                "neighborhoods",
-                value
-                  .split(",")
-                  .map((item) => item.trim())
-                  .filter((item) => item !== ""),
-              )
-            }
-            placeholder="Downtown, Tech District, etc. (comma separated)"
-            placeholderTextColor={colors.secondaryText}
-          />
-
-          {/* Favorite Cafes */}
-          <Text style={[styles.label, { color: colors.secondaryText }]}>
-            Favorite Cafes
-          </Text>
-          <TextInput
-            style={[
-              styles.input,
-              {
-                backgroundColor: colors.background,
-                color: colors.text,
-                borderColor: colors.border,
-              },
-            ]}
-            value={
-              userData.favoriteCafes ? userData.favoriteCafes.join(", ") : ""
-            }
-            onChangeText={(value) =>
-              handleChange(
-                "favoriteCafes",
-                value
-                  .split(",")
-                  .map((item) => item.trim())
-                  .filter((item) => item !== ""),
-              )
-            }
-            placeholder="Coffee House, Bean There, etc. (comma separated)"
-            placeholderTextColor={colors.secondaryText}
-          />
-        </View>
+          
+        {/* Cafes */}
+         <View>
+             <Text style={[styles.label, { color: colors.secondaryText }]}>Favorite Cafes</Text>
+           <View style={styles.tagsContainer}>
+             {favoriteCafes.map((cafe, index) => (
+               <View key={index} style={styles.tag}>
+                 <Text style={styles.tagText}>{cafe}</Text>
+                 <TouchableOpacity onPress={() => handleRemoveCafe(index)}>
+                   <Ionicons name="close-circle" size={18} color="#fff" />
+                 </TouchableOpacity>
+               </View>
+             ))}
+           </View>
+           <View style={styles.tagInput}>
+             <TextInput
+               style={[
+                 styles.input,
+                 {
+                   backgroundColor: colors.background,
+                   color: colors.text,
+                   borderColor: colors.border,
+                 },
+               ]}
+               placeholder="Coffee House, Bean There, etc. (comma separated)"
+               placeholderTextColor={isDark ? '#999' : '#777'}
+               onSubmitEditing={(e) => {
+                 handleAddCafe(e.nativeEvent.text);
+                 e.currentTarget.clear();
+               }}
+             />
+           </View>
+         </View>
 
         {/* Save Button */}
         <View style={styles.buttonContainer}>
@@ -1553,5 +1564,47 @@ const styles = StyleSheet.create({
     fontFamily: "K2D-Medium",
     fontSize: 12,
     marginLeft: 4,
+  },
+  tagInput: {
+    flexDirection: 'row',
+  },
+  avatarContainer: {
+    alignItems: 'center',
+    marginBottom: 30,
+  },
+  avatarWrapper: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: '#f0f0f0',
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
+  },
+  avatarPlaceholder: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: '#f0f0f0',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  avatarText: {
+    marginTop: 10,
+    color: '#0097FB',
+    fontSize: 16,
+  },
+  textDark: {
+    color: '#fff',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#666',
   },
 });
