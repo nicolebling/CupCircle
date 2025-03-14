@@ -133,7 +133,7 @@ export default function ProfileCard({
   onCancel,
   onLike,
   onSkip,
-  supabase, // Added supabase client prop
+  supabase = null, // Added supabase client prop
   userId,
   isNewUser = true,
 }: ProfileCardProps) {
@@ -280,6 +280,9 @@ export default function ProfileCard({
 
       const response = await fetch(uri);
       const blob = await response.blob();
+
+      // Import supabase client from lib
+      const { supabase } = await import('@/lib/supabase');
 
       const { error: uploadError } = await supabase.storage
         .from("avatars")
