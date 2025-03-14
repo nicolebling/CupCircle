@@ -1267,16 +1267,17 @@ export default function ProfileCard({
         {/* Save Button */}
         <View style={styles.buttonContainer}>
           <Button
-            title={loading ? "Saving..." : "Save Profile"} // Updated button title
+            title={loading ? "Saving..." : "Save Profile"}
             onPress={saveProfile}
-            disabled={loading} // Disabled while saving
+            disabled={loading}
             style={styles.saveButton}
           />
           {loading && (
             <ActivityIndicator color={colors.primary} style={styles.spinner} />
           )}
-          {error && <Text style={styles.errorText}>{error}</Text>}{" "}
-          {/* Display error message */}
+          <View>
+            {error && <Text style={styles.errorText}>{error}</Text>}
+          </View>
         </View>
 
         {/* Error Summary */}
