@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, SafeAreaView, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { router } from 'expo-router';
@@ -6,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import Colors from '@/constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
 import InterestSelector from '@/components/InterestSelector';
+import IndustrySelector from '@/components/IndustrySelector'; // Import IndustrySelector
 
 export default function OnboardingScreen() {
   const { user, updateUser } = useAuth();
@@ -16,6 +16,7 @@ export default function OnboardingScreen() {
     occupation: '',
     bio: '',
     interests: [] as string[],
+    industry_categories: [], // Add industry_categories to profileData
     photo: 'https://randomuser.me/api/portraits/lego/1.jpg', // Default avatar
   });
   const colors = Colors.light;
@@ -47,6 +48,11 @@ export default function OnboardingScreen() {
     }
   };
 
+  const handleInputChange = (field, value) => {
+    setProfileData({...profileData, [field]: value});
+  };
+
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <KeyboardAvoidingView
@@ -64,7 +70,7 @@ export default function OnboardingScreen() {
           {step === 1 && (
             <View style={styles.formSection}>
               <Text style={[styles.sectionTitle, { color: colors.text }]}>Basic Information</Text>
-              
+
               <Text style={[styles.label, { color: colors.text }]}>Full Name</Text>
               <TextInput
                 style={[styles.input, { backgroundColor: colors.card, color: colors.text, borderColor: colors.border }]}
@@ -73,7 +79,7 @@ export default function OnboardingScreen() {
                 value={profileData.name}
                 onChangeText={(text) => setProfileData({ ...profileData, name: text })}
               />
-              
+
               <Text style={[styles.label, { color: colors.text }]}>Occupation</Text>
               <TextInput
                 style={[styles.input, { backgroundColor: colors.card, color: colors.text, borderColor: colors.border }]}
@@ -88,7 +94,7 @@ export default function OnboardingScreen() {
           {step === 2 && (
             <View style={styles.formSection}>
               <Text style={[styles.sectionTitle, { color: colors.text }]}>About You</Text>
-              
+
               <Text style={[styles.label, { color: colors.text }]}>Bio</Text>
               <TextInput
                 style={[styles.textArea, { backgroundColor: colors.card, color: colors.text, borderColor: colors.border }]}
@@ -109,7 +115,7 @@ export default function OnboardingScreen() {
               <Text style={[styles.description, { color: colors.secondaryText }]}>
                 Add interests that will help connect you with like-minded professionals
               </Text>
-              
+
               <InterestSelector
                 selectedInterests={profileData.interests}
                 onInterestsChange={(interests) => setProfileData({...profileData, interests})}
@@ -118,6 +124,15 @@ export default function OnboardingScreen() {
               <Text style={[styles.helperText, { color: colors.secondaryText }]}>
                 Select up to 5 interests that will help connect you with like-minded professionals
               </Text>
+              <View style={styles.inputGroup}> {/* Placeholder for IndustrySelector */}
+                <Text style={[styles.label, { color: colors.text }]}>Industries</Text>
+                <IndustrySelector
+                  selected={profileData.industry_categories || []}
+                  onChange={(industries) => handleInputChange('industry_categories', industries)}
+                  maxSelections={3}
+                  isDark={false} // Assuming light theme by default.  Needs proper theme integration.
+                />
+              </View>
             </View>
           )}
 
@@ -130,7 +145,7 @@ export default function OnboardingScreen() {
                 <Text style={[styles.backButtonText, { color: colors.text }]}>Back</Text>
               </TouchableOpacity>
             )}
-            
+
             <TouchableOpacity 
               style={[
                 styles.nextButton, 
@@ -292,5 +307,8 @@ const styles = StyleSheet.create({
   },
   loadingIcon: {
     marginLeft: 8,
+  },
+  inputGroup: {
+    marginBottom: 16,
   }
 });
