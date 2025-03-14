@@ -3,7 +3,6 @@ import { query } from '../services/database';
 
 export interface Profile {
   id: string;
-  user_id: string;
   name: string;
   age?: number;
   occupation?: string;
