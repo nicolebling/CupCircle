@@ -83,7 +83,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       await AsyncStorage.setItem('@user', JSON.stringify(authenticatedUser));
       setUser(authenticatedUser);
-      router.replace('/profile-setup');
+      router.replace('/(tabs)/matching');
 
     } catch (error) {
       console.error('Login failed', error);
@@ -101,7 +101,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       await AsyncStorage.setItem('@user', JSON.stringify(newUser));
       setUser(newUser);
-      router.replace('/profile-setup');
+      router.replace('/(tabs)/matching');
 
     } catch (error) {
       console.error('Registration failed', error);

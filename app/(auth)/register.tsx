@@ -115,7 +115,7 @@ export default function SignUpScreen() {
           }
         }
 
-        router.replace('/(auth)/profile-setup');
+        router.replace('/(tabs)/matching');
       }
     } catch (e) {
       console.error("Signup exception:", e)
