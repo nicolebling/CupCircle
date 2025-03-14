@@ -27,6 +27,9 @@ import { useAuth } from "@/contexts/AuthContext";
 
 const { width } = Dimensions.get("window");
 
+// Get auth context at component level
+const { user } = useAuth();
+
 // Function to get coffee theme based on experience level
 const getCoffeeTheme = (level: string): string => {
   switch (level) {
@@ -326,12 +329,14 @@ export default function ProfileCard({
       setLoading(true);
       setError("");
       
-      console.log("Current user state:", user);
-      if (!user?.id) {
-        console.log("No user ID found in context");
+      if (!user) {
+        console.error("No authenticated user found");
         setError("User not authenticated");
         return;
       }
+
+      console.log("Current user state:", user);
+      console.log("Using user ID:", user.id);
 
       const ageNumber = age ? parseInt(age) : null;
       console.log("Parsed age:", ageNumber);
