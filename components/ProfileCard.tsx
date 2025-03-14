@@ -27,9 +27,6 @@ import { useAuth } from "@/contexts/AuthContext";
 
 const { width } = Dimensions.get("window");
 
-// Get auth context at component level
-const { user } = useAuth();
-
 // Function to get coffee theme based on experience level
 const getCoffeeTheme = (level: string): string => {
   switch (level) {
