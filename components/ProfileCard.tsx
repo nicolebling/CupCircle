@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { View, Text, Image, StyleSheet, Dimensions, TouchableOpacity, ScrollView, TextInput, ActivityIndicator } from 'react-native';
 import Colors from '@/constants/Colors';
@@ -8,6 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import IndustrySelector from './IndustrySelector';
 import ExperienceLevelSelector from './ExperienceLevelSelector';
 import InterestSelector from './InterestSelector';
+import { createClient } from '@supabase/supabase-js'; // Added Supabase import
 
 const { width } = Dimensions.get('window');
 
@@ -70,6 +70,7 @@ type ProfileCardProps = {
   onCancel?: () => void;
   onLike?: () => void;
   onSkip?: () => void;
+  supabase: any; //Added supabase client prop
 };
 
 const EMPTY_PROFILE: UserProfileData = {
@@ -98,7 +99,8 @@ export default function ProfileCard({
   onSave,
   onCancel,
   onLike,
-  onSkip
+  onSkip,
+  supabase, // Added supabase client prop
 }: ProfileCardProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
@@ -106,7 +108,9 @@ export default function ProfileCard({
   const [userData, setUserData] = useState<UserProfileData>(profile);
   const [isSaving, setIsSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  
+  const [loading, setLoading] = useState(false); // Added loading state
+  const [error, setError] = useState('');       // Added error state
+
   // Function to handle edit button press
   const handleEdit = () => {
     if (onSave) {
@@ -150,15 +154,44 @@ export default function ProfileCard({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!validateForm()) return;
 
-    setIsSaving(true);
-    // Simulate API call
-    setTimeout(() => {
-      if (onSave) onSave(userData);
-      setIsSaving(false);
-    }, 1000);
+    setLoading(true); // Set loading state to true
+    setError('');     // Clear any previous errors
+
+    try {
+      const profileData = {
+        id: profile.id,
+        name: userData.name,
+        photo_url: userData.photo,
+        bio: userData.bio,
+        occupation: userData.occupation,
+        industry_categories: userData.industries,
+        interests: userData.interests,
+        neighborhoods: userData.neighborhoods,
+        favorite_cafes: userData.favoriteCafes,
+        updated_at: new Date()
+      };
+
+      const { data, error: supabaseError } = await supabase
+        .from('profiles')
+        .upsert(profileData)
+        .select()
+        .single();
+
+      if (supabaseError) {
+        throw supabaseError;
+      }
+
+      console.log('Profile saved successfully:', data);
+      onSave?.(userData); // Pass updated userData
+    } catch (err) {
+      console.error('Error saving profile:', err);
+      setError('Failed to save profile. Please try again.');
+    } finally {
+      setLoading(false); // Set loading state to false
+    }
   };
 
   // For matching view
@@ -166,14 +199,14 @@ export default function ProfileCard({
     return (
       <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
         <Image source={{ uri: profile.photo }} style={styles.image} />
-        
+
         {profile.matchedCafe && (
           <View style={[styles.matchBadge, { backgroundColor: colors.primary }]}>
             <Ionicons name="cafe" size={14} color="white" />
             <Text style={styles.matchBadgeText}>Café Match</Text>
           </View>
         )}
-        
+
         <View style={styles.content}>
           <View style={styles.nameRow}>
             <Text style={[styles.name, { color: colors.text }]}>
@@ -186,19 +219,19 @@ export default function ProfileCard({
               </View>
             )}
           </View>
-          
+
           <View style={[styles.occupationBadge, { backgroundColor: colors.primary + '20' }]}>
             <Ionicons name="briefcase-outline" size={14} color={colors.primary} style={styles.occupationIcon} />
             <Text style={[styles.occupation, { color: colors.primary }]}>{profile.occupation}</Text>
           </View>
-          
+
           <View style={styles.divider} />
-          
+
           <Text style={[styles.sectionTitle, { color: colors.text }]}>About</Text>
           <Text style={[styles.sectionText, { color: colors.secondaryText }]} numberOfLines={3}>
             {profile.bio}
           </Text>
-          
+
           <Text style={[styles.sectionTitle, { color: colors.text }]}>Interests</Text>
           <View style={styles.interestsContainer}>
             {profile.interests && profile.interests.slice(0, 5).map((interest, index) => (
@@ -213,7 +246,7 @@ export default function ProfileCard({
               </View>
             ))}
           </View>
-          
+
           {profile.favoriteCafes && profile.favoriteCafes.length > 0 && (
             <>
               <Text style={[styles.sectionTitle, { color: colors.text }]}>Favorite Cafes</Text>
@@ -234,7 +267,7 @@ export default function ProfileCard({
               </View>
             </>
           )}
-          
+
           {profile.neighborhoods && profile.neighborhoods.length > 0 && (
             <>
               <Text style={[styles.sectionTitle, { color: colors.text }]}>Neighborhoods</Text>
@@ -255,7 +288,7 @@ export default function ProfileCard({
               </View>
             </>
           )}
-          
+
           {profile.experience && (
             <>
               <Text style={[styles.sectionTitle, { color: colors.text }]}>Experience</Text>
@@ -265,7 +298,7 @@ export default function ProfileCard({
             </>
           )}
         </View>
-        
+
         {onLike && onSkip && (
           <View style={styles.buttonsContainer}>
             <TouchableOpacity 
@@ -274,7 +307,7 @@ export default function ProfileCard({
             >
               <Ionicons name="close" size={24} color="#EF4444" />
             </TouchableOpacity>
-            
+
             <TouchableOpacity 
               onPress={onLike} 
               style={[styles.actionButton, styles.likeButton, { backgroundColor: '#DCFCE7' }]}
@@ -353,7 +386,7 @@ export default function ProfileCard({
           {/* Professional Details */}
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>Professional Details</Text>
-            
+
             {profile.experienceLevel && (
               <>
                 <Text style={[styles.label, { color: colors.secondaryText }]}>Experience Level</Text>
@@ -420,7 +453,7 @@ export default function ProfileCard({
           {/* Location */}
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>Location Preferences</Text>
-            
+
             {profile.city && (
               <>
                 <Text style={[styles.label, { color: colors.secondaryText }]}>City</Text>
@@ -455,7 +488,7 @@ export default function ProfileCard({
             )}
           </View>
 
-          
+
         </View>
       </ScrollView>
     );
@@ -561,21 +594,21 @@ export default function ProfileCard({
           </Text>
           {errors.bio && <Text style={styles.errorText}>{errors.bio}</Text>}
           </View>
-          
+
         </View>
- 
+
 
         {/* Professional Details */}
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>Professional Details</Text>
-          
+
           {/* Experience Level */}
           <Text style={[styles.label, { color: colors.secondaryText }]}>Experience Level</Text>
           <ExperienceLevelSelector
             selected={userData.experienceLevel || ''}
             onChange={(level) => handleChange('experienceLevel', level)}
           />
-          
+
           {/* Experience */}
           <Text style={[styles.label, { color: colors.secondaryText }]}>Experience</Text>
           <TextInput
@@ -590,7 +623,7 @@ export default function ProfileCard({
             multiline
             numberOfLines={4}
           />
-          
+
           {/* Education */}
           <Text style={[styles.label, { color: colors.secondaryText }]}>Education</Text>
           <TextInput
@@ -603,21 +636,21 @@ export default function ProfileCard({
             placeholder="Your education background"
             placeholderTextColor={colors.secondaryText}
           />
-          
+
           {/* Industries */}
           <Text style={[styles.label, { color: colors.secondaryText }]}>Industries (select up to 3)</Text>
           <IndustrySelector
             selected={userData.industries || []}
             onChange={(industries) => handleChange('industries', industries)}
             maxSelections={3}
-            
+
           />
         </View>
 
         {/* Location Preferences */}
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>Location Preferences</Text>
-          
+
           <Text style={[styles.label, { color: colors.secondaryText }]}>Neighborhoods</Text>
           <TextInput
             style={[
@@ -629,7 +662,7 @@ export default function ProfileCard({
             placeholder="Downtown, Tech District, etc. (comma separated)"
             placeholderTextColor={colors.secondaryText}
           />
-          
+
           {/* Favorite Cafes */}
           <Text style={[styles.label, { color: colors.secondaryText }]}>Favorite Cafes</Text>
           <TextInput
@@ -647,12 +680,13 @@ export default function ProfileCard({
         {/* Save Button */}
         <View style={styles.buttonContainer}>
           <Button
-            title={isSaving ? 'Saving...' : 'Save Profile'}
+            title={loading ? 'Saving...' : 'Save Profile'} // Updated button title
             onPress={handleSave}
-            disabled={isSaving}
+            disabled={loading} // Disabled while saving
             style={styles.saveButton}
           />
-          {isSaving && <ActivityIndicator color={colors.primary} style={styles.spinner} />}
+          {loading && <ActivityIndicator color={colors.primary} style={styles.spinner} />}
+          {error && <Text style={styles.errorText}>{error}</Text>} {/* Display error message */}
         </View>
 
         {/* Error Summary */}
@@ -698,7 +732,7 @@ const styles = StyleSheet.create({
     fontFamily: 'K2D-Bold',
     fontSize: 24,
   },
-  
+
   // Matching card styles
   image: {
     width: '100%',
@@ -815,7 +849,7 @@ const styles = StyleSheet.create({
   likeButton: {
     // Styles specific to like button
   },
-  
+
   // User profile styles
   photoContainer: {
     alignItems: 'center',
@@ -880,8 +914,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 12,
-    paddingTop: 12,
-    marginBottom: 8,
+    paddingTop: 12,marginBottom: 8,
     fontFamily: 'K2D-Regular',
     fontSize: 16,
     textAlignVertical: 'top',
