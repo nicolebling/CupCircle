@@ -9,7 +9,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
+
 export default function ProfileScreen() {
+  
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const { user } = useAuth();
