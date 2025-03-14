@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -20,37 +21,65 @@ import IndustrySelector from '@/components/IndustrySelector';
 import InterestSelector from '@/components/InterestSelector';
 import ExperienceLevelSelector from '@/components/ExperienceLevelSelector';
 
+export type ProfileFormData = {
+  name: string;
+  username: string;
+  photo_url?: string;
+  occupation: string;
+  bio: string;
+  age?: string;
+  experience_level: string;
+  education: string;
+  city: string;
+  industry_categories: string[];
+  skills: string[];
+  neighborhoods: string[];
+  favorite_cafes: string[];
+  interests: string[];
+};
+
 type ProfileFormProps = {
   userId: string;
   isNewUser?: boolean;
+  initialData?: Partial<ProfileFormData>;
+  onSaveComplete?: (profile: ProfileFormData) => void;
+  onCancel?: () => void;
+  redirectPath?: string;
 };
 
-export default function ProfileForm({ userId, isNewUser = true }: ProfileFormProps) {
+export default function ProfileForm({ 
+  userId, 
+  isNewUser = true, 
+  initialData = {}, 
+  onSaveComplete,
+  onCancel,
+  redirectPath = '/(tabs)/matching'
+}: ProfileFormProps) {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
 
   const [loading, setLoading] = useState(false);
-  const [name, setName] = useState('');
-  const [username, setUsername] = useState('');
-  const [avatar, setAvatar] = useState('');
-  const [occupation, setOccupation] = useState('');
-  const [bio, setBio] = useState('');
-  const [age, setAge] = useState('');
-  const [experienceLevel, setExperienceLevel] = useState('');
-  const [education, setEducation] = useState('');
-  const [city, setCity] = useState('');
-  const [industryCategories, setIndustryCategories] = useState<string[]>([]);
-  const [skills, setSkills] = useState<string[]>([]);
-  const [neighborhoods, setNeighborhoods] = useState<string[]>([]);
-  const [favoriteCafes, setFavoriteCafes] = useState<string[]>([]);
-  const [interests, setInterests] = useState<string[]>([]);
+  const [name, setName] = useState(initialData.name || '');
+  const [username, setUsername] = useState(initialData.username || '');
+  const [avatar, setAvatar] = useState(initialData.photo_url || '');
+  const [occupation, setOccupation] = useState(initialData.occupation || '');
+  const [bio, setBio] = useState(initialData.bio || '');
+  const [age, setAge] = useState(initialData.age || '');
+  const [experienceLevel, setExperienceLevel] = useState(initialData.experience_level || '');
+  const [education, setEducation] = useState(initialData.education || '');
+  const [city, setCity] = useState(initialData.city || '');
+  const [industryCategories, setIndustryCategories] = useState<string[]>(initialData.industry_categories || []);
+  const [skills, setSkills] = useState<string[]>(initialData.skills || []);
+  const [neighborhoods, setNeighborhoods] = useState<string[]>(initialData.neighborhoods || []);
+  const [favoriteCafes, setFavoriteCafes] = useState<string[]>(initialData.favorite_cafes || []);
+  const [interests, setInterests] = useState<string[]>(initialData.interests || []);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (!isNewUser) {
+    if (!isNewUser && !initialData.name) {
       fetchProfile();
     }
-  }, [userId, isNewUser]);
+  }, [userId, isNewUser, initialData]);
 
   const fetchProfile = async () => {
     try {
@@ -196,14 +225,14 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
 
       console.log('Preparing to save profile for user ID:', userId);
 
-      const profileData = {
+      const profileData: ProfileFormData & { id: string; updated_at: Date } = {
         id: userId,
         name,
         username,
         occupation,
         photo_url: avatar,
         bio,
-        age: ageNumber,
+        age: ageNumber?.toString(),
         experience_level: experienceLevel,
         education,
         city,
@@ -231,7 +260,13 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
 
       console.log('Profile saved successfully:', data);
       Alert.alert('Success', 'Your profile has been saved');
-      router.replace('/(tabs)/matching');
+      
+      // Handle completion
+      if (onSaveComplete) {
+        onSaveComplete(profileData);
+      } else {
+        router.replace(redirectPath);
+      }
     } catch (error: any) {
       console.error('Error saving profile:', error);
       setError('Failed to save profile. Please try again.');
@@ -243,7 +278,15 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
     }
   };
 
-  if (loading && !isNewUser) {
+  const handleCancel = () => {
+    if (onCancel) {
+      onCancel();
+    } else {
+      router.back();
+    }
+  };
+
+  if (loading && !isNewUser && !initialData.name) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#0097FB" />
@@ -259,9 +302,16 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
     >
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.formContainer}>
-          <Text style={[styles.title, isDark && styles.titleDark]}>
-            {isNewUser ? 'Complete Your Profile' : 'Edit Profile'}
-          </Text>
+          <View style={styles.header}>
+            <Text style={[styles.title, isDark && styles.titleDark]}>
+              {isNewUser ? 'Complete Your Profile' : 'Edit Profile'}
+            </Text>
+            {!isNewUser && (
+              <TouchableOpacity onPress={handleCancel} style={styles.closeButton}>
+                <Ionicons name="close-outline" size={24} color={isDark ? '#fff' : '#333'} />
+              </TouchableOpacity>
+            )}
+          </View>
 
           {error ? (
             <View style={styles.errorContainer}>
@@ -490,6 +540,16 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
               <Text style={styles.buttonText}>Save Profile</Text>
             )}
           </TouchableOpacity>
+
+          {!isNewUser && (
+            <TouchableOpacity
+              style={styles.cancelButton}
+              onPress={handleCancel}
+              disabled={loading}
+            >
+              <Text style={styles.cancelButtonText}>Cancel</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -499,6 +559,17 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+    marginBottom: 20,
+  },
+  closeButton: {
+    position: 'absolute',
+    right: 0,
   },
   loadingContainer: {
     flex: 1,
@@ -516,7 +587,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 20,
     textAlign: 'center',
     color: '#333',
   },
@@ -646,4 +716,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+  cancelButton: {
+    borderWidth: 1,
+    borderColor: '#0097FB',
+    borderRadius: 8,
+    padding: 15,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  cancelButtonText: {
+    color: '#0097FB',
+    fontSize: 16,
+    fontWeight: 'bold',
+  }
 });

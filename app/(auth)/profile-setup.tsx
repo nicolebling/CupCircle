@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView, StyleSheet, View, ActivityIndicator, Text, Alert } from 'react-native';
+import { SafeAreaView, StyleSheet, View, ActivityIndicator, Text } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
@@ -11,7 +11,7 @@ export default function ProfileSetupScreen() {
   const theme = colorScheme === 'dark' ? DarkTheme : DefaultTheme;
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState(null); // Added state for user object
+  const [user, setUser] = useState(null);
 
   // Get the user ID and user object from the Supabase session
   useEffect(() => {
@@ -21,62 +21,13 @@ export default function ProfileSetupScreen() {
       if (session?.user) {
         console.log("User ID for profile setup:", session.user.id);
         setUserId(session.user.id);
-        setUser(session.user); // Set the user object
+        setUser(session.user);
       }
       setLoading(false);
     }
 
     getUserData();
   }, []);
-
-  useEffect(() => {
-    console.log("User ID for profile setup:", user?.id);
-
-    // Check if user has a profile, create one if needed
-    async function checkAndCreateProfile() {
-      if (!user) return;
-
-      try {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', user.id)
-          .single();
-
-        if (error && error.code !== 'PGRST116') {
-          console.error("Error checking for profile:", error);
-          return;
-        }
-
-        // If profile doesn't exist, create an empty one
-        if (!data) {
-          console.log("Creating new profile for user:", user.id);
-          const { error: insertError } = await supabase
-            .from('profiles')
-            .insert({
-              id: user.id,
-              username: user.email?.split('@')[0] || 'user',
-              full_name: '',
-              website: '', // Add website column
-              avatar_url: '' // Add avatar_url column
-            });
-
-          if (insertError) {
-            console.error("Error creating initial profile:", insertError);
-            Alert.alert('Profile Error', 'Could not create your profile. Please try again.');
-          } else {
-            console.log("Initial profile created successfully");
-          }
-        } else {
-          console.log("User already has a profile");
-        }
-      } catch (e) {
-        console.error("Exception checking/creating profile:", e);
-      }
-    }
-
-    checkAndCreateProfile();
-  }, [user]);
 
   if (loading) {
     return (
@@ -112,7 +63,11 @@ export default function ProfileSetupScreen() {
       <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
         <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
         <View style={styles.content}>
-          <ProfileForm userId={userId} isNewUser={true} />
+          <ProfileForm 
+            userId={userId} 
+            isNewUser={true} 
+            redirectPath="/(tabs)/matching"
+          />
         </View>
       </SafeAreaView>
     </ThemeProvider>
@@ -132,7 +87,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadingText: {
-    marginTop: 16,
+    marginTop: 10,
     fontSize: 16,
   },
   errorContainer: {
@@ -144,5 +99,5 @@ const styles = StyleSheet.create({
   errorText: {
     fontSize: 16,
     textAlign: 'center',
-  }
+  },
 });
