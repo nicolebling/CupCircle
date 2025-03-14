@@ -315,20 +315,29 @@ export default function ProfileCard({
   const { user } = useAuth();
 
   const saveProfile = async () => {
-    if (!validateForm()) return;
+    console.log("Starting saveProfile function");
+    if (!validateForm()) {
+      console.log("Form validation failed");
+      return;
+    }
 
     try {
+      console.log("Setting loading state and clearing errors");
       setLoading(true);
       setError("");
       
+      console.log("Current user state:", user);
       if (!user?.id) {
+        console.log("No user ID found in context");
         setError("User not authenticated");
         return;
       }
 
       const ageNumber = age ? parseInt(age) : null;
+      console.log("Parsed age:", ageNumber);
 
       console.log("Preparing to save profile for user ID:", user.id);
+      console.log("Auth context user data:", { user });
 
       const profileData = {
         id: userId,
@@ -353,14 +362,21 @@ export default function ProfileCard({
         JSON.stringify(profileData, null, 2),
       );
 
+      console.log("Profile data being sent to Supabase:", JSON.stringify(profileData, null, 2));
+      
       const { data, error } = await supabase
         .from("profiles")
         .upsert(profileData, { onConflict: "id" })
         .select();
 
+      console.log("Supabase response:", { data, error });
+
       if (error) {
         console.error("Supabase error response:", error);
-        console.error("Error details:", JSON.stringify(error));
+        console.error("Error details:", JSON.stringify(error, null, 2));
+        console.error("Error code:", error.code);
+        console.error("Error message:", error.message);
+        console.error("Error hint:", error.hint);
         Alert.alert(
           "Profile Save Error",
           error?.message || "Failed to save profile. Please try again.",
