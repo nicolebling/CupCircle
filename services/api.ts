@@ -41,12 +41,16 @@ export const authService = {
   // Register function
   async register(email: string, password: string) {
     try {
+      console.log('Register attempt for email:', email);
+      console.log('API URL:', API_URL);
+      
       // For development, use mockAuthService if API is not available
       if (!API_URL.includes('replit.dev')) {
-        console.log('Using mock auth service');
+        console.log('Using mock auth service (API URL not configured)');
         return mockAuthService.register(email, password);
       }
       
+      console.log('Sending registration request to:', `${API_URL}/api/auth/register`);
       const response = await fetch(`${API_URL}/api/auth/register`, {
         method: 'POST',
         headers: {
@@ -55,15 +59,23 @@ export const authService = {
         body: JSON.stringify({ email, password }),
       });
       
+      console.log('Registration response status:', response.status);
+      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+      
       if (!response.ok) {
         const data = await response.json();
+        console.error('Registration failed - Server response:', data);
         throw new Error(data.error || 'Registration failed');
       }
       
-      return await response.json();
+      const userData = await response.json();
+      console.log('Registration successful - User data:', userData);
+      return userData;
     } catch (error) {
-      console.error('Register error:', error);
+      console.error('Register error - Full details:', error);
+      console.error('Stack trace:', error instanceof Error ? error.stack : 'No stack trace');
       // Fallback to mock during development
+      console.log('Falling back to mock auth service');
       return mockAuthService.register(email, password);
     }
   }
