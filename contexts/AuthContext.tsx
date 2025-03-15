@@ -94,32 +94,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signUp = async (email: string, password: string, name: string) => {
-    console.log('Starting signup process for:', email);
     setLoading(true);
     try {
-      console.log('Attempting to register new user...');
+      // Register new user
       const newUser = await authService.register(email, password);
-      console.log('User registered successfully:', newUser);
 
-      console.log('Storing user data in AsyncStorage...');
       await AsyncStorage.setItem('@user', JSON.stringify(newUser));
-      console.log('User data stored successfully');
-
       setUser(newUser);
-      console.log('User context updated, redirecting to profile setup...');
       router.replace('/profile-setup');
 
-    } catch (error: any) {
-      console.error('Registration failed - Full error:', error);
-      console.error('Error message:', error.message);
-      console.error('Error code:', error.code);
-      if (error.response) {
-        console.error('Server response:', error.response.data);
-      }
+    } catch (error) {
+      console.error('Registration failed', error);
       throw error;
     } finally {
       setLoading(false);
-      console.log('Signup process completed');
     }
   };
 

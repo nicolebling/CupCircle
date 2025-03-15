@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Alert,
   View,
@@ -131,11 +131,6 @@ export default function SignUpScreen() {
       SplashScreen.hideAsync();
     }
   }, [fontsLoaded]);
-
-  // Add logging for state changes
-  useEffect(() => {
-    console.log('Form state updated:', { email, password: '***', loading, error });
-  }, [email, password, loading, error]);
 
   if (!fontsLoaded) {
     return null;
@@ -299,7 +294,7 @@ export default function SignUpScreen() {
               </TouchableOpacity>
             </View>
 
-
+            
 
             {/* Already Have an Account? */}
             <View style={styles.footer}>
@@ -322,7 +317,7 @@ export default function SignUpScreen() {
           </View>
         </KeyboardAvoidingView>
         <StatusBar style="auto" />
-        <Toast 
+      <Toast 
           visible={toastVisible} 
           message={toastMessage} 
           type="error" 
