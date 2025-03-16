@@ -319,8 +319,11 @@ export default function ProfileCard({
 
   const saveProfile = async () => {
     console.log("Starting saveProfile function");
-    if (!validateForm()) {
-      console.log("Form validation failed");
+    if (!validateForm()) return;
+
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError || !user?.id) {
+      console.error("No authenticated user found:", userError?.message);
       return;
     }
 
@@ -328,13 +331,6 @@ export default function ProfileCard({
       console.log("Setting loading state and clearing errors");
       setLoading(true);
       setError("");
-      
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
-      if (userError || !user?.id) {
-        console.error("No authenticated user found:", userError?.message);
-        setError("Please sign in to save your profile");
-        return;
-      }
 
       console.log("Current user:", user);
       console.log("Using user ID:", user.id);
@@ -346,7 +342,7 @@ export default function ProfileCard({
       console.log("Auth context user data:", { user });
 
       const profileData = {
-        id: userId,
+        id: user.id, // Use the ID from AuthContext
         name,
         username,
         occupation,
@@ -370,7 +366,7 @@ export default function ProfileCard({
       );
 
       console.log("Profile data being sent to Supabase:", JSON.stringify(profileData, null, 2));
-      
+
       const { data, error } = await supabase
         .from("profiles")
         .upsert(profileData, { onConflict: "id" })
@@ -1178,7 +1174,7 @@ export default function ProfileCard({
             maxSelections={3}
           />
         </View>
-        
+
         {/* skills */}
         <View style={styles.inputGroup}>
             <Text style={[styles.label, isDark && styles.textDark]}>Skills</Text>
@@ -1204,7 +1200,7 @@ export default function ProfileCard({
               />
             </View>
           </View>
-        
+
 
         {/* Location Preferences */}
         <View style={styles.section}>
@@ -1628,5 +1624,8 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 16,
     color: '#666',
+  },
+  inputGroup: {
+    marginBottom: 20,
   },
 });
