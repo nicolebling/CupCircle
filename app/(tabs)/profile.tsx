@@ -64,6 +64,22 @@ export default function ProfileScreen() {
   // Separate effect for updating profile data
   useEffect(() => {
     if (profile) {
+      console.log('Profile data received:', {
+        name: profile.name,
+        age: profile.age,
+        photo: profile.photo_url,
+        occupation: profile.occupation,
+        industries: profile.industry_categories,
+        skills: profile.skills,
+        experience: profile.experience_level,
+        education: profile.education,
+        bio: profile.bio,
+        city: profile.city,
+        neighborhoods: profile.neighborhoods,
+        favoriteCafes: profile.favorite_cafes,
+        interests: profile.interests
+      });
+      
       setProfileData({
         name: profile.name || '',
         age: profile.age,
