@@ -36,15 +36,18 @@ export default function ProfileScreen() {
 
   useEffect(() => {
     const loadProfile = async () => {
-      if (!user) {
-        console.log("No user object found");
-        return;
-      }
-
-      if (!user.id) {
-        console.log("No user ID available");
-        return;
-      }
+      try {
+        const session = await supabase.auth.getSession();
+        if (!session.data.session?.user) {
+          console.log("No authenticated session found");
+          return;
+        }
+        
+        const currentUser = session.data.session.user;
+        if (!currentUser.id) {
+          console.log("No user ID available in session");
+          return;
+        }
 
       console.log("Profile fetch triggered for user:", user.id);
       try {
