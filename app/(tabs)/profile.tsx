@@ -33,21 +33,26 @@ export default function ProfileScreen() {
   });
   
   const userId = user?.id || '';
-  const { profile, isLoading: profileLoading, error, fetchProfile, updateProfile } = useProfileManager(userId);
+  const { profile, isLoading: profileLoading, error, fetchProfile, updateProfile } = useProfileManager(user?.id || '');
   
   useEffect(() => {
-    console.log("Profile useEffect triggered");
-    if (user?.id) {
-      console.log("Attempting to fetch profile for user:", user.id);
-      fetchProfile().then(() => {
-        console.log("Profile fetch completed");
-      }).catch((error) => {
+    const loadProfile = async () => {
+      if (!user) {
+        console.log("Waiting for user authentication...");
+        return;
+      }
+      
+      console.log("Profile fetch triggered for user:", user.id);
+      try {
+        await fetchProfile();
+        console.log("Profile fetch completed successfully");
+      } catch (error) {
         console.error("Error fetching profile:", error);
-      });
-    } else {
-      console.log("No user ID available for profile fetch");
-    }
-  }, [user?.id, fetchProfile]);
+      }
+    };
+
+    loadProfile();
+  }, [user, fetchProfile]);
   
   const [isLoading, setIsLoading] = useState(true);
   
