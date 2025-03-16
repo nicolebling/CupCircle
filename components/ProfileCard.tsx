@@ -168,6 +168,8 @@ export default function ProfileCard({
     }
   }, [userId, isNewUser]);
 
+  
+
   const fetchProfile = async () => {
     try {
       setLoading(true);
