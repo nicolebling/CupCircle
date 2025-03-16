@@ -214,11 +214,11 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
         experience_level: experienceLevel,
         education,
         city,
-        industry_categories: industryCategories,
-        skills,
-        neighborhoods,
-        favorite_cafes: favoriteCafes,
-        interests,
+        industry_categories: industryCategories || [],
+        skills: skills || [],
+        neighborhoods: neighborhoods || [],
+        favorite_cafes: favoriteCafes || [],
+        interests: interests || [],
         updated_at: new Date(),
       };
 
