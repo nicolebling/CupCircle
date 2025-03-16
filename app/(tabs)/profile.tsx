@@ -38,30 +38,31 @@ export default function ProfileScreen() {
   useEffect(() => {
     const loadProfile = async () => {
       try {
-        if (!user?.id) {
-          console.log("No user ID available");
+        const session = await supabase.auth.getSession();
+        if (!session.data.session?.user) {
+          console.log("No authenticated session found");
           return;
         }
-        console.log("Fetching profile for user:", user.id);
+
+        const currentUser = session.data.session.user;
+        if (!currentUser.id) {
+          console.log("No user ID available in session");
+          return;
+        }
+
+        console.log("Profile fetch triggered for user:", currentUser.id);
         await fetchProfile();
-        console.log("Profile fetched successfully");
+        console.log("Profile fetch completed successfully");
       } catch (error) {
         console.error("Error in profile loading:", error);
       }
     };
 
     loadProfile();
-
-      } catch (error) {
-        console.error("Error in profile loading:", error);
-      }
-    };
-
-    loadProfile();
-  }, []);
+  }, [user, fetchProfile]);
 
   // Separate effect for updating profile data
- useEffect(() => {
+  useEffect(() => {
     if (profile) {
       console.log('Profile data received:', {
         name: profile.name,
@@ -100,27 +101,6 @@ export default function ProfileScreen() {
 
   const [isLoading, setIsLoading] = useState(true);
 
-  // Update form data when profile is loaded
-  useEffect(() => {
-    if (profile) {
-      setProfileData({
-        name: profile.name || '',
-        age: profile.age,
-        photo: profile.photo,
-        occupation: profile.occupation || '',
-        industries: profile.industry_categories || [],
-        skills: profile.skills || [],
-        experience: '', // Not directly mapped
-        education: '', // Not directly mapped
-        bio: profile.bio || '',
-        city: 'New York City', // Default or from location
-        neighborhoods: profile.neighborhoods || [],
-        favoriteCafes: profile.favorite_cafes || [],
-        interests: profile.interests || [],
-      });
-      setIsLoading(false);
-    }
-  }, [profile]);
 
   // Error handling
   useEffect(() => {
