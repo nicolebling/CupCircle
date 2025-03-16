@@ -1,5 +1,18 @@
-import React from 'react';
-import { View, StyleSheet, Dimensions, ScrollView, ActivityIndicator, Text, TouchableOpacity, Image } from "react-native";
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  Dimensions,
+  KeyboardAvoidingView,
+  Platform,
+  Alert,
+  TouchableOpacity,
+  ScrollView,
+  TextInput,
+  ActivityIndicator,
+} from "react-native";
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import * as ImagePicker from "expo-image-picker";
@@ -11,9 +24,6 @@ import IndustrySelector from "./IndustrySelector";
 import ExperienceLevelSelector from "./ExperienceLevelSelector";
 import InterestSelector from "./InterestSelector";
 import { useAuth } from "@/contexts/AuthContext";
-import MatchingProfileCard from './profile/MatchingProfileCard';
-import ViewProfileCard from './profile/ViewProfileCard';
-import EditProfileForm from './profile/EditProfileForm';
 
 const { width } = Dimensions.get("window");
 
@@ -157,7 +167,6 @@ export default function ProfileCard({
       fetchProfile();
     }
   }, [userId, isNewUser]);
-
 
   const fetchProfile = async () => {
     try {
@@ -407,6 +416,8 @@ export default function ProfileCard({
     );
   }
 
+  ////////////////////////////
+
   const getTitle = () => {
     if (isOnboarding) return "Complete Your Profile";
     if (isEditMode) return "Edit Profile";
@@ -445,14 +456,501 @@ export default function ProfileCard({
   };
 
 
-  // Matching view
+  // For matching view
   if (!isUserProfile && !isEditMode && !isOnboarding) {
-    return <MatchingProfileCard profile={profile} onLike={onLike} onSkip={onSkip} />;
+    return (
+      <View
+        style={[
+          styles.card,
+          { backgroundColor: colors.card, borderColor: colors.border },
+        ]}
+      >
+        <Image source={{ uri: profile.photo }} style={styles.image} />
+
+        {profile.matchedCafe && (
+          <View
+            style={[styles.matchBadge, { backgroundColor: colors.primary }]}
+          >
+            <Ionicons name="cafe" size={14} color="white" />
+            <Text style={styles.matchBadgeText}>Café Match</Text>
+          </View>
+        )}
+
+        <View style={styles.content}>
+          <View style={styles.nameRow}>
+            <Text style={[styles.name, { color: colors.text }]}>
+              {profile.name} {profile.age && <Text>{profile.age}</Text>}
+            </Text>
+            {profile.location && (
+              <View style={styles.locationContainer}>
+                <Ionicons
+                  name="location"
+                  size={16}
+                  color={colors.secondaryText}
+                />
+                <Text
+                  style={[styles.location, { color: colors.secondaryText }]}
+                >
+                  {profile.location}
+                </Text>
+              </View>
+            )}
+          </View>
+
+          <View
+            style={[
+              styles.occupationBadge,
+              { backgroundColor: colors.primary + "20" },
+            ]}
+          >
+            <Ionicons
+              name="briefcase-outline"
+              size={14}
+              color={colors.primary}
+              style={styles.occupationIcon}
+            />
+            <Text style={[styles.occupation, { color: colors.primary }]}>
+              {profile.occupation}
+            </Text>
+          </View>
+
+          <View style={styles.divider} />
+
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>
+            About
+          </Text>
+          <Text
+            style={[styles.sectionText, { color: colors.secondaryText }]}
+            numberOfLines={3}
+          >
+            {profile.bio}
+          </Text>
+
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>
+            Interests
+          </Text>
+          <View style={styles.interestsContainer}>
+            {profile.interests &&
+              profile.interests.slice(0, 5).map((interest, index) => (
+                <View
+                  key={index}
+                  style={[
+                    styles.interestTag,
+                    { backgroundColor: colors.primary + "20" },
+                  ]}
+                >
+                  <Text
+                    style={[styles.interestText, { color: colors.primary }]}
+                  >
+                    {interest}
+                  </Text>
+                </View>
+              ))}
+          </View>
+
+          {profile.favoriteCafes && profile.favoriteCafes.length > 0 && (
+            <>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                Favorite Cafes
+              </Text>
+              <View style={styles.interestsContainer}>
+                {profile.favoriteCafes.slice(0, 3).map((cafe, index) => (
+                  <View
+                    key={index}
+                    style={[
+                      styles.interestTag,
+                      { backgroundColor: colors.primary + "15" },
+                    ]}
+                  >
+                    <Text
+                      style={[styles.interestText, { color: colors.primary }]}
+                    >
+                      <Ionicons
+                        name="cafe-outline"
+                        size={12}
+                        color={colors.primary}
+                      />{" "}
+                      {cafe}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            </>
+          )}
+
+          {profile.neighborhoods && profile.neighborhoods.length > 0 && (
+            <>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                Neighborhoods
+              </Text>
+              <View style={styles.interestsContainer}>
+                {profile.neighborhoods
+                  .slice(0, 3)
+                  .map((neighborhood, index) => (
+                    <View
+                      key={index}
+                      style={[
+                        styles.interestTag,
+                        { backgroundColor: colors.primary + "15" },
+                      ]}
+                    >
+                      <Text
+                        style={[styles.interestText, { color: colors.primary }]}
+                      >
+                        <Ionicons
+                          name="location-outline"
+                          size={12}
+                          color={colors.primary}
+                        />{" "}
+                        {neighborhood}
+                      </Text>
+                    </View>
+                  ))}
+              </View>
+            </>
+          )}
+
+          {profile.experience && (
+            <>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                Experience
+              </Text>
+              <Text
+                style={[styles.sectionText, { color: colors.secondaryText }]}
+                numberOfLines={2}
+              >
+                {profile.experience}
+              </Text>
+            </>
+          )}
+        </View>
+
+        {onLike && onSkip && (
+          <View style={styles.buttonsContainer}>
+            <TouchableOpacity
+              onPress={onSkip}
+              style={[
+                styles.actionButton,
+                styles.skipButton,
+                { backgroundColor: "#FEE2E2" },
+              ]}
+            >
+              <Ionicons name="close" size={24} color="#EF4444" />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={onLike}
+              style={[
+                styles.actionButton,
+                styles.likeButton,
+                { backgroundColor: "#DCFCE7" },
+              ]}
+            >
+              <Ionicons name="checkmark" size={24} color="#22C55E" />
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
+    );
   }
 
-  // View profile
+  // For user profile view (non-edit)
   if (isUserProfile && !isEditMode && !isOnboarding) {
-    return <ViewProfileCard profile={profile} />;
+    return (
+      <ScrollView>
+        <View
+          style={[
+            styles.userCard,
+            { backgroundColor: colors.card, borderColor: colors.border },
+          ]}
+        >
+          {/* Header */}
+          <View style={styles.header}>
+            <Text style={[styles.title, { color: colors.text }]}>
+              {getTitle()}
+            </Text>
+            <TouchableOpacity
+              onPress={() =>
+                isEditMode ? onCancel && onCancel() : handleEdit()
+              }
+            >
+              <Ionicons
+                name={isEditMode ? "close-outline" : "create-outline"}
+                size={24}
+                color={colors.primary}
+              />
+            </TouchableOpacity>
+          </View>
+
+          {/* Profile Photo */}
+          <View style={styles.photoContainer}>
+            <Image
+              source={{ uri: profile.photo }}
+              style={styles.profilePhoto}
+            />
+          </View>
+
+          <View style={styles.nameRow}>
+            <Text style={[styles.name, { color: colors.text }]}>
+              {profile.name} {profile.age && <Text>{profile.age}</Text>}
+            </Text>
+            {profile.location && (
+              <View style={styles.locationContainer}>
+                <Ionicons
+                  name="location"
+                  size={16}
+                  color={colors.secondaryText}
+                />
+                <Text
+                  style={[styles.location, { color: colors.secondaryText }]}
+                >
+                  {profile.location}
+                </Text>
+              </View>
+            )}
+          </View>
+
+          {/* Personal Information */}
+          <View style={styles.section}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>
+              Personal Information
+            </Text>
+            <Text style={[styles.label, { color: colors.secondaryText }]}>
+              Name
+            </Text>
+            <Text style={[styles.value, { color: colors.text }]}>
+              {profile.name}
+            </Text>
+
+            <Text style={[styles.label, { color: colors.secondaryText }]}>
+              Age
+            </Text>
+            <Text style={[styles.value, { color: colors.text }]}>
+              {profile.age || "Not provided"}
+            </Text>
+
+            <Text style={[styles.label, { color: colors.secondaryText }]}>
+              Occupation
+            </Text>
+            <Text style={[styles.value, { color: colors.text }]}>
+              {profile.occupation}
+            </Text>
+          </View>
+
+          {/* Bio */}
+          <View style={styles.section}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>
+              About Me
+            </Text>
+            <Text style={[styles.value, { color: colors.text }]}>
+              {profile.bio}
+            </Text>
+          </View>
+
+          {/* Interests */}
+          {profile.interests && profile.interests.length > 0 && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                Interests
+              </Text>
+              <View style={styles.tagsContainer}>
+                {profile.interests.map((interest, index) => (
+                  <View
+                    key={index}
+                    style={[
+                      styles.tag,
+                      { backgroundColor: colors.primary + "20" },
+                    ]}
+                  >
+                    <Text style={[styles.tagText, { color: colors.primary }]}>
+                      {interest}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          )}
+
+          {/* Professional Details */}
+          <View style={styles.section}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>
+              Professional Details
+            </Text>
+
+            {profile.experienceLevel && (
+              <>
+                <Text style={[styles.label, { color: colors.secondaryText }]}>
+                  Experience Level
+                </Text>
+                <View style={styles.coffeeExperienceContainer}>
+                  <Text style={[styles.value, { color: colors.text }]}>
+                    {profile.experienceLevel || ""}
+                  </Text>
+                  {/* Display coffee theme based on experience level */}
+                  <View
+                    style={[
+                      styles.coffeeBadge,
+                      {
+                        backgroundColor:
+                          getCoffeeColor(profile.experienceLevel || "") + "20",
+                      },
+                    ]}
+                  >
+                    <Ionicons
+                      name="cafe"
+                      size={14}
+                      color={getCoffeeColor(profile.experienceLevel || "")}
+                    />
+                    <Text
+                      style={[
+                        styles.coffeeBadgeText,
+                        {
+                          color: getCoffeeColor(profile.experienceLevel || ""),
+                        },
+                      ]}
+                    >
+                      {getCoffeeTheme(profile.experienceLevel || "")}
+                    </Text>
+                  </View>
+                </View>
+              </>
+            )}
+
+            {profile.industries && profile.industries.length > 0 && (
+              <>
+                <Text style={[styles.label, { color: colors.secondaryText }]}>
+                  Industries
+                </Text>
+                <View style={styles.tagsContainer}>
+                  {profile.industries.map((industry, index) => (
+                    <View
+                      key={index}
+                      style={[
+                        styles.tag,
+                        { backgroundColor: colors.primary + "20" },
+                      ]}
+                    >
+                      <Text style={[styles.tagText, { color: colors.primary }]}>
+                        {industry}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              </>
+            )}
+
+            {profile.skills && profile.skills.length > 0 && (
+              <>
+                <Text style={[styles.label, { color: colors.secondaryText }]}>
+                  Skills
+                </Text>
+                <View style={styles.tagsContainer}>
+                  {profile.skills.map((skill, index) => (
+                    <View
+                      key={index}
+                      style={[
+                        styles.tag,
+                        { backgroundColor: colors.primary + "20" },
+                      ]}
+                    >
+                      <Text style={[styles.tagText, { color: colors.primary }]}>
+                        {skill}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              </>
+            )}
+
+            {profile.experience && (
+              <>
+                <Text style={[styles.label, { color: colors.secondaryText }]}>
+                  Experience
+                </Text>
+                <Text style={[styles.value, { color: colors.text }]}>
+                  {profile.experience}
+                </Text>
+              </>
+            )}
+
+            {profile.education && (
+              <>
+                <Text style={[styles.label, { color: colors.secondaryText }]}>
+                  Education
+                </Text>
+                <Text style={[styles.value, { color: colors.text }]}>
+                  {profile.education}
+                </Text>
+              </>
+            )}
+          </View>
+
+          {/* Location */}
+          <View style={styles.section}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>
+              Location Preferences
+            </Text>
+
+            {profile.city && (
+              <>
+                <Text style={[styles.label, { color: colors.secondaryText }]}>
+                  City
+                </Text>
+                <Text style={[styles.value, { color: colors.text }]}>
+                  {profile.city}
+                </Text>
+              </>
+            )}
+
+            {profile.neighborhoods && profile.neighborhoods.length > 0 && (
+              <>
+                <Text style={[styles.label, { color: colors.secondaryText }]}>
+                  Neighborhoods
+                </Text>
+                <View style={styles.tagsContainer}>
+                  {profile.neighborhoods.map((neighborhood, index) => (
+                    <View
+                      key={index}
+                      style={[
+                        styles.tag,
+                        { backgroundColor: colors.primary + "20" },
+                      ]}
+                    >
+                      <Text style={[styles.tagText, { color: colors.primary }]}>
+                        {neighborhood}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              </>
+            )}
+
+            {profile.favoriteCafes && profile.favoriteCafes.length > 0 && (
+              <>
+                <Text style={[styles.label, { color: colors.secondaryText }]}>
+                  Favorite Cafes
+                </Text>
+                <View style={styles.tagsContainer}>
+                  {profile.favoriteCafes.map((cafe, index) => (
+                    <View
+                      key={index}
+                      style={[
+                        styles.tag,
+                        { backgroundColor: colors.primary + "20" },
+                      ]}
+                    >
+                      <Text style={[styles.tagText, { color: colors.primary }]}>
+                        {cafe}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              </>
+            )}
+          </View>
+        </View>
+      </ScrollView>
+    );
   }
 
   // Edit mode or Onboarding mode
@@ -749,37 +1247,37 @@ export default function ProfileCard({
 
 
         {/* Cafes */}
-        <View>
-            <Text style={[styles.label, { color: colors.secondaryText }]}>Favorite Cafes</Text>
-          <View style={styles.tagsContainer}>
-            {favoriteCafes.map((cafe, index) => (
-              <View key={index} style={styles.tag}>
-                <Text style={styles.tagText}>{cafe}</Text>
-                <TouchableOpacity onPress={() => handleRemoveCafe(index)}>
-                  <Ionicons name="close-circle" size={18} color="#fff" />
-                </TouchableOpacity>
-              </View>
-            ))}
-          </View>
-          <View style={styles.tagInput}>
-            <TextInput
-              style={[
-                styles.input,
-                {
-                  backgroundColor: colors.background,
-                  color: colors.text,
-                  borderColor: colors.border,
-                },
-              ]}
-              placeholder="Coffee House, Bean There, etc. (comma separated)"
-              placeholderTextColor={isDark ? '#999' : '#777'}
-              onSubmitEditing={(e) => {
-                handleAddCafe(e.nativeEvent.text);
-                e.currentTarget.clear();
-              }}
-            />
-          </View>
-        </View>
+         <View>
+             <Text style={[styles.label, { color: colors.secondaryText }]}>Favorite Cafes</Text>
+           <View style={styles.tagsContainer}>
+             {favoriteCafes.map((cafe, index) => (
+               <View key={index} style={styles.tag}>
+                 <Text style={styles.tagText}>{cafe}</Text>
+                 <TouchableOpacity onPress={() => handleRemoveCafe(index)}>
+                   <Ionicons name="close-circle" size={18} color="#fff" />
+                 </TouchableOpacity>
+               </View>
+             ))}
+           </View>
+           <View style={styles.tagInput}>
+             <TextInput
+               style={[
+                 styles.input,
+                 {
+                   backgroundColor: colors.background,
+                   color: colors.text,
+                   borderColor: colors.border,
+                 },
+               ]}
+               placeholder="Coffee House, Bean There, etc. (comma separated)"
+               placeholderTextColor={isDark ? '#999' : '#777'}
+               onSubmitEditing={(e) => {
+                 handleAddCafe(e.nativeEvent.text);
+                 e.currentTarget.clear();
+               }}
+             />
+           </View>
+         </View>
 
         {/* Save Button */}
         <View style={styles.buttonContainer}>
@@ -1129,8 +1627,5 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 16,
     color: '#666',
-  },
-  inputGroup: {
-    marginBottom: 24,
   },
 });
