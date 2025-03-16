@@ -24,6 +24,9 @@ import ExperienceLevelSelector from '@/components/ExperienceLevelSelector';
 type ProfileFormProps = {
   userId: string;
   isNewUser?: boolean;
+  onSave?: (profileData: any) => void;
+  initialData?: any;
+  onCancel?: () => void;
 };
 
 export default function ProfileForm({ userId, isNewUser = true }: ProfileFormProps) {
@@ -235,7 +238,9 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
 
       console.log('Profile saved successfully:', data);
       Alert.alert('Success', 'Your profile has been saved');
-      onSave && onSave(profileData);
+      if (onSave) {
+        onSave(profileData);
+      }
     } catch (error: any) {
       console.error('Error saving profile:', error);
       setError('Failed to save profile. Please try again.');
