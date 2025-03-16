@@ -1,156 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, StyleSheet, Alert, View, Text, TouchableOpacity } from 'react-native';
+import { SafeAreaView, StyleSheet, Alert, View, TouchableOpacity } from 'react-native';
 import { supabase } from "@/lib/supabase";
 import Colors from '@/constants/Colors';
-import UserProfileCard, { UserProfileData } from '@/components/UserProfileCard';
-import { useProfileManager, ProfileFormData } from '@/hooks/useProfileManager';
+import ProfileForm from '@/components/ProfileForm';
 import { useAuth } from '@/contexts/AuthContext';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
-
 export default function ProfileScreen() {
-
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const { user } = useAuth();
   const [isEditMode, setIsEditMode] = useState(false);
-  const [profileData, setProfileData] = useState<UserProfileData>({
-    name: '',
-    age: undefined,
-    photo: undefined,
-    occupation: '',
-    industries: [],
-    skills: [],
-    experience: '',
-    education: '',
-    bio: '',
-    city: '',
-    neighborhoods: [],
-    favoriteCafes: [],
-    interests: [],
-  });
 
-  const userId = user?.id || '';
-  const { profile, isLoading: profileLoading, error, fetchProfile } = useProfileManager(user?.id || '');
-
-  useEffect(() => {
-    const loadProfile = async () => {
-      try {
-        const { data, error } = await supabase.auth.getUser();
-        if (error) {
-          console.log("Error fetching user:", error.message);
-          return;
-        }
-
-        if (!data?.user) {
-          console.log("No authenticated user found");
-          return;
-        }
-
-        const currentUser = data.user;
-        if (!currentUser.id) {
-          console.log("No user ID available");
-          return;
-        }
-
-        console.log("Profile fetchingg triggered for user:", currentUser.id);
-        await fetchProfile();
-        console.log("Profile fetch completed successfully");
-
-        console.log("ProfileScreen: User from AuthContext:", user);
-        console.log("ProfileScreen: userId being passed to useProfileManager:", user?.id);
-
-
-      } catch (error) {
-        console.error("Error in profile loading:", error);
-      }
-    };
-
-    loadProfile();
-  }, [user?.id]); // Only depend on user ID changes
-
-
-  // Separate effect for updating profile data
-  useEffect(() => {
-    if (profile) {
-      console.log('Profile data received:', {
-        name: profile.name,
-        age: profile.age,
-        photo: profile.photo_url,
-        occupation: profile.occupation,
-        industries: profile.industry_categories,
-        skills: profile.skills,
-        experience: profile.experience_level,
-        education: profile.education,
-        bio: profile.bio,
-        city: profile.city,
-        neighborhoods: profile.neighborhoods,
-        favoriteCafes: profile.favorite_cafes,
-        interests: profile.interests
-      });
-
-      setProfileData({
-        name: profile.name || '',
-        age: profile.age,
-        photo: profile.photo_url,
-        occupation: profile.occupation || '',
-        industries: profile.industry_categories || [],
-        skills: profile.skills || [],
-        experience: profile.experience_level || '',
-        education: profile.education || '',
-        bio: profile.bio || '',
-        city: profile.city || '',
-        neighborhoods: profile.neighborhoods || [],
-        favoriteCafes: profile.favorite_cafes || [],
-        interests: profile.interests || [],
-      });
-      setIsLoading(false);
-    }
-  }, [profile]);
-
-  const [isLoading, setIsLoading] = useState(true);
-
-
-  // Error handling
-  useEffect(() => {
-    if (error) {
-      Alert.alert('Error', error);
-    }
-  }, [error]);
-
-  const handleSaveProfile = async (updatedData: UserProfileData) => {
-    // If not in edit mode, toggle to edit mode
-    if (!isEditMode) {
-      setIsEditMode(true);
-      return;
-    }
-
-    // Convert UI format to database format
-    const profileFormData: ProfileFormData = {
-      name: updatedData.name,
-      age: updatedData.age,
-      occupation: updatedData.occupation,
-      photo: updatedData.photo,
-      bio: updatedData.bio,
-      industry_categories: updatedData.industries,
-      skills: updatedData.skills,
-      neighborhoods: updatedData.neighborhoods,
-      favorite_cafes: updatedData.favoriteCafes,
-      interests: updatedData.interests,
-    };
-
-    const success = await updateProfile(profileFormData);
-    if (success) {
-      setIsEditMode(false);
-      Alert.alert('Success', 'Profile updated successfully');
-    }
-  };
-
-  const navigateToSettings = () => {
-    router.push('/(tabs)/settings');
-  };
+  if (!user) {
+    return null;
+  }
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
@@ -158,19 +24,16 @@ export default function ProfileScreen() {
         <View style={styles.headerContent}>
           <TouchableOpacity 
             style={[styles.settingsButton, { backgroundColor: colors.card, borderColor: colors.border }]} 
-            onPress={navigateToSettings}
+            onPress={() => setIsEditMode(!isEditMode)}
           >
-            <Ionicons name="settings-outline" size={20} color={colors.text} />
+            <Ionicons name={isEditMode ? "close" : "create-outline"} size={20} color={colors.text} />
           </TouchableOpacity>
         </View>
       </View>
 
-      <UserProfileCard 
-        isEditMode={isEditMode}
-        isLoading={isLoading || profileLoading}
-        initialData={profileData}
-        onSave={handleSaveProfile}
-        onCancel={() => setIsEditMode(false)}
+      <ProfileForm 
+        userId={user.id} 
+        isNewUser={false}
       />
     </SafeAreaView>
   );
@@ -183,23 +46,13 @@ const styles = StyleSheet.create({
   },
   header: {
     marginBottom: 16,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
   },
   headerContent: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 4,
-  },
-  title: {
-    fontSize: 24,
-    fontFamily: 'K2D-Bold',
-  },
-  subtitle: {
-    fontSize: 16,
-    marginBottom: 16,
-  },
-  editButton: {
-    padding: 8,
   },
   settingsButton: {
     width: 40,
