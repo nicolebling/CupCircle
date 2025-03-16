@@ -24,16 +24,20 @@ export function useProfileManager(userId: string) {
 
   const fetchProfile = async () => {
     try {
+      console.log('useProfileManager: Starting profile fetch');
       setIsLoading(true);
       setError(null);
+      console.log('useProfileManager: Fetching profile for userId:', userId);
       const userProfile = await profileService.getProfileByUserId(userId);
+      console.log('useProfileManager: Profile data received:', userProfile);
       setProfile(userProfile);
       
     } catch (err) {
-      console.error('Failed to load user profile', err);
+      console.error('useProfileManager: Failed to load user profile', err);
       setError('Failed to load profile. Please try again.');
     } finally {
       setIsLoading(false);
+      console.log('useProfileManager: Profile fetch complete');
     }
   };
 

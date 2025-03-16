@@ -36,9 +36,16 @@ export default function ProfileScreen() {
   const { profile, isLoading: profileLoading, error, fetchProfile, updateProfile } = useProfileManager(userId);
   
   useEffect(() => {
+    console.log("Profile useEffect triggered");
     if (user?.id) {
-      console.log("Triggering profile fetch for user:", user.id);
-      fetchProfile();
+      console.log("Attempting to fetch profile for user:", user.id);
+      fetchProfile().then(() => {
+        console.log("Profile fetch completed");
+      }).catch((error) => {
+        console.error("Error fetching profile:", error);
+      });
+    } else {
+      console.log("No user ID available for profile fetch");
     }
   }, [user?.id, fetchProfile]);
   
