@@ -33,17 +33,16 @@ export default function ProfileScreen() {
   });
   
   const userId = user?.id || '';
-  const userId = user?.id || '';
-  const { profile, isLoading: profileLoading, error, fetchProfile, updateProfile } = useProfileManager(userId);
+  const { profile, isLoading: profileLoading, error, fetchProfile, updateProfile } = useProfileManager(user?.id || '');
   
   useEffect(() => {
     const loadProfile = async () => {
-      if (!userId) {
+      if (!user) {
         console.log("Waiting for user authentication...");
         return;
       }
       
-      console.log("Profile fetch triggered for user:", userId);
+      console.log("Profile fetch triggered for user:", user.id);
       try {
         await fetchProfile();
         console.log("Profile fetch completed successfully");
@@ -53,7 +52,7 @@ export default function ProfileScreen() {
     };
 
     loadProfile();
-  }, [userId, fetchProfile]);
+  }, [user, fetchProfile]);
   
   const [isLoading, setIsLoading] = useState(true);
   
@@ -132,7 +131,6 @@ export default function ProfileScreen() {
       </View>
       
       <UserProfileCard 
-        userId={userId}
         isEditMode={isEditMode}
         isLoading={isLoading || profileLoading}
         initialData={profileData}
