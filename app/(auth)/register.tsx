@@ -92,9 +92,7 @@ export default function SignUpScreen() {
                 .insert([
                   { 
                     id: data.user.id,
-                    username: email.split('@')[0], // Default username from email
                     avatar_url: null,
-                    website: null
                   }
                 ])
                 .select();
