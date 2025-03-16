@@ -38,21 +38,31 @@ export default function ProfileScreen() {
   useEffect(() => {
     const loadProfile = async () => {
       try {
-        const session = await supabase.auth.getSession();
-        if (!session.data.session?.user) {
-          console.log("No authenticated session found");
+        const { data, error } = await supabase.auth.getUser();
+        if (error) {
+          console.log("Error fetching user:", error.message);
           return;
         }
 
-        const currentUser = session.data.session.user;
+        if (!data?.user) {
+          console.log("No authenticated user found");
+          return;
+        }
+
+        const currentUser = data.user;
         if (!currentUser.id) {
-          console.log("No user ID available in session");
+          console.log("No user ID available");
           return;
         }
 
-        console.log("Profile fetchesss triggered for user:", currentUser.id);
+        console.log("Profile fetchingg triggered for user:", currentUser.id);
         await fetchProfile();
         console.log("Profile fetch completed successfully");
+
+        console.log("ProfileScreen: User from AuthContext:", user);
+        console.log("ProfileScreen: userId being passed to useProfileManager:", user?.id);
+
+        
       } catch (error) {
         console.error("Error in profile loading:", error);
       }
@@ -60,6 +70,7 @@ export default function ProfileScreen() {
 
     loadProfile();
   }, [user, fetchProfile]);
+
 
   // Separate effect for updating profile data
   useEffect(() => {

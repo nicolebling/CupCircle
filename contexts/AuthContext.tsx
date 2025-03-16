@@ -53,6 +53,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Check if user is logged in
     const checkUserSession = async () => {
       try {
+
+        
         const userJSON = await AsyncStorage.getItem('@user');
         if (userJSON) {
           setUser(JSON.parse(userJSON));

@@ -27,6 +27,8 @@ export function useProfileManager(userId: string) {
       console.log('useProfileManager: Starting profile fetch');
       setIsLoading(true);
       setError(null);
+      console.log("useProfileManager: userId is", userId);
+
       console.log('useProfileManager: Fetching profile for userId:', userId);
       const userProfile = await profileService.getProfileByUserId(userId);
       console.log('useProfileManager: Profile data received:', userProfile);
