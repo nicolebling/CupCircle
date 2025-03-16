@@ -49,27 +49,7 @@ export default function ProfileScreen() {
   // Log profile data for debugging
   useEffect(() => {
     if (profile) {
-      console.log('Profile Data:', {
-        id: profile.id,
-        updated_at: profile.updated_at,
-        name: profile.name,
-        occupation: profile.occupation,
-        photo_url: profile.photo_url,
-        bio: profile.bio,
-        age: profile.age,
-        experience_level: profile.experience_level,
-        education: profile.education,
-        city: profile.city,
-        industry_categories: profile.industry_categories,
-        skills: profile.skills,
-        neighborhoods: profile.neighborhoods,
-        favorite_cafes: profile.favorite_cafes,
-        interests: profile.interests,
-        created_at: profile.created_at,
-        avatar_url: profile.avatar_url,
-        full_name: profile.full_name,
-        username: profile.username
-      });
+      console.log('Profile loaded:', profile);
     }
   }, [profile]);
   
