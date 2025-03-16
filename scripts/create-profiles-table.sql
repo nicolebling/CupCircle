@@ -4,7 +4,6 @@ CREATE TABLE IF NOT EXISTS profiles (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   username TEXT,
-  full_name TEXT,
   avatar_url TEXT,
   website TEXT,
   name VARCHAR,
