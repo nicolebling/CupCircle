@@ -1,10 +1,9 @@
+
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { authService } from '../services/api';
-import { profileService } from '../services/api';
-import {supabase} from '../lib/supabase'
-
+import { supabase } from '../lib/supabase';
+import { Session } from '@supabase/supabase-js';
 
 type User = {
   id: string;
@@ -31,12 +30,12 @@ type Profile = {
 
 type AuthContextType = {
   user: User | null;
-  session: null;
+  session: Session | null;
   profile: Profile | null;
   loading: boolean;
   signUp: (email: string, password: string, name: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
-  signOut: () => void;
+  signOut: () => Promise<void>;
   fetchProfile: () => Promise<Profile | null>;
   updateUser: (userData: Partial<Profile>) => Promise<void>;
 };
@@ -45,49 +44,43 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is logged in
-    const checkUserSession = async () => {
-      try {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
 
-        
-        const userJSON = await AsyncStorage.getItem('@user');
-        if (userJSON) {
-          setUser(JSON.parse(userJSON));
-          router.replace('/(tabs)');
-        } else {
-          router.replace('/(auth)/login');
-        }
-      } catch (error) {
-        console.error('Failed to load user data', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
 
-    checkUserSession();
+    return () => subscription.unsubscribe();
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    setLoading(true);
     try {
-      // Get user from database
-      const authenticatedUser = await authService.login(email, password);
+      setLoading(true);
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
 
-      if (!authenticatedUser) {
-        throw new Error('Invalid email or password');
+      if (error) throw error;
+      
+      if (data.user) {
+        setUser(data.user);
+        setSession(data.session);
+        router.replace('/profile-setup');
       }
-
-      await AsyncStorage.setItem('@user', JSON.stringify(authenticatedUser));
-      setUser(authenticatedUser);
-      router.replace('/profile-setup');
-
     } catch (error) {
-      console.error('Login failed', error);
+      console.error('Login failed:', error);
       throw error;
     } finally {
       setLoading(false);
@@ -95,17 +88,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signUp = async (email: string, password: string, name: string) => {
-    setLoading(true);
     try {
-      // Register new user
-      const newUser = await authService.register(email, password);
+      setLoading(true);
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { name }
+        }
+      });
 
-      await AsyncStorage.setItem('@user', JSON.stringify(newUser));
-      setUser(newUser);
-      router.replace('/profile-setup');
+      if (error) throw error;
 
+      if (data.user) {
+        setUser(data.user);
+        setSession(data.session);
+        router.replace('/profile-setup');
+      }
     } catch (error) {
-      console.error('Registration failed', error);
+      console.error('Registration failed:', error);
       throw error;
     } finally {
       setLoading(false);
@@ -114,23 +115,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signOut = async () => {
     try {
-      await AsyncStorage.removeItem('@user');
+      await supabase.auth.signOut();
       setUser(null);
+      setSession(null);
       setProfile(null);
       router.replace('/(auth)/login');
     } catch (error) {
-      console.error('Logout failed', error);
+      console.error('Logout failed:', error);
+      throw error;
     }
   };
 
   const fetchProfile = async (): Promise<Profile | null> => {
     try {
-      if (!user) return null;
+      if (!user?.id) return null;
 
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', user.id)
+        .eq('user_id', user.id)
         .single();
 
       if (error) {
@@ -148,52 +151,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const updateUser = async (userData: Partial<Profile>) => {
     try {
-      if (!user || !profile) return;
+      if (!user?.id) return;
 
-      // Log the update attempt for debugging
-      console.log("Updating profile with data:", userData);
-      
-      // Remove any fields that no longer exist in the database
-      const { website, avatar_url, ...validUserData } = userData as any;
-      
-      const updatedProfile = {...profile, ...validUserData};
       const { error } = await supabase
         .from('profiles')
-        .update(validUserData)
-        .eq('id', profile.id);
-        
-      if (error){
-        console.error("Error updating profile", error);
-        console.error("Error details:", JSON.stringify(error));
-        throw error;
-      }
-      
-      console.log("Profile updated successfully");
-      setProfile(updatedProfile);
-      await AsyncStorage.setItem('@user', JSON.stringify({...user, ...validUserData}))
+        .update(userData)
+        .eq('user_id', user.id);
 
+      if (error) throw error;
+
+      setProfile(prev => prev ? { ...prev, ...userData } : null);
     } catch (error) {
-      console.error('Update user failed', error);
-      console.error('Error details:', JSON.stringify(error));
+      console.error('Update user failed:', error);
       throw error;
     }
   };
-
-
-  // Fetch profile when user changes
-  useEffect(() => {
-    if (user) {
-      fetchProfile();
-    } else {
-      setProfile(null);
-    }
-  }, [user]);
 
   return (
     <AuthContext.Provider
       value={{
         user,
-        session: null,
+        session,
         profile,
         loading,
         signUp,
