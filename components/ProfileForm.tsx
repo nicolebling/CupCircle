@@ -14,6 +14,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { supabase } from '@/lib/supabase';
+import Colors from "@/constants/Colors";
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { router } from 'expo-router';
 import IndustrySelector from '@/components/IndustrySelector';
@@ -27,6 +28,7 @@ type ProfileFormProps = {
 
 export default function ProfileForm({ userId, isNewUser = true }: ProfileFormProps) {
   const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme];
   const isDark = colorScheme === 'dark';
 
   const [loading, setLoading] = useState(false);
@@ -45,6 +47,8 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
   const [favoriteCafes, setFavoriteCafes] = useState<string[]>([]);
   const [interests, setInterests] = useState<string[]>([]);
   const [error, setError] = useState('');
+
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (!isNewUser) {
@@ -291,11 +295,18 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isDark && styles.textDark]}>Name*</Text>
               <TextInput
-                style={[styles.input, isDark && styles.inputDark]}
+                style={[
+                  styles.input,
+                  {
+                    backgroundColor: colors.background,
+                    color: colors.text,
+                    borderColor: errors.name ? "red" : colors.border,
+                  },
+                ]}
                 value={name}
                 onChangeText={setName}
-                placeholder="Enter your name"
-                placeholderTextColor={isDark ? '#999' : '#777'}
+                placeholder="Your name"
+                placeholderTextColor={colors.secondaryText}
               />
             </View>
 
