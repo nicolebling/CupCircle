@@ -1,8 +1,12 @@
+
 import { Profile } from '../models/Profile';
 import { supabase } from '../lib/supabase';
 
 // Auth service
 export const authService = {
+
+
+
   // Login function
   async login(email: string, password: string) {
     try {
@@ -43,11 +47,11 @@ export const profileService = {
     try {
       if (!userId) return null;
 
-      console.log('Fetching profile for user:', userId);
+      console.log('Fetching profile for user22:', userId);
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .eq('user_id', userId)
+        .eq('id', user.id)
         .single();
 
       if (error) {

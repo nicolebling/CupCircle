@@ -50,7 +50,7 @@ export default function ProfileScreen() {
           return;
         }
 
-        console.log("Profile fetch triggered for user:", currentUser.id);
+        console.log("Profile fetchesss triggered for user:", currentUser.id);
         await fetchProfile();
         console.log("Profile fetch completed successfully");
       } catch (error) {
