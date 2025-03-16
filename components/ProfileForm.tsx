@@ -29,7 +29,7 @@ type ProfileFormProps = {
   onCancel?: () => void;
 };
 
-export default function ProfileForm({ userId, isNewUser = true }: ProfileFormProps) {
+export default function ProfileForm({ userId, isNewUser = true, onSave, initialData, onCancel }: ProfileFormProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const isDark = colorScheme === 'dark';
@@ -239,7 +239,23 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
       console.log('Profile saved successfully:', data);
       Alert.alert('Success', 'Your profile has been saved');
       if (onSave) {
-        onSave(profileData);
+        onSave({
+          id: userId,
+          name,
+          username,
+          occupation,
+          photo_url: avatar,
+          bio,
+          age: age ? parseInt(age) : null,
+          experience_level: experienceLevel,
+          education,
+          city,
+          industry_categories: industryCategories,
+          skills,
+          neighborhoods,
+          favorite_cafes: favoriteCafes,
+          interests
+        });
       }
     } catch (error: any) {
       console.error('Error saving profile:', error);
