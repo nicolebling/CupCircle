@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { SafeAreaView, StyleSheet, Alert, View, Text, TouchableOpacity } from 'react-native';
+import { supabase } from "@/lib/supabase";
 import Colors from '@/constants/Colors';
 import UserProfileCard, { UserProfileData } from '@/components/UserProfileCard';
 import { useProfileManager, ProfileFormData } from '@/hooks/useProfileManager';
