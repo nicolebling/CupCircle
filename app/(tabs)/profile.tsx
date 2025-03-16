@@ -33,36 +33,49 @@ export default function ProfileScreen() {
   });
 
   const userId = user?.id || '';
-  const { profile, isLoading: profileLoading, error, fetchProfile, updateProfile } = useProfileManager(user?.id || '');
+  const { profile, isLoading: profileLoading, error,  setProfile,  } = useProfileManager(user?.id || '');
 
   useEffect(() => {
     const loadProfile = async () => {
       try {
-        const session = await supabase.auth.getSession();
-        if (!session.data.session?.user) {
-          console.log("No authenticated session found");
-          return;
-        }
-        
-        const currentUser = session.data.session.user;
-        if (!currentUser.id) {
-          console.log("No user ID available in session");
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+
+        if (sessionError) {
+          console.error("Session error:", sessionError);
           return;
         }
 
-        console.log("Profile fetch triggered for user:", currentUser.id);
-        await fetchProfile();
-        console.log("Profile fetch completed successfully");
+        if (!session?.user) {
+          console.log("No authenticated session found");
+          return;
+        }
+
+        console.log("Session user:", session.user);
+
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
+
+        if (profileError) {
+          console.error("Profile fetch error:", profileError);
+          return;
+        }
+
+        console.log("Profile data received:", profileData);
+        setProfile(profileData);
+
       } catch (error) {
         console.error("Error in profile loading:", error);
       }
     };
 
     loadProfile();
-  }, [user]);
+  }, []);
 
   // Separate effect for updating profile data
-  useEffect(() => {
+ useEffect(() => {
     if (profile) {
       console.log('Profile data received:', {
         name: profile.name,
@@ -79,7 +92,7 @@ export default function ProfileScreen() {
         favoriteCafes: profile.favorite_cafes,
         interests: profile.interests
       });
-      
+
       setProfileData({
         name: profile.name || '',
         age: profile.age,
