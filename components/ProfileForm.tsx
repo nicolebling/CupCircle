@@ -214,11 +214,11 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
         experience_level: experienceLevel,
         education,
         city,
-        industry_categories: Array.isArray(industryCategories) ? industryCategories : [],
-        skills: Array.isArray(skills) ? skills : [],
-        neighborhoods: Array.isArray(neighborhoods) ? neighborhoods : [],
-        favorite_cafes: Array.isArray(favoriteCafes) ? favoriteCafes : [],
-        interests: Array.isArray(interests) ? interests : [],
+        industry_categories: industryCategories,
+        skills: skills,
+        neighborhoods: neighborhoods,
+        favorite_cafes: favoriteCafes,
+        interests: interests,
         updated_at: new Date(),
       };
 
