@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { SafeAreaView, StyleSheet, Alert, View, Text, TouchableOpacity } from 'react-native';
 import Colors from '@/constants/Colors';
@@ -11,7 +10,7 @@ import { useColorScheme } from '@/hooks/useColorScheme';
 
 
 export default function ProfileScreen() {
-  
+
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const { user } = useAuth();
@@ -31,17 +30,17 @@ export default function ProfileScreen() {
     favoriteCafes: [],
     interests: [],
   });
-  
+
   const userId = user?.id || '';
   const { profile, isLoading: profileLoading, error, fetchProfile, updateProfile } = useProfileManager(user?.id || '');
-  
+
   useEffect(() => {
     const loadProfile = async () => {
       if (!user?.id) {
         console.log("Waiting for user authentication...");
         return;
       }
-      
+
       console.log("Profile fetch triggered for user:", user.id);
       try {
         await fetchProfile();
@@ -67,13 +66,11 @@ export default function ProfileScreen() {
     };
 
     loadProfile();
-  }, [user, profile]);
+  }, [user, profile, fetchProfile]);
 
-    loadProfile();
-  }, [user, fetchProfile]);
-  
+
   const [isLoading, setIsLoading] = useState(true);
-  
+
   // Update form data when profile is loaded
   useEffect(() => {
     if (profile) {
@@ -95,21 +92,21 @@ export default function ProfileScreen() {
       setIsLoading(false);
     }
   }, [profile]);
-  
+
   // Error handling
   useEffect(() => {
     if (error) {
       Alert.alert('Error', error);
     }
   }, [error]);
-  
+
   const handleSaveProfile = async (updatedData: UserProfileData) => {
     // If not in edit mode, toggle to edit mode
     if (!isEditMode) {
       setIsEditMode(true);
       return;
     }
-    
+
     // Convert UI format to database format
     const profileFormData: ProfileFormData = {
       name: updatedData.name,
@@ -123,18 +120,18 @@ export default function ProfileScreen() {
       favorite_cafes: updatedData.favoriteCafes,
       interests: updatedData.interests,
     };
-    
+
     const success = await updateProfile(profileFormData);
     if (success) {
       setIsEditMode(false);
       Alert.alert('Success', 'Profile updated successfully');
     }
   };
-  
+
   const navigateToSettings = () => {
     router.push('/(tabs)/settings');
   };
-  
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.header}>
@@ -147,7 +144,7 @@ export default function ProfileScreen() {
           </TouchableOpacity>
         </View>
       </View>
-      
+
       <UserProfileCard 
         isEditMode={isEditMode}
         isLoading={isLoading || profileLoading}
