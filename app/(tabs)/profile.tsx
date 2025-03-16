@@ -1,8 +1,10 @@
+
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, StyleSheet, Alert, View, TouchableOpacity } from 'react-native';
+import { SafeAreaView, StyleSheet, View, TouchableOpacity } from 'react-native';
 import { supabase } from "@/lib/supabase";
 import Colors from '@/constants/Colors';
 import ProfileForm from '@/components/ProfileForm';
+import UserProfileCard from '@/components/UserProfileCard';
 import { useAuth } from '@/contexts/AuthContext';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -13,6 +15,33 @@ export default function ProfileScreen() {
   const colors = Colors[colorScheme];
   const { user } = useAuth();
   const [isEditMode, setIsEditMode] = useState(false);
+  const [profileData, setProfileData] = useState(null);
+
+  useEffect(() => {
+    if (user) {
+      fetchProfile();
+    }
+  }, [user]);
+
+  const fetchProfile = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      if (error) throw error;
+      setProfileData(data);
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+    }
+  };
+
+  const handleProfileSave = async (updatedData) => {
+    setProfileData(updatedData);
+    setIsEditMode(false);
+  };
 
   if (!user) {
     return null;
@@ -31,10 +60,21 @@ export default function ProfileScreen() {
         </View>
       </View>
 
-      <ProfileForm 
-        userId={user.id} 
-        isNewUser={false}
-      />
+      {isEditMode ? (
+        <ProfileForm 
+          userId={user.id} 
+          isNewUser={false}
+          initialData={profileData}
+          onSave={handleProfileSave}
+          onCancel={() => setIsEditMode(false)}
+        />
+      ) : (
+        <UserProfileCard
+          initialData={profileData}
+          isEditMode={false}
+          onEdit={() => setIsEditMode(true)}
+        />
+      )}
     </SafeAreaView>
   );
 }
@@ -42,24 +82,20 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
   },
   header: {
-    marginBottom: 16,
+    padding: 16,
     flexDirection: 'row',
     justifyContent: 'flex-end',
+    alignItems: 'center',
   },
   headerContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 4,
   },
   settingsButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
+    padding: 8,
+    borderRadius: 8,
     borderWidth: 1,
-  },
+  }
 });
