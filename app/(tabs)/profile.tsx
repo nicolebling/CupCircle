@@ -62,14 +62,14 @@ export default function ProfileScreen() {
         console.log("ProfileScreen: User from AuthContext:", user);
         console.log("ProfileScreen: userId being passed to useProfileManager:", user?.id);
 
-        
+
       } catch (error) {
         console.error("Error in profile loading:", error);
       }
     };
 
     loadProfile();
-  }, [user, fetchProfile]);
+  }, [user?.id]); // Only depend on user ID changes
 
 
   // Separate effect for updating profile data
