@@ -26,8 +26,22 @@ export function useProfileManager(userId: string) {
     try {
       setIsLoading(true);
       setError(null);
-      const userProfile = await profileService.getProfileByUserId(userId);
-      setProfile(userProfile);
+      
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching profile:', error);
+        setError('Failed to load profile. Please try again.');
+        return;
+      }
+
+      console.log('Fetched profile data:', data);
+      setProfile(data);
+      
     } catch (err) {
       console.error('Failed to load user profile', err);
       setError('Failed to load profile. Please try again.');
