@@ -218,8 +218,6 @@ export default function ProfileCard({
     }
   };
 
-  ///NEW
-
   const handleAddSkill = (skill: string) => {
     if (skill.trim() && !skills.includes(skill.trim())) {
       setSkills([...skills, skill.trim()]);
@@ -412,8 +410,6 @@ export default function ProfileCard({
       </View>
     );
   }
-
-  ////////////////////////////
 
   const getTitle = () => {
     if (isOnboarding) return "Complete Your Profile";
@@ -725,13 +721,42 @@ export default function ProfileCard({
             <Text style={[styles.value, { color: colors.text }]}>
               {profile.age || "Not provided"}
             </Text>
+            <Text style={[styles.label, { color: colors.secondaryText }]}>
+              City
+            </Text>
+            <Text style={[styles.value, { color: colors.text }]}>
+              {profile.city}
+            </Text>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>
+              About Me
+            </Text>
+            <Text style={[styles.value, { color: colors.text }]}>
+              {profile.bio}
+            </Text>
+            
+            
+            
+          </View>
 
+          {/* Professional Information */}
+          <View style={styles.section}>
+          
             <Text style={[styles.label, { color: colors.secondaryText }]}>
               Occupation
             </Text>
             <Text style={[styles.value, { color: colors.text }]}>
               {profile.occupation}
             </Text>
+
+            <Text style={[styles.label, { color: colors.secondaryText }]}>
+              Experience Level
+            </Text>
+            <Text style={[styles.value, { color: colors.text }]}>
+              {profile.experienceLevel}
+            </Text>
+
+
+            
           </View>
 
           {/* Bio */}
@@ -921,6 +946,10 @@ export default function ProfileCard({
                 </View>
               </>
             )}
+
+            <Text style={[styles.label, { color: colors.secondaryText }]}>
+              Favorite Cafes
+            </Text>
 
             {profile.favoriteCafes && profile.favoriteCafes.length > 0 && (
               <>
