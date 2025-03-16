@@ -36,8 +36,13 @@ export default function ProfileScreen() {
 
   useEffect(() => {
     const loadProfile = async () => {
-      if (!user?.id) {
-        console.log("Waiting for user authentication...");
+      if (!user) {
+        console.log("No user object found");
+        return;
+      }
+
+      if (!user.id) {
+        console.log("No user ID available");
         return;
       }
 
@@ -45,29 +50,35 @@ export default function ProfileScreen() {
       try {
         await fetchProfile();
         console.log("Profile fetch completed successfully");
-        setProfileData({
-          name: profile?.name || '',
-          age: profile?.age,
-          photo: profile?.photo_url,
-          occupation: profile?.occupation || '',
-          industries: profile?.industry_categories || [],
-          skills: profile?.skills || [],
-          experience: profile?.experience_level || '',
-          education: profile?.education || '',
-          bio: profile?.bio || '',
-          city: profile?.city || '',
-          neighborhoods: profile?.neighborhoods || [],
-          favoriteCafes: profile?.favorite_cafes || [],
-          interests: profile?.interests || [],
-        });
       } catch (error) {
         console.error("Error fetching profile:", error);
       }
     };
 
     loadProfile();
-  }, [user, profile, fetchProfile]);
+  }, [user]);
 
+  // Separate effect for updating profile data
+  useEffect(() => {
+    if (profile) {
+      setProfileData({
+        name: profile.name || '',
+        age: profile.age,
+        photo: profile.photo_url,
+        occupation: profile.occupation || '',
+        industries: profile.industry_categories || [],
+        skills: profile.skills || [],
+        experience: profile.experience_level || '',
+        education: profile.education || '',
+        bio: profile.bio || '',
+        city: profile.city || '',
+        neighborhoods: profile.neighborhoods || [],
+        favoriteCafes: profile.favorite_cafes || [],
+        interests: profile.interests || [],
+      });
+      setIsLoading(false);
+    }
+  }, [profile]);
 
   const [isLoading, setIsLoading] = useState(true);
 
