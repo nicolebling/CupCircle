@@ -39,8 +39,25 @@ export default function ProfileScreen() {
   };
 
   const handleProfileSave = async (updatedData) => {
-    setProfileData(updatedData);
-    setIsEditMode(false);
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .upsert({
+          id: user.id,
+          ...updatedData,
+          updated_at: new Date()
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      
+      setProfileData(data);
+      setIsEditMode(false);
+    } catch (error) {
+      console.error('Error saving profile:', error);
+      Alert.alert('Error', 'Failed to save profile changes');
+    }
   };
 
   if (!user) {

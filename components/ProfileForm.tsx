@@ -235,7 +235,7 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
 
       console.log('Profile saved successfully:', data);
       Alert.alert('Success', 'Your profile has been saved');
-      router.replace('/(tabs)/matching');
+      onSave && onSave(profileData);
     } catch (error: any) {
       console.error('Error saving profile:', error);
       setError('Failed to save profile. Please try again.');
