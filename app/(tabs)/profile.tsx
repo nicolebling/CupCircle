@@ -82,7 +82,10 @@ export default function ProfileScreen() {
           userId={user.id} 
           isNewUser={false}
           initialData={profileData}
-          onSave={handleProfileSave}
+          onSave={(updatedData) => {
+            handleProfileSave(updatedData);
+            setIsEditMode(false);
+          }}
           onCancel={() => setIsEditMode(false)}
         />
       ) : (
