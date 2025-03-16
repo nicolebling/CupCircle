@@ -36,10 +36,11 @@ export default function ProfileScreen() {
   const { profile, isLoading: profileLoading, error, fetchProfile, updateProfile } = useProfileManager(userId);
   
   useEffect(() => {
-    if (userId) {
-        fetchProfile();
-      }
-    }, [userId]);
+    if (user?.id) {
+      console.log("Triggering profile fetch for user:", user.id);
+      fetchProfile();
+    }
+  }, [user?.id, fetchProfile]);
   
   const [isLoading, setIsLoading] = useState(true);
   
