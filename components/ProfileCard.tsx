@@ -143,6 +143,7 @@ export default function ProfileCard({
   const [userData, setUserData] = useState<UserProfileData>(profile);
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState("");
+  const [username, setUsername] = useState('');
   const [avatar, setAvatar] = useState("");
   const [occupation, setOccupation] = useState("");
   const [bio, setBio] = useState("");
@@ -345,6 +346,7 @@ export default function ProfileCard({
       const profileData = {
         id: userId,
         name,
+        username,
         occupation,
         photo_url: avatar,
         bio,
@@ -1023,6 +1025,26 @@ export default function ProfileCard({
           />
           {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
 
+          {/* Username */}
+          <Text style={[styles.label, { color: colors.secondaryText }]}>
+            Username*
+          </Text>
+          <TextInput
+            style={[
+              styles.input,
+              {
+                backgroundColor: colors.background,
+                color: colors.text,
+                borderColor: errors.name ? "red" : colors.border,
+              },
+            ]}
+            value={username}
+            onChangeText={setUsername}
+            placeholder="Choose a username"
+            placeholderTextColor={colors.secondaryText}
+          />
+          {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
+
           {/* Age */}
           <Text style={[styles.label, { color: colors.secondaryText }]}>
             Age*
@@ -1154,6 +1176,33 @@ export default function ProfileCard({
             maxSelections={3}
           />
         </View>
+        
+        {/* skills */}
+        <View style={styles.inputGroup}>
+            <Text style={[styles.label, isDark && styles.textDark]}>Skills</Text>
+            <View style={styles.tagsContainer}>
+              {skills.map((skill, index) => (
+                <View key={index} style={styles.tag}>
+                  <Text style={styles.tagText}>{skill}</Text>
+                  <TouchableOpacity onPress={() => handleRemoveSkill(index)}>
+                    <Ionicons name="close-circle" size={18} color="#fff" />
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </View>
+            <View style={styles.tagInput}>
+              <TextInput
+                style={[styles.input, isDark && styles.inputDark]}
+                placeholder="Add a skill"
+                placeholderTextColor={isDark ? '#999' : '#777'}
+                onSubmitEditing={(e) => {
+                  handleAddSkill(e.nativeEvent.text);
+                  e.currentTarget.clear();
+                }}
+              />
+            </View>
+          </View>
+        
 
         {/* Location Preferences */}
         <View style={styles.section}>
