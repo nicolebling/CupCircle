@@ -43,17 +43,22 @@ export const profileService = {
     try {
       if (!userId) return null;
 
+      console.log('Fetching profile for user:', userId);
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', userId)
+        .eq('user_id', userId)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
+      console.log('Profile data:', data);
       return data;
     } catch (error) {
-      console.error('Failed to load user profile', error);
-      return null;
+      console.error('Failed to load user profile:', error);
+      throw error;
     }
   },
 
