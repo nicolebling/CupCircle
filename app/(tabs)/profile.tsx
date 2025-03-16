@@ -49,12 +49,11 @@ export default function ProfileScreen() {
           return;
         }
 
-      console.log("Profile fetch triggered for user:", user.id);
-      try {
+        console.log("Profile fetch triggered for user:", currentUser.id);
         await fetchProfile();
         console.log("Profile fetch completed successfully");
       } catch (error) {
-        console.error("Error fetching profile:", error);
+        console.error("Error in profile loading:", error);
       }
     };
 
