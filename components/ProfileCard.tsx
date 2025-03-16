@@ -93,6 +93,8 @@ export type UserProfileData = {
 };
 
 type ProfileCardProps = {
+  userId: string;
+  isNewUser?: boolean;
   profile: UserProfileData;
   isUserProfile?: boolean; // Whether this is the user's own profile (edit mode)
   isEditMode?: boolean; // Whether the user profile is in edit mode
@@ -102,8 +104,7 @@ type ProfileCardProps = {
   onCancel?: () => void;
   onLike?: () => void;
   onSkip?: () => void;
-  userId: string;
-  isNewUser?: boolean;
+
 };
 
 const EMPTY_PROFILE: UserProfileData = {
