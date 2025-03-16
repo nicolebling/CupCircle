@@ -71,7 +71,7 @@ export default function ProfileForm({ userId, isNewUser = true }: ProfileFormPro
         console.error('Error fetching profile:', error);
         throw error;
       }
-
+      console.log(userId);
       console.log('Profile fetched:', data);
 
       if (data) {
