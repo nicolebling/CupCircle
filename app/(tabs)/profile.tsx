@@ -33,38 +33,24 @@ export default function ProfileScreen() {
   });
 
   const userId = user?.id || '';
-  const { profile, isLoading: profileLoading, error,  setProfile,  } = useProfileManager(user?.id || '');
+  const { profile, isLoading: profileLoading, error, fetchProfile } = useProfileManager(user?.id || '');
 
   useEffect(() => {
     const loadProfile = async () => {
       try {
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-
-        if (sessionError) {
-          console.error("Session error:", sessionError);
+        if (!user?.id) {
+          console.log("No user ID available");
           return;
         }
+        console.log("Fetching profile for user:", user.id);
+        await fetchProfile();
+        console.log("Profile fetched successfully");
+      } catch (error) {
+        console.error("Error in profile loading:", error);
+      }
+    };
 
-        if (!session?.user) {
-          console.log("No authenticated session found");
-          return;
-        }
-
-        console.log("Session user:", session.user);
-
-        const { data: profileData, error: profileError } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .single();
-
-        if (profileError) {
-          console.error("Profile fetch error:", profileError);
-          return;
-        }
-
-        console.log("Profile data received:", profileData);
-        setProfile(profileData);
+    loadProfile();
 
       } catch (error) {
         console.error("Error in profile loading:", error);

@@ -74,6 +74,7 @@ export function useProfileManager(userId: string) {
 
   return {
     profile,
+    setProfile,
     isLoading,
     error,
     fetchProfile,
