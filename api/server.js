@@ -1,8 +1,8 @@
-
-const express = require('express');
-const { Pool } = require('pg');
-const cors = require('cors');
-const bcrypt = require('bcryptjs');
+import express from 'express';
+import { Pool } from 'pg';
+import cors from 'cors';
+import bcrypt from 'bcryptjs';
+import fetch from 'node-fetch';
 
 const app = express();
 const port = 3000;
@@ -86,9 +86,6 @@ app.post('/api/auth/register', async (req, res) => {
   }
 });
 
-// Import fetch at the top of the file
-const fetch = require('node-fetch');
-
 // Places API proxy
 app.get('/api/places/search', async (req, res) => {
   try {
@@ -98,10 +95,11 @@ app.get('/api/places/search', async (req, res) => {
     }
 
     console.log('Searching for cafes with query:', query);
+    const apiKey = process.env.GOOGLE_MAPS_API_KEY;
     const response = await fetch(
       `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(
         query + ' cafe in new york'
-      )}&type=cafe&key=AIzaSyDYiKrt8lG2X2HxF4DUqVqIFi4wpGo6Aec`,
+      )}&type=cafe&key=${apiKey}`,
       {
         method: 'GET',
         headers: {
