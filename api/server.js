@@ -91,38 +91,75 @@ app.post('/api/auth/register', async (req, res) => {
 app.get('/api/places/search', async (req, res) => {
   try {
     const query = req.query.query;
-    if (!query) {
-      return res.status(400).json({ error: 'Query parameter is required' });
+    if (!query || typeof query !== 'string') {
+      return res.status(400).json({
+        error: 'Missing or invalid query parameter',
+        status: 'ERROR',
+        predictions: []
+      });
     }
 
-    console.log('Searching for cafes with query:', query);
     const apiKey = process.env.GOOGLE_MAPS_API_KEY;
-    console.log('API Key available:', !!apiKey);
-    
-    const url = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(
-      query + ' cafe in new york'
-    )}&type=cafe&key=${apiKey}`;
-    console.log('Request URL:', url);
+    if (!apiKey) {
+      console.error('Google Maps API key is missing');
+      return res.status(500).json({
+        error: 'API configuration error',
+        status: 'ERROR',
+        predictions: []
+      });
+    }
 
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-      }
+    const baseUrl = 'https://maps.googleapis.com/maps/api/place/textsearch/json';
+    const searchQuery = `${query} in New York`;
+    
+    const queryParams = new URLSearchParams({
+      query: searchQuery,
+      key: apiKey,
+      language: 'en',
+      type: 'cafe',
+      location: '40.7128,-74.0060',
+      radius: '10000'
     });
 
-    console.log('Response status:', response.status);
-    console.log('Response ok:', response.ok);
+    const apiUrl = `${baseUrl}?${queryParams}`;
+    console.log('Places API Request:', apiUrl.replace(apiKey, 'REDACTED'));
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Response error text:', errorText);
-      throw new Error(`Places API responded with status: ${response.status}, body: ${errorText}`);
+    const response = await fetch(apiUrl);
+    const data = await response.json();
+
+    if (data.status === 'ZERO_RESULTS') {
+      return res.json({
+        status: 'OK',
+        predictions: []
+      });
     }
 
-    const data = await response.json();
-    console.log('Places API response:', data);
-    res.json(data);
+    if (data.status !== 'OK') {
+      console.error('Places API error:', {
+        status: data.status,
+        error_message: data.error_message,
+        data: data
+      });
+      return res.status(400).json({
+        error: data.error_message || 'Failed to fetch places',
+        status: data.status,
+        predictions: []
+      });
+    }
+
+    const predictions = data.results.map((place) => ({
+      place_id: place.place_id,
+      description: place.name + ' - ' + place.formatted_address,
+      structured_formatting: {
+        main_text: place.name,
+        secondary_text: place.formatted_address
+      }
+    }));
+
+    res.json({
+      status: 'OK',
+      predictions: predictions.slice(0, 5)
+    });
   } catch (error) {
     console.error('Places API detailed error:', {
       message: error.message,
