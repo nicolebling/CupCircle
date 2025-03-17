@@ -1,0 +1,155 @@
+
+
+ <FormField
+                    control={form.control}
+                    name="favoriteCafes"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Cafes <span className="text-destructive">*</span>
+                        </FormLabel>
+                        <FormDescription>
+                          Select your top 3 cafes for meetups
+                        </FormDescription>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              className={cn(
+                                "w-full justify-between",
+                                cafes.length >= 3 &&
+                                  "cursor-not-allowed opacity-50",
+                              )}
+                              disabled={cafes.length >= 3}
+                            >
+                              <span className="truncate">
+                                {cafes.length > 0
+                                  ? `${cafes.length} cafe${
+                                      cafes.length === 1 ? "" : "s"
+                                    } selected`
+                                  : "Search for cafes..."}
+                              </span>
+                              {isLoadingSuggestions ? (
+                                <Loader2 className="h-4 w-4 animate-spin ml-2" />
+                              ) : (
+                                <Search className="h-4 w-4 ml-2 opacity-50" />
+                              )}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent
+                            className="w-[400px] p-0"
+                            align="start"
+                            onOpenAutoFocus={(e) => e.preventDefault()}
+                          >
+                            <Command shouldFilter={false}>
+                              <CommandInput
+                                placeholder="Search cafes..."
+                                value={cafeInput}
+                                onValueChange={(value) => {
+                                  setCafeInput(value);
+                                  if (!value.trim()) {
+                                    setSuggestions([]);
+                                    setIsLoadingSuggestions(false);
+                                  }
+                                }}
+                                autoFocus
+                              />
+                              <CommandList>
+                                <CommandEmpty>
+                                  {isLoadingSuggestions ? (
+                                    <div className="flex items-center justify-center p-4">
+                                      <Loader2 className="h-4 w-4 animate-spin" />
+                                    </div>
+                                  ) : (
+                                    suggestions.length === 0 && "No cafes found"
+                                  )}
+                                </CommandEmpty>
+                                <CommandGroup>
+                                  {suggestions.map((suggestion) => {
+                                    const cafeString = `${suggestion.label}${
+                                      suggestion.address
+                                        ? ` (${suggestion.address})`
+                                        : ""
+                                    }`;
+                                    const isSelected =
+                                      cafes.includes(cafeString);
+
+                                    return (
+                                      <CommandItem
+                                        key={suggestion.value}
+                                        onSelect={() => {
+                                          if (isSelected) {
+                                            const updatedCafes = cafes.filter(
+                                              (cafe) => cafe !== cafeString,
+                                            );
+                                            setCafes(updatedCafes);
+                                            field.onChange(updatedCafes);
+                                          } else if (cafes.length < 3) {
+                                            const updatedCafes = [
+                                              ...cafes,
+                                              cafeString,
+                                            ];
+                                            setCafes(updatedCafes);
+                                            field.onChange(updatedCafes);
+                                          }
+                                        }}
+                                      >
+                                        <div className="flex items-center justify-between w-full">
+                                          <div className="flex flex-col">
+                                            <span className="fontmedium">
+                                              {suggestion.label}{" "}
+                                            </span>
+                                            {suggestion.address && (
+                                              <span className="text-sm text-muted-foreground">
+                                                {suggestion.address}
+                                              </span>
+                                            )}
+                                          </div>
+                                          <div
+                                            className={
+                                              ("flex h-4 w-4 items-center justify-center rounded-sm border",
+                                              isSelected
+                                                ? "bg-primary border-primary text-primary-foreground"
+                                                : "border-input")
+                                            }
+                                          >
+                                            {isSelected && "✓"}
+                                          </div>
+                                        </div>
+                                      </CommandItem>
+                                    );
+                                  })}
+                                </CommandGroup>
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {cafes.map((cafe, index) => (
+                            <Badge
+                              key={index}
+                              variant="outline"
+                              className="cursor-pointer"
+                              onClick={() => {
+                                const updatedCafes = cafes.filter(
+                                  (_, i) => i !== index,
+                                );
+                                setCafes(updatedCafes);
+                                field.onChange(updatedCafes);
+                              }}
+                            >
+                              {cafe} ×
+                            </Badge>
+                          ))}
+                        </div>
+                        {cafes.length >= 3 && (
+                          <p className="text-sm text-muted-foreground mt-2">
+                            Maximum 3 cafes allowed. Remove a cafe to add
+                            another.
+                          </p>
+                        )}
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
