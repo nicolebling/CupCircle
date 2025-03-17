@@ -472,27 +472,11 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
 
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isDark && styles.textDark]}>Favorite Cafes</Text>
-              <View style={styles.tagsContainer}>
-                {favoriteCafes.map((cafe, index) => (
-                  <View key={index} style={styles.tag}>
-                    <Text style={styles.tagText}>{cafe}</Text>
-                    <TouchableOpacity onPress={() => handleRemoveCafe(index)}>
-                      <Ionicons name="close-circle" size={18} color="#fff" />
-                    </TouchableOpacity>
-                  </View>
-                ))}
-              </View>
-              <View style={styles.tagInput}>
-                <TextInput
-                  style={[styles.input, isDark && styles.inputDark]}
-                  placeholder="Add a cafe"
-                  placeholderTextColor={isDark ? '#999' : '#777'}
-                  onSubmitEditing={(e) => {
-                    handleAddCafe(e.nativeEvent.text);
-                    e.currentTarget.clear();
-                  }}
-                />
-              </View>
+              <CafeSelector
+                selected={favoriteCafes}
+                onChange={setFavoriteCafes}
+                isDark={isDark}
+              />
             </View>
           </View>
 
