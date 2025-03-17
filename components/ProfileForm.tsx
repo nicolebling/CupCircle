@@ -20,6 +20,7 @@ import { router } from 'expo-router';
 import IndustrySelector from '@/components/IndustrySelector';
 import InterestSelector from '@/components/InterestSelector';
 import ExperienceLevelSelector from '@/components/ExperienceLevelSelector';
+import NeighborhoodSelector from '@/components/NeighborhoodSelector';
 
 type ProfileFormProps = {
   userId: string;
@@ -462,27 +463,11 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
 
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isDark && styles.textDark]}>Favorite Neighborhoods</Text>
-              <View style={styles.tagsContainer}>
-                {neighborhoods.map((neighborhood, index) => (
-                  <View key={index} style={styles.tag}>
-                    <Text style={styles.tagText}>{neighborhood}</Text>
-                    <TouchableOpacity onPress={() => handleRemoveNeighborhood(index)}>
-                      <Ionicons name="close-circle" size={18} color="#fff" />
-                    </TouchableOpacity>
-                  </View>
-                ))}
-              </View>
-              <View style={styles.tagInput}>
-                <TextInput
-                  style={[styles.input, isDark && styles.inputDark]}
-                  placeholder="Add a neighborhood"
-                  placeholderTextColor={isDark ? '#999' : '#777'}
-                  onSubmitEditing={(e) => {
-                    handleAddNeighborhood(e.nativeEvent.text);
-                    e.currentTarget.clear();
-                  }}
-                />
-              </View>
+              <NeighborhoodSelector
+                selected={neighborhoods}
+                onChange={setNeighborhoods}
+                isDark={isDark}
+              />
             </View>
 
             <View style={styles.inputGroup}>
