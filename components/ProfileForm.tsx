@@ -216,8 +216,8 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
         city,
         industry_categories: industryCategories,
         skills: skills,
-        neighborhoods: neighborhoods,
-        favorite_cafes: favoriteCafes,
+        neighborhoods: ["Downtown Brooklyn", "Midtown", "Tribeca"],
+        favorite_cafes: ["Coffee House", "Bean There", "Morning Brew"],
         interests: interests,
         updated_at: new Date(),
       };
