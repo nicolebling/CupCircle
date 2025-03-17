@@ -86,16 +86,36 @@ app.post('/api/auth/register', async (req, res) => {
   }
 });
 
+// Import fetch at the top of the file
+const fetch = require('node-fetch');
+
 // Places API proxy
 app.get('/api/places/search', async (req, res) => {
   try {
     const query = req.query.query;
+    if (!query) {
+      return res.status(400).json({ error: 'Query parameter is required' });
+    }
+
+    console.log('Searching for cafes with query:', query);
     const response = await fetch(
       `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(
         query + ' cafe in new york'
-      )}&type=cafe&key=AIzaSyDYiKrt8lG2X2HxF4DUqVqIFi4wpGo6Aec`
+      )}&type=cafe&key=AIzaSyDYiKrt8lG2X2HxF4DUqVqIFi4wpGo6Aec`,
+      {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+        }
+      }
     );
+
+    if (!response.ok) {
+      throw new Error(`Places API responded with status: ${response.status}`);
+    }
+
     const data = await response.json();
+    console.log('Places API response received');
     res.json(data);
   } catch (error) {
     console.error('Places API error:', error);
