@@ -682,6 +682,7 @@ export default function ProfileCard({
               style={styles.profilePhoto}
             />
           </View>
+          
 
           <View style={styles.nameRow}>
             <Text style={[styles.name, { color: colors.text }]}>
@@ -740,7 +741,8 @@ export default function ProfileCard({
 
           {/* Professional Information */}
           <View style={styles.section}>
-          
+
+            {/* Occupation */}
             <Text style={[styles.label, { color: colors.secondaryText }]}>
               Occupation
             </Text>
@@ -748,6 +750,8 @@ export default function ProfileCard({
               {profile.occupation}
             </Text>
 
+
+            {/* Experience Level */}
             <Text style={[styles.label, { color: colors.secondaryText }]}>
               Experience Level
             </Text>
