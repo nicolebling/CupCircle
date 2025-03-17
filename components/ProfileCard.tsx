@@ -756,7 +756,7 @@ export default function ProfileCard({
               Experience Level
             </Text>
             <Text style={[styles.value, { color: colors.text }]}>
-              {profile.experienceLevel}
+              {profile.experience_level || "Not specified"}
             </Text>
 
 
