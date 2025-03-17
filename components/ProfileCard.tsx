@@ -241,8 +241,8 @@ export default function ProfileCard({
   // Function to handle edit button press
   const handleEdit = () => {
     if (onSave) {
+      // This will trigger edit mode in the parent component
       onSave(userData);
-      router.replace('/(tabs)/profile');
     }
   };
 
@@ -682,7 +682,7 @@ export default function ProfileCard({
               style={styles.profilePhoto}
             />
           </View>
-
+          
 
           <View style={styles.nameRow}>
             <Text style={[styles.name, { color: colors.text }]}>
@@ -746,7 +746,7 @@ export default function ProfileCard({
             </Text>
           </View>
 
-
+          
 
           {/* Professional Details */}
           <View style={styles.section}>
@@ -887,7 +887,7 @@ export default function ProfileCard({
               </>
             )} */}
 
-
+            
           </View>
 
           {/* Location */}
@@ -965,13 +965,11 @@ export default function ProfileCard({
           <Text style={[styles.title, { color: colors.text }]}>
             {getTitle()}
           </Text>
-          <TouchableOpacity onPress={isEditMode ? onCancel : handleEdit}>
-            <Ionicons
-              name={isEditMode ? "close-outline" : "create-outline"}
-              size={24}
-              color={colors.primary}
-            />
-          </TouchableOpacity>
+          {!isOnboarding && (
+            <TouchableOpacity onPress={onCancel}>
+              <Ionicons name="close-outline" size={24} color={colors.primary} />
+            </TouchableOpacity>
+          )}
         </View>
 
         {/* Profile Photo */}
@@ -1093,7 +1091,8 @@ export default function ProfileCard({
           {/* Interests */}
           <View style={styles.label}>
             <Text style={[styles.label, { color: colors.secondaryText }]}>
-              Interests            </Text>
+              Interests
+            </Text>
             <InterestSelector
               selected={interests || []}
               onChange={setInterests}
