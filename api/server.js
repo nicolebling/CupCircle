@@ -88,10 +88,10 @@ app.post('/api/auth/register', async (req, res) => {
 });
 
 // Places API proxy
-app.get('/api/places/search', async (req, res) => {
+app.get('/api/places/autocomplete', async (req, res) => {
   try {
-    const query = req.query.query;
-    if (!query || typeof query !== 'string') {
+    const { input } = req.query;
+    if (!input || typeof input !== 'string') {
       return res.status(400).json({
         error: 'Missing or invalid query parameter',
         status: 'ERROR',
@@ -110,7 +110,7 @@ app.get('/api/places/search', async (req, res) => {
     }
 
     const baseUrl = 'https://maps.googleapis.com/maps/api/place/textsearch/json';
-    const searchQuery = `${query} in New York`;
+    const searchQuery = `${input} in New York`;
     
     const queryParams = new URLSearchParams({
       query: searchQuery,
