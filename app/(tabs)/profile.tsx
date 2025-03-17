@@ -66,8 +66,6 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      
-
       {isEditMode ? (
         <ProfileForm 
           userId={user.id} 

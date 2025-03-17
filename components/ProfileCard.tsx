@@ -241,8 +241,8 @@ export default function ProfileCard({
   // Function to handle edit button press
   const handleEdit = () => {
     if (onSave) {
-      // This will trigger edit mode in the parent component
       onSave(userData);
+      router.replace('/(tabs)/profile');
     }
   };
 
