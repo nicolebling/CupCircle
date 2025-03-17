@@ -23,6 +23,8 @@ export default function RootLayout() {
     'K2D-Bold': require('../assets/fonts/K2D-Bold.ttf'),
     'K2D-SemiBold': require('../assets/fonts/K2D-SemiBold.ttf'),
   });
+  
+  const [isEditMode, setIsEditMode] = useState(false);
 
   useEffect(() => {
     if (loaded) {
@@ -60,6 +62,21 @@ export default function RootLayout() {
             headerTitleStyle: {
               fontFamily: 'K2D-SemiBold',
             },
+            headerRight: () => (
+              <TouchableOpacity 
+                style={{
+                  padding: 8,
+                  borderRadius: 8,
+                  borderWidth: 1,
+                  borderColor: colors.border,
+                  backgroundColor: colors.card,
+                  marginRight: 16
+                }}
+                onPress={() => setIsEditMode(!isEditMode)}
+              >
+                <Ionicons name={isEditMode ? "close" : "create-outline"} size={20} color={colors.text} />
+              </TouchableOpacity>
+            ),
           }}
         >
           <Stack.Screen name="(auth)" options={{ headerShown: false }} />
