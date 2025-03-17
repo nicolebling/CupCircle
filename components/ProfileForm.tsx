@@ -386,7 +386,7 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isDark && styles.textDark]}>Experience Level</Text>
               <ExperienceLevelSelector
-                value={experienceLevel}
+                selected={experienceLevel}
                 onChange={setExperienceLevel}
                 isDark={isDark}
               />
