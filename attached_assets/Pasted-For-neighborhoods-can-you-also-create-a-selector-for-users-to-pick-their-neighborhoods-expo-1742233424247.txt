@@ -1,0 +1,243 @@
+For neighborhoods, can you also create a selector for users to pick their neighborhoods?
+
+
+
+export const NYC_NEIGHBORHOODS_BY_BOROUGH = {
+  Manhattan: [
+    "Alphabet City",
+    "Battery Park City",
+    "Bowery",
+    "Carnegie Hill",
+    "Chelsea",
+    "Chinatown",
+    "Civic Center",
+    "East Harlem",
+    "East Village",
+    "Financial District",
+    "Flatiron District",
+    "Gramercy Park",
+    "Greenwich Village",
+    "Harlem",
+    "Hell's Kitchen",
+    "Inwood",
+    "Kips Bay",
+    "Lower East Side",
+    "Manhattan Valley",
+    "Marble Hill",
+    "Meatpacking District",
+    "Midtown East",
+    "Midtown West",
+    "Morningside Heights",
+    "Murray Hill",
+    "NoHo",
+    "Nolita",
+    "Roosevelt Island",
+    "SoHo",
+    "South Street Seaport",
+    "South Village",
+    "Stuyvesant Town",
+    "Theater District",
+    "TriBeCa",
+    "Two Bridges",
+    "Upper East Side",
+    "Upper West Side",
+    "Washington Heights",
+    "West Village",
+    "Yorkville",
+  ],
+  Brooklyn: [
+    "Bath Beach",
+    "Bay Ridge",
+    "Bedford-Stuyvesant",
+    "Bensonhurst",
+    "Bergen Beach",
+    "Boerum Hill",
+    "Borough Park",
+    "Brighton Beach",
+    "Brooklyn Heights",
+    "Brownsville",
+    "Bushwick",
+    "Canarsie",
+    "Carroll Gardens",
+    "Clinton Hill",
+    "Cobble Hill",
+    "Columbia Street Waterfront District",
+    "Coney Island",
+    "Crown Heights",
+    "Cypress Hills",
+    "DUMBO",
+    "Ditmas Park",
+    "Downtown Brooklyn",
+    "Dyker Heights",
+    "East Flatbush",
+    "East New York",
+    "East Williamsburg",
+    "Flatbush",
+    "Flatlands",
+    "Fort Greene",
+    "Fort Hamilton",
+    "Gowanus",
+    "Gravesend",
+    "Greenpoint",
+    "Greenwood Heights",
+    "Highland Park",
+    "Kensington",
+    "Manhattan Beach",
+    "Marine Park",
+    "Midwood",
+    "Mill Basin",
+  ],
+  Queens: [
+    "Astoria",
+    "Bayside",
+    "Corona",
+    "Elmhurst",
+    "Flushing",
+    "Forest Hills",
+    "Jackson Heights",
+    "Jamaica",
+    "Long Island City",
+    "Ridgewood",
+    "Sunnyside",
+    "Woodside",
+  ],
+};
+
+
+Here is a reference code in react for the selector:
+
+<FormField
+                    control={form.control}
+                    name="neighborhoods"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Neighborhoods{" "}
+                          <span className="text-destructive">*</span>
+                        </FormLabel>
+                        <FormDescription>
+                          Select your preferred neighborhoods for meetups
+                        </FormDescription>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              className="w-full justify-between"
+                            >
+                              {selectedNeighborhoods.length
+                                ? `${selectedNeighborhoods.length} neighborhood${
+                                    selectedNeighborhoods.length === 1
+                                      ? ""
+                                      : "s"
+                                  } selected`
+                                : "Select Neighborhoods"}
+                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent
+                            className="w-[400px] p-0 bg-secondary"
+                            align="start"
+                          >
+                            <Tabs
+                              defaultValue={NYC_BOROUGHS[0]}
+                              className="w-full"
+                            >
+                              <TabsList className="w-full">
+                                {NYC_BOROUGHS.map((borough) => (
+                                  <TabsTrigger
+                                    key={borough}
+                                    value={borough}
+                                    className="flex-1"
+                                  >
+                                    {borough}
+                                  </TabsTrigger>
+                                ))}
+                              </TabsList>
+                              {NYC_BOROUGHS.map((borough) => (
+                                <TabsContent key={borough} value={borough}>
+                                  <Command>
+                                    <CommandInput
+                                      placeholder={`Search ${borough} neighborhoods...`}
+                                    />
+                                    <CommandList>
+                                      <CommandEmpty>
+                                        No neighborhoods found in {borough}
+                                      </CommandEmpty>
+                                      <CommandGroup>
+                                        {NYC_NEIGHBORHOODS_BY_BOROUGH[
+                                          borough
+                                        ]?.map((neighborhood) => (
+                                          <CommandItem
+                                            key={neighborhood}
+                                            onSelect={() => {
+                                              setSelectedNeighborhoods(
+                                                (current) => {
+                                                  const updated =
+                                                    current.includes(
+                                                      neighborhood,
+                                                    )
+                                                      ? current.filter(
+                                                          (i) =>
+                                                            i !== neighborhood,
+                                                        )
+                                                      : [
+                                                          ...current,
+                                                          neighborhood,
+                                                        ];
+                                                  form.setValue(
+                                                    "neighborhoods",
+                                                    updated,
+                                                  );
+                                                  return updated;
+                                                },
+                                              );
+                                            }}
+                                          >
+                                            <div
+                                              className={`w-4 h-4 border rounded-sm flex items-center justify-center ${
+                                                selectedNeighborhoods.includes(
+                                                  neighborhood,
+                                                )
+                                                  ? "bg-primary border-primary"
+                                                  : "border-input"
+                                              }`}
+                                            >
+                                              {selectedNeighborhoods.includes(
+                                                neighborhood,
+                                              ) && "✓"}
+                                            </div>
+                                            {neighborhood}
+                                          </CommandItem>
+                                        ))}
+                                      </CommandGroup>
+                                    </CommandList>
+                                  </Command>
+                                </TabsContent>
+                              ))}
+                            </Tabs>
+                          </PopoverContent>
+                        </Popover>
+                        <div className="flex flex-wrap gap-2">
+                          {selectedNeighborhoods.map((neighborhood, index) => (
+                            <Badge
+                              key={index}
+                              variant="outline"
+                              className="cursor-pointer"
+                              onClick={() => {
+                                const newNeighborhood =
+                                  selectedNeighborhoods.filter(
+                                    (_, i) => i !== index,
+                                  );
+                                setSelectedNeighborhoods(newNeighborhood);
+                                form.setValue("neighborhoods", newNeighborhood);
+                              }}
+                            >
+                              {neighborhood} ×
+                            </Badge>
+                          ))}
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
