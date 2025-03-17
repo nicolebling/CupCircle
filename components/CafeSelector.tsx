@@ -39,12 +39,25 @@ export default function CafeSelector({
 
     setIsLoading(true);
     try {
+      // Using Places API Text Search for better results
       const response = await fetch(
         `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(
-          input + ' cafe'
-        )}&key=AIzaSyDYiKrt8lG2X2HxF4DUqVqIFi4wpGo6Aec`
+          input + ' cafe in new york'
+        )}&type=cafe&key=AIzaSyDYiKrt8lG2X2HxF4DUqVqIFi4wpGo6Aec`,
+        {
+          headers: {
+            'Accept': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          }
+        }
       );
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch cafe suggestions');
+      }
+
       const data = await response.json();
+      console.log('Places API response:', data);
       
       if (data.results) {
         const places = data.results.map((result: any) => ({
@@ -55,6 +68,7 @@ export default function CafeSelector({
       }
     } catch (error) {
       console.error('Error searching cafes:', error);
+      setSuggestions([]);
     } finally {
       setIsLoading(false);
     }
