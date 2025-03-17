@@ -104,6 +104,7 @@ type ProfileCardProps = {
   onCancel?: () => void;
   onLike?: () => void;
   onSkip?: () => void;
+  onEdit?: () => void; // Added onEdit prop
 
 };
 
@@ -136,6 +137,7 @@ export default function ProfileCard({
   onSkip,
   userId,
   isNewUser = true,
+  onEdit, // Added onEdit prop
 }: ProfileCardProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
@@ -240,9 +242,8 @@ export default function ProfileCard({
 
   // Function to handle edit button press
   const handleEdit = () => {
-    if (onSave) {
-      // This will trigger edit mode in the parent component
-      onSave(userData);
+    if (onEdit) {
+      onEdit();
     }
   };
 
@@ -682,7 +683,7 @@ export default function ProfileCard({
               style={styles.profilePhoto}
             />
           </View>
-          
+
 
           <View style={styles.nameRow}>
             <Text style={[styles.name, { color: colors.text }]}>
@@ -746,7 +747,7 @@ export default function ProfileCard({
             </Text>
           </View>
 
-          
+
 
           {/* Professional Details */}
           <View style={styles.section}>
@@ -887,7 +888,7 @@ export default function ProfileCard({
               </>
             )} */}
 
-            
+
           </View>
 
           {/* Location */}
