@@ -21,6 +21,7 @@ import IndustrySelector from '@/components/IndustrySelector';
 import InterestSelector from '@/components/InterestSelector';
 import ExperienceLevelSelector from '@/components/ExperienceLevelSelector';
 import NeighborhoodSelector from '@/components/NeighborhoodSelector';
+import CafeSelector from '@/components/CafeSelector';
 
 type ProfileFormProps = {
   userId: string;
