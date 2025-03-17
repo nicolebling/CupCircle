@@ -78,7 +78,7 @@ export type UserProfileData = {
   birthday?: string;
   age?: number;
   occupation: string;
-  experienceLevel?: string;
+  experience_level?: string;
   industries?: string[];
   skills?: string[];
   experience?: string;
