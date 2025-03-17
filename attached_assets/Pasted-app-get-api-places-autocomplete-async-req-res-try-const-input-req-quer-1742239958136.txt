@@ -1,0 +1,92 @@
+app.get("/api/places/autocomplete", async (req, res) => {
+    try {
+      const { input } = req.query;
+
+      if (!input || typeof input !== "string") {
+        return res.status(400).json({
+          error: "Missing or invalid input parameter",
+          status: "ERROR",
+          predictions: [],
+        });
+      }
+
+      const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+      if (!apiKey) {
+        console.error("Google Maps API key is missing");
+        return res.status(500).json({
+          error: "API configuration error",
+          status: "ERROR",
+          predictions: [],
+        });
+      }
+
+      // Build Places API request for cafes in NYC by default
+      const baseUrl =
+        "https://maps.googleapis.com/maps/api/place/textsearch/json";
+
+      // Use "cafe" search query with default city as NYC (no need to include city in the search string)
+      let searchQuery = `${input} in New York`;
+
+      // Build query parameters
+      const queryParams = new URLSearchParams({
+        query: searchQuery,
+        key: apiKey,
+        language: "en",
+        type: "cafe",
+      });
+
+      // Bias search to NYC with fixed coordinates
+      queryParams.append("location", "40.7128,-74.0060"); // Coordinates of NYC
+      queryParams.append("radius", "10000"); // 10km radius for better local results
+
+      const apiUrl = `${baseUrl}?${queryParams}`;
+      console.log("Places API Request:", apiUrl.replace(apiKey, "REDACTED"));
+
+      const response = await fetch(apiUrl);
+      const data = await response.json();
+
+      if (data.status === "ZERO_RESULTS") {
+        return res.json({
+          status: "OK",
+          predictions: [],
+        });
+      }
+
+      if (data.status !== "OK") {
+        console.error("Places API error:", {
+          status: data.status,
+          error_message: data.error_message,
+          data: data,
+        });
+        return res.status(400).json({
+          error: data.error_message || "Failed to fetch places",
+          status: data.status,
+          predictions: [],
+        });
+      }
+
+      console.log("Found places API response");
+
+      // Transform results to match frontend expectations
+      const predictions = data.results.map((place: any) => ({
+        place_id: place.place_id,
+        description: place.name + " - " + place.formatted_address,
+        structured_formatting: {
+          main_text: place.name,
+          secondary_text: place.formatted_address,
+        },
+      }));
+
+      res.json({
+        status: "OK",
+        predictions: predictions.slice(0, 5), // Limit to 5 results for better performance
+      });
+    } catch (error) {
+      console.error("Places API error:", error);
+      res.status(500).json({
+        error: error instanceof Error ? error.message : "Error fetching places",
+        status: "ERROR",
+        predictions: [],
+      });
+    }
+  });
