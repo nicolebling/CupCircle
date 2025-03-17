@@ -1,5 +1,5 @@
 import React from 'react';
-import { Tabs, TouchableOpacity } from 'expo-router';
+import { Tabs } from 'expo-router';
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
 
@@ -73,37 +73,12 @@ export default function TabLayout() {
 
       <Tabs.Screen
         name="profile"
-        options={({ navigation }) => ({
+        options={{
           title: 'Profile',
           tabBarIcon: ({ color, size }) => (
             <FontAwesome5 name="user" size={size - 2} color={color} />
           ),
-          headerRight: () => {
-            const isEditMode = navigation.getState().routes.find(
-              route => route.name === 'profile'
-            )?.params?.isEditMode;
-            
-            return (
-              <TouchableOpacity 
-                style={{
-                  padding: 8,
-                  borderRadius: 8,
-                  borderWidth: 1,
-                  borderColor: colors.border,
-                  backgroundColor: colors.card,
-                  marginRight: 16
-                }}
-                onPress={() => navigation.setParams({ isEditMode: !isEditMode })}
-              >
-                <Ionicons 
-                  name={isEditMode ? "close" : "create-outline"} 
-                  size={20} 
-                  color={colors.text} 
-                />
-              </TouchableOpacity>
-            );
-          },
-        })}
+        }}
       />
 
       <Tabs.Screen

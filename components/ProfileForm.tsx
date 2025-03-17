@@ -319,14 +319,7 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isDark && styles.textDark]}>Name*</Text>
               <TextInput
-                style={[
-                  styles.input,
-                  {
-                    backgroundColor: colors.background,
-                    color: colors.text,
-                    borderColor: errors.name ? "red" : colors.border,
-                  },
-                ]}
+                style={[styles.input, isDark && styles.inputDark]}
                 value={name}
                 onChangeText={setName}
                 placeholder="Your name"
