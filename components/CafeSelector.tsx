@@ -41,7 +41,7 @@ export default function CafeSelector({
     try {
       // Using Places API Text Search for better results
       const response = await fetch(
-        `/api/places/search?query=${encodeURIComponent(input)}`,
+        `/api/places/autocomplete?input=${encodeURIComponent(input)}`,
         {
           headers: {
             'Accept': 'application/json'
