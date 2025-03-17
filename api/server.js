@@ -97,28 +97,39 @@ app.get('/api/places/search', async (req, res) => {
 
     console.log('Searching for cafes with query:', query);
     const apiKey = process.env.GOOGLE_MAPS_API_KEY;
-    const response = await fetch(
-      `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(
-        query + ' cafe in new york'
-      )}&type=cafe&key=${apiKey}`,
-      {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/json',
-        }
+    console.log('API Key available:', !!apiKey);
+    
+    const url = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(
+      query + ' cafe in new york'
+    )}&type=cafe&key=${apiKey}`;
+    console.log('Request URL:', url);
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
       }
-    );
+    });
+
+    console.log('Response status:', response.status);
+    console.log('Response ok:', response.ok);
 
     if (!response.ok) {
-      throw new Error(`Places API responded with status: ${response.status}`);
+      const errorText = await response.text();
+      console.error('Response error text:', errorText);
+      throw new Error(`Places API responded with status: ${response.status}, body: ${errorText}`);
     }
 
     const data = await response.json();
-    console.log('Places API response received');
+    console.log('Places API response:', data);
     res.json(data);
   } catch (error) {
-    console.error('Places API error:', error);
-    res.status(500).json({ error: 'Failed to fetch places' });
+    console.error('Places API detailed error:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    });
+    res.status(500).json({ error: `Failed to fetch places: ${error.message}` });
   }
 });
 
