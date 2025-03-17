@@ -148,6 +148,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 12,
     marginBottom: 16,
+    backgroundColor: '#f8f8f8',
   },
   selectorText: {
     fontFamily: 'K2D-Regular',

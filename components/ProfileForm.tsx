@@ -378,13 +378,11 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
 
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isDark && styles.textDark]}>Experience Level</Text>
-              <View style={{ backgroundColor: '#f8f8f8' }}>
-                <ExperienceLevelSelector
-                  selected={experienceLevel}
-                  onChange={setExperienceLevel}
-                  isDark={isDark}
-                />
-              </View>
+              <ExperienceLevelSelector
+                selected={experienceLevel}
+                onChange={setExperienceLevel}
+                isDark={isDark}
+              />
             </View>
 
             <View style={styles.inputGroup}>
@@ -400,13 +398,11 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
 
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isDark && styles.textDark]}>Industry Categories</Text>
-              <View style={{ backgroundColor: '#f8f8f8' }}>
-                <IndustrySelector
-                  selected={industryCategories}
-                  onChange={setIndustryCategories}
-                  isDark={isDark}
-                />
-              </View>
+              <IndustrySelector
+                selected={industryCategories}
+                onChange={setIndustryCategories}
+                isDark={isDark}
+              />
             </View>
 
 
@@ -436,7 +432,7 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
               </View>
             </View> */}
 
-
+            
           </View>
 
           <View style={styles.section}>
@@ -457,13 +453,11 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
 
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isDark && styles.textDark]}>Interests</Text>
-              <View style={{ backgroundColor: '#f8f8f8' }}>
-                <InterestSelector
-                  selected={interests}
-                  onChange={setInterests}
-                  isDark={isDark}
-                />
-              </View>
+              <InterestSelector
+                selected={interests}
+                onChange={setInterests}
+                isDark={isDark}
+              />
             </View>
 
             <View style={styles.inputGroup}>
