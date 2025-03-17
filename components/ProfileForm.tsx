@@ -412,7 +412,9 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
               />
             </View>
 
-            <View style={styles.inputGroup}>
+
+            {/* Skills are removed temporarily */}
+            {/* <View style={styles.inputGroup}>
               <Text style={[styles.label, isDark && styles.textDark]}>Skills</Text>
               <View style={styles.tagsContainer}>
                 {skills.map((skill, index) => (
@@ -435,7 +437,9 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
                   }}
                 />
               </View>
-            </View>
+            </View> */}
+
+            
           </View>
 
           <View style={styles.section}>

@@ -79,7 +79,7 @@ export type UserProfileData = {
   age?: number;
   occupation: string;
   experience_level?: string;
-  industries?: string[];
+  industry_categories?: string[];
   skills?: string[];
   experience?: string;
   education?: string;
@@ -728,19 +728,31 @@ export default function ProfileCard({
             <Text style={[styles.value, { color: colors.text }]}>
               {profile.city}
             </Text>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>
+            {profile.education && (
+              <>
+                <Text style={[styles.label, { color: colors.secondaryText }]}>
+                  Education
+                </Text>
+                <Text style={[styles.value, { color: colors.text }]}>
+                  {profile.education}
+                </Text>
+              </>
+            )}
+            <Text style={[styles.label, { color: colors.secondaryText }]}>
               About Me
             </Text>
             <Text style={[styles.value, { color: colors.text }]}>
               {profile.bio}
             </Text>
-            
-            
-            
           </View>
 
-          {/* Professional Information */}
+          
+
+          {/* Professional Details */}
           <View style={styles.section}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>
+              Professional Details
+            </Text>
 
             {/* Occupation */}
             <Text style={[styles.label, { color: colors.secondaryText }]}>
@@ -750,67 +762,15 @@ export default function ProfileCard({
               {profile.occupation}
             </Text>
 
-
             {/* Experience Level */}
-            <Text style={[styles.label, { color: colors.secondaryText }]}>
-              Experience Level
-            </Text>
-            <Text style={[styles.value, { color: colors.text }]}>
-              {profile.experience_level || "Not specified"}
-            </Text>
-
-
-            
-          </View>
-
-          {/* Bio */}
-          <View style={styles.section}>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>
-              About Me
-            </Text>
-            <Text style={[styles.value, { color: colors.text }]}>
-              {profile.bio}
-            </Text>
-          </View>
-
-          {/* Interests */}
-          {profile.interests && profile.interests.length > 0 && (
-            <View style={styles.section}>
-              <Text style={[styles.sectionTitle, { color: colors.text }]}>
-                Interests
-              </Text>
-              <View style={styles.tagsContainer}>
-                {profile.interests.map((interest, index) => (
-                  <View
-                    key={index}
-                    style={[
-                      styles.tag,
-                      { backgroundColor: colors.primary + "20" },
-                    ]}
-                  >
-                    <Text style={[styles.tagText, { color: colors.primary }]}>
-                      {interest}
-                    </Text>
-                  </View>
-                ))}
-              </View>
-            </View>
-          )}
-
-          {/* Professional Details */}
-          <View style={styles.section}>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>
-              Professional Details
-            </Text>
-
-            {profile.experienceLevel && (
+            {profile.experience_level && (
               <>
                 <Text style={[styles.label, { color: colors.secondaryText }]}>
                   Experience Level
                 </Text>
-                <View style={styles.coffeeExperienceContainer}>
+                <View style={[styles.coffeeExperienceContainer, { flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }]}>
                   <Text style={[styles.value, { color: colors.text }]}>
-                    {profile.experienceLevel || ""}
+                    {profile.experience_level || ""}
                   </Text>
                   {/* Display coffee theme based on experience level */}
                   <View
@@ -818,37 +778,39 @@ export default function ProfileCard({
                       styles.coffeeBadge,
                       {
                         backgroundColor:
-                          getCoffeeColor(profile.experienceLevel || "") + "20",
+                          getCoffeeColor(profile.experience_level || "") + "20",
                       },
                     ]}
                   >
                     <Ionicons
                       name="cafe"
                       size={14}
-                      color={getCoffeeColor(profile.experienceLevel || "")}
+                      color={getCoffeeColor(profile.experience_level || "")}
                     />
                     <Text
                       style={[
                         styles.coffeeBadgeText,
                         {
-                          color: getCoffeeColor(profile.experienceLevel || ""),
+                          color: getCoffeeColor(profile.experience_level || ""),
                         },
                       ]}
                     >
-                      {getCoffeeTheme(profile.experienceLevel || "")}
+                      {getCoffeeTheme(profile.experience_level || "")}
                     </Text>
                   </View>
                 </View>
               </>
             )}
 
-            {profile.industries && profile.industries.length > 0 && (
+
+             {/* Industry Categories */}
+            {profile.industry_categories && profile.industry_categories.length > 0 && (
               <>
                 <Text style={[styles.label, { color: colors.secondaryText }]}>
                   Industries
                 </Text>
                 <View style={styles.tagsContainer}>
-                  {profile.industries.map((industry, index) => (
+                  {profile.industry_categories.map((industry, index) => (
                     <View
                       key={index}
                       style={[
@@ -865,6 +827,7 @@ export default function ProfileCard({
               </>
             )}
 
+            {/* Skills */}
             {profile.skills && profile.skills.length > 0 && (
               <>
                 <Text style={[styles.label, { color: colors.secondaryText }]}>
@@ -888,7 +851,32 @@ export default function ProfileCard({
               </>
             )}
 
-            {profile.experience && (
+            {/* Interests */}
+            {profile.interests && profile.interests.length > 0 && (
+              <View style={styles.section}>
+                <Text style={[styles.label, { color: colors.secondaryText }]}>
+                  Interests
+                </Text>
+                <View style={styles.tagsContainer}>
+                  {profile.interests.map((interest, index) => (
+                    <View
+                      key={index}
+                      style={[
+                        styles.tag,
+                        { backgroundColor: colors.primary + "20" },
+                      ]}
+                    >
+                      <Text style={[styles.tagText, { color: colors.primary }]}>
+                        {interest}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              </View>
+            )}
+
+            {/* experience is not added */}
+            {/* {profile.experience && (
               <>
                 <Text style={[styles.label, { color: colors.secondaryText }]}>
                   Experience
@@ -897,18 +885,9 @@ export default function ProfileCard({
                   {profile.experience}
                 </Text>
               </>
-            )}
+            )} */}
 
-            {profile.education && (
-              <>
-                <Text style={[styles.label, { color: colors.secondaryText }]}>
-                  Education
-                </Text>
-                <Text style={[styles.value, { color: colors.text }]}>
-                  {profile.education}
-                </Text>
-              </>
-            )}
+            
           </View>
 
           {/* Location */}
@@ -916,17 +895,6 @@ export default function ProfileCard({
             <Text style={[styles.sectionTitle, { color: colors.text }]}>
               Location Preferences
             </Text>
-
-            {profile.city && (
-              <>
-                <Text style={[styles.label, { color: colors.secondaryText }]}>
-                  City
-                </Text>
-                <Text style={[styles.value, { color: colors.text }]}>
-                  {profile.city}
-                </Text>
-              </>
-            )}
 
             {profile.neighborhoods && profile.neighborhoods.length > 0 && (
               <>
