@@ -77,18 +77,24 @@ export default function ProfileScreen() {
         </View>
       </View>
 
-      <ProfileCard
-        userId={user.id}
-        profile={profileData}
-        isUserProfile={true}
-        isEditMode={isEditMode}
-        onEdit={() => setIsEditMode(true)}
-        onSave={(updatedData) => {
-          handleProfileSave(updatedData);
-          setIsEditMode(false);
-        }}
-        onCancel={() => setIsEditMode(false)}
-      />
+      {isEditMode ? (
+        <ProfileForm 
+          userId={user.id} 
+          isNewUser={false}
+          initialData={profileData}
+          onSave={(updatedData) => {
+            handleProfileSave(updatedData);
+            setIsEditMode(false);
+          }}
+          onCancel={() => setIsEditMode(false)}
+        />
+      ) : (
+        <UserProfileCard
+          initialData={profileData}
+          isEditMode={false}
+          onEdit={() => setIsEditMode(true)}
+        />
+      )}
     </SafeAreaView>
   );
 }
