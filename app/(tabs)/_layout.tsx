@@ -78,25 +78,31 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => (
             <FontAwesome5 name="user" size={size - 2} color={color} />
           ),
-          headerRight: () => (
-            <TouchableOpacity 
-              style={{
-                padding: 8,
-                borderRadius: 8,
-                borderWidth: 1,
-                borderColor: colors.border,
-                backgroundColor: colors.card,
-                marginRight: 16
-              }}
-              onPress={() => navigation.setParams({ isEditMode: !navigation.getParams()?.isEditMode })}
-            >
-              <Ionicons 
-                name={navigation.getParams()?.isEditMode ? "close" : "create-outline"} 
-                size={20} 
-                color={colors.text} 
-              />
-            </TouchableOpacity>
-          ),
+          headerRight: () => {
+            const isEditMode = navigation.getState().routes.find(
+              route => route.name === 'profile'
+            )?.params?.isEditMode;
+            
+            return (
+              <TouchableOpacity 
+                style={{
+                  padding: 8,
+                  borderRadius: 8,
+                  borderWidth: 1,
+                  borderColor: colors.border,
+                  backgroundColor: colors.card,
+                  marginRight: 16
+                }}
+                onPress={() => navigation.setParams({ isEditMode: !isEditMode })}
+              >
+                <Ionicons 
+                  name={isEditMode ? "close" : "create-outline"} 
+                  size={20} 
+                  color={colors.text} 
+                />
+              </TouchableOpacity>
+            );
+          },
         })}
       />
 
