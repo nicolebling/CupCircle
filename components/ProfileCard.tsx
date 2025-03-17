@@ -966,8 +966,12 @@ export default function ProfileCard({
             {getTitle()}
           </Text>
           {!isOnboarding && (
-            <TouchableOpacity onPress={onCancel}>
-              <Ionicons name="close-outline" size={24} color={colors.primary} />
+            <TouchableOpacity onPress={isEditMode ? onCancel : handleEdit}>
+              <Ionicons 
+                name={isEditMode ? "close-outline" : "create-outline"} 
+                size={24} 
+                color={colors.primary} 
+              />
             </TouchableOpacity>
           )}
         </View>
