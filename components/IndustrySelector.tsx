@@ -162,6 +162,8 @@ export default function IndustrySelector({
   );
 }
 
+
+
 const styles = StyleSheet.create({
   selector: {
     flexDirection: 'row',
@@ -183,6 +185,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     marginTop: -8,
     marginBottom: 16,
+    
   },
   selectedBubble: {
     paddingHorizontal: 12,
@@ -236,6 +239,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     alignSelf: 'flex-start', 
+    
   },
   columnWrapper: {
     justifyContent: 'flex-start',
