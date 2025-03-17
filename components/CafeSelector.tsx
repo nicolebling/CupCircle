@@ -41,13 +41,10 @@ export default function CafeSelector({
     try {
       // Using Places API Text Search for better results
       const response = await fetch(
-        `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(
-          input + ' cafe in new york'
-        )}&type=cafe&key=AIzaSyDYiKrt8lG2X2HxF4DUqVqIFi4wpGo6Aec`,
+        `/api/places/search?query=${encodeURIComponent(input)}`,
         {
           headers: {
-            'Accept': 'application/json',
-            'Access-Control-Allow-Origin': '*'
+            'Accept': 'application/json'
           }
         }
       );

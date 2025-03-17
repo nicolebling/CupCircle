@@ -86,6 +86,23 @@ app.post('/api/auth/register', async (req, res) => {
   }
 });
 
+// Places API proxy
+app.get('/api/places/search', async (req, res) => {
+  try {
+    const query = req.query.query;
+    const response = await fetch(
+      `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(
+        query + ' cafe in new york'
+      )}&type=cafe&key=AIzaSyDYiKrt8lG2X2HxF4DUqVqIFi4wpGo6Aec`
+    );
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    console.error('Places API error:', error);
+    res.status(500).json({ error: 'Failed to fetch places' });
+  }
+});
+
 // Profile routes
 app.get('/', (req, res) => {
   res.json({ message: 'API server is running' });
