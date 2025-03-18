@@ -38,7 +38,6 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
 
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState('');
-  const [username, setUsername] = useState('');
   const [avatar, setAvatar] = useState('');
   const [occupation, setOccupation] = useState('');
   const [bio, setBio] = useState('');
@@ -208,7 +207,6 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
       const profileData = {
         id: userId,
         name,
-        username,
         occupation,
         photo_url: avatar,
         bio,
@@ -329,16 +327,7 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
               />
             </View>
 
-            <View style={styles.inputGroup}>
-              <Text style={[styles.label, isDark && styles.textDark]}>Username</Text>
-              <TextInput
-                style={[styles.input, isDark && styles.inputDark]}
-                value={username}
-                onChangeText={setUsername}
-                placeholder="Choose a username"
-                placeholderTextColor={isDark ? '#999' : '#777'}
-              />
-            </View>
+            
 
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isDark && styles.textDark]}>Age</Text>

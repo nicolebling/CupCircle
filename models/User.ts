@@ -1,4 +1,3 @@
-
 import { query } from '../services/database';
 import * as bcrypt from 'bcryptjs';
 
