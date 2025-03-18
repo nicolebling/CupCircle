@@ -81,9 +81,13 @@ export default function CafeSelector({
                 components: 'country:us'
               }}
               requestUrl={{
-                url: 'https://maps.googleapis.com/maps/api',
-                useOnPlatform: 'all'
+                url: '/api/places/autocomplete',
+                useOnPlatform: 'web'
               }}
+              onFail={(error) => {
+                console.log('Google Places API error:', error);
+              }}
+              fetchDetails={true}
               styles={{
                 textInput: {
                   height: 40,

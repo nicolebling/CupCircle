@@ -128,8 +128,13 @@ app.get('/api/places/autocomplete', async (req, res) => {
 
     const apiUrl = `${baseUrl}?${queryParams}`;
     console.log('Places API Request:', apiUrl.replace(apiKey, 'REDACTED'));
+    console.log('Search query:', searchQuery);
 
     const response = await fetch(apiUrl);
+    console.log('Google API Response Status:', response.status);
+    
+    const responseData = await response.json();
+    console.log('Google API Response:', responseData);
     if (!response.ok) {
       throw new Error(`Google Places API responded with status: ${response.status}`);
     }
