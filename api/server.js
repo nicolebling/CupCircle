@@ -95,7 +95,7 @@ app.get('/api/places/autocomplete', async (req, res) => {
       return res.status(400).json({
         error: 'Missing or invalid query parameter',
         status: 'ERROR',
-        predictions: []
+        results: []
       });
     }
 
@@ -105,12 +105,12 @@ app.get('/api/places/autocomplete', async (req, res) => {
       return res.status(500).json({
         error: 'API configuration error',
         status: 'ERROR',
-        predictions: []
+        results: []
       });
     }
 
     const baseUrl = 'https://maps.googleapis.com/maps/api/place/textsearch/json';
-    const searchQuery = `${input} in New York`;
+    const searchQuery = `${input} cafe in New York`;
     
     const queryParams = new URLSearchParams({
       query: searchQuery,
@@ -125,6 +125,9 @@ app.get('/api/places/autocomplete', async (req, res) => {
     console.log('Places API Request:', apiUrl.replace(apiKey, 'REDACTED'));
 
     const response = await fetch(apiUrl);
+    if (!response.ok) {
+      throw new Error(`Google Places API responded with status: ${response.status}`);
+    }
     const data = await response.json();
 
     if (data.status === 'ZERO_RESULTS') {
