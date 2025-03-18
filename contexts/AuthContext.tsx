@@ -12,7 +12,6 @@ type User = {
 
 type Profile = {
   id: string;
-  user_id: string;
   name?: string;
   occupation?: string;
   photo_url?: string;
@@ -26,8 +25,6 @@ type Profile = {
   neighborhoods?: string[];
   favorite_cafes?: string[];
   interests?: string[];
-  created_at?: string;
-  updated_at?: string;
 };
 
 type AuthContextType = {
@@ -135,7 +132,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', user.id)
+        .eq('user_id', user.id)
         .single();
 
       if (error) {
@@ -143,13 +140,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return null;
       }
 
-      const profileData = {
-        ...data,
-        id: user.id
-      };
-
-      setProfile(profileData);
-      return profileData;
+      setProfile(data);
+      return data;
     } catch (error) {
       console.error('Failed to fetch profile:', error);
       return null;
