@@ -26,7 +26,8 @@ type TimeSlot = {
 export default function AvailabilityScreen() {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
-  const { isLoading, error, createSlot, getSlots } = useAvailability();
+  import { useAvailability } from '../../hooks/useAvailability';
+const { isLoading, error, createSlot, getSlots } = useAvailability();
   
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
