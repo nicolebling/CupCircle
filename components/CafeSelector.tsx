@@ -81,8 +81,8 @@ export default function CafeSelector({
                 components: 'country:us'
               }}
               requestUrl={{
-                url: '/api/places',
-                useOnPlatform: 'web'
+                url: 'https://maps.googleapis.com/maps/api',
+                useOnPlatform: 'all'
               }}
               styles={{
                 textInput: {
