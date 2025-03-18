@@ -56,12 +56,10 @@ export default function CafeSelector({
       const data = await response.json();
       console.log('Places API response:', data);
       
-      if (data.results) {
-        const places = data.results.map((result: any) => ({
-          name: result.name,
-          formatted_address: result.formatted_address,
-        }));
-        setSuggestions(places);
+      if (data.results && Array.isArray(data.results)) {
+        setSuggestions(data.results);
+      } else {
+        setSuggestions([]);
       }
     } catch (error) {
       console.error('Error searching cafes:', error);

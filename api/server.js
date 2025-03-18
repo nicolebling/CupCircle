@@ -161,7 +161,7 @@ app.get('/api/places/autocomplete', async (req, res) => {
 
     res.json({
       status: 'OK',
-      predictions: predictions.slice(0, 5)
+      results: data.results.slice(0, 5)
     });
   } catch (error) {
     console.error('Places API detailed error:', {
