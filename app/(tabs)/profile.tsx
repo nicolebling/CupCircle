@@ -13,7 +13,7 @@ import { useColorScheme } from '@/hooks/useColorScheme';
 export default function ProfileScreen() {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const [isEditMode, setIsEditMode] = useState(false);
   const [profileData, setProfileData] = useState(null);
 
@@ -67,6 +67,12 @@ export default function ProfileScreen() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.header}>
+        <TouchableOpacity 
+          style={[styles.settingsButton, { backgroundColor: colors.card, borderColor: colors.border }]} 
+          onPress={() => signOut()}
+        >
+          <Ionicons name="log-out-outline" size={20} color="#FF3B30" />
+        </TouchableOpacity>
         <View style={styles.headerContent}>
           <TouchableOpacity 
             style={[styles.settingsButton, { backgroundColor: colors.card, borderColor: colors.border }]} 
@@ -106,7 +112,7 @@ const styles = StyleSheet.create({
   header: {
     padding: 16,
     flexDirection: 'row',
-    justifyContent: 'flex-end',
+    justifyContent: 'space-between',
     alignItems: 'center',
   },
   headerContent: {
