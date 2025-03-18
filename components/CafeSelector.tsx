@@ -68,10 +68,10 @@ export default function CafeSelector({
               onFail={(error) => console.error('Places API error:', error)}
               query={{
                 key: "AIzaSyDYiKrt8lG2X2HxF4DUqVqIFi4wpGo6Aec",
-                language: 'en'
+                language: 'en',
               }}
               requestUrl={{
-                url: '/api/places/autocomplete',
+                url: 'https://maps.googleapis.com/maps/api',
                 useOnPlatform: 'web',
               }}
               styles={{
