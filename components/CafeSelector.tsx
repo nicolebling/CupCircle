@@ -1,20 +1,15 @@
-
-import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Modal, FlatList, TextInput, ActivityIndicator } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Modal, FlatList } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 
 interface CafeSelectorProps {
   selected: string[];
   onChange: (cafes: string[]) => void;
   maxSelections?: number;
   isDark?: boolean;
-}
-
-interface PlaceResult {
-  name: string;
-  formatted_address: string;
 }
 
 export default function CafeSelector({
@@ -25,70 +20,17 @@ export default function CafeSelector({
 }: CafeSelectorProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
-
   const [modalVisible, setModalVisible] = useState(false);
-  const [searchText, setSearchText] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [suggestions, setSuggestions] = useState<PlaceResult[]>([]);
 
-  const searchCafes = async (input: string) => {
-    if (!input.trim()) {
-      setSuggestions([]);
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      // Using Places API Text Search for better results
-      const domain = window.location.hostname.includes('replit') ? `https://${window.location.hostname}` : 'http://localhost:3000';
-      const response = await fetch(
-        `${domain}/api/places/autocomplete?input=${encodeURIComponent(input)}`,
-        {
-          headers: {
-            'Accept': 'application/json'
-          }
-        }
-      );
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch cafe suggestions');
-      }
-
-      const data = await response.json();
-      console.log('Places API response:', data);
-      
-      if (data.results && Array.isArray(data.results)) {
-        setSuggestions(data.results);
-      } else {
-        setSuggestions([]);
-      }
-    } catch (error) {
-      console.error('Error searching cafes:', error);
-      if (error instanceof TypeError && error.message === 'Failed to fetch') {
-        console.log('Network error - check if API server is running');
-      }
-      setSuggestions([]);
-    } finally {
-      setIsLoading(false);
+  const handleSelect = (place: any) => {
+    const cafeString = `${place.name} (${place.formatted_address})`;
+    if (!selected.includes(cafeString) && selected.length < maxSelections) {
+      onChange([...selected, cafeString]);
     }
   };
 
-  useEffect(() => {
-    const debounceTimer = setTimeout(() => {
-      if (searchText) {
-        searchCafes(searchText);
-      }
-    }, 300);
-
-    return () => clearTimeout(debounceTimer);
-  }, [searchText]);
-
-  const toggleCafe = (cafe: string) => {
-    if (selected.includes(cafe)) {
-      onChange(selected.filter(c => c !== cafe));
-    } else if (selected.length < maxSelections) {
-      onChange([...selected, cafe]);
-    }
+  const removeCafe = (index: number) => {
+    onChange(selected.filter((_, i) => i !== index));
   };
 
   return (
@@ -120,60 +62,57 @@ export default function CafeSelector({
               </TouchableOpacity>
             </View>
 
-            <View style={[styles.searchContainer, { borderColor: colors.border }]}>
-              <Ionicons name="search" size={20} color={colors.secondaryText} />
-              <TextInput
-                style={[styles.searchInput, { color: colors.text }]}
-                placeholder="Search cafes..."
-                placeholderTextColor={colors.secondaryText}
-                value={searchText}
-                onChangeText={setSearchText}
-              />
-            </View>
+            <GooglePlacesAutocomplete
+              placeholder='Search for cafes...'
+              onPress={(data, details: any) => {
+                if (details) {
+                  handleSelect({
+                    name: details.name,
+                    formatted_address: details.formatted_address
+                  });
+                }
+              }}
+              query={{
+                key: process.env.EXPO_PUBLIC_GOOGLE_PLACES_API_KEY,
+                language: 'en',
+                types: ['cafe', 'restaurant'],
+                location: '40.7128,-74.0060', // NYC coordinates
+                radius: '10000',
+                components: 'country:us'
+              }}
+              styles={{
+                textInput: {
+                  height: 40,
+                  borderWidth: 1,
+                  borderColor: colors.border,
+                  borderRadius: 8,
+                  paddingHorizontal: 12,
+                  color: colors.text,
+                  backgroundColor: colors.background,
+                },
+                listView: {
+                  backgroundColor: colors.background,
+                },
+                description: {
+                  color: colors.text,
+                }
+              }}
+            />
 
-            {isLoading ? (
-              <ActivityIndicator style={styles.loader} color={colors.primary} />
-            ) : (
-              <FlatList
-                data={suggestions}
-                keyExtractor={(item, index) => index.toString()}
-                renderItem={({ item }) => {
-                  const cafeString = `${item.name} (${item.formatted_address})`;
-                  const isSelected = selected.includes(cafeString);
-                  return (
-                    <TouchableOpacity
-                      style={[
-                        styles.cafeItem,
-                        {
-                          backgroundColor: isSelected ? colors.primary : colors.background,
-                          borderColor: colors.border
-                        }
-                      ]}
-                      onPress={() => toggleCafe(cafeString)}
-                    >
-                      <View style={styles.cafeInfo}>
-                        <Text style={[
-                          styles.cafeName,
-                          { color: isSelected ? 'white' : colors.text }
-                        ]}>
-                          {item.name}
-                        </Text>
-                        <Text style={[
-                          styles.cafeAddress,
-                          { color: isSelected ? 'rgba(255,255,255,0.8)' : colors.secondaryText }
-                        ]}>
-                          {item.formatted_address}
-                        </Text>
-                      </View>
-                      {isSelected && (
-                        <Ionicons name="checkmark-circle" size={20} color="white" />
-                      )}
-                    </TouchableOpacity>
-                  );
-                }}
-                contentContainerStyle={styles.cafesList}
-              />
-            )}
+            <FlatList
+              data={selected}
+              keyExtractor={(item, index) => index.toString()}
+              renderItem={({ item, index }) => (
+                <TouchableOpacity
+                  style={[styles.cafeItem, { backgroundColor: colors.primary, borderColor: colors.border }]}
+                  onPress={() => removeCafe(index)}
+                >
+                  <Text style={styles.cafeText}>{item}</Text>
+                  <Ionicons name="close-circle" size={20} color="white" />
+                </TouchableOpacity>
+              )}
+              style={styles.selectedList}
+            />
           </View>
         </View>
       </Modal>
@@ -216,46 +155,22 @@ const styles = StyleSheet.create({
     fontFamily: 'K2D-Bold',
     fontSize: 20,
   },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    marginBottom: 16,
-    height: 40,
-  },
-  searchInput: {
-    flex: 1,
-    marginLeft: 8,
-    fontFamily: 'K2D-Regular',
-    fontSize: 16,
-  },
-  loader: {
-    padding: 20,
-  },
-  cafesList: {
-    paddingBottom: 20,
+  selectedList: {
+    marginTop: 20,
   },
   cafeItem: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderWidth: 1,
+    padding: 12,
     borderRadius: 8,
     marginBottom: 8,
   },
-  cafeInfo: {
-    flex: 1,
-  },
-  cafeName: {
-    fontFamily: 'K2D-Medium',
-    fontSize: 16,
-  },
-  cafeAddress: {
+  cafeText: {
+    color: 'white',
     fontFamily: 'K2D-Regular',
-    fontSize: 14,
+    fontSize: 16,
+    flex: 1,
+    marginRight: 8,
   }
 });
