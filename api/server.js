@@ -148,6 +148,13 @@ app.get('/api/places/autocomplete', async (req, res) => {
       });
     }
 
+    if (responseData.status === 'ZERO_RESULTS') {
+      return res.json({
+        status: 'OK',
+        predictions: []
+      });
+    }
+
     const results = responseData.results.map(place => ({
       description: `${place.name}, ${place.formatted_address}`,
       structured_formatting: {
@@ -160,13 +167,6 @@ app.get('/api/places/autocomplete', async (req, res) => {
       status: 'OK',
       predictions: results.slice(0, 5)
     });
-
-    if (data.status === 'ZERO_RESULTS') {
-      return res.json({
-        status: 'OK',
-        predictions: []
-      });
-    }
 
     if (data.status !== 'OK') {
       console.error('Places API error:', {

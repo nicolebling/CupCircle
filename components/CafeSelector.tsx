@@ -69,6 +69,10 @@ export default function CafeSelector({
               query={{
                 key: "AIzaSyDYiKrt8lG2X2HxF4DUqVqIFi4wpGo6Aec",
                 language: 'en',
+                types: 'cafe|restaurant',
+                location: '40.7128,-74.0060', // NYC coordinates
+                radius: '10000',
+                components: 'country:us'
               }}
               requestUrl={{
                 url: 'https://maps.googleapis.com/maps/api',
