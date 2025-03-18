@@ -26,10 +26,27 @@ type TimeSlot = {
 export default function AvailabilityScreen() {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
+  const { isLoading, error, createSlot, getSlots } = useAvailability();
   
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    loadAvailability();
+  }, []);
+
+  const loadAvailability = async () => {
+    const slots = await getSlots();
+    setTimeSlots(slots);
+  };
+
+  const handleAddSlot = async () => {
+    const endTime = calculateEndTime(selectedTime);
+    const result = await createSlot(selectedDate, selectedTime, endTime);
+    if (result) {
+      await loadAvailability();
+    }
+  };
   const [isAddingSlot, setIsAddingSlot] = useState(false);
   const [selectedTime, setSelectedTime] = useState('10:00 AM');
   

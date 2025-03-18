@@ -83,3 +83,84 @@ export const profileService = {
     }
   }
 };
+// Availability service
+export const availabilityService = {
+  // Create availability slot
+  async createAvailability(availabilityData: {
+    user_id: string;
+    date: Date;
+    start_time: string;
+    end_time: string;
+    is_available: boolean;
+  }) {
+    try {
+      const { data, error } = await supabase
+        .from('availability')
+        .insert([availabilityData])
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('Failed to create availability:', error);
+      throw error;
+    }
+  },
+
+  // Get user's availability slots
+  async getUserAvailability(userId: string) {
+    try {
+      const { data, error } = await supabase
+        .from('availability')
+        .select('*')
+        .eq('user_id', userId)
+        .order('date', { ascending: true });
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('Failed to get availability:', error);
+      throw error;
+    }
+  },
+
+  // Update availability slot
+  async updateAvailability(id: string, updateData: Partial<{
+    date: Date;
+    start_time: string;
+    end_time: string;
+    is_available: boolean;
+  }>) {
+    try {
+      const { data, error } = await supabase
+        .from('availability')
+        .update(updateData)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('Failed to update availability:', error);
+      throw error;
+    }
+  },
+
+  // Delete availability slot
+  async deleteAvailability(id: string) {
+    try {
+      const { error } = await supabase
+        .from('availability')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      console.error('Failed to delete availability:', error);
+      throw error;
+    }
+  }
+};
