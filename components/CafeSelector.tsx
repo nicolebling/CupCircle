@@ -59,8 +59,10 @@ export default function CafeSelector({
               </TouchableOpacity>
             </View>
 
-            <GooglePlacesAutocomplete
+
+              <GooglePlacesAutocomplete
               placeholder="Search for cafes..."
+              
               onPress={(data) => {
                 console.log('Selected place:', data);
                 handleSelect(data);
@@ -92,6 +94,7 @@ export default function CafeSelector({
                 }
               }}
             />
+              
 
             <View style={styles.selectedCafes}>
               {selected.map((cafe, index) => (
@@ -113,6 +116,9 @@ export default function CafeSelector({
 }
 
 const styles = StyleSheet.create({
+  container:{
+    flex: 1
+  },
   selector: {
     height: 48,
     borderRadius: 8,
