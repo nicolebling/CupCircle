@@ -1,35 +1,43 @@
 
+-- Enable UUID extension
+create extension if not exists "uuid-ossp";
+
 -- Create availability table
-CREATE TABLE IF NOT EXISTS availability (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  user_id UUID NOT NULL,
-  date DATE NOT NULL,
-  start_time TIME NOT NULL,
-  end_time TIME NOT NULL,
-  is_available BOOLEAN DEFAULT TRUE,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+create table if not exists "public"."availability" (
+  "id" uuid not null default uuid_generate_v4(),
+  "user_id" uuid not null,
+  "date" date not null,
+  "start_time" time not null,
+  "end_time" time not null,
+  "is_available" boolean default true,
+  "created_at" timestamp with time zone default timezone('utc'::text, now()),
+  "updated_at" timestamp with time zone default timezone('utc'::text, now()),
+  primary key ("id")
 );
 
--- Create index for faster queries
-CREATE INDEX IF NOT EXISTS idx_availability_user_id ON availability(user_id);
+-- Enable RLS (Row Level Security)
+alter table "public"."availability" enable row level security;
 
--- Enable RLS
-ALTER TABLE availability ENABLE ROW LEVEL SECURITY;
+-- Create RLS policies
+create policy "Users can view own availability"
+  on "public"."availability"
+  for select
+  using (auth.uid() = user_id);
 
--- Create policies
-CREATE POLICY "Users can view their own availability" 
-  ON availability FOR SELECT 
-  USING (auth.uid() = user_id);
+create policy "Users can insert own availability"
+  on "public"."availability"
+  for insert
+  with check (auth.uid() = user_id);
 
-CREATE POLICY "Users can insert their own availability" 
-  ON availability FOR INSERT 
-  WITH CHECK (auth.uid() = user_id);
+create policy "Users can update own availability"
+  on "public"."availability"
+  for update
+  using (auth.uid() = user_id);
 
-CREATE POLICY "Users can update their own availability" 
-  ON availability FOR UPDATE 
-  USING (auth.uid() = user_id);
+create policy "Users can delete own availability"
+  on "public"."availability"
+  for delete
+  using (auth.uid() = user_id);
 
-CREATE POLICY "Users can delete their own availability" 
-  ON availability FOR DELETE 
-  USING (auth.uid() = user_id);
+-- Create indexes
+create index if not exists idx_availability_user_id on "public"."availability" (user_id);
