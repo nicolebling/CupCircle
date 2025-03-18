@@ -68,14 +68,10 @@ export default function CafeSelector({
               onFail={(error) => console.error('Places API error:', error)}
               query={{
                 key: "AIzaSyDYiKrt8lG2X2HxF4DUqVqIFi4wpGo6Aec",
-                language: 'en',
-                types: 'cafe|restaurant',
-                location: '40.7128,-74.0060', // NYC coordinates
-                radius: '10000',
-                components: 'country:us'
+                language: 'en'
               }}
               requestUrl={{
-                url: 'https://maps.googleapis.com/maps/api',
+                url: '/api/places/autocomplete',
                 useOnPlatform: 'web',
               }}
               styles={{

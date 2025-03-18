@@ -38,22 +38,22 @@ pool.query('SELECT NOW()', (err, res) => {
 app.post('/api/auth/login', async (req, res) => {
   try {
     const { email, password } = req.body;
-    
+
     const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
-    
+
     if (result.rows.length === 0) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
-    
+
     const user = result.rows[0];
-    
+
     // Compare passwords (in production, use bcrypt.compare)
     const isPasswordValid = await bcrypt.compare(password, user.password);
-    
+
     if (!isPasswordValid) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
-    
+
     // Return user data (exclude password)
     return res.json({
       id: user.id,
@@ -68,23 +68,23 @@ app.post('/api/auth/login', async (req, res) => {
 app.post('/api/auth/register', async (req, res) => {
   try {
     const { email, password } = req.body;
-    
+
     // Check if email already exists
     const existingUser = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
-    
+
     if (existingUser.rows.length > 0) {
       return res.status(400).json({ error: 'Email already exists' });
     }
-    
+
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
-    
+
     // Insert new user
     const result = await pool.query(
       'INSERT INTO users (email, password) VALUES ($1, $2) RETURNING id, email',
       [email, hashedPassword]
     );
-    
+
     return res.status(201).json(result.rows[0]);
   } catch (error) {
     console.error('Register error:', error);
@@ -116,7 +116,7 @@ app.get('/api/places/autocomplete', async (req, res) => {
 
     const baseUrl = 'https://maps.googleapis.com/maps/api/place/textsearch/json';
     const searchQuery = `${input} cafe in New York`;
-    
+
     const queryParams = new URLSearchParams({
       query: searchQuery,
       key: apiKey,
@@ -132,22 +132,15 @@ app.get('/api/places/autocomplete', async (req, res) => {
 
     const response = await fetch(apiUrl);
     console.log('Google API Response Status:', response.status);
-    
+
     const responseData = await response.json();
     console.log('Google API Response:', responseData);
-    
+
     if (!response.ok) {
       throw new Error(`Google Places API responded with status: ${response.status}`);
     }
 
     // Send the response data directly since we already parsed it
-    if (responseData.status === 'ZERO_RESULTS') {
-      return res.json({
-        status: 'OK',
-        predictions: []
-      });
-    }
-
     if (responseData.status === 'ZERO_RESULTS') {
       return res.json({
         status: 'OK',
@@ -167,31 +160,8 @@ app.get('/api/places/autocomplete', async (req, res) => {
       status: 'OK',
       predictions: results.slice(0, 5)
     });
-
-    if (data.status !== 'OK') {
-      console.error('Places API error:', {
-        status: data.status,
-        error_message: data.error_message,
-        data: data
-      });
-      return res.status(400).json({
-        error: data.error_message || 'Failed to fetch places',
-        status: data.status,
-        predictions: []
-      });
-    }
-
-    const results = data.results.map((place) => ({
-      name: place.name,
-      formatted_address: place.formatted_address || place.vicinity
-    }));
-
-    res.json({
-      status: 'OK',
-      results: results.slice(0, 5)
-    });
   } catch (error) {
-    console.error('Places API detailed error:', {
+    console.error('Places API error:', {
       message: error.message,
       stack: error.stack,
       name: error.name
@@ -212,13 +182,13 @@ app.get('/profile', (req, res) => {
 app.get('/api/profile/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
-    
+
     const result = await pool.query('SELECT * FROM profiles WHERE user_id = $1', [userId]);
-    
+
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'Profile not found' });
     }
-    
+
     return res.json(result.rows[0]);
   } catch (error) {
     console.error('Get profile error:', error);
@@ -230,10 +200,10 @@ app.post('/api/profile', async (req, res) => {
   try {
     const profileData = req.body;
     const { user_id } = profileData;
-    
+
     // Check if profile exists
     const existingProfile = await pool.query('SELECT * FROM profiles WHERE user_id = $1', [user_id]);
-    
+
     if (existingProfile.rows.length > 0) {
       // Update existing profile
       const result = await pool.query(
@@ -264,7 +234,7 @@ app.post('/api/profile', async (req, res) => {
           profileData.interests || existingProfile.rows[0].interests
         ]
       );
-      
+
       return res.json(result.rows[0]);
     } else {
       // Create new profile
@@ -288,7 +258,7 @@ app.post('/api/profile', async (req, res) => {
           profileData.interests || []
         ]
       );
-      
+
       return res.status(201).json(result.rows[0]);
     }
   } catch (error) {
@@ -304,11 +274,11 @@ app.use((req, res, next) => {
   const now = Date.now();
   const windowMs = 60 * 1000; // 1 minute
   const maxRequests = 100; // max 100 requests per minute
-  
+
   // Initialize or get the requests map
   global.requests = global.requests || new Map();
   const requestRecord = global.requests.get(ip) || { count: 0, resetTime: now + windowMs };
-  
+
   if (now > requestRecord.resetTime) {
     // Reset the window
     requestRecord.count = 1;
@@ -317,14 +287,14 @@ app.use((req, res, next) => {
     // Increment request count
     requestRecord.count += 1;
   }
-  
+
   global.requests.set(ip, requestRecord);
-  
+
   // Check if over limit
   if (requestRecord.count > maxRequests) {
     return res.status(429).json({ error: 'Too many requests, please try again later' });
   }
-  
+
   next();
 });
 
