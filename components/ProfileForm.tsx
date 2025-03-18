@@ -80,6 +80,7 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
 
       if (data) {
         setName(data.name || '');
+        setUsername(data.username || '');
         setAvatar(data.photo_url || '');
         setOccupation(data.occupation || '');
         setBio(data.bio || '');
@@ -228,13 +229,13 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
 
       const { data, error } = await supabase
         .from('profiles')
-        .upsert(profileData, { onConflict: 'id' })
+        .upsert(profileData, { onConflict: 'id' }) 
         .select();
 
       if (error) {
         console.error('Supabase error response:', error);
-        console.error('Error details:', JSON.stringify(error));
-        Alert.alert('Profile Save Error', error?.message || 'Failed to save profile. Please try again.');
+        console.error('Error details:', JSON.stringify(error)); 
+        Alert.alert('Profile Save Error', error?.message || 'Failed to save profile. Please try again.'); 
         throw error;
       }
 
@@ -244,6 +245,7 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
         onSave({
           id: userId,
           name,
+          username,
           occupation,
           photo_url: avatar,
           bio,
@@ -325,7 +327,7 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
               />
             </View>
 
-
+            
 
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isDark && styles.textDark]}>Age</Text>
@@ -421,7 +423,7 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
               </View>
             </View> */}
 
-
+            
           </View>
 
           <View style={styles.section}>
