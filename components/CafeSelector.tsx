@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Modal, FlatList } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Modal } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
@@ -23,14 +23,11 @@ export default function CafeSelector({
   const [modalVisible, setModalVisible] = useState(false);
 
   const handleSelect = (place: any) => {
-    const cafeString = `${place.name} (${place.formatted_address})`;
+    const cafeString = place.description;
     if (!selected.includes(cafeString) && selected.length < maxSelections) {
       onChange([...selected, cafeString]);
+      setModalVisible(false);
     }
-  };
-
-  const removeCafe = (index: number) => {
-    onChange(selected.filter((_, i) => i !== index));
   };
 
   return (
@@ -63,35 +60,20 @@ export default function CafeSelector({
             </View>
 
             <GooglePlacesAutocomplete
-              placeholder='Search for cafes...'
-              onPress={(data: any, details = null) => {
+              placeholder="Search for cafes..."
+              onPress={(data) => {
                 console.log('Selected place:', data);
-                if (data) {
-                  handleSelect({
-                    name: data.structured_formatting?.main_text || data.description,
-                    formatted_address: data.structured_formatting?.secondary_text || ''
-                  });
-                }
+                handleSelect(data);
               }}
-              onFail={(error) => {
-                console.error('Places API error:', error);
-              }}
-              textInputProps={{
-                onChangeText: (text) => console.log('Search text:', text),
-              }}
+              onFail={(error) => console.error('Places API error:', error)}
               query={{
-                key: 'AIzaSyDYiKrt8lG2X2HxF4DUqVqIFi4wpGo6Aec',
+                key: "AIzaSyDYiKrt8lG2X2HxF4DUqVqIFi4wpGo6Aec",
                 language: 'en',
-                types: 'cafe|restaurant',
-                location: '40.7128,-74.0060', // NYC coordinates
-                radius: '10000',
-                components: 'country:us'
               }}
               requestUrl={{
                 url: 'https://maps.googleapis.com/maps/api',
-                useOnPlatform: 'all'
+                useOnPlatform: 'web',
               }}
-              fetchDetails={true}
               styles={{
                 textInput: {
                   height: 40,
@@ -111,20 +93,18 @@ export default function CafeSelector({
               }}
             />
 
-            <FlatList
-              data={selected}
-              keyExtractor={(item, index) => index.toString()}
-              renderItem={({ item, index }) => (
+            <View style={styles.selectedCafes}>
+              {selected.map((cafe, index) => (
                 <TouchableOpacity
-                  style={[styles.cafeItem, { backgroundColor: colors.primary, borderColor: colors.border }]}
-                  onPress={() => removeCafe(index)}
+                  key={index}
+                  style={[styles.cafeItem, { backgroundColor: colors.primary }]}
+                  onPress={() => onChange(selected.filter((_, i) => i !== index))}
                 >
-                  <Text style={styles.cafeText}>{item}</Text>
+                  <Text style={styles.cafeText}>{cafe}</Text>
                   <Ionicons name="close-circle" size={20} color="white" />
                 </TouchableOpacity>
-              )}
-              style={styles.selectedList}
-            />
+              ))}
+            </View>
           </View>
         </View>
       </Modal>
@@ -143,7 +123,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   selectorText: {
-    fontFamily: 'K2D-Regular',
     fontSize: 16,
   },
   modalOverlay: {
@@ -164,10 +143,10 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   modalTitle: {
-    fontFamily: 'K2D-Bold',
     fontSize: 20,
+    fontWeight: 'bold',
   },
-  selectedList: {
+  selectedCafes: {
     marginTop: 20,
   },
   cafeItem: {
@@ -180,7 +159,6 @@ const styles = StyleSheet.create({
   },
   cafeText: {
     color: 'white',
-    fontFamily: 'K2D-Regular',
     fontSize: 16,
     flex: 1,
     marginRight: 8,
