@@ -80,8 +80,6 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
 
       if (data) {
         setName(data.name || '');
-        setUsername(data.username || '');
-        setAvatar(data.photo_url || '');
         setOccupation(data.occupation || '');
         setBio(data.bio || '');
         setAge(data.age ? data.age.toString() : '');
@@ -245,7 +243,6 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
         onSave({
           id: userId,
           name,
-          username,
           occupation,
           photo_url: avatar,
           bio,
