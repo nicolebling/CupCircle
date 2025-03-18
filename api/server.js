@@ -181,12 +181,14 @@ app.get('/api/places/autocomplete', async (req, res) => {
       });
     }
 
+    const results = data.results.map((place) => ({
+      name: place.name,
+      formatted_address: place.formatted_address || place.vicinity
+    }));
+
     res.json({
       status: 'OK',
-      results: data.results.map((place) => ({
-        name: place.name,
-        formatted_address: place.formatted_address || place.vicinity
-      })).slice(0, 5)
+      results: results.slice(0, 5)
     });
   } catch (error) {
     console.error('Places API detailed error:', {
