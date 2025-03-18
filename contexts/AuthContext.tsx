@@ -12,7 +12,6 @@ type User = {
 
 type Profile = {
   id: string;
-  username?: string;
   name?: string;
   occupation?: string;
   photo_url?: string;
