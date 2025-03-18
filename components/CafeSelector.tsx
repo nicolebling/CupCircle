@@ -64,21 +64,25 @@ export default function CafeSelector({
 
             <GooglePlacesAutocomplete
               placeholder='Search for cafes...'
-              onPress={(data, details: any) => {
-                if (details) {
+              onPress={(data: any, details = null) => {
+                if (data) {
                   handleSelect({
-                    name: details.name,
-                    formatted_address: details.formatted_address
+                    name: data.structured_formatting.main_text,
+                    formatted_address: data.structured_formatting.secondary_text
                   });
                 }
               }}
               query={{
                 key: process.env.EXPO_PUBLIC_GOOGLE_PLACES_API_KEY,
                 language: 'en',
-                types: ['cafe', 'restaurant'],
+                types: 'cafe|restaurant',
                 location: '40.7128,-74.0060', // NYC coordinates
                 radius: '10000',
                 components: 'country:us'
+              }}
+              requestUrl={{
+                url: '/api/places',
+                useOnPlatform: 'web'
               }}
               styles={{
                 textInput: {
