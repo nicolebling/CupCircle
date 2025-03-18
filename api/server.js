@@ -11,7 +11,9 @@ const port = 3000;
 // Middleware
 app.use(express.json());
 app.use(cors({
-  origin: true,
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
   credentials: true
 }));
 
@@ -153,18 +155,14 @@ app.get('/api/places/autocomplete', async (req, res) => {
       });
     }
 
-    const predictions = data.results.map((place) => ({
-      place_id: place.place_id,
-      description: place.name + ' - ' + place.formatted_address,
-      structured_formatting: {
-        main_text: place.name,
-        secondary_text: place.formatted_address
-      }
+    const results = data.results.map((place) => ({
+      name: place.name,
+      formatted_address: place.formatted_address || place.vicinity
     }));
 
     res.json({
       status: 'OK',
-      results: data.results.slice(0, 5)
+      results: results.slice(0, 5)
     });
   } catch (error) {
     console.error('Places API detailed error:', {

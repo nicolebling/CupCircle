@@ -64,6 +64,9 @@ export default function CafeSelector({
       }
     } catch (error) {
       console.error('Error searching cafes:', error);
+      if (error instanceof TypeError && error.message === 'Failed to fetch') {
+        console.log('Network error - check if API server is running');
+      }
       setSuggestions([]);
     } finally {
       setIsLoading(false);
