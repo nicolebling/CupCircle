@@ -65,12 +65,19 @@ export default function CafeSelector({
             <GooglePlacesAutocomplete
               placeholder='Search for cafes...'
               onPress={(data: any, details = null) => {
+                console.log('Selected place:', data);
                 if (data) {
                   handleSelect({
-                    name: data.structured_formatting.main_text,
-                    formatted_address: data.structured_formatting.secondary_text
+                    name: data.structured_formatting?.main_text || data.description,
+                    formatted_address: data.structured_formatting?.secondary_text || ''
                   });
                 }
+              }}
+              onFail={(error) => {
+                console.error('Places API error:', error);
+              }}
+              textInputProps={{
+                onChangeText: (text) => console.log('Search text:', text),
               }}
               query={{
                 key: process.env.EXPO_PUBLIC_GOOGLE_PLACES_API_KEY,
@@ -83,9 +90,6 @@ export default function CafeSelector({
               requestUrl={{
                 url: '/api/places/autocomplete',
                 useOnPlatform: 'web'
-              }}
-              onFail={(error) => {
-                console.log('Google Places API error:', error);
               }}
               fetchDetails={true}
               styles={{

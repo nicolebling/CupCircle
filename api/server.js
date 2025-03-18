@@ -135,10 +135,31 @@ app.get('/api/places/autocomplete', async (req, res) => {
     
     const responseData = await response.json();
     console.log('Google API Response:', responseData);
+    
     if (!response.ok) {
       throw new Error(`Google Places API responded with status: ${response.status}`);
     }
-    const data = await response.json();
+
+    // Send the response data directly since we already parsed it
+    if (responseData.status === 'ZERO_RESULTS') {
+      return res.json({
+        status: 'OK',
+        predictions: []
+      });
+    }
+
+    const results = responseData.results.map(place => ({
+      description: `${place.name}, ${place.formatted_address}`,
+      structured_formatting: {
+        main_text: place.name,
+        secondary_text: place.formatted_address
+      }
+    }));
+
+    return res.json({
+      status: 'OK',
+      predictions: results.slice(0, 5)
+    });
 
     if (data.status === 'ZERO_RESULTS') {
       return res.json({
