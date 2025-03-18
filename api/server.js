@@ -307,5 +307,6 @@ app.use((req, res, next) => {
 // Start server
 app.listen(port, '0.0.0.0', () => {
   console.log(`Server running on port ${port}`);
-  console.log(`API available at: ${process.env.EXPO_PUBLIC_API_URL || 'https://your-replit-domain.replit.app'}`);
+  const domain = process.env.REPL_SLUG ? `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co` : 'http://localhost:3000';
+  console.log(`API available at: ${domain}`);
 });

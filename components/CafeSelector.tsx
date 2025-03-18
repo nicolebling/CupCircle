@@ -40,9 +40,9 @@ export default function CafeSelector({
     setIsLoading(true);
     try {
       // Using Places API Text Search for better results
-      const apiUrl = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000';
+      const domain = window.location.hostname.includes('replit') ? `https://${window.location.hostname}` : 'http://localhost:3000';
       const response = await fetch(
-        `${apiUrl}/api/places/autocomplete?input=${encodeURIComponent(input)}`,
+        `${domain}/api/places/autocomplete?input=${encodeURIComponent(input)}`,
         {
           headers: {
             'Accept': 'application/json'
