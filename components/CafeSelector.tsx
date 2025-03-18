@@ -80,7 +80,7 @@ export default function CafeSelector({
                 onChangeText: (text) => console.log('Search text:', text),
               }}
               query={{
-                key: process.env.EXPO_PUBLIC_GOOGLE_PLACES_API_KEY,
+                key: 'AIzaSyDYiKrt8lG2X2HxF4DUqVqIFi4wpGo6Aec',
                 language: 'en',
                 types: 'cafe|restaurant',
                 location: '40.7128,-74.0060', // NYC coordinates
@@ -88,8 +88,8 @@ export default function CafeSelector({
                 components: 'country:us'
               }}
               requestUrl={{
-                url: '/api/places/autocomplete',
-                useOnPlatform: 'web'
+                url: 'https://maps.googleapis.com/maps/api',
+                useOnPlatform: 'all'
               }}
               fetchDetails={true}
               styles={{
