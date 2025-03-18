@@ -1,19 +1,11 @@
-
 import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  SafeAreaView, 
-  TouchableOpacity, 
-  FlatList,
-  ActivityIndicator
-} from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import Colors from '@/constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
 import AvailabilityCard from '@/components/AvailabilityCard';
-import { format, addDays, isToday, isPast, startOfToday } from 'date-fns';
+import { format, addDays, isPast, isToday } from 'date-fns';
+import { useAvailability } from '../../hooks/useAvailability';
 
 // Type definitions
 type TimeSlot = {
@@ -26,9 +18,8 @@ type TimeSlot = {
 export default function AvailabilityScreen() {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
-  import { useAvailability } from '../../hooks/useAvailability';
-const { isLoading, error, createSlot, getSlots } = useAvailability();
-  
+  const { isLoading, error, createSlot, getSlots } = useAvailability();
+
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
 
@@ -48,12 +39,13 @@ const { isLoading, error, createSlot, getSlots } = useAvailability();
       await loadAvailability();
     }
   };
+
   const [isAddingSlot, setIsAddingSlot] = useState(false);
   const [selectedTime, setSelectedTime] = useState('10:00 AM');
-  
+
   // Generate next 7 days for calendar
   const next7Days = Array.from({ length: 7 }, (_, i) => addDays(new Date(), i));
-  
+
   // Available time slots (30-minute increments from 8 AM to 7 PM)
   const availableTimes = [
     '8:00 AM', '8:30 AM', '9:00 AM', '9:30 AM', '10:00 AM', '10:30 AM',
@@ -61,62 +53,33 @@ const { isLoading, error, createSlot, getSlots } = useAvailability();
     '2:00 PM', '2:30 PM', '3:00 PM', '3:30 PM', '4:00 PM', '4:30 PM',
     '5:00 PM', '5:30 PM', '6:00 PM', '6:30 PM', '7:00 PM'
   ];
-  
+
   // Function to calculate end time (30 minutes after start time)
   const calculateEndTime = (startTime: string): string => {
     const [time, period] = startTime.split(' ');
     const [hour, minute] = time.split(':').map(Number);
-    
+
     let newHour = hour;
     let newMinute = minute + 30;
     let newPeriod = period;
-    
+
     if (newMinute >= 60) {
       newMinute = 0;
       newHour += 1;
-      
+
       if (newHour === 12 && period === 'AM') {
         newPeriod = 'PM';
       } else if (newHour === 12 && period === 'PM') {
         newPeriod = 'AM';
       } else if (newHour > 12) {
-        newHour = 1;
+        newHour = newHour -12;
       }
     }
-    
+
     return `${newHour}:${newMinute === 0 ? '00' : newMinute} ${newPeriod}`;
   };
-  
-  // Load mock data
-  useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
-      const mockTimeSlots: TimeSlot[] = [
-        {
-          id: '1',
-          date: addDays(new Date(), 1),
-          startTime: '9:00 AM',
-          endTime: '9:30 AM',
-        },
-        {
-          id: '2',
-          date: addDays(new Date(), 1),
-          startTime: '2:00 PM',
-          endTime: '2:30 PM',
-        },
-        {
-          id: '3',
-          date: addDays(new Date(), 2),
-          startTime: '10:30 AM',
-          endTime: '11:00 AM',
-        },
-      ];
-      
-      setTimeSlots(mockTimeSlots);
-      setIsLoading(false);
-    }, 1000);
-  }, []);
-  
+
+
   // Function to add a new time slot
   const handleAddTimeSlot = () => {
     const newSlot: TimeSlot = {
@@ -125,39 +88,39 @@ const { isLoading, error, createSlot, getSlots } = useAvailability();
       startTime: selectedTime,
       endTime: calculateEndTime(selectedTime),
     };
-    
+
     // Check for overlaps
-    const hasOverlap = timeSlots.some(slot => 
-      slot.date.toDateString() === selectedDate.toDateString() && 
+    const hasOverlap = timeSlots.some(slot =>
+      slot.date.toDateString() === selectedDate.toDateString() &&
       slot.startTime === selectedTime
     );
-    
+
     if (hasOverlap) {
       // In a real app, show a toast message
       console.log('You already have a time slot at this time');
       return;
     }
-    
+
     setTimeSlots([...timeSlots, newSlot]);
     setIsAddingSlot(false);
   };
-  
+
   // Function to delete a time slot
   const handleDeleteTimeSlot = (id: string) => {
     setTimeSlots(timeSlots.filter(slot => slot.id !== id));
   };
-  
+
   // Function to check if a date has time slots
   const hasTimeSlotsOnDate = (date: Date) => {
     return timeSlots.some(slot => slot.date.toDateString() === date.toDateString());
   };
-  
+
   // Function to filter time slots for a specific date
   const getSlotsForDate = (date: Date) => {
     return timeSlots.filter(slot => slot.date.toDateString() === date.toDateString())
       .sort((a, b) => a.startTime.localeCompare(b.startTime));
   };
-  
+
   // Group time slots by date
   const groupedTimeSlots = timeSlots.reduce((groups, slot) => {
     const dateString = format(slot.date, 'yyyy-MM-dd');
@@ -167,35 +130,35 @@ const { isLoading, error, createSlot, getSlots } = useAvailability();
     groups[dateString].push(slot);
     return groups;
   }, {} as Record<string, TimeSlot[]>);
-  
+
   // Sort dates for display
   const sortedDates = Object.keys(groupedTimeSlots).sort();
-  
+
   // Create data for FlatList
   const flatListData = sortedDates.map(dateString => ({
     date: new Date(dateString),
     slots: groupedTimeSlots[dateString].sort((a, b) => a.startTime.localeCompare(b.startTime)),
   }));
-  
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.header}>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={[styles.addButton, { backgroundColor: colors.primary }]}
           onPress={() => setIsAddingSlot(!isAddingSlot)}
         >
-          <Ionicons 
-            name={isAddingSlot ? "close" : "add"} 
-            size={24} 
-            color="white" 
+          <Ionicons
+            name={isAddingSlot ? "close" : "add"}
+            size={24}
+            color="white"
           />
         </TouchableOpacity>
       </View>
-      
+
       <Text style={[styles.subtitle, { color: colors.secondaryText }]}>
         Set your availability for coffee chats with other professionals
       </Text>
-      
+
       {/* Calendar Section */}
       <View style={styles.calendarContainer}>
         <FlatList
@@ -205,7 +168,7 @@ const { isLoading, error, createSlot, getSlots } = useAvailability();
             const isSelected = selectedDate.toDateString() === item.toDateString();
             const isPastDate = isPast(item) && !isToday(item);
             const hasSlots = hasTimeSlotsOnDate(item);
-            
+
             return (
               <TouchableOpacity
                 style={[
@@ -216,18 +179,18 @@ const { isLoading, error, createSlot, getSlots } = useAvailability();
                 onPress={() => !isPastDate && setSelectedDate(item)}
                 disabled={isPastDate}
               >
-                <Text 
+                <Text
                   style={[
-                    styles.dayText, 
+                    styles.dayText,
                     { color: isSelected ? 'white' : colors.text },
                     isPastDate && styles.disabledText,
                   ]}
                 >
                   {format(item, 'EEE')}
                 </Text>
-                <Text 
+                <Text
                   style={[
-                    styles.dateText, 
+                    styles.dateText,
                     { color: isSelected ? 'white' : colors.text },
                     isPastDate && styles.disabledText,
                   ]}
@@ -245,7 +208,7 @@ const { isLoading, error, createSlot, getSlots } = useAvailability();
           contentContainerStyle={styles.calendarList}
         />
       </View>
-      
+
       {/* Add Time Slot UI */}
       {isAddingSlot && (
         <View style={[styles.addSlotContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
@@ -255,24 +218,24 @@ const { isLoading, error, createSlot, getSlots } = useAvailability();
           <Text style={[styles.selectedDateText, { color: colors.secondaryText }]}>
             {format(selectedDate, 'EEEE, MMMM d, yyyy')}
           </Text>
-          
+
           <Text style={[styles.timeSelectorLabel, { color: colors.text }]}>
             Select Start Time (30-minute duration)
           </Text>
-          
+
           <View style={styles.timePickerContainer}>
             <FlatList
               horizontal
               data={availableTimes}
               renderItem={({ item }) => {
                 const isSelectedTime = selectedTime === item;
-                
+
                 // Check if this time is already taken on selected date
                 const isTimeTaken = timeSlots.some(
-                  slot => slot.date.toDateString() === selectedDate.toDateString() && 
-                  slot.startTime === item
+                  slot => slot.date.toDateString() === selectedDate.toDateString() &&
+                    slot.startTime === item
                 );
-                
+
                 return (
                   <TouchableOpacity
                     style={[
@@ -283,9 +246,9 @@ const { isLoading, error, createSlot, getSlots } = useAvailability();
                     onPress={() => !isTimeTaken && setSelectedTime(item)}
                     disabled={isTimeTaken}
                   >
-                    <Text 
+                    <Text
                       style={[
-                        styles.timeText, 
+                        styles.timeText,
                         { color: isSelectedTime ? 'white' : colors.text },
                         isTimeTaken && styles.disabledText,
                       ]}
@@ -300,12 +263,12 @@ const { isLoading, error, createSlot, getSlots } = useAvailability();
               contentContainerStyle={styles.timesList}
             />
           </View>
-          
+
           <Text style={[styles.endTimeText, { color: colors.secondaryText }]}>
             End Time: {calculateEndTime(selectedTime)}
           </Text>
-          
-          <TouchableOpacity 
+
+          <TouchableOpacity
             style={[styles.saveButton, { backgroundColor: colors.primary }]}
             onPress={handleAddTimeSlot}
           >
@@ -313,13 +276,13 @@ const { isLoading, error, createSlot, getSlots } = useAvailability();
           </TouchableOpacity>
         </View>
       )}
-      
+
       {/* Time Slots List */}
       <View style={styles.slotsContainer}>
         <Text style={[styles.sectionTitle, { color: colors.text }]}>
           Your Available Time Slots
         </Text>
-        
+
         {isLoading ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color={colors.primary} />
@@ -374,11 +337,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 8,
     padding: 16
-  },
-  title: {
-    fontFamily: 'K2D-SemiBold, sans-serif',
-    fontWeight: 'bold',
-    fontSize: 24,
   },
   subtitle: {
     fontFamily: 'K2D-Regular, sans-serif',
