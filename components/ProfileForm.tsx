@@ -155,9 +155,9 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
         // Get the file extension
         const ext = uri.substring(uri.lastIndexOf('.') + 1);
         
-        // Generate a unique file name
+        // Generate a unique file name with auth.uid() as the first folder
         const fileName = `${Date.now()}.${ext}`;
-        const filePath = `${userId}/${fileName}`;
+        const filePath = `${supabase.auth.getUser().then(response => response.data.user?.id)}/${fileName}`;
 
         // Convert image to blob
         const response = await fetch(uri);
