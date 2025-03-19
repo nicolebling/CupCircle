@@ -170,20 +170,31 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
         const filePath = `${user.id}/${fileName}`;
 
         // Upload to Supabase Storage
-        const { data, error: uploadError } = await supabase.storage
+        const { data: uploadData, error: uploadError } = await supabase.storage
           .from('photos')
-          .upload(filePath, blob);
+          .upload(filePath, blob, {
+            contentType: `image/${ext}`
+          });
 
         if (uploadError) {
+          console.error('Upload error:', uploadError);
           throw uploadError;
         }
 
-        // Get the public URL
-        const { data: { publicUrl } } = supabase.storage
-          .from('photos')
-          .getPublicUrl(filePath);
+        if (!uploadData?.path) {
+          throw new Error('Upload failed - no path returned');
+        }
 
-        setAvatar(publicUrl);
+        // Get the public URL
+        const { data: urlData } = supabase.storage
+          .from('photos')
+          .getPublicUrl(uploadData.path);
+
+        if (!urlData?.publicUrl) {
+          throw new Error('Failed to get public URL');
+        }
+
+        setAvatar(urlData.publicUrl);
 
         // Update profile with new photo URL
         const { error: updateError } = await supabase
