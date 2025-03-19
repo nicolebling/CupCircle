@@ -15,7 +15,7 @@ export function useAvailability() {
     
     try {
       return await availabilityService.createAvailability({
-        user_id: user.id,
+        id: user.id,
         date,
         start_time: startTime,
         end_time: endTime,

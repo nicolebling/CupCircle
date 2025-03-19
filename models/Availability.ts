@@ -2,7 +2,6 @@ import { query } from "../services/database";
 
 export interface Availability {
   id: string;
-  user_id: string;
   date: Date;
   start_time: string;
   end_time: string;
