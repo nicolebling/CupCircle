@@ -151,42 +151,40 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
       if (!result.canceled && result.assets && result.assets.length > 0) {
         setLoading(true);
         const uri = result.assets[0].uri;
-        
+
         // Get the file extension
         const ext = uri.substring(uri.lastIndexOf('.') + 1);
-        
-        // Generate a unique file name with auth.uid() as the first folder
-        const fileName = `${Date.now()}.${ext}`;
-        const filePath = `${supabase.auth.getUser().then(response => response.data.user?.id)}/${fileName}`;
 
-        // Convert image to blob
+        // Create Blob from URI
         const response = await fetch(uri);
         const blob = await response.blob();
 
+        // Get the current user
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        if (userError || !user) {
+          throw new Error('No authenticated user found');
+        }
+
+        // Generate unique filename
+        const fileName = `${Date.now()}.${ext}`;
+        const filePath = `${user.id}/${fileName}`;
+
         // Upload to Supabase Storage
-        const { data: uploadData, error: uploadError } = await supabase.storage
+        const { data, error: uploadError } = await supabase.storage
           .from('photos')
-          .upload(filePath, blob, {
-            contentType: `image/${ext}`,
-            upsert: true
-          });
+          .upload(filePath, blob);
 
         if (uploadError) {
-          console.error('Upload error:', uploadError);
           throw uploadError;
         }
 
-        // Get public URL
-        const { data: urlData } = supabase.storage
+        // Get the public URL
+        const { data: { publicUrl } } = supabase.storage
           .from('photos')
-          .getPublicUrl(uploadData?.path || filePath);
+          .getPublicUrl(filePath);
 
-        if (!urlData?.publicUrl) {
-          throw new Error('Failed to get public URL for uploaded image');
-        }
+        setAvatar(publicUrl);
 
-        setAvatar(urlData.publicUrl);
-        
         // Update profile with new photo URL
         const { error: updateError } = await supabase
           .from('profiles')
@@ -356,7 +354,7 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
               />
             </View>
 
-            
+
 
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isDark && styles.textDark]}>Age</Text>
@@ -452,7 +450,7 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
               </View>
             </View> */}
 
-            
+
           </View>
 
           <View style={styles.section}>
