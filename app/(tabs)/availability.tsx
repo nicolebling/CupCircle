@@ -40,14 +40,6 @@ export default function AvailabilityScreen() {
     setTimeSlots(slots);
   };
 
-  const handleAddSlot = async () => {
-    const endTime = calculateEndTime(selectedTime);
-    const result = await createSlot(selectedDate, selectedTime, endTime);
-    if (result) {
-      await loadAvailability();
-    }
-  };
-
   const [selectedTime, setSelectedTime] = useState("10:00 AM");
 
   // Generate next 7 days for calendar
@@ -96,30 +88,6 @@ export default function AvailabilityScreen() {
     return `${newHour}:${newMinute === 0 ? "00" : newMinute} ${newPeriod}`;
   };
 
-  // Function to add a new time slot
-  const handleAddTimeSlot = () => {
-    const newSlot: TimeSlot = {
-      id: Date.now().toString(),
-      date: selectedDate,
-      startTime: selectedTime,
-      endTime: calculateEndTime(selectedTime),
-    };
-
-    // Check for overlaps
-    const hasOverlap = timeSlots.some(
-      (slot) =>
-        slot.date.toDateString() === selectedDate.toDateString() &&
-        slot.startTime === selectedTime,
-    );
-
-    if (hasOverlap) {
-      // In a real app, show a toast message
-      console.log("You already have a time slot at this time");
-      return;
-    }
-
-    setTimeSlots([...timeSlots, newSlot]);
-  };
 
   // Function to delete a time slot
   const handleDeleteTimeSlot = (id: string) => {
@@ -171,10 +139,23 @@ export default function AvailabilityScreen() {
 
   const handleAddSlot = async () => {
     if (!selectedDate) return;
-    
+
     const endTime = calculateEndTime(selectedTime);
+
+    // Check for overlaps
+    const hasOverlap = timeSlots.some(
+      (slot) =>
+        slot.date.toDateString() === selectedDate.toDateString() &&
+        slot.startTime === selectedTime,
+    );
+
+    if (hasOverlap) {
+      console.log("You already have a time slot at this time");
+      return;
+    }
+
     const result = await createSlot(selectedDate, selectedTime, endTime);
-    
+
     if (result) {
       await loadAvailability();
       setSelectedTime("9:30 AM"); // Reset time selection
@@ -319,7 +300,7 @@ export default function AvailabilityScreen() {
 
         <TouchableOpacity
           style={[styles.saveButton, { backgroundColor: colors.primary }]}
-          onPress={handleAddTimeSlot}
+          onPress={handleAddSlot}
         >
           <Text style={styles.saveButtonText}>Save Time Slot</Text>
         </TouchableOpacity>
