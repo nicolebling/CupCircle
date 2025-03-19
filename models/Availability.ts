@@ -41,8 +41,8 @@ export class AvailabilityModel {
   // Get availability slots for a user
   static async getByUserId(userId: string): Promise<Availability[]> {
     const result = await query(
-      "SELECT * FROM availability WHERE user_id = $1 ORDER BY date ASC, start_time ASC",
-      [userId],
+      "SELECT * FROM availability WHERE id = $1 ORDER BY date, start_time",
+      [id],
     );
     return result.rows;
   }
