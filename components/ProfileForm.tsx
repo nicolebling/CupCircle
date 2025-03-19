@@ -139,94 +139,67 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
     setFavoriteCafes(favoriteCafes.filter((_, i) => i !== index));
   };
 
-  const pickImage = async () => {
-    try {
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [1, 1],
-        quality: 0.8,
-      });
-
-      if (!result.canceled && result.assets && result.assets.length > 0) {
-        setLoading(true);
-        const uri = result.assets[0].uri;
-
-        // Get the file extension
-        const ext = uri.substring(uri.lastIndexOf('.') + 1);
-
-        // Create Blob from URI
-        const response = await fetch(uri);
-        const blob = await response.blob();
-
-        // Get the current user
-        const { data: { user }, error: userError } = await supabase.auth.getUser();
-        if (userError || !user) {
-          throw new Error('No authenticated user found');
-        }
-
-        // Generate unique filename
-        const fileName = `${Date.now()}.${ext}`;
-        const filePath = `${user.id}/${fileName}`;
-
-        // Upload to Supabase Storage
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('photos')
-          .upload(filePath, blob, {
-            contentType: `image/${ext}`
+        const pickImage = async () => {
+          const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [1, 1],
+            quality: 0.8,
           });
 
-        if (uploadError) {
-          console.error('Upload error:', uploadError);
-          throw uploadError;
-        }
+          if (!result.canceled && result.assets && result.assets.length > 0) {
+            uploadImage(result.assets[0].uri);
+          }
+        };
 
-        if (!uploadData?.path) {
-          throw new Error('Upload failed - no path returned');
-        }
 
-        // Get the public URL
-        const { data: urlData } = supabase.storage
-          .from('photos')
-          .getPublicUrl(uploadData.path);
+        const uploadImage = async (uri: string) => {
+          try {
+            setLoading(true);
 
-        if (!urlData?.publicUrl) {
-          throw new Error('Failed to get public URL');
-        }
+            const filename = uri.split('/').pop();
+            const fileExt = filename?.split('.').pop();
+            const filePath = `${userId}/${Date.now()}.${fileExt}`;
 
-        setAvatar(urlData.publicUrl);
+            const response = await fetch(uri);
+            const blob = await response.blob();
 
-        // Update profile with new photo URL
-        const { error: updateError } = await supabase
-          .from('profiles')
-          .update({ photo_url: publicUrl })
-          .eq('id', userId);
+            const { error: uploadError } = await supabase.storage
+              .from('photos')
+              .upload(filePath, blob);
 
-        if (updateError) {
-          throw updateError;
-        }
-      }
-    } catch (error) {
-      console.error('Error uploading image:', error);
-      Alert.alert('Error', 'Failed to upload image. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
+            if (uploadError) {
+              throw uploadError;
+            }
 
-  const validateForm = () => {
-    if (!name.trim()) {
-      setError('Name is required');
-      return false;
-    }
+            const { data } = supabase.storage
+              .from('photos')
+              .getPublicUrl(filePath);
 
-    if (age && isNaN(Number(age))) {
-      setError('Age must be a number');
-      return false;
-    }
+            setAvatar(data.publicUrl);
+          } catch (error) {
+            console.error('Error uploading image:', error);
+            Alert.alert('Error', 'Failed to upload image. Please try again.');
+          } finally {
+            setLoading(false);
+          }
+        };
 
-    return true;
-  };
+        const validateForm = () => {
+          if (!name.trim()) {
+            setError('Name is required');
+            return false;
+          }
+
+          if (age && isNaN(Number(age))) {
+            setError('Age must be a number');
+            return false;
+          }
+
+          return true;
+        };
+  
+  
 
   const saveProfile = async () => {
     if (!validateForm()) return;
@@ -676,3 +649,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
+
+
+
+
+
+
+
+
+
+
+
+

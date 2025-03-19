@@ -5,7 +5,6 @@ create extension if not exists "uuid-ossp";
 -- Create availability table
 create table if not exists "public"."availability" (
   id uuid not null default uuid_generate_v4(),
-  user_id uuid references auth.users(id) on delete cascade,
   "date" date not null,
   "start_time" time not null,
   "end_time" time not null,
