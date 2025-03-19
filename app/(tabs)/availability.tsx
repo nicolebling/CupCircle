@@ -33,7 +33,7 @@ export default function AvailabilityScreen() {
   const [showAddSlot, setShowAddSlot] = useState(false); // Added state for toggle
 
   useEffect(() => {
-    if (user) {
+    if (user?.id) {
       fetchAvailability();
     }
   }, [user]);
@@ -43,11 +43,11 @@ export default function AvailabilityScreen() {
       const { data, error } = await supabase
         .from("availability")
         .select("*")
-        .eq("id", user.id)
-        .single();
+        .eq("user_id", user.id)
+        .order("date", { ascending: true });
 
       if (error) throw error;
-      setTimeSlots(data);
+      setTimeSlots(data || []);
     } catch (error) {
       console.error("Error fetching availability:", error);
     }
