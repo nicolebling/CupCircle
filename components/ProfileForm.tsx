@@ -98,6 +98,7 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
         setNeighborhoods(data.neighborhoods || []);
         setFavoriteCafes(data.favorite_cafes || []);
         setInterests(data.interests || []);
+        setAvatar(data.photo_url || '');
 
         console.log('Profile data loaded into form state');
       }
