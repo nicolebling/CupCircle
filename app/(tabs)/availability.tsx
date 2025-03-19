@@ -175,6 +175,11 @@ export default function AvailabilityScreen() {
     ),
   }));
 
+  const handleDateSelect = (date: Date) => {
+    setSelectedDate(date);
+    setIsAddingSlot(true); // Show "Add Time Slot" UI when a date is selected
+  };
+
   return (
     <SafeAreaView
       style={[styles.container, { backgroundColor: colors.background }]}
@@ -214,7 +219,7 @@ export default function AvailabilityScreen() {
                   isSelected && { backgroundColor: colors.primary },
                   isPastDate && styles.disabledDate,
                 ]}
-                onPress={() => !isPastDate && setSelectedDate(item)}
+                onPress={() => !isPastDate && handleDateSelect(item)}
                 disabled={isPastDate}
               >
                 <TouchableOpacity
