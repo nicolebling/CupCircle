@@ -19,8 +19,8 @@ CREATE TABLE IF NOT EXISTS profiles (
   neighborhoods TEXT[],
   favorite_cafes TEXT[],
   interests TEXT[],
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-  
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  user_id INT NOT NULL AUTO_INCREMENT
 );
 
 -- Create RLS policies
