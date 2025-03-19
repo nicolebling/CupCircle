@@ -9,7 +9,8 @@ import {
   KeyboardAvoidingView,
   Platform,
   Alert,
-  ActivityIndicator
+  ActivityIndicator,
+  Image
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
@@ -139,42 +140,58 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
   };
 
   const pickImage = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.8,
-    });
-
-    if (!result.canceled && result.assets && result.assets.length > 0) {
-      uploadImage(result.assets[0].uri);
-    }
-  };
-
-  const uploadImage = async (uri: string) => {
     try {
-      setLoading(true);
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
 
-      const filename = uri.split('/').pop();
-      const fileExt = filename?.split('.').pop();
-      const filePath = `${userId}/${Date.now()}.${fileExt}`;
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        setLoading(true);
+        const uri = result.assets[0].uri;
+        
+        // Get the file extension
+        const ext = uri.substring(uri.lastIndexOf('.') + 1);
+        
+        // Generate a unique file name
+        const fileName = `${Date.now()}.${ext}`;
+        const filePath = `${userId}/${fileName}`;
 
-      const response = await fetch(uri);
-      const blob = await response.blob();
+        // Convert image to blob
+        const response = await fetch(uri);
+        const blob = await response.blob();
 
-      const { error: uploadError } = await supabase.storage
-        .from('photos')
-        .upload(filePath, blob);
+        // Upload to Supabase Storage
+        const { data, error: uploadError } = await supabase.storage
+          .from('photos')
+          .upload(filePath, blob, {
+            contentType: `image/${ext}`,
+            upsert: true
+          });
 
-      if (uploadError) {
-        throw uploadError;
+        if (uploadError) {
+          throw uploadError;
+        }
+
+        // Get public URL
+        const { data: { publicUrl } } = supabase.storage
+          .from('photos')
+          .getPublicUrl(filePath);
+
+        setAvatar(publicUrl);
+        
+        // Update profile with new photo URL
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({ photo_url: publicUrl })
+          .eq('id', userId);
+
+        if (updateError) {
+          throw updateError;
+        }
       }
-
-      const { data } = supabase.storage
-        .from('photos')
-        .getPublicUrl(filePath);
-
-      setAvatar(data.publicUrl);
     } catch (error) {
       console.error('Error uploading image:', error);
       Alert.alert('Error', 'Failed to upload image. Please try again.');
@@ -304,7 +321,11 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
           <TouchableOpacity style={styles.avatarContainer} onPress={pickImage}>
             {avatar ? (
               <View style={styles.avatarWrapper}>
-                <Ionicons name="image" size={80} color="#ccc" />
+                <Image 
+                  source={{ uri: avatar }} 
+                  style={{ width: 120, height: 120, borderRadius: 60 }}
+                  resizeMode="cover"
+                />
               </View>
             ) : (
               <View style={styles.avatarPlaceholder}>
