@@ -1,7 +1,6 @@
-
-import { useState } from 'react';
-import { availabilityService } from '../services/api';
-import { useAuth } from '../contexts/AuthContext';
+import { useState } from "react";
+import { availabilityService } from "../services/api";
+import { useAuth } from "../contexts/AuthContext";
 
 export function useAvailability() {
   const [isLoading, setIsLoading] = useState(false);
@@ -12,17 +11,18 @@ export function useAvailability() {
     if (!user?.id) return null;
     setIsLoading(true);
     setError(null);
-    
+
     try {
-      return await availabilityService.createAvailability({
+      const result = await availabilityService.createAvailability({
         id: user.id,
         date,
         start_time: startTime,
         end_time: endTime,
-        is_available: true
+        is_available: true,
       });
+      return result;
     } catch (err) {
-      setError('Failed to create availability slot');
+      setError("Failed to create availability slot");
       console.error(err);
       return null;
     } finally {
@@ -34,11 +34,12 @@ export function useAvailability() {
     if (!user?.id) return [];
     setIsLoading(true);
     setError(null);
-    
+
     try {
-      return await availabilityService.getUserAvailability(user.id);
+      const slots = await availabilityService.getUserAvailability(user.id);
+      return slots;
     } catch (err) {
-      setError('Failed to fetch availability slots');
+      setError("Failed to fetch availability slots");
       console.error(err);
       return [];
     } finally {
@@ -50,6 +51,6 @@ export function useAvailability() {
     isLoading,
     error,
     createSlot,
-    getSlots
+    getSlots,
   };
 }

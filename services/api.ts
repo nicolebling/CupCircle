@@ -125,7 +125,7 @@ export const availabilityService = {
         .order("start_time", { ascending: true });
 
       if (error) throw error;
-      return data;
+      return data || [];
     } catch (error) {
       console.error("Failed to get availability:", error);
       throw error;
