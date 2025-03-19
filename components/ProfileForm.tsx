@@ -164,7 +164,7 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
         const blob = await response.blob();
 
         // Upload to Supabase Storage
-        const { data, error: uploadError } = await supabase.storage
+        const { data: uploadData, error: uploadError } = await supabase.storage
           .from('photos')
           .upload(filePath, blob, {
             contentType: `image/${ext}`,
@@ -172,15 +172,20 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
           });
 
         if (uploadError) {
+          console.error('Upload error:', uploadError);
           throw uploadError;
         }
 
         // Get public URL
-        const { data: { publicUrl } } = supabase.storage
+        const { data: urlData } = supabase.storage
           .from('photos')
-          .getPublicUrl(filePath);
+          .getPublicUrl(uploadData?.path || filePath);
 
-        setAvatar(publicUrl);
+        if (!urlData?.publicUrl) {
+          throw new Error('Failed to get public URL for uploaded image');
+        }
+
+        setAvatar(urlData.publicUrl);
         
         // Update profile with new photo URL
         const { error: updateError } = await supabase
