@@ -14,13 +14,15 @@ export function useAvailability() {
     setError(null);
     
     try {
-      return await availabilityService.createAvailability({
+      const formattedDate = new Date(date.setHours(0,0,0,0)).toISOString();
+      const result = await availabilityService.createAvailability({
         user_id: user.id,
-        date,
+        date: formattedDate,
         start_time: startTime,
         end_time: endTime,
         is_available: true
       });
+      return result;
     } catch (err) {
       setError('Failed to create availability slot');
       console.error(err);

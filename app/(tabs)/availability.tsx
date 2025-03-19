@@ -166,6 +166,19 @@ export default function AvailabilityScreen() {
 
   const handleDateSelect = (date: Date) => {
     setSelectedDate(date);
+    loadAvailability(); // Refresh availability after selection
+  };
+
+  const handleAddSlot = async () => {
+    if (!selectedDate) return;
+    
+    const endTime = calculateEndTime(selectedTime);
+    const result = await createSlot(selectedDate, selectedTime, endTime);
+    
+    if (result) {
+      await loadAvailability();
+      setSelectedTime("9:30 AM"); // Reset time selection
+    }
   };
 
   return (
