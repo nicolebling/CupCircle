@@ -13,6 +13,11 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
+import { useAuth } from '../../provider/AuthProvider'
+import * as FileSystem from 'expo-file-system'
+import { decode } from 'base64-arraybuffer'
+import { FileObject } from '@supabase/storage-js'
+
 import { supabase } from '@/lib/supabase';
 import Colors from "@/constants/Colors";
 import { useColorScheme } from '@/hooks/useColorScheme';
@@ -22,6 +27,7 @@ import InterestSelector from '@/components/InterestSelector';
 import ExperienceLevelSelector from '@/components/ExperienceLevelSelector';
 import NeighborhoodSelector from '@/components/NeighborhoodSelector';
 import CafeSelector from '@/components/CafeSelector';
+import ImageItem from '@/components/ImageItem';
 
 type ProfileFormProps = {
   userId: string;
@@ -157,7 +163,7 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
       const blob = await response.blob();
 
       const { error: uploadError } = await supabase.storage
-        .from('avatars')
+        .from('photos')
         .upload(filePath, blob);
 
       if (uploadError) {
@@ -165,7 +171,7 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
       }
 
       const { data } = supabase.storage
-        .from('avatars')
+        .from('photos')
         .getPublicUrl(filePath);
 
       setAvatar(data.publicUrl);

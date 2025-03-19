@@ -174,7 +174,7 @@ export default function AvailabilityScreen() {
       style={[styles.container, { backgroundColor: colors.background }]}
     >
       <View style={styles.header}>
-        <Text style={[styles.title, { color: colors.text }]}>
+        <Text style={[styles.subtitle, { color: colors.text }]}>
           Set Your Availability
         </Text>
         <TouchableOpacity
@@ -185,10 +185,10 @@ export default function AvailabilityScreen() {
         </TouchableOpacity>
       </View>
 
-      <Text style={[styles.subtitle, { color: colors.secondaryText }]}>
+      {/* <Text style={[styles.subtitle, { color: colors.secondaryText }]}>
         Set your availability for coffee chats with other professionals
       </Text>
-
+ */}
       {showAddSlot && (
         <>
           {/* Calendar Section */}
