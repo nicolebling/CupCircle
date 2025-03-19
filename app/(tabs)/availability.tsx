@@ -53,11 +53,8 @@ export default function AvailabilityScreen() {
   // Generate next 7 days for calendar
   const next7Days = Array.from({ length: 7 }, (_, i) => addDays(new Date(), i));
 
-  // Available time slots (30-minute increments from 8 AM to 7 PM)
+  // Available time slots (30-minute increments from 9:30 AM to 4:00 PM)
   const availableTimes = [
-    "8:00 AM",
-    "8:30 AM",
-    "9:00 AM",
     "9:30 AM",
     "10:00 AM",
     "10:30 AM",
@@ -72,12 +69,6 @@ export default function AvailabilityScreen() {
     "3:00 PM",
     "3:30 PM",
     "4:00 PM",
-    "4:30 PM",
-    "5:00 PM",
-    "5:30 PM",
-    "6:00 PM",
-    "6:30 PM",
-    "7:00 PM",
   ];
 
   // Function to calculate end time (30 minutes after start time)
