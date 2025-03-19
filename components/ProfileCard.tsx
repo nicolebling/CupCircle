@@ -677,12 +677,19 @@ export default function ProfileCard({
 
           {/* Profile Photo */}
           <View style={styles.photoContainer}>
-            <Image
-              source={{ uri: profile.photo }}
-              style={styles.profilePhoto}
-            />
+            {profile.photo_url ? (
+              <Image
+                source={{ uri: profile.photo_url }}
+                style={styles.profilePhoto}
+                resizeMode="cover"
+              />
+            ) : (
+              <View style={[styles.profilePhoto, { backgroundColor: '#1A1A1A' }]}>
+                <Ionicons name="person" size={40} color="#ffffff" />
+              </View>
+            )}
           </View>
-          
+
 
           <View style={styles.nameRow}>
             <Text style={[styles.name, { color: colors.text }]}>
@@ -746,7 +753,7 @@ export default function ProfileCard({
             </Text>
           </View>
 
-          
+
 
           {/* Professional Details */}
           <View style={styles.section}>
@@ -887,7 +894,7 @@ export default function ProfileCard({
               </>
             )} */}
 
-            
+
           </View>
 
           {/* Location */}
@@ -974,7 +981,17 @@ export default function ProfileCard({
 
         {/* Profile Photo */}
         <View style={styles.photoContainer}>
-          <Image source={{ uri: userData.photo }} style={styles.profilePhoto} />
+          {userData.photo_url ? (
+            <Image
+              source={{ uri: userData.photo_url }}
+              style={styles.profilePhoto}
+              resizeMode="cover"
+            />
+          ) : (
+            <View style={[styles.profilePhoto, { backgroundColor: '#1A1A1A' }]}>
+              <Ionicons name="person" size={40} color="#ffffff" />
+            </View>
+          )}
           <TouchableOpacity
             style={[styles.uploadButton, { backgroundColor: colors.primary }]}
             onPress={() => console.log("Upload photo")}
@@ -1466,6 +1483,10 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 60,
+    marginBottom: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
   },
   uploadButton: {
     position: "absolute",
