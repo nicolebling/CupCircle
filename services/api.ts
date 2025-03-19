@@ -1,5 +1,5 @@
-import { Profile } from '../models/Profile';
-import { supabase } from '../lib/supabase';
+import { Profile } from "../models/Profile";
+import { supabase } from "../lib/supabase";
 
 // Auth service
 export const authService = {
@@ -8,13 +8,13 @@ export const authService = {
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
-        password
+        password,
       });
 
       if (error) throw error;
       return data.user;
     } catch (error) {
-      console.error('Login error:', error);
+      console.error("Login error:", error);
       return null;
     }
   },
@@ -24,16 +24,16 @@ export const authService = {
     try {
       const { data, error } = await supabase.auth.signUp({
         email,
-        password
+        password,
       });
 
       if (error) throw error;
       return data.user;
     } catch (error) {
-      console.error('Register error:', error);
+      console.error("Register error:", error);
       throw error;
     }
-  }
+  },
 };
 
 // Profile service
@@ -43,21 +43,21 @@ export const profileService = {
     try {
       if (!userId) return null;
 
-      console.log('Fetching profile for user:', userId);
+      console.log("Fetching profile for user:", userId);
       const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
+        .from("profiles")
+        .select("*")
+        .eq("id", userId)
         .single();
 
       if (error) {
-        console.error('Supabase error:', error);
+        console.error("Supabase error:", error);
         throw error;
       }
-      console.log('Profile data:', data);
+      console.log("Profile data:", data);
       return data;
     } catch (error) {
-      console.error('Failed to load user profile:', error);
+      console.error("Failed to load user profile:", error);
       throw error;
     }
   },
@@ -66,11 +66,11 @@ export const profileService = {
   async saveProfile(profileData: Partial<Profile> & { user_id: string }) {
     try {
       const { data, error } = await supabase
-        .from('profiles')
+        .from("profiles")
         .upsert({
           id: profileData.user_id,
           ...profileData,
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
         })
         .select()
         .single();
@@ -78,10 +78,10 @@ export const profileService = {
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Failed to save profile', error);
+      console.error("Failed to save profile", error);
       throw error;
     }
-  }
+  },
 };
 // Availability service
 export const availabilityService = {
@@ -95,19 +95,21 @@ export const availabilityService = {
   }) {
     try {
       const { data, error } = await supabase
-        .from('availability')
-        .insert([{
-          ...availabilityData,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        }])
+        .from("availability")
+        .insert([
+          {
+            ...availabilityData,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+        ])
         .select()
         .single();
 
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Failed to create availability:', error);
+      console.error("Failed to create availability:", error);
       throw error;
     }
   },
@@ -116,39 +118,42 @@ export const availabilityService = {
   async getUserAvailability(userId: string) {
     try {
       const { data, error } = await supabase
-        .from('availability')
-        .select('*')
-        .eq('user_id', userId)
-        .order('date', { ascending: true })
-        .order('start_time', { ascending: true });
+        .from("availability")
+        .select("*")
+        .eq("id", userId)
+        .order("date", { ascending: true })
+        .order("start_time", { ascending: true });
 
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Failed to get availability:', error);
+      console.error("Failed to get availability:", error);
       throw error;
     }
   },
 
   // Update availability slot
-  async updateAvailability(id: string, updateData: Partial<{
-    date: Date;
-    start_time: string;
-    end_time: string;
-    is_available: boolean;
-  }>) {
+  async updateAvailability(
+    id: string,
+    updateData: Partial<{
+      date: Date;
+      start_time: string;
+      end_time: string;
+      is_available: boolean;
+    }>,
+  ) {
     try {
       const { data, error } = await supabase
-        .from('availability')
+        .from("availability")
         .update(updateData)
-        .eq('id', id)
+        .eq("id", id)
         .select()
         .single();
 
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Failed to update availability:', error);
+      console.error("Failed to update availability:", error);
       throw error;
     }
   },
@@ -157,15 +162,15 @@ export const availabilityService = {
   async deleteAvailability(id: string) {
     try {
       const { error } = await supabase
-        .from('availability')
+        .from("availability")
         .delete()
-        .eq('id', id);
+        .eq("id", id);
 
       if (error) throw error;
       return true;
     } catch (error) {
-      console.error('Failed to delete availability:', error);
+      console.error("Failed to delete availability:", error);
       throw error;
     }
-  }
+  },
 };
