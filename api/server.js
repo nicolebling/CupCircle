@@ -281,13 +281,13 @@ app.post('/api/profile', async (req, res) => {
 // Availability routes
 app.post('/api/availability', async (req, res) => {
   try {
-    const { user_id, date, start_time, end_time, is_available } = req.body;
+    const { date, start_time, end_time, is_available } = req.body;
     
     const result = await pool.query(
-      `INSERT INTO availability (user_id, date, start_time, end_time, is_available) 
-       VALUES ($1, $2, $3, $4, $5) 
+      `INSERT INTO availability (date, start_time, end_time, is_available) 
+       VALUES ($1, $2, $3, $4) 
        RETURNING *`,
-      [user_id, date, start_time, end_time, is_available]
+      [date, start_time, end_time, is_available]
     );
     
     return res.status(201).json(result.rows[0]);
@@ -297,13 +297,13 @@ app.post('/api/availability', async (req, res) => {
   }
 });
 
-app.get('/api/availability/:userId', async (req, res) => {
+app.get('/api/availability/:id', async (req, res) => {
   try {
-    const { userId } = req.params;
+    const { id } = req.params;
     
     const result = await pool.query(
-      'SELECT * FROM availability WHERE user_id = $1 ORDER BY date ASC, start_time ASC',
-      [userId]
+      'SELECT * FROM availability WHERE id = $1 ORDER BY date ASC, start_time ASC',
+      [id]
     );
     
     return res.json(result.rows);
