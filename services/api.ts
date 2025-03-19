@@ -96,7 +96,11 @@ export const availabilityService = {
     try {
       const { data, error } = await supabase
         .from('availability')
-        .insert([availabilityData])
+        .insert([{
+          ...availabilityData,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        }])
         .select()
         .single();
 
@@ -115,7 +119,8 @@ export const availabilityService = {
         .from('availability')
         .select('*')
         .eq('user_id', userId)
-        .order('date', { ascending: true });
+        .order('date', { ascending: true })
+        .order('start_time', { ascending: true });
 
       if (error) throw error;
       return data;

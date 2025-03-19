@@ -1,4 +1,3 @@
-
 import { query } from '../services/database';
 
 export interface Availability {
@@ -12,9 +11,12 @@ export interface Availability {
   updated_at?: Date;
 }
 
+export type CreateAvailabilityInput = Omit<Availability, 'id' | 'created_at' | 'updated_at'>;
+export type UpdateAvailabilityInput = Partial<CreateAvailabilityInput>;
+
 export class AvailabilityModel {
   // Create a new availability slot
-  static async create(availability: Omit<Availability, 'id' | 'created_at' | 'updated_at'>): Promise<Availability> {
+  static async create(availability: CreateAvailabilityInput): Promise<Availability> {
     const { user_id, date, start_time, end_time, is_available } = availability;
 
     const result = await query(
@@ -35,7 +37,7 @@ export class AvailabilityModel {
   }
 
   // Update availability slot
-  static async update(id: string, availabilityData: Partial<Availability>): Promise<Availability> {
+  static async update(id: string, availabilityData: UpdateAvailabilityInput): Promise<Availability> {
     const keys = Object.keys(availabilityData);
     const setClause = keys.map((key, i) => `${key} = $${i + 2}`).join(', ');
     

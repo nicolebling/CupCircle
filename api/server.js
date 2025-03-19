@@ -277,6 +277,62 @@ app.post('/api/profile', async (req, res) => {
         [
           user_id,
           profileData.name || '',
+
+// Availability routes
+app.post('/api/availability', async (req, res) => {
+  try {
+    const { user_id, date, start_time, end_time, is_available } = req.body;
+    
+    const result = await pool.query(
+      `INSERT INTO availability (user_id, date, start_time, end_time, is_available) 
+       VALUES ($1, $2, $3, $4, $5) 
+       RETURNING *`,
+      [user_id, date, start_time, end_time, is_available]
+    );
+    
+    return res.status(201).json(result.rows[0]);
+  } catch (error) {
+    console.error('Create availability error:', error);
+    return res.status(500).json({ error: 'Server error' });
+  }
+});
+
+app.get('/api/availability/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    
+    const result = await pool.query(
+      'SELECT * FROM availability WHERE user_id = $1 ORDER BY date ASC, start_time ASC',
+      [userId]
+    );
+    
+    return res.json(result.rows);
+  } catch (error) {
+    console.error('Get availability error:', error);
+    return res.status(500).json({ error: 'Server error' });
+  }
+});
+
+app.delete('/api/availability/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const result = await pool.query(
+      'DELETE FROM availability WHERE id = $1 RETURNING *',
+      [id]
+    );
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Availability not found' });
+    }
+    
+    return res.json({ message: 'Availability deleted successfully' });
+  } catch (error) {
+    console.error('Delete availability error:', error);
+    return res.status(500).json({ error: 'Server error' });
+  }
+});
+
           profileData.age || null,
           profileData.occupation || '',
           profileData.photo || '',
