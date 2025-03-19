@@ -59,7 +59,7 @@ export default function AvailabilityScreen() {
     const endTime = calculateEndTime(selectedTime);
     const result = await createSlot(selectedDate, selectedTime, endTime);
     if (result) {
-      await loadAvailability();
+      await fetchAvailability();
     }
   };
 
