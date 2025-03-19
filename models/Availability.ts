@@ -20,9 +20,9 @@ export class AvailabilityModel {
     const { user_id, date, start_time, end_time, is_available } = availability;
 
     const result = await query(
-      `INSERT INTO availability(user_id, date, start_time, end_time, is_available) 
+      `INSERT INTO availability(id, date, start_time, end_time, is_available) 
        VALUES($1, $2, $3, $4, $5) RETURNING *`,
-      [user_id, date, start_time, end_time, is_available]
+      [id, date, start_time, end_time, is_available]
     );
     return result.rows[0];
   }
