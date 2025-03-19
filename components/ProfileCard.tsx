@@ -25,6 +25,54 @@ import ExperienceLevelSelector from "./ExperienceLevelSelector";
 import InterestSelector from "./InterestSelector";
 import { useAuth } from "@/contexts/AuthContext";
 
+// Map of interests to emojis
+const INTEREST_EMOJIS: Record<string, string> = {
+  "Reading": "📚",
+  "Writing": "✍️",
+  "Self-Development": "🌱",
+  "Mindfulness": "🧘",
+  "Languages": "🗣️",
+  "Psychology": "🧠",
+  "Philosophy": "💭",
+  "Education": "🎓",
+  "Mentoring": "👨‍🏫",
+  "Leadership": "👑",
+  "Technology": "💻",
+  "Business": "💼",
+  "Startups": "🚀",
+  "Innovation": "💡",
+  "Sustainability": "♻️",
+  "Social Impact": "🤝",
+  "Marketing": "📢",
+  "Design": "🎨",
+  "Finance": "💰",
+  "Entrepreneurship": "🏆",
+  "Public Speaking": "🎤",
+  "Networking": "🔗",
+  "Project Management": "📋",
+  "Data Science": "📊",
+  "Photography": "📷",
+  "Travel": "✈️",
+  "Cooking": "👨‍🍳",
+  "Music": "🎵",
+  "Art": "🖼️",
+  "Sports": "⚽",
+  "Gaming": "🎮",
+  "Fashion": "👔",
+  "Fitness": "💪",
+  "Hiking": "🥾",
+  "Movies": "🎬",
+  "Theatre": "🎭",
+  "Dance": "💃",
+  "Food & Wine": "🍷",
+  "Coffee": "☕",
+  "Tea": "🍵",
+  "Yoga": "🧘‍♀️",
+  "Meditation": "🧘‍♂️",
+  "Podcasts": "🎧",
+  "Blogging": "📝",
+};
+
 const { width } = Dimensions.get("window");
 
 // Function to get coffee theme based on experience level
@@ -535,7 +583,7 @@ export default function ProfileCard({
                   <Text
                     style={[styles.interestText, { color: colors.primary }]}
                   >
-                    {interest}
+                    {INTEREST_EMOJIS[interest] || "🔖"} {interest}
                   </Text>
                 </View>
               ))}
@@ -874,7 +922,7 @@ export default function ProfileCard({
                       ]}
                     >
                       <Text style={[styles.tagText, { color: colors.primary }]}>
-                        {interest}
+                        {INTEREST_EMOJIS[interest] || "🔖"} {interest}
                       </Text>
                     </View>
                   ))}
