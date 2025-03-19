@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import Colors from "@/constants/Colors";
+import { useAuth } from "@/contexts/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
 import AvailabilityCard from "@/components/AvailabilityCard";
 import { format, addDays, isPast, isToday } from "date-fns";
@@ -26,6 +27,7 @@ type TimeSlot = {
 export default function AvailabilityScreen() {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
+  const { user } = useAuth();
   const { isLoading, error, createSlot, getSlots } = useAvailability();
 
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
