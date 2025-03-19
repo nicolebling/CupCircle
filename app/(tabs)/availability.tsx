@@ -48,7 +48,7 @@ export default function AvailabilityScreen() {
     }
   };
 
-  const [isAddingSlot, setIsAddingSlot] = useState(false);
+  const [isAddingSlot] = useState(true);
   const [selectedTime, setSelectedTime] = useState("10:00 AM");
 
   // Generate next 7 days for calendar
@@ -185,16 +185,9 @@ export default function AvailabilityScreen() {
       style={[styles.container, { backgroundColor: colors.background }]}
     >
       <View style={styles.header}>
-        <TouchableOpacity
-          style={[styles.addButton, { backgroundColor: colors.primary }]}
-          onPress={() => setIsAddingSlot(!isAddingSlot)}
-        >
-          <Ionicons
-            name={isAddingSlot ? "close" : "add"}
-            size={24}
-            color="white"
-          />
-        </TouchableOpacity>
+        <Text style={[styles.title, { color: colors.text }]}>
+          Set Your Availability
+        </Text>
       </View>
 
       <Text style={[styles.subtitle, { color: colors.secondaryText }]}>
