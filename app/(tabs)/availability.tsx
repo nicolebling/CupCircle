@@ -33,12 +33,24 @@ export default function AvailabilityScreen() {
   const [showAddSlot, setShowAddSlot] = useState(false); // Added state for toggle
 
   useEffect(() => {
-    loadAvailability();
-  }, []);
+    if (user) {
+      fetchAvailability();
+    }
+  }, [user]);
 
-  const loadAvailability = async () => {
-    const slots = await getSlots();
-    setTimeSlots(slots);
+  const fetchAvailability = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("availability")
+        .select("*")
+        .eq("id", user.id)
+        .single();
+
+      if (error) throw error;
+      setTimeSlots(data);
+    } catch (error) {
+      console.error("Error fetching availability:", error);
+    }
   };
 
   const handleAddSlot = async () => {
@@ -181,7 +193,11 @@ export default function AvailabilityScreen() {
           style={styles.addButton}
           onPress={() => setShowAddSlot(!showAddSlot)}
         >
-          <Ionicons name={showAddSlot ? "close-circle" : "add-circle"} size={32} color={colors.primary} />
+          <Ionicons
+            name={showAddSlot ? "close-circle" : "add-circle"}
+            size={32}
+            color={colors.primary}
+          />
         </TouchableOpacity>
       </View>
 
@@ -277,8 +293,8 @@ export default function AvailabilityScreen() {
                   // Check if this time is already taken on selected date
                   const isTimeTaken = timeSlots.some(
                     (slot) =>
-                      slot.date.toDateString() === selectedDate.toDateString() &&
-                      slot.startTime === item,
+                      slot.date.toDateString() ===
+                        selectedDate.toDateString() && slot.startTime === item,
                   );
 
                   return (
