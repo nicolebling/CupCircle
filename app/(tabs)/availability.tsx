@@ -306,7 +306,7 @@ export default function AvailabilityScreen() {
 
         <TouchableOpacity
           style={[styles.saveButton, { backgroundColor: colors.primary }]}
-          onPress={handleAddTimeSlot}
+          onPress={handleAddSlot}
         >
           <Text style={styles.saveButtonText}>Save Time Slot</Text>
         </TouchableOpacity>
