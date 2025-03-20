@@ -347,10 +347,25 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
               <TextInput
                 style={[styles.input, isDark && styles.inputDark]}
                 value={birthday}
-                onChangeText={setBirthday}
-                placeholder="YYYY-MM-DD"
+                onChangeText={(text) => {
+                  // Remove any non-numeric characters
+                  const numbers = text.replace(/[^\d]/g, '');
+                  if (numbers.length <= 8) {
+                    // Format as YYYY-MM-DD
+                    let formatted = numbers;
+                    if (numbers.length > 4) {
+                      formatted = numbers.slice(0, 4) + '-' + numbers.slice(4);
+                    }
+                    if (numbers.length > 6) {
+                      formatted = formatted.slice(0, 7) + '-' + formatted.slice(7);
+                    }
+                    setBirthday(formatted);
+                  }
+                }}
+                placeholder="YYYYMMDD"
                 placeholderTextColor={colors.secondaryText}
                 keyboardType="number-pad"
+                maxLength={10}
               />
             </View>
 
