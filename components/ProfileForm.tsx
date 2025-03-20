@@ -90,7 +90,7 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
         setName(data.name || '');
         setOccupation(data.occupation || '');
         setBio(data.bio || '');
-        setAge(data.age ? data.age.toString() : '');
+        setAge(data.age);
         setBirthday(data.birthday ? data.birthday.toString() : ''); //Added birthday fetch
         setExperienceLevel(data.experience_level || '');
         setEducation(data.education || '');
@@ -194,12 +194,6 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
             return false;
           }
 
-          //Removed age validation since birthday is now used
-          // if (age && isNaN(Number(age))) {
-          //   setError('Age must be a number');
-          //   return false;
-          // }
-
           return true;
         };
 
@@ -219,8 +213,8 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
         occupation,
         photo_url: avatar,
         bio,
-        birthday, //Using birthday instead of age
-        age: null, //Removed age from the payload
+        birthday, 
+        age: birthday ? calculateAge(birthday) : null,
         experience_level: experienceLevel,
         education,
         city,
@@ -258,7 +252,7 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
           occupation,
           photo_url: avatar,
           bio,
-          birthday, //Passing birthday instead of age
+          birthday, 
           experience_level: experienceLevel,
           education,
           city,
@@ -278,6 +272,18 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
     } finally {
       setLoading(false);
     }
+  };
+
+  const calculateAge = (birthday: string) => {
+    if (!birthday) return null;
+    const birthDate = new Date(birthday);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
   };
 
   if (loading && !isNewUser) {
@@ -360,7 +366,7 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
                       formatted = formatted.slice(0, 7) + '-' + formatted.slice(7);
                     }
                     setBirthday(formatted);
-                    
+
                     // Calculate age if birthday is complete
                     if (formatted.length === 10) {
                       const calculatedAge = calculateAge(formatted);
@@ -676,4 +682,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+  ageText: {
+    marginTop: 5,
+    fontSize: 14,
+    color: '#555',
+  }
 });
