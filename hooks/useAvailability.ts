@@ -21,7 +21,7 @@ export function useAvailability() {
         start_time: startTime,
         end_time: endTime,
         is_available: true,
-        time_zone: timeZone,
+        timezone: timeZone,
       });
       return result;
     } catch (err) {
