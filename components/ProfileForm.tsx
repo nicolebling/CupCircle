@@ -48,8 +48,8 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
   const [avatar, setAvatar] = useState('');
   const [occupation, setOccupation] = useState('');
   const [bio, setBio] = useState('');
-  const [age, setAge] = useState('');
-  const [birthday, setBirthday] = useState(''); // Added birthday state
+  const [birthday, setBirthday] = useState('');
+  const [age, setAge] = useState<number | null>(null);
   const [experienceLevel, setExperienceLevel] = useState('');
   const [education, setEducation] = useState('');
   const [city, setCity] = useState('');
@@ -360,6 +360,12 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
                       formatted = formatted.slice(0, 7) + '-' + formatted.slice(7);
                     }
                     setBirthday(formatted);
+                    
+                    // Calculate age if birthday is complete
+                    if (formatted.length === 10) {
+                      const calculatedAge = calculateAge(formatted);
+                      setAge(calculatedAge);
+                    }
                   }
                 }}
                 placeholder="YYYY-MM-DD"
@@ -367,6 +373,11 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
                 keyboardType="number-pad"
                 maxLength={10}
               />
+              {age !== null && (
+                <Text style={[styles.ageText, isDark && styles.textDark]}>
+                  Age: {age}
+                </Text>
+              )}
             </View>
 
             <View style={styles.inputGroup}>
