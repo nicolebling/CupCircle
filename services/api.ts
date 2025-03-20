@@ -95,12 +95,16 @@ export const availabilityService = {
   }) {
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     try {
+      // Format date as YYYY-MM-DD to avoid timezone issues
+      const formattedDate = availabilityData.date.toISOString().split('T')[0];
+
       const { data, error } = await supabase
         .from("availability")
         .insert([
           {
             ...availabilityData,
-            timezone,
+            date: formattedDate,
+            time_zone: timezone,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
           },
@@ -122,7 +126,7 @@ export const availabilityService = {
       const { data, error } = await supabase
         .from("availability")
         .select("*")
-        .eq("id", userId)
+        .eq("user_id", userId) // Corrected the column name here.  It was likely "id" before and should be "user_id" to match the createAvailability function.
         .order("date", { ascending: true })
         .order("start_time", { ascending: true });
 
@@ -166,7 +170,7 @@ export const availabilityService = {
       const { error } = await supabase
         .from("availability")
         .delete()
-        .eq("avil_id", avail_id);
+        .eq("id", id); // Corrected column name here.  It was likely "avil_id" before and should match the other functions.
 
       if (error) throw error;
       return true;

@@ -16,8 +16,8 @@ export function useAvailability() {
     try {
       const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       // Adjust date for timezone
-      const adjustedDate = new Date(date);
-      adjustedDate.setMinutes(adjustedDate.getMinutes() + adjustedDate.getTimezoneOffset());
+      // Create date at midnight in local timezone
+      const adjustedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
 
       const result = await availabilityService.createAvailability({
         id: user.id,
