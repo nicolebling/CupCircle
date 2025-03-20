@@ -170,11 +170,12 @@ export default function AvailabilityScreen() {
       const { error } = await supabase
         .from('availability')
         .delete()
-        .eq('id', id);
+        .eq('id', id)
+        .single();
 
       if (error) throw error;
 
-      // Only remove the deleted slot from state
+      // Only remove the specific deleted slot from state
       setTimeSlots(prevTimeSlots => 
         prevTimeSlots.filter(slot => slot.id !== id)
       );
