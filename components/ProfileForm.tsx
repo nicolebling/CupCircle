@@ -49,6 +49,7 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
   const [occupation, setOccupation] = useState('');
   const [bio, setBio] = useState('');
   const [age, setAge] = useState('');
+  const [birthday, setBirthday] = useState(''); // Added birthday state
   const [experienceLevel, setExperienceLevel] = useState('');
   const [education, setEducation] = useState('');
   const [city, setCity] = useState('');
@@ -90,6 +91,7 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
         setOccupation(data.occupation || '');
         setBio(data.bio || '');
         setAge(data.age ? data.age.toString() : '');
+        setBirthday(data.birthday ? data.birthday.toString() : ''); //Added birthday fetch
         setExperienceLevel(data.experience_level || '');
         setEducation(data.education || '');
         setCity(data.city || '');
@@ -192,15 +194,16 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
             return false;
           }
 
-          if (age && isNaN(Number(age))) {
-            setError('Age must be a number');
-            return false;
-          }
+          //Removed age validation since birthday is now used
+          // if (age && isNaN(Number(age))) {
+          //   setError('Age must be a number');
+          //   return false;
+          // }
 
           return true;
         };
-  
-  
+
+
 
   const saveProfile = async () => {
     if (!validateForm()) return;
@@ -209,9 +212,6 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
       setLoading(true);
       setError('');
 
-      const ageNumber = age ? parseInt(age) : null;
-
-      console.log('Preparing to save profile for user ID:', userId);
 
       const profileData = {
         id: userId,
@@ -219,8 +219,8 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
         occupation,
         photo_url: avatar,
         bio,
-        birthday,
-        age: ageNumber,
+        birthday, //Using birthday instead of age
+        age: null, //Removed age from the payload
         experience_level: experienceLevel,
         education,
         city,
@@ -258,7 +258,7 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
           occupation,
           photo_url: avatar,
           bio,
-          age: age ? parseInt(age) : null,
+          birthday, //Passing birthday instead of age
           experience_level: experienceLevel,
           education,
           city,
@@ -343,13 +343,13 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
 
 
             <View style={styles.inputGroup}>
-              <Text style={[styles.label, isDark && styles.textDark]}>Age</Text>
+              <Text style={[styles.label, isDark && styles.textDark]}>Birthday*</Text>
               <TextInput
                 style={[styles.input, isDark && styles.inputDark]}
-                value={age}
-                onChangeText={setAge}
-                placeholder="Your age"
-                placeholderTextColor={isDark ? '#999' : '#777'}
+                value={birthday}
+                onChangeText={setBirthday}
+                placeholder="YYYY-MM-DD"
+                placeholderTextColor={colors.secondaryText}
                 keyboardType="number-pad"
               />
             </View>
@@ -651,15 +651,3 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
-
-
-
-
-
-
-
-
-
-
-
-
