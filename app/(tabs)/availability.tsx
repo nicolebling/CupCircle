@@ -24,6 +24,7 @@ type TimeSlot = {
   date: Date;
   startTime: string;
   endTime: string;
+  timeZone: string;
 };
 
 export default function AvailabilityScreen() {
