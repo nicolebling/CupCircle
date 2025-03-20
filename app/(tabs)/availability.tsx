@@ -20,7 +20,7 @@ import { supabase } from "../../lib/supabase";
 // Type definitions
 type TimeSlot = {
   id: string;
-  avail_id: int;
+  avail_id: number;
   date: Date;
   startTime: string;
   endTime: string;
@@ -58,6 +58,7 @@ export default function AvailabilityScreen() {
         date: new Date(slot.date),
         startTime: slot.start_time,
         endTime: slot.end_time,
+        avail_id: parseInt(slot.avail_id, 10), //added to parse avail_id as int
       }));
 
       // Sort by date and time
@@ -138,6 +139,7 @@ export default function AvailabilityScreen() {
       date: selectedDate,
       startTime: selectedTime,
       endTime: calculateEndTime(selectedTime),
+      avail_id: Math.random(), //added to give avail_id a random number for testing purposes.  Should be replaced with a proper ID generation strategy.
     };
 
     // Check for overlaps
@@ -166,14 +168,13 @@ export default function AvailabilityScreen() {
   };
 
   // Function to delete a time slot
-  const handleDeleteTimeSlot = async (id: string) => {
+  const handleDeleteTimeSlot = async (avail_id: number) => {
     try {
-      // Delete from Supabase
+      // Delete from Supabase using avail_id
       const { error } = await supabase
         .from("availability")
         .delete()
-        .eq("avail_id", avail_id)
-        .single();
+        .eq("avail_id", avail_id);
 
       if (error) {
         console.error("Error deleting time slot:", error);
@@ -183,7 +184,7 @@ export default function AvailabilityScreen() {
 
       // Update state only if deletion is successful
       setTimeSlots((prevTimeSlots) =>
-        prevTimeSlots.filter((slot) => slot.id !== id),
+        prevTimeSlots.filter((slot) => slot.avail_id !== avail_id),
       );
     } catch (error) {
       console.error("Unexpected error:", error);
@@ -444,9 +445,9 @@ export default function AvailabilityScreen() {
                 </Text>
                 {item.slots.map((slot) => (
                   <AvailabilityCard
-                    key={slot.id}
+                    key={slot.avail_id}
                     timeSlot={slot}
-                    onDelete={() => handleDeleteTimeSlot(slot.id)}
+                    onDelete={() => handleDeleteTimeSlot(slot.avail_id)}
                   />
                 ))}
               </View>
