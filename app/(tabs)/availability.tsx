@@ -58,7 +58,7 @@ export default function AvailabilityScreen() {
         date: new Date(slot.date),
         startTime: slot.start_time,
         endTime: slot.end_time,
-        avail_id: parseInt(slot.avail_id, 10), //added to parse avail_id as int
+        // avail_id: parseInt(slot.avail_id, 10), //added to parse avail_id as int
       }));
 
       // Sort by date and time
@@ -139,7 +139,7 @@ export default function AvailabilityScreen() {
       date: selectedDate,
       startTime: selectedTime,
       endTime: calculateEndTime(selectedTime),
-      avail_id: Math.random(), //added to give avail_id a random number for testing purposes.  Should be replaced with a proper ID generation strategy.
+      
     };
 
     // Check for overlaps
