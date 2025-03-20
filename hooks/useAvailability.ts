@@ -14,12 +14,14 @@ export function useAvailability() {
     setError(null);
 
     try {
+      const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       const result = await availabilityService.createAvailability({
         id: user.id,
         date,
         start_time: startTime,
         end_time: endTime,
         is_available: true,
+        time_zone: timeZone,
       });
       return result;
     } catch (err) {

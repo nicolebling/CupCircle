@@ -22,8 +22,8 @@ export default function AvailabilityCard({ timeSlot, onDelete }: AvailabilityCar
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   
-  // Get current timezone
-  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  // Get timezone from props or fallback to system timezone
+  const timeZone = timeSlot.time_zone || Intl.DateTimeFormat().resolvedOptions().timeZone;
   const timeZoneAbbr = timeZone.split('/')[1] || timeZone;
   
   return (
