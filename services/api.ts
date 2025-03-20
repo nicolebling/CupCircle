@@ -95,8 +95,12 @@ export const availabilityService = {
   }) {
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     try {
+      console.log('Received date in service:', availabilityData.date);
+      console.log('Timezone being used:', timezone);
+      
       // Format date as YYYY-MM-DD to avoid timezone issues
       const formattedDate = availabilityData.date.toISOString().split('T')[0];
+      console.log('Formatted date to be saved:', formattedDate);
 
       const { data, error } = await supabase
         .from("availability")

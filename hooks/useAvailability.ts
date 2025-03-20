@@ -15,9 +15,14 @@ export function useAvailability() {
 
     try {
       const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      console.log('Original selected date:', date);
+      console.log('Original date ISO string:', date.toISOString());
+      
       // Adjust date for timezone
       // Create date at midnight in local timezone
       const adjustedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+      console.log('Adjusted date:', adjustedDate);
+      console.log('Adjusted date ISO string:', adjustedDate.toISOString());
 
       const result = await availabilityService.createAvailability({
         id: user.id,
