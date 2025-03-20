@@ -362,7 +362,7 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
                     setBirthday(formatted);
                   }
                 }}
-                placeholder="YYYYMMDD"
+                placeholder="YYYY-MM-DD"
                 placeholderTextColor={colors.secondaryText}
                 keyboardType="number-pad"
                 maxLength={10}
