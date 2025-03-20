@@ -167,20 +167,25 @@ export default function AvailabilityScreen() {
   // Function to delete a time slot
   const handleDeleteTimeSlot = async (id: string) => {
     try {
+      // Delete from Supabase
       const { error } = await supabase
-        .from('availability')
+        .from("availability")
         .delete()
-        .eq('id', id)
-        .single();
+        .eq("avail_id", id);
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error deleting time slot:", error);
+        alert("Failed to delete the time slot. Please try again.");
+        return;
+      }
 
-      // Only remove the specific deleted slot from state
-      setTimeSlots(prevTimeSlots => 
-        prevTimeSlots.filter(slot => slot.id !== id)
+      // Update state only if deletion is successful
+      setTimeSlots((prevTimeSlots) =>
+        prevTimeSlots.filter((slot) => slot.id !== id),
       );
     } catch (error) {
-      console.error('Error deleting time slot:', error);
+      console.error("Unexpected error:", error);
+      alert("Something went wrong while deleting. Please try again.");
     }
   };
 

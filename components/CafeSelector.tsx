@@ -33,7 +33,7 @@ export default function CafeSelector({
   return (
     <View>
       <TouchableOpacity
-        style={[styles.selector, { backgroundColor: colors.background, borderColor: colors.border }]}
+        style={[styles.selector, { backgroundColor: colors.input, borderColor: colors.border }]}
         onPress={() => setModalVisible(true)}
       >
         <Text style={[styles.selectorText, { color: selected.length ? colors.text : colors.secondaryText }]}>

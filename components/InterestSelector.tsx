@@ -156,7 +156,7 @@ export default function InterestSelector({
   return (
     <View style={styles.container}>
       <TouchableOpacity 
-        style={[styles.selector, { backgroundColor: colors.background, borderColor: colors.border }]} 
+        style={[styles.selector, { backgroundColor: colors.input, borderColor: colors.border }]} 
         onPress={() => setModalVisible(true)}
       >
         <View style={styles.selectorContent}>

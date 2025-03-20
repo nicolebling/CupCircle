@@ -6,6 +6,7 @@ export default {
   light: {
     primary: '#F97415',
     background: 'hsl(28, 18%, 95%)',
+    input: '#F8F8F8',
     card: '#FFFFFF',
     text: '#1E1916',
     secondaryText: '#64748B',
