@@ -50,7 +50,25 @@ export default function AvailabilityScreen() {
         .order("date", { ascending: true });
 
       if (error) throw error;
-      setTimeSlots(data || []);
+      
+      // Ensure dates are properly parsed and sorted
+      const formattedData = (data || []).map(slot => ({
+        ...slot,
+        date: new Date(slot.date),
+        startTime: slot.start_time,
+        endTime: slot.end_time
+      }));
+      
+      // Sort by date and time
+      const sortedData = formattedData.sort((a, b) => {
+        const dateCompare = a.date.getTime() - b.date.getTime();
+        if (dateCompare === 0) {
+          return a.startTime.localeCompare(b.startTime);
+        }
+        return dateCompare;
+      });
+
+      setTimeSlots(sortedData);
     } catch (error) {
       console.error("Error fetching availability:", error);
     }
