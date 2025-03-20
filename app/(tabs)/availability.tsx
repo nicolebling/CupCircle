@@ -24,7 +24,7 @@ type TimeSlot = {
   date: Date;
   startTime: string;
   endTime: string;
-  timeZone: string;
+  time_zone: string;
 };
 
 export default function AvailabilityScreen() {
@@ -140,7 +140,7 @@ export default function AvailabilityScreen() {
       date: selectedDate,
       startTime: selectedTime,
       endTime: calculateEndTime(selectedTime),
-      
+
     };
 
     // Check for overlaps
