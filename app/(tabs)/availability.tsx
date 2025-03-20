@@ -20,6 +20,7 @@ import { supabase } from "../../lib/supabase";
 // Type definitions
 type TimeSlot = {
   id: string;
+  avail_id: int;
   date: Date;
   startTime: string;
   endTime: string;
@@ -171,7 +172,8 @@ export default function AvailabilityScreen() {
       const { error } = await supabase
         .from("availability")
         .delete()
-        .eq("avail_id", id);
+        .eq("avail_id", avail_id)
+        .single();
 
       if (error) {
         console.error("Error deleting time slot:", error);

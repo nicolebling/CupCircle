@@ -164,7 +164,7 @@ export const availabilityService = {
       const { error } = await supabase
         .from("availability")
         .delete()
-        .eq("id", id);
+        .eq("avil_id", avail_id);
 
       if (error) throw error;
       return true;
