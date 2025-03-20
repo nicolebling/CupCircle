@@ -50,15 +50,15 @@ export default function AvailabilityScreen() {
         .order("date", { ascending: true });
 
       if (error) throw error;
-      
+
       // Ensure dates are properly parsed and sorted
-      const formattedData = (data || []).map(slot => ({
+      const formattedData = (data || []).map((slot) => ({
         ...slot,
         date: new Date(slot.date),
         startTime: slot.start_time,
-        endTime: slot.end_time
+        endTime: slot.end_time,
       }));
-      
+
       // Sort by date and time
       const sortedData = formattedData.sort((a, b) => {
         const dateCompare = a.date.getTime() - b.date.getTime();
@@ -140,15 +140,24 @@ export default function AvailabilityScreen() {
     };
 
     // Check for overlaps
-    const hasOverlap = timeSlots.some(
-      (slot) =>
-        slot.date.toDateString() === selectedDate.toDateString() &&
-        slot.startTime === selectedTime,
-    );
+    const hasOverlap = timeSlots.some((slot) => {
+      if (new Date(slot.date).toDateString() !== selectedDate.toDateString()) {
+        return false;
+      }
+      const existingStart = new Date(
+        `1970-01-01T${slot.startTime}:00`,
+      ).getTime();
+      const existingEnd = new Date(`1970-01-01T${slot.endTime}:00`).getTime();
+      const newStart = new Date(`1970-01-01T${selectedTime}:00`).getTime();
+      const newEnd = new Date(
+        `1970-01-01T${calculateEndTime(selectedTime)}:00`,
+      ).getTime();
+
+      return newStart < existingEnd && newEnd > existingStart;
+    });
 
     if (hasOverlap) {
-      // In a real app, show a toast message
-      console.log("You already have a time slot at this time");
+      console.log("This time slot overlaps with an existing slot");
       return;
     }
 
@@ -157,27 +166,30 @@ export default function AvailabilityScreen() {
 
   // Function to delete a time slot
   const handleDeleteTimeSlot = (id: string) => {
-    setTimeSlots(timeSlots.filter((slot) => slot.id !== id));
+    setTimeSlots((prevTimeSlots) =>
+      prevTimeSlots.filter((slot) => slot.id !== id),
+    );
   };
 
   // Function to check if a date has time slots
   const hasTimeSlotsOnDate = (date: Date) => {
     return timeSlots.some(
-      (slot) => slot.date.toDateString() === date.toDateString(),
+      (slot) => new Date(slot.date).toDateString() === date.toDateString(),
     );
   };
 
-  // Function to filter time slots for a specific date
   const getSlotsForDate = (date: Date) => {
     return timeSlots
-      .filter((slot) => slot.date.toDateString() === date.toDateString())
+      .filter(
+        (slot) => new Date(slot.date).toDateString() === date.toDateString(),
+      )
       .sort((a, b) => a.startTime.localeCompare(b.startTime));
   };
 
   // Group time slots by date
   const groupedTimeSlots = timeSlots.reduce(
     (groups, slot) => {
-      const dateString = format(slot.date, "yyyy-MM-dd");
+      const dateString = format(new Date(slot.date), "yyyy-MM-dd");
       if (!groups[dateString]) {
         groups[dateString] = [];
       }
@@ -188,8 +200,9 @@ export default function AvailabilityScreen() {
   );
 
   // Sort dates for display
-  const sortedDates = Object.keys(groupedTimeSlots).sort();
-
+  const sortedDates = Object.keys(groupedTimeSlots).sort(
+    (a, b) => new Date(a).getTime() - new Date(b).getTime(),
+  );
   // Create data for FlatList
   const flatListData = sortedDates.map((dateString) => ({
     date: new Date(dateString),
