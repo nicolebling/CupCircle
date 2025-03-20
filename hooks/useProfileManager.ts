@@ -6,6 +6,7 @@ import { Profile } from '../models/Profile';
 export interface ProfileFormData {
   name: string;
   age?: number;
+  birthday: string;
   occupation?: string;
   photo?: string;
   bio?: string;

@@ -219,6 +219,7 @@ export default function ProfileForm({ userId, isNewUser = true, onSave, initialD
         occupation,
         photo_url: avatar,
         bio,
+        birthday,
         age: ageNumber,
         experience_level: experienceLevel,
         education,
