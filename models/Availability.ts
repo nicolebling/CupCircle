@@ -5,6 +5,7 @@ export interface Availability {
   date: Date;
   start_time: string;
   end_time: string;
+  timezone: string;
   is_available: boolean;
   created_at?: Date;
   updated_at?: Date;

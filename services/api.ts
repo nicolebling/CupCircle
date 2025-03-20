@@ -93,12 +93,14 @@ export const availabilityService = {
     end_time: string;
     is_available: boolean;
   }) {
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     try {
       const { data, error } = await supabase
         .from("availability")
         .insert([
           {
             ...availabilityData,
+            timezone,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
           },
