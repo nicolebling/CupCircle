@@ -165,10 +165,22 @@ export default function AvailabilityScreen() {
   };
 
   // Function to delete a time slot
-  const handleDeleteTimeSlot = (id: string) => {
-    setTimeSlots((prevTimeSlots) =>
-      prevTimeSlots.filter((slot) => slot.id !== id),
-    );
+  const handleDeleteTimeSlot = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('availability')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      // Only remove the deleted slot from state
+      setTimeSlots(prevTimeSlots => 
+        prevTimeSlots.filter(slot => slot.id !== id)
+      );
+    } catch (error) {
+      console.error('Error deleting time slot:', error);
+    }
   };
 
   // Function to check if a date has time slots
