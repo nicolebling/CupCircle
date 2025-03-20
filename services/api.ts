@@ -120,7 +120,7 @@ export const availabilityService = {
       const { data, error } = await supabase
         .from("availability")
         .select("*")
-        .eq("user_id", userId)
+        .eq("id", userId)
         .order("date", { ascending: true })
         .order("start_time", { ascending: true });
 

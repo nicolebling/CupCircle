@@ -15,6 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import AvailabilityCard from "@/components/AvailabilityCard";
 import { format, addDays, isPast, isToday } from "date-fns";
 import { useAvailability } from "../../hooks/useAvailability";
+import { supabase } from "../../lib/supabase";
 
 // Type definitions
 type TimeSlot = {
@@ -36,16 +37,16 @@ export default function AvailabilityScreen() {
 
   useEffect(() => {
     if (user?.id) {
-      fetchAvailability();
+      getUserAvailability();
     }
   }, [user]);
 
-  const fetchAvailability = async () => {
+  const getUserAvailability = async () => {
     try {
       const { data, error } = await supabase
         .from("availability")
         .select("*")
-        .eq("user_id", user.id)
+        .eq("id", user?.id)
         .order("date", { ascending: true });
 
       if (error) throw error;
@@ -59,7 +60,7 @@ export default function AvailabilityScreen() {
     const endTime = calculateEndTime(selectedTime);
     const result = await createSlot(selectedDate, selectedTime, endTime);
     if (result) {
-      await fetchAvailability();
+      await getUserAvailability();
     }
   };
 
@@ -174,8 +175,10 @@ export default function AvailabilityScreen() {
   // Create data for FlatList
   const flatListData = sortedDates.map((dateString) => ({
     date: new Date(dateString),
-    slots: groupedTimeSlots[dateString].sort((a, b) =>
-      a.startTime.localeCompare(b.startTime),
+    slots: groupedTimeSlots[dateString].sort(
+      (a, b) =>
+        new Date(`1970-01-01T${a.startTime}:00`).getTime() -
+        new Date(`1970-01-01T${b.startTime}:00`).getTime(),
     ),
   }));
 

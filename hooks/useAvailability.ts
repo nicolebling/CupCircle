@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { availabilityService } from "../services/api";
 import { useAuth } from "../contexts/AuthContext";
+import { Availability } from "../models/Availability";
 
 export function useAvailability() {
   const [isLoading, setIsLoading] = useState(false);
