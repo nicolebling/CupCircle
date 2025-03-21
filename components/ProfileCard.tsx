@@ -24,6 +24,7 @@ import IndustrySelector from "./IndustrySelector";
 import ExperienceLevelSelector from "./ExperienceLevelSelector";
 import InterestSelector from "./InterestSelector";
 import { useAuth } from "@/contexts/AuthContext";
+import Badge from "./Badge";
 
 // Map of interests to emojis
 const INTEREST_EMOJIS: Record<string, string> = {
@@ -732,26 +733,45 @@ export default function ProfileCard({
             )}
           </View>
 
-          <View style={styles.nameRow}>
-            <Text style={[styles.name, { color: colors.text }]}>
-              {profile.name}{" "}
-              {profile.occupation && <Text>{profile.occupation}</Text>}
-            </Text>
-            {profile.location && (
-              <View style={styles.locationContainer}>
-                <Ionicons
-                  name="location"
-                  size={16}
-                  color={colors.secondaryText}
-                />
-                <Text
-                  style={[styles.location, { color: colors.secondaryText }]}
-                >
-                  {profile.location}
-                </Text>
-              </View>
-            )}
+          <View style={styles.detailsWrapper}>
+            <View style={styles.centered}>
+              <Text style={[styles.name, { color: colors.text }]}>
+                {profile.name}
+              </Text>
+
+              {profile.occupation && profile.age && (
+                <View style={styles.infoRow}>
+                  <Cake size={16} color={colors.text} />
+                  <Text style={styles.infoText}>{profile.age}</Text>
+
+                  <View style={styles.divider} />
+
+                  <BriefcaseBusiness size={16} color={colors.text} />
+                  <Text style={styles.infoText}>{profile.occupation}</Text>
+
+                  {profile.experienceLevel && (
+                    <>
+                      <View style={styles.divider} />
+                      <Badge text={profile.experienceLevel} />
+                    </>
+                  )}
+                </View>
+              )}
+            </View>
           </View>
+
+          {profile.location && (
+            <View style={styles.locationContainer}>
+              <Ionicons
+                name="location"
+                size={16}
+                color={colors.secondaryText}
+              />
+              <Text style={[styles.location, { color: colors.secondaryText }]}>
+                {profile.location}
+              </Text>
+            </View>
+          )}
 
           {/* Personal Information */}
           <View style={styles.section}>
@@ -831,17 +851,7 @@ export default function ProfileCard({
                 >
                   <Text style={[styles.value, { color: colors.text }]}>
                     {profile.experience_level || ""}
-                  </Text>
-                  {/* Display coffee theme based on experience level */}
-                  <View
-                    style={[
-                      styles.coffeeBadge,
-                      {
-                        backgroundColor:
-                          getCoffeeColor(profile.experience_level || "") + "20",
-                      },
-                    ]}
-                  >
+                    {"\t"}
                     <Ionicons
                       name="cafe"
                       size={14}
@@ -857,7 +867,7 @@ export default function ProfileCard({
                     >
                       {getCoffeeTheme(profile.experience_level || "")}
                     </Text>
-                  </View>
+                  </Text>
                 </View>
               </>
             )}
@@ -936,18 +946,6 @@ export default function ProfileCard({
                 </View>
               </View>
             )}
-
-            {/* experience is not added */}
-            {/* {profile.experience && (
-              <>
-                <Text style={[styles.label, { color: colors.secondaryText }]}>
-                  Experience
-                </Text>
-                <Text style={[styles.value, { color: colors.text }]}>
-                  {profile.experience}
-                </Text>
-              </>
-            )} */}
           </View>
 
           {/* Location */}
