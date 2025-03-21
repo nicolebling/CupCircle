@@ -27,50 +27,50 @@ import { useAuth } from "@/contexts/AuthContext";
 
 // Map of interests to emojis
 const INTEREST_EMOJIS: Record<string, string> = {
-  "Reading": "📚",
-  "Writing": "✍️",
+  Reading: "📚",
+  Writing: "✍️",
   "Self-Development": "🌱",
-  "Mindfulness": "🧘",
-  "Languages": "🗣️",
-  "Psychology": "🧠",
-  "Philosophy": "💭",
-  "Education": "🎓",
-  "Mentoring": "👨‍🏫",
-  "Leadership": "👑",
-  "Technology": "💻",
-  "Business": "💼",
-  "Startups": "🚀",
-  "Innovation": "💡",
-  "Sustainability": "♻️",
+  Mindfulness: "🧘",
+  Languages: "🗣️",
+  Psychology: "🧠",
+  Philosophy: "💭",
+  Education: "🎓",
+  Mentoring: "👨‍🏫",
+  Leadership: "👑",
+  Technology: "💻",
+  Business: "💼",
+  Startups: "🚀",
+  Innovation: "💡",
+  Sustainability: "♻️",
   "Social Impact": "🤝",
-  "Marketing": "📢",
-  "Design": "🎨",
-  "Finance": "💰",
-  "Entrepreneurship": "🏆",
+  Marketing: "📢",
+  Design: "🎨",
+  Finance: "💰",
+  Entrepreneurship: "🏆",
   "Public Speaking": "🎤",
-  "Networking": "🔗",
+  Networking: "🔗",
   "Project Management": "📋",
   "Data Science": "📊",
-  "Photography": "📷",
-  "Travel": "✈️",
-  "Cooking": "👨‍🍳",
-  "Music": "🎵",
-  "Art": "🖼️",
-  "Sports": "⚽",
-  "Gaming": "🎮",
-  "Fashion": "👔",
-  "Fitness": "💪",
-  "Hiking": "🥾",
-  "Movies": "🎬",
-  "Theatre": "🎭",
-  "Dance": "💃",
+  Photography: "📷",
+  Travel: "✈️",
+  Cooking: "👨‍🍳",
+  Music: "🎵",
+  Art: "🖼️",
+  Sports: "⚽",
+  Gaming: "🎮",
+  Fashion: "👔",
+  Fitness: "💪",
+  Hiking: "🥾",
+  Movies: "🎬",
+  Theatre: "🎭",
+  Dance: "💃",
   "Food & Wine": "🍷",
-  "Coffee": "☕",
-  "Tea": "🍵",
-  "Yoga": "🧘‍♀️",
-  "Meditation": "🧘‍♂️",
-  "Podcasts": "🎧",
-  "Blogging": "📝",
+  Coffee: "☕",
+  Tea: "🍵",
+  Yoga: "🧘‍♀️",
+  Meditation: "🧘‍♂️",
+  Podcasts: "🎧",
+  Blogging: "📝",
 };
 
 const { width } = Dimensions.get("window");
@@ -152,7 +152,6 @@ type ProfileCardProps = {
   onCancel?: () => void;
   onLike?: () => void;
   onSkip?: () => void;
-
 };
 
 const EMPTY_PROFILE: UserProfileData = {
@@ -192,7 +191,7 @@ export default function ProfileCard({
   const [userData, setUserData] = useState<UserProfileData>(profile);
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState("");
-  const [username, setUsername] = useState('');
+  const [username, setUsername] = useState("");
   const [avatar, setAvatar] = useState("");
   const [occupation, setOccupation] = useState("");
   const [bio, setBio] = useState("");
@@ -367,7 +366,10 @@ export default function ProfileCard({
     console.log("Starting saveProfile function");
     if (!validateForm()) return;
 
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
     if (userError || !user?.id) {
       console.error("No authenticated user found:", userError?.message);
       return;
@@ -411,7 +413,10 @@ export default function ProfileCard({
         JSON.stringify(profileData, null, 2),
       );
 
-      console.log("Profile data being sent to Supabase:", JSON.stringify(profileData, null, 2));
+      console.log(
+        "Profile data being sent to Supabase:",
+        JSON.stringify(profileData, null, 2),
+      );
 
       const { data, error } = await supabase
         .from("profiles")
@@ -483,8 +488,7 @@ export default function ProfileCard({
     const newErrors: Record<string, string> = {};
 
     if (!userData.name) newErrors.name = "Name is required";
-    if (isUserProfile && !userData.birthday)
-      newErrors.age = "Age is required";
+    if (isUserProfile && !userData.birthday) newErrors.age = "Age is required";
     if (!userData.occupation) newErrors.occupation = "Occupation is required";
     if (!userData.bio) newErrors.bio = "Bio is required";
     if (userData.bio.length > 500)
@@ -495,7 +499,6 @@ export default function ProfileCard({
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
 
   // For matching view
   if (!isUserProfile && !isEditMode && !isOnboarding) {
@@ -710,17 +713,6 @@ export default function ProfileCard({
             <Text style={[styles.title, { color: colors.text }]}>
               {getTitle()}
             </Text>
-            <TouchableOpacity
-              onPress={() =>
-                isEditMode ? onCancel && onCancel() : handleEdit()
-              }
-            >
-              <Ionicons
-                name={isEditMode ? "close-outline" : "create-outline"}
-                size={24}
-                color={colors.primary}
-              />
-            </TouchableOpacity>
           </View>
 
           {/* Profile Photo */}
@@ -732,16 +724,18 @@ export default function ProfileCard({
                 resizeMode="cover"
               />
             ) : (
-              <View style={[styles.profilePhoto, { backgroundColor: '#1A1A1A' }]}>
+              <View
+                style={[styles.profilePhoto, { backgroundColor: "#1A1A1A" }]}
+              >
                 <Ionicons name="person" size={40} color="#ffffff" />
               </View>
             )}
           </View>
 
-
           <View style={styles.nameRow}>
             <Text style={[styles.name, { color: colors.text }]}>
-              {profile.name} {profile.age && <Text>{profile.age}</Text>}
+              {profile.name}{" "}
+              {profile.occupation && <Text>{profile.occupation}</Text>}
             </Text>
             {profile.location && (
               <View style={styles.locationContainer}>
@@ -772,10 +766,14 @@ export default function ProfileCard({
             </Text>
 
             <Text style={[styles.label, { color: colors.secondaryText }]}>
-              Age
+              Birthday
             </Text>
             <Text style={[styles.value, { color: colors.text }]}>
-              {profile.age || "Not provided"}
+              {profile.birthday || "Not provided"}
+              {"\n"}
+              <Text style={[styles.label, { color: colors.secondaryText }]}>
+                Age {profile.age}
+              </Text>
             </Text>
             <Text style={[styles.label, { color: colors.secondaryText }]}>
               City
@@ -801,8 +799,6 @@ export default function ProfileCard({
             </Text>
           </View>
 
-
-
           {/* Professional Details */}
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>
@@ -823,7 +819,16 @@ export default function ProfileCard({
                 <Text style={[styles.label, { color: colors.secondaryText }]}>
                   Experience Level
                 </Text>
-                <View style={[styles.coffeeExperienceContainer, { flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }]}>
+                <View
+                  style={[
+                    styles.coffeeExperienceContainer,
+                    {
+                      flexDirection: "row",
+                      justifyContent: "flex-start",
+                      alignItems: "center",
+                    },
+                  ]}
+                >
                   <Text style={[styles.value, { color: colors.text }]}>
                     {profile.experience_level || ""}
                   </Text>
@@ -857,30 +862,32 @@ export default function ProfileCard({
               </>
             )}
 
-
-             {/* Industry Categories */}
-            {profile.industry_categories && profile.industry_categories.length > 0 && (
-              <>
-                <Text style={[styles.label, { color: colors.secondaryText }]}>
-                  Industries
-                </Text>
-                <View style={styles.tagsContainer}>
-                  {profile.industry_categories.map((industry, index) => (
-                    <View
-                      key={index}
-                      style={[
-                        styles.tag,
-                        { backgroundColor: colors.primary + "20" },
-                      ]}
-                    >
-                      <Text style={[styles.tagText, { color: colors.primary }]}>
-                        {industry}
-                      </Text>
-                    </View>
-                  ))}
-                </View>
-              </>
-            )}
+            {/* Industry Categories */}
+            {profile.industry_categories &&
+              profile.industry_categories.length > 0 && (
+                <>
+                  <Text style={[styles.label, { color: colors.secondaryText }]}>
+                    Industries
+                  </Text>
+                  <View style={styles.tagsContainer}>
+                    {profile.industry_categories.map((industry, index) => (
+                      <View
+                        key={index}
+                        style={[
+                          styles.tag,
+                          { backgroundColor: colors.primary + "20" },
+                        ]}
+                      >
+                        <Text
+                          style={[styles.tagText, { color: colors.primary }]}
+                        >
+                          {industry}
+                        </Text>
+                      </View>
+                    ))}
+                  </View>
+                </>
+              )}
 
             {/* Skills */}
             {profile.skills && profile.skills.length > 0 && (
@@ -941,8 +948,6 @@ export default function ProfileCard({
                 </Text>
               </>
             )} */}
-
-
           </View>
 
           {/* Location */}
@@ -1020,11 +1025,11 @@ export default function ProfileCard({
           <Text style={[styles.title, { color: colors.text }]}>
             {getTitle()}
           </Text>
-          {/* {!isOnboarding && (
+          {!isOnboarding && (
             <TouchableOpacity onPress={onCancel}>
               <Ionicons name="close-outline" size={24} color={colors.primary} />
             </TouchableOpacity>
-          )} */}
+          )}
         </View>
 
         {/* Profile Photo */}
@@ -1036,7 +1041,7 @@ export default function ProfileCard({
               resizeMode="cover"
             />
           ) : (
-            <View style={[styles.profilePhoto, { backgroundColor: '#1A1A1A' }]}>
+            <View style={[styles.profilePhoto, { backgroundColor: "#1A1A1A" }]}>
               <Ionicons name="person" size={40} color="#ffffff" />
             </View>
           )}
@@ -1243,30 +1248,29 @@ export default function ProfileCard({
 
         {/* skills */}
         <View style={styles.inputGroup}>
-            <Text style={[styles.label, isDark && styles.textDark]}>Skills</Text>
-            <View style={styles.tagsContainer}>
-              {skills.map((skill, index) => (
-                <View key={index} style={styles.tag}>
-                  <Text style={styles.tagText}>{skill}</Text>
-                  <TouchableOpacity onPress={() => handleRemoveSkill(index)}>
-                    <Ionicons name="close-circle" size={18} color="#fff" />
-                  </TouchableOpacity>
-                </View>
-              ))}
-            </View>
-            <View style={styles.tagInput}>
-              <TextInput
-                style={[styles.input, isDark && styles.inputDark]}
-                placeholder="Add a skill"
-                placeholderTextColor={isDark ? '#999' : '#777'}
-                onSubmitEditing={(e) => {
-                  handleAddSkill(e.nativeEvent.text);
-                  e.currentTarget.clear();
-                }}
-              />
-            </View>
+          <Text style={[styles.label, isDark && styles.textDark]}>Skills</Text>
+          <View style={styles.tagsContainer}>
+            {skills.map((skill, index) => (
+              <View key={index} style={styles.tag}>
+                <Text style={styles.tagText}>{skill}</Text>
+                <TouchableOpacity onPress={() => handleRemoveSkill(index)}>
+                  <Ionicons name="close-circle" size={18} color="#fff" />
+                </TouchableOpacity>
+              </View>
+            ))}
           </View>
-
+          <View style={styles.tagInput}>
+            <TextInput
+              style={[styles.input, isDark && styles.inputDark]}
+              placeholder="Add a skill"
+              placeholderTextColor={isDark ? "#999" : "#777"}
+              onSubmitEditing={(e) => {
+                handleAddSkill(e.nativeEvent.text);
+                e.currentTarget.clear();
+              }}
+            />
+          </View>
+        </View>
 
         {/* Location Preferences */}
         <View style={styles.section}>
@@ -1276,12 +1280,16 @@ export default function ProfileCard({
 
           {/* Neighborhoods */}
           <View>
-            <Text style={[styles.label, { color: colors.secondaryText }]}>Neighborhoods</Text>
+            <Text style={[styles.label, { color: colors.secondaryText }]}>
+              Neighborhoods
+            </Text>
             <View style={styles.tagsContainer}>
               {neighborhoods.map((neighborhood, index) => (
                 <View key={index} style={styles.tag}>
                   <Text style={styles.tagText}>{neighborhood}</Text>
-                  <TouchableOpacity onPress={() => handleRemoveNeighborhood(index)}>
+                  <TouchableOpacity
+                    onPress={() => handleRemoveNeighborhood(index)}
+                  >
                     <Ionicons name="close-circle" size={18} color="#fff" />
                   </TouchableOpacity>
                 </View>
@@ -1298,7 +1306,7 @@ export default function ProfileCard({
                   },
                 ]}
                 placeholder="Add a neighborhood"
-                placeholderTextColor={isDark ? '#999' : '#777'}
+                placeholderTextColor={isDark ? "#999" : "#777"}
                 onSubmitEditing={(e) => {
                   handleAddNeighborhood(e.nativeEvent.text);
                   e.currentTarget.clear();
@@ -1306,41 +1314,42 @@ export default function ProfileCard({
               />
             </View>
           </View>
-           </View>
-
+        </View>
 
         {/* Cafes */}
-         <View>
-             <Text style={[styles.label, { color: colors.secondaryText }]}>Favorite Cafes</Text>
-           <View style={styles.tagsContainer}>
-             {favoriteCafes.map((cafe, index) => (
-               <View key={index} style={styles.tag}>
-                 <Text style={styles.tagText}>{cafe}</Text>
-                 <TouchableOpacity onPress={() => handleRemoveCafe(index)}>
-                   <Ionicons name="close-circle" size={18} color="#fff" />
-                 </TouchableOpacity>
-               </View>
-             ))}
-           </View>
-           <View style={styles.tagInput}>
-             <TextInput
-               style={[
-                 styles.input,
-                 {
-                   backgroundColor: colors.background,
-                   color: colors.text,
-                   borderColor: colors.border,
-                 },
-               ]}
-               placeholder="Coffee House, Bean There, etc. (comma separated)"
-               placeholderTextColor={isDark ? '#999' : '#777'}
-               onSubmitEditing={(e) => {
-                 handleAddCafe(e.nativeEvent.text);
-                 e.currentTarget.clear();
-               }}
-             />
-           </View>
-         </View>
+        <View>
+          <Text style={[styles.label, { color: colors.secondaryText }]}>
+            Favorite Cafes
+          </Text>
+          <View style={styles.tagsContainer}>
+            {favoriteCafes.map((cafe, index) => (
+              <View key={index} style={styles.tag}>
+                <Text style={styles.tagText}>{cafe}</Text>
+                <TouchableOpacity onPress={() => handleRemoveCafe(index)}>
+                  <Ionicons name="close-circle" size={18} color="#fff" />
+                </TouchableOpacity>
+              </View>
+            ))}
+          </View>
+          <View style={styles.tagInput}>
+            <TextInput
+              style={[
+                styles.input,
+                {
+                  backgroundColor: colors.background,
+                  color: colors.text,
+                  borderColor: colors.border,
+                },
+              ]}
+              placeholder="Coffee House, Bean There, etc. (comma separated)"
+              placeholderTextColor={isDark ? "#999" : "#777"}
+              onSubmitEditing={(e) => {
+                handleAddCafe(e.nativeEvent.text);
+                e.currentTarget.clear();
+              }}
+            />
+          </View>
+        </View>
 
         {/* Save Button */}
         <View style={styles.buttonContainer}>
@@ -1353,9 +1362,7 @@ export default function ProfileCard({
           {loading && (
             <ActivityIndicator color={colors.primary} style={styles.spinner} />
           )}
-          <View>
-            {error && <Text style={styles.errorText}>{error}</Text>}
-          </View>
+          <View>{error && <Text style={styles.errorText}>{error}</Text>}</View>
         </View>
 
         {/* Error Summary */}
@@ -1532,9 +1539,9 @@ const styles = StyleSheet.create({
     height: 120,
     borderRadius: 60,
     marginBottom: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-    overflow: 'hidden',
+    justifyContent: "center",
+    alignItems: "center",
+    overflow: "hidden",
   },
   uploadButton: {
     position: "absolute",
@@ -1570,8 +1577,8 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     marginRight: 8,
     marginBottom: 8,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   tagText: {
     fontFamily: "K2D-Medium",
@@ -1652,48 +1659,48 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   tagInput: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 16,
   },
   avatarContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 30,
   },
   avatarWrapper: {
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: '#f0f0f0',
-    justifyContent: 'center',
-    alignItems: 'center',
-    overflow: 'hidden',
+    backgroundColor: "#f0f0f0",
+    justifyContent: "center",
+    alignItems: "center",
+    overflow: "hidden",
   },
   avatarPlaceholder: {
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: '#f0f0f0',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#f0f0f0",
+    justifyContent: "center",
+    alignItems: "center",
   },
   avatarText: {
     marginTop: 10,
-    color: '#0097FB',
+    color: "#0097FB",
     fontSize: 16,
   },
   textDark: {
-    color: '#fff',
+    color: "#fff",
   },
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   loadingText: {
     marginTop: 10,
     fontSize: 16,
-    color: '#666',
+    color: "#666",
   },
   inputGroup: {
     marginBottom: 20,

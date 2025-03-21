@@ -4,6 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
+import MapView from 'react-native-maps';
 
 
 interface CafeSelectorProps {
@@ -74,9 +75,11 @@ export default function CafeSelector({
                 <Ionicons name="close" size={24} color={colors.text} />
               </TouchableOpacity>
             </View>
+            <View style={styles.container}>
+              <MapView style={styles.map} />
+            </View>
 
-
-            <GooglePlacesAutocomplete
+            {/* <GooglePlacesAutocomplete
               placeholder="Search for cafes..."
               onPress={(data) => {
                 console.log("Selected place:", data);
@@ -102,7 +105,7 @@ export default function CafeSelector({
                   backgroundColor: colors.card,
                 },
                 listView: {
-                  backgroundColor: colors.card,
+                  backgroundColor: colors.background,
                   zIndex: 1000, //To popover the component outwards
                     position: 'absolute',
                     top: 45
@@ -111,7 +114,7 @@ export default function CafeSelector({
                   color: colors.text,
                 },
               }}
-            />
+            /> */}
 
             <View style={styles.selectedCafes}>
               {selected.map((cafe, index) => (
@@ -187,5 +190,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     flex: 1,
     marginRight: 8,
+  },
+  map: {
+    width: '100%',
+    height: '100%',
   },
 });
