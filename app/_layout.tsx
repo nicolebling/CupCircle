@@ -20,6 +20,7 @@ function RootLayoutNav() {
   const router = useRouter();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
+  
 
   useEffect(() => {
     if (!loading) {
