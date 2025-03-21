@@ -160,36 +160,8 @@ app.get('/api/places/autocomplete', async (req, res) => {
       status: 'OK',
       predictions: results.slice(0, 5)
     });
-
-    if (data.status === 'ZERO_RESULTS') {
-      return res.json({
-        status: 'OK',
-        predictions: []
-      });
-    }
-
-    if (data.status !== 'OK') {
-      console.error('Places API error:', {
-        status: data.status,
-        error_message: data.error_message,
-        data: data
-      });
-      return res.status(400).json({
-        error: data.error_message || 'Failed to fetch places',
-        status: data.status,
-        predictions: []
-      });
-    }
-
-    const results = data.results.map((place) => ({
-      name: place.name,
-      formatted_address: place.formatted_address || place.vicinity
-    }));
-
-    res.json({
-      status: 'OK',
-      results: results.slice(0, 5)
-    });
+    
+    // Note: Code below this point is unreachable due to the return statement above
   } catch (error) {
     console.error('Places API detailed error:', {
       message: error.message,
