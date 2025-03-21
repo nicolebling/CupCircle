@@ -4,11 +4,11 @@ import { useFonts } from 'expo-font';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import 'react-native-reanimated';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import { Text, TextInput, View } from 'react-native';
+import { Text, TextInput } from 'react-native';
 import Colors from '@/constants/Colors';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -20,7 +20,6 @@ function RootLayoutNav() {
   const router = useRouter();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
-  
 
   useEffect(() => {
     if (!loading) {
@@ -52,6 +51,7 @@ function RootLayoutNav() {
 }
 
 export default function RootLayout() {
+  const colorScheme = useColorScheme();
   const [loaded, error] = useFonts({
     'K2D-Regular': require('../assets/fonts/K2D-Regular.ttf'),
     'K2D-Medium': require('../assets/fonts/K2D-Medium.ttf'),
