@@ -249,6 +249,25 @@ app.post('/api/profile', async (req, res) => {
         [
           user_id,
           profileData.name || '',
+          profileData.age || null,
+          profileData.occupation || '',
+          profileData.photo || '',
+          profileData.bio || '',
+          profileData.industry_categories || [],
+          profileData.skills || [],
+          profileData.neighborhoods || [],
+          profileData.favorite_cafes || [],
+          profileData.interests || []
+        ]
+      );
+      
+      return res.status(201).json(result.rows[0]);
+    }
+  } catch (error) {
+    console.error('Save profile error:', error);
+    return res.status(500).json({ error: 'Server error' });
+  }
+});
 
 // Availability routes
 app.post('/api/availability', async (req, res) => {
