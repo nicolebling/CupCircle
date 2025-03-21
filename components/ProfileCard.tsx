@@ -13,6 +13,7 @@ import {
   TextInput,
   ActivityIndicator,
 } from "react-native";
+import { Cake, BriefcaseBusiness } from "@expo/vector-icons/build/Icons";
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import * as ImagePicker from "expo-image-picker";
@@ -160,8 +161,8 @@ const EMPTY_PROFILE: UserProfileData = {
   photo: "https://via.placeholder.com/150",
   birthday: "",
   occupation: "",
-  experienceLevel: "",
-  industries: [],
+  experience_level: "",
+  industry_categories: [],
   skills: [],
   experience: "",
   education: "",
