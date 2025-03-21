@@ -1020,11 +1020,11 @@ export default function ProfileCard({
           <Text style={[styles.title, { color: colors.text }]}>
             {getTitle()}
           </Text>
-          {!isOnboarding && (
+          {/* {!isOnboarding && (
             <TouchableOpacity onPress={onCancel}>
               <Ionicons name="close-outline" size={24} color={colors.primary} />
             </TouchableOpacity>
-          )}
+          )} */}
         </View>
 
         {/* Profile Photo */}

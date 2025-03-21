@@ -5,6 +5,7 @@ import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 
+
 interface CafeSelectorProps {
   selected: string[];
   onChange: (cafes: string[]) => void;
@@ -74,6 +75,7 @@ export default function CafeSelector({
               </TouchableOpacity>
             </View>
 
+
             <GooglePlacesAutocomplete
               placeholder="Search for cafes..."
               onPress={(data) => {
@@ -82,7 +84,7 @@ export default function CafeSelector({
               }}
               onFail={(error) => console.error("Places API error:", error)}
               query={{
-                key: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY,
+                key: process.env['GOOGLE_MAPS_API_KEY'],
                 language: "en",
               }}
               requestUrl={{
@@ -97,10 +99,13 @@ export default function CafeSelector({
                   borderRadius: 8,
                   paddingHorizontal: 12,
                   color: colors.text,
-                  backgroundColor: colors.background,
+                  backgroundColor: colors.card,
                 },
                 listView: {
-                  backgroundColor: colors.background,
+                  backgroundColor: colors.card,
+                  zIndex: 1000, //To popover the component outwards
+                    position: 'absolute',
+                    top: 45
                 },
                 description: {
                   color: colors.text,
