@@ -161,8 +161,35 @@ app.get('/api/places/autocomplete', async (req, res) => {
       predictions: results.slice(0, 5)
     });
 
-    // The code below is unreachable because of the return statement above
-    // Removing to fix the duplicate variable declaration error
+    if (data.status === 'ZERO_RESULTS') {
+      return res.json({
+        status: 'OK',
+        predictions: []
+      });
+    }
+
+    if (data.status !== 'OK') {
+      console.error('Places API error:', {
+        status: data.status,
+        error_message: data.error_message,
+        data: data
+      });
+      return res.status(400).json({
+        error: data.error_message || 'Failed to fetch places',
+        status: data.status,
+        predictions: []
+      });
+    }
+
+    const results = data.results.map((place) => ({
+      name: place.name,
+      formatted_address: place.formatted_address || place.vicinity
+    }));
+
+    res.json({
+      status: 'OK',
+      results: results.slice(0, 5)
+    });
   } catch (error) {
     console.error('Places API detailed error:', {
       message: error.message,
