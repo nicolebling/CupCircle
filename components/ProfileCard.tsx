@@ -233,7 +233,7 @@ export default function ProfileCard({
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
-        .eq("id", user?.id)
+        .eq("id", user.id)
         .single();
 
       if (error) {
@@ -520,13 +520,9 @@ export default function ProfileCard({
 
       if (error) throw error;
 
-      // Update both local states with the new data
       setProfileData(data);
       setUserData(data);
       setIsEditMode(false);
-      
-      // Refetch profile to ensure we have latest data
-      await fetchProfile();
     } catch (error) {
       console.error("Error saving profile:", error);
       Alert.alert("Error", "Failed to save profile changes");
