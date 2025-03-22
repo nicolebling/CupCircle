@@ -233,7 +233,7 @@ export default function ProfileCard({
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
-        .eq("id", userId)
+        .eq("id", user?.id)
         .single();
 
       if (error) {

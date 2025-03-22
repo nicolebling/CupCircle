@@ -1,14 +1,13 @@
-
-import React, { useState, useEffect } from 'react';
-import { SafeAreaView, StyleSheet, View, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from "react";
+import { SafeAreaView, StyleSheet, View, TouchableOpacity } from "react-native";
 import { supabase } from "@/lib/supabase";
-import Colors from '@/constants/Colors';
-import ProfileForm from '@/components/ProfileForm';
-import UserProfileCard from '@/components/UserProfileCard';
-import { useAuth } from '@/contexts/AuthContext';
-import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
-import { useColorScheme } from '@/hooks/useColorScheme';
+import Colors from "@/constants/Colors";
+import ProfileForm from "@/components/ProfileForm";
+import UserProfileCard from "@/components/UserProfileCard";
+import { useAuth } from "@/contexts/AuthContext";
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
+import { useColorScheme } from "@/hooks/useColorScheme";
 
 export default function ProfileScreen() {
   const colorScheme = useColorScheme();
@@ -26,37 +25,37 @@ export default function ProfileScreen() {
   const fetchProfile = async () => {
     try {
       const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
         .single();
 
       if (error) throw error;
       setProfileData(data);
     } catch (error) {
-      console.error('Error fetching profile:', error);
+      console.error("Error fetching profile:", error);
     }
   };
 
   const handleProfileSave = async (updatedData) => {
     try {
       const { data, error } = await supabase
-        .from('profiles')
+        .from("profiles")
         .upsert({
           id: user.id,
           ...updatedData,
-          updated_at: new Date()
+          updated_at: new Date(),
         })
         .select()
         .single();
 
       if (error) throw error;
-      
+
       setProfileData(data);
       setIsEditMode(false);
     } catch (error) {
-      console.error('Error saving profile:', error);
-      Alert.alert('Error', 'Failed to save profile changes');
+      console.error("Error saving profile:", error);
+      Alert.alert("Error", "Failed to save profile changes");
     }
   };
 
@@ -65,27 +64,39 @@ export default function ProfileScreen() {
   }
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: colors.background }]}
+    >
       <View style={styles.header}>
-        <TouchableOpacity 
-          style={[styles.settingsButton, { backgroundColor: colors.card, borderColor: colors.border }]} 
+        <TouchableOpacity
+          style={[
+            styles.settingsButton,
+            { backgroundColor: colors.card, borderColor: colors.border },
+          ]}
           onPress={() => signOut()}
         >
           <Ionicons name="log-out-outline" size={20} color="#FF3B30" />
         </TouchableOpacity>
         <View style={styles.headerContent}>
-          <TouchableOpacity 
-            style={[styles.settingsButton, { backgroundColor: colors.card, borderColor: colors.border }]} 
+          <TouchableOpacity
+            style={[
+              styles.settingsButton,
+              { backgroundColor: colors.card, borderColor: colors.border },
+            ]}
             onPress={() => setIsEditMode(!isEditMode)}
           >
-            <Ionicons name={isEditMode ? "close" : "create-outline"} size={20} color={colors.text} />
+            <Ionicons
+              name={isEditMode ? "close" : "create-outline"}
+              size={20}
+              color={colors.text}
+            />
           </TouchableOpacity>
         </View>
       </View>
 
       {isEditMode ? (
-        <ProfileForm 
-          userId={user.id} 
+        <ProfileForm
+          userId={user.id}
           isNewUser={false}
           initialData={profileData}
           onSave={(updatedData) => {
@@ -111,23 +122,20 @@ const styles = StyleSheet.create({
   },
   header: {
     padding: 16,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   headerContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   settingsButton: {
     padding: 8,
     borderRadius: 8,
     borderWidth: 1,
-  }
+  },
 });
-
-
-
 
 // import React, { useState, useEffect } from 'react';
 // import {
@@ -360,13 +368,13 @@ const styles = StyleSheet.create({
 
 //       const { data, error } = await supabase
 //         .from('profiles')
-//         .upsert(profileData, { onConflict: 'id' }) 
+//         .upsert(profileData, { onConflict: 'id' })
 //         .select();
 
 //       if (error) {
 //         console.error('Supabase error response:', error);
-//         console.error('Error details:', JSON.stringify(error)); 
-//         Alert.alert('Profile Save Error', error?.message || 'Failed to save profile. Please try again.'); 
+//         console.error('Error details:', JSON.stringify(error));
+//         Alert.alert('Profile Save Error', error?.message || 'Failed to save profile. Please try again.');
 //         throw error;
 //       }
 
@@ -543,7 +551,6 @@ const styles = StyleSheet.create({
 //               />
 //             </View>
 
-
 //             {/* Skills are removed temporarily */}
 //             {/* <View style={styles.inputGroup}>
 //               <Text style={[styles.label, isDark && styles.textDark]}>Skills</Text>
@@ -569,7 +576,6 @@ const styles = StyleSheet.create({
 //                 />
 //               </View>
 //             </View> */}
-
 
 //           </View>
 
