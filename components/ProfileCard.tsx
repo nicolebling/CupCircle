@@ -1060,7 +1060,20 @@ export default function ProfileCard({
             onCancel={() => setIsEditMode(false)}
           />
         </ScrollView>
-      ) : null}
+      ) : (
+        <ScrollView>
+          <View style={[styles.userCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+            {profileData && <ProfileCard
+              profile={profileData}
+              isUserProfile={true}
+              isEditMode={false}
+              userId={user.id}
+              isNewUser={false}
+              onEdit={() => setIsEditMode(true)}
+            />}
+          </View>
+        </ScrollView>
+      )}
     </SafeAreaView>
   );
 }
