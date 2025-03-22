@@ -13,6 +13,7 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
 
+
 interface CafeSelectorProps {
   selected: string[];
   onChange: (cafes: string[]) => void;
@@ -33,6 +34,7 @@ export default function CafeSelector({
   const [location, setLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [cafes, setCafes] = useState([]);
 
   useEffect(() => {
     const getLocation = async () => {
@@ -67,11 +69,27 @@ export default function CafeSelector({
     getLocation();
   }, []);
 
+  
+
   const handleSelect = (place: any) => {
     const cafeString = place.description;
     if (!selected.includes(cafeString) && selected.length < maxSelections) {
       onChange([...selected, cafeString]);
       setModalVisible(false);
+    }
+  };
+
+  const fetchCafes = async (lat, lng) => {
+    try {
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=2000&type=cafe&key=${process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY}`
+      );
+      const data = await response.json();
+      setCafes(data.results);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching cafes:", error);
+      setLoading(false);
     }
   };
 
@@ -142,7 +160,23 @@ export default function CafeSelector({
                     }}
                     title="Your Location"
                   />
+
+                  {/* Markers for cafes */}
+                  {cafes.map((cafe) => (
+                    <Marker
+                      key={cafe.place_id}
+                      coordinate={{
+                        latitude: cafe.geometry.location.lat,
+                        longitude: cafe.geometry.location.lng,
+                      }}
+                      title={cafe.name}
+                      description={cafe.vicinity}
+                      onPress={() => handleSelect(cafe)}
+                    />
+                  ))}
+                  
                 </MapView>
+            
               ) : null}
             </View>
 

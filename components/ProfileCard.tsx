@@ -25,6 +25,7 @@ import ExperienceLevelSelector from "./ExperienceLevelSelector";
 import InterestSelector from "./InterestSelector";
 import { useAuth } from "@/contexts/AuthContext";
 import Badge from "./Badge";
+import ProfileForm from "./ProfileForm";
 
 // Map of interests to emojis
 const INTEREST_EMOJIS: Record<string, string> = {
@@ -175,7 +176,7 @@ const EMPTY_PROFILE: UserProfileData = {
 export default function ProfileCard({
   profile = EMPTY_PROFILE,
   isUserProfile = false,
-  isEditMode = false,
+  // isEditMode = false,
   isOnboarding = false,
   isLoading = false,
   onSave,
@@ -206,7 +207,8 @@ export default function ProfileCard({
   const [favoriteCafes, setFavoriteCafes] = useState<string[]>([]);
   const [interests, setInterests] = useState<string[]>([]);
   const [error, setError] = useState("");
-  //others
+  const [isEditMode, setIsEditMode] = useState(false);
+
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSaving, setIsSaving] = useState(false);
 
@@ -500,7 +502,31 @@ export default function ProfileCard({
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+  const handleProfileSave = async (updatedData) => {
+    try {
+      const { data, error } = await supabase
+        .from("profiles")
+        .upsert({
+          id: user.id,
+          ...updatedData,
+          updated_at: new Date(),
+        })
+        .select()
+        .single();
 
+      if (error) throw error;
+
+      setProfileData(data);
+      setIsEditMode(false);
+    } catch (error) {
+      console.error("Error saving profile:", error);
+      Alert.alert("Error", "Failed to save profile changes");
+    }
+  };
+
+  if (!user) {
+    return null;
+  }
   // For matching view
   if (!isUserProfile && !isEditMode && !isOnboarding) {
     return (
@@ -715,6 +741,19 @@ export default function ProfileCard({
               {getTitle()}
             </Text>
           </View>
+          <TouchableOpacity
+            style={[
+              styles.settingsButton,
+              { backgroundColor: colors.card, borderColor: colors.border },
+            ]}
+            onPress={() => setIsEditMode(!isEditMode)}
+          >
+            <Ionicons
+              name={isEditMode ? "close" : "create-outline"}
+              size={20}
+              color={colors.text}
+            />
+          </TouchableOpacity>
 
           {/* Profile Photo */}
           <View style={styles.photoContainer}>
@@ -732,7 +771,6 @@ export default function ProfileCard({
               </View>
             )}
           </View>
-
           <View style={styles.nameRow}>
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               <Text style={[styles.name, { color: colors.text }]}>
@@ -767,7 +805,6 @@ export default function ProfileCard({
               </View>
             )}
           </View>
-
           {/* Personal Information */}
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>
@@ -813,7 +850,6 @@ export default function ProfileCard({
               {profile.bio}
             </Text>
           </View>
-
           {/* Professional Details */}
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>
@@ -942,7 +978,6 @@ export default function ProfileCard({
               </View>
             )}
           </View>
-
           {/* Location */}
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>
@@ -1006,370 +1041,273 @@ export default function ProfileCard({
 
   // Edit mode or Onboarding mode
   return (
-    <ScrollView>
-      <View
-        style={[
-          styles.userCard,
-          { backgroundColor: colors.card, borderColor: colors.border },
-        ]}
-      >
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={[styles.title, { color: colors.text }]}>
-            {getTitle()}
-          </Text>
-          {!isOnboarding && (
-            <TouchableOpacity onPress={onCancel}>
-              <Ionicons name="close-outline" size={24} color={colors.primary} />
-            </TouchableOpacity>
-          )}
-        </View>
-
-        {/* Profile Photo */}
-        <View style={styles.photoContainer}>
-          {userData.photo_url ? (
-            <Image
-              source={{ uri: userData.photo_url }}
-              style={styles.profilePhoto}
-              resizeMode="cover"
-            />
-          ) : (
-            <View style={[styles.profilePhoto, { backgroundColor: "#1A1A1A" }]}>
-              <Ionicons name="person" size={40} color="#ffffff" />
-            </View>
-          )}
-          <TouchableOpacity
-            style={[styles.uploadButton, { backgroundColor: colors.primary }]}
-            onPress={() => console.log("Upload photo")}
-          >
-            <Ionicons name="camera" size={20} color="white" />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.avatarContainer} onPress={pickImage}>
-            {avatar ? (
-              <View style={styles.avatarWrapper}>
-                <Ionicons name="image" size={80} color="#ccc" />
-              </View>
-            ) : (
-              <View style={styles.avatarPlaceholder}>
-                <Ionicons name="person" size={80} color="#ccc" />
-              </View>
-            )}
-            <Text style={[styles.avatarText, isDark && styles.textDark]}>
-              {avatar ? "Change Photo" : "Add Photo"}
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Personal Information */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>
-            Personal Information
-          </Text>
-
-          {/* Name */}
-          <Text style={[styles.label, { color: colors.secondaryText }]}>
-            Name*
-          </Text>
-          <TextInput
-            style={[
-              styles.input,
-              {
-                backgroundColor: colors.background,
-                color: colors.text,
-                borderColor: errors.name ? "red" : colors.border,
-              },
-            ]}
-            value={name}
-            onChangeText={setName}
-            placeholder="Your name"
-            placeholderTextColor={colors.secondaryText}
-          />
-          {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
-
-          {/* Username */}
-          <Text style={[styles.label, { color: colors.secondaryText }]}>
-            Username*
-          </Text>
-          <TextInput
-            style={[
-              styles.input,
-              {
-                backgroundColor: colors.background,
-                color: colors.text,
-                borderColor: errors.name ? "red" : colors.border,
-              },
-            ]}
-            value={username}
-            onChangeText={setUsername}
-            placeholder="Choose a username"
-            placeholderTextColor={colors.secondaryText}
-          />
-          {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
-
-          {/* Age */}
-          <Text style={[styles.label, { color: colors.secondaryText }]}>
-            Age*
-          </Text>
-          <TextInput
-            style={[
-              styles.input,
-              {
-                backgroundColor: colors.background,
-                color: colors.text,
-                borderColor: errors.birthday ? "red" : colors.border,
-              },
-            ]}
-            value={age}
-            onChangeText={setAge}
-            placeholder="Your Age"
-            placeholderTextColor={colors.secondaryText}
-          />
-          {errors.birthday && (
-            <Text style={styles.errorText}>{errors.birthday}</Text>
-          )}
-
-          {/* Occupation */}
-          <Text style={[styles.label, { color: colors.secondaryText }]}>
-            Occupation*
-          </Text>
-          <TextInput
-            style={[
-              styles.input,
-              {
-                backgroundColor: colors.background,
-                color: colors.text,
-                borderColor: errors.occupation ? "red" : colors.border,
-              },
-            ]}
-            value={occupation}
-            onChangeText={setOccupation}
-            placeholder="Your Occupation"
-            placeholderTextColor={colors.secondaryText}
-          />
-          {errors.occupation && (
-            <Text style={styles.errorText}>{errors.occupation}</Text>
-          )}
-
-          {/* Interests */}
-          <View style={styles.label}>
-            <Text style={[styles.label, { color: colors.secondaryText }]}>
-              Interests
-            </Text>
-            <InterestSelector
-              selected={interests || []}
-              onChange={setInterests}
-              maxInterests={10}
-            />
-
-            {/* About me */}
-            <Text style={[styles.label, { color: colors.secondaryText }]}>
-              About Me*
-            </Text>
-            <TextInput
-              style={[
-                styles.textArea,
-                {
-                  backgroundColor: colors.background,
-                  color: colors.text,
-                  borderColor: errors.bio ? "red" : colors.border,
-                },
-              ]}
-              value={bio}
-              onChangeText={setBio}
-              placeholder="Tell others about yourself (max 500 characters)"
-              placeholderTextColor={colors.secondaryText}
-              multiline
-              numberOfLines={5}
-              maxLength={500}
-            />
-            <Text
-              style={[styles.characterCount, { color: colors.secondaryText }]}
-            >
-              {userData.bio ? userData.bio.length : 0}/500
-            </Text>
-            {errors.bio && <Text style={styles.errorText}>{errors.bio}</Text>}
-          </View>
-        </View>
-
-        {/* Professional Details */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>
-            Professional Details
-          </Text>
-
-          {/* Experience Level */}
-          <Text style={[styles.label, { color: colors.secondaryText }]}>
-            Experience Level
-          </Text>
-          <ExperienceLevelSelector
-            selected={experienceLevel || ""}
-            onChange={setExperienceLevel}
-          />
-
-          {/* Experience */}
-
-          {/* Education */}
-          <Text style={[styles.label, { color: colors.secondaryText }]}>
-            Education
-          </Text>
-          <TextInput
-            style={[
-              styles.input,
-              {
-                backgroundColor: colors.background,
-                color: colors.text,
-                borderColor: colors.border,
-              },
-            ]}
-            value={education}
-            onChangeText={setEducation}
-            placeholder="Your education background"
-            placeholderTextColor={colors.secondaryText}
-          />
-
-          {/* Industries */}
-          <Text style={[styles.label, { color: colors.secondaryText }]}>
-            Industries (select up to 3)
-          </Text>
-          <IndustrySelector
-            selected={industryCategories || []}
-            onChange={setIndustryCategories}
-            maxSelections={3}
-          />
-        </View>
-
-        {/* skills */}
-        <View style={styles.inputGroup}>
-          <Text style={[styles.label, isDark && styles.textDark]}>Skills</Text>
-          <View style={styles.tagsContainer}>
-            {skills.map((skill, index) => (
-              <View key={index} style={styles.tag}>
-                <Text style={styles.tagText}>{skill}</Text>
-                <TouchableOpacity onPress={() => handleRemoveSkill(index)}>
-                  <Ionicons name="close-circle" size={18} color="#fff" />
-                </TouchableOpacity>
-              </View>
-            ))}
-          </View>
-          <View style={styles.tagInput}>
-            <TextInput
-              style={[styles.input, isDark && styles.inputDark]}
-              placeholder="Add a skill"
-              placeholderTextColor={isDark ? "#999" : "#777"}
-              onSubmitEditing={(e) => {
-                handleAddSkill(e.nativeEvent.text);
-                e.currentTarget.clear();
-              }}
-            />
-          </View>
-        </View>
-
-        {/* Location Preferences */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>
-            Location Preferences
-          </Text>
-
-          {/* Neighborhoods */}
-          <View>
-            <Text style={[styles.label, { color: colors.secondaryText }]}>
-              Neighborhoods
-            </Text>
-            <View style={styles.tagsContainer}>
-              {neighborhoods.map((neighborhood, index) => (
-                <View key={index} style={styles.tag}>
-                  <Text style={styles.tagText}>{neighborhood}</Text>
-                  <TouchableOpacity
-                    onPress={() => handleRemoveNeighborhood(index)}
-                  >
-                    <Ionicons name="close-circle" size={18} color="#fff" />
-                  </TouchableOpacity>
-                </View>
-              ))}
-            </View>
-            <View style={styles.tagInput}>
-              <TextInput
-                style={[
-                  styles.input,
-                  {
-                    backgroundColor: colors.background,
-                    color: colors.text,
-                    borderColor: colors.border,
-                  },
-                ]}
-                placeholder="Add a neighborhood"
-                placeholderTextColor={isDark ? "#999" : "#777"}
-                onSubmitEditing={(e) => {
-                  handleAddNeighborhood(e.nativeEvent.text);
-                  e.currentTarget.clear();
-                }}
-              />
-            </View>
-          </View>
-        </View>
-
-        {/* Cafes */}
-        <View>
-          <Text style={[styles.label, { color: colors.secondaryText }]}>
-            Favorite Cafes
-          </Text>
-          <View style={styles.tagsContainer}>
-            {favoriteCafes.map((cafe, index) => (
-              <View key={index} style={styles.tag}>
-                <Text style={styles.tagText}>{cafe}</Text>
-                <TouchableOpacity onPress={() => handleRemoveCafe(index)}>
-                  <Ionicons name="close-circle" size={18} color="#fff" />
-                </TouchableOpacity>
-              </View>
-            ))}
-          </View>
-          <View style={styles.tagInput}>
-            <TextInput
-              style={[
-                styles.input,
-                {
-                  backgroundColor: colors.background,
-                  color: colors.text,
-                  borderColor: colors.border,
-                },
-              ]}
-              placeholder="Coffee House, Bean There, etc. (comma separated)"
-              placeholderTextColor={isDark ? "#999" : "#777"}
-              onSubmitEditing={(e) => {
-                handleAddCafe(e.nativeEvent.text);
-                e.currentTarget.clear();
-              }}
-            />
-          </View>
-        </View>
-
-        {/* Save Button */}
-        <View style={styles.buttonContainer}>
-          <Button
-            title={loading ? "Saving..." : "Save Profile"}
-            onPress={saveProfile}
-            disabled={loading}
-            style={styles.saveButton}
-          />
-          {loading && (
-            <ActivityIndicator color={colors.primary} style={styles.spinner} />
-          )}
-          <View>{error && <Text style={styles.errorText}>{error}</Text>}</View>
-        </View>
-
-        {/* Error Summary */}
-        {Object.keys(errors).length > 0 && (
-          <View style={styles.errorSummary}>
-            <Text style={styles.errorSummaryText}>
-              Please fix the errors above to continue
-            </Text>
-          </View>
-        )}
-      </View>
-    </ScrollView>
+    <SafeAreaView>
+      <ProfileForm />
+    </SafeAreaView>
   );
 }
+//     <KeyboardAvoidingView
+//       behavior={Platform.OS === "ios" ? "padding" : "height"}
+//       style={styles.container}
+//     >
+//       <ScrollView showsVerticalScrollIndicator={false}>
+//         <View style={styles.formContainer}>
+//           <Text style={[styles.title, isDark && styles.titleDark]}>
+//             {isNewUser ? "Complete Your Profile" : "Edit Profile"}
+//           </Text>
+
+//           {error ? (
+//             <View style={styles.errorContainer}>
+//               <Ionicons
+//                 name="alert-circle"
+//                 size={24}
+//                 color="#c62828"
+//                 style={styles.errorIcon}
+//               />
+//               <Text style={styles.errorText}>{error}</Text>
+//             </View>
+//           ) : null}
+
+//           <TouchableOpacity style={styles.avatarContainer} onPress={pickImage}>
+//             {avatar ? (
+//               <View style={styles.avatarWrapper}>
+//                 <Image
+//                   source={{ uri: avatar }}
+//                   style={{ width: 120, height: 120, borderRadius: 60 }}
+//                   resizeMode="cover"
+//                 />
+//               </View>
+//             ) : (
+//               <View style={styles.avatarPlaceholder}>
+//                 <Ionicons name="person" size={80} color="#ccc" />
+//               </View>
+//             )}
+//             <Text style={[styles.avatarText, isDark && styles.textDark]}>
+//               {avatar ? "Change Photo" : "Add Photo"}
+//             </Text>
+//           </TouchableOpacity>
+
+//           <View style={styles.section}>
+//             <Text style={[styles.sectionTitle, isDark && styles.textDark]}>
+//               Basic Information
+//             </Text>
+
+//             <View style={styles.inputGroup}>
+//               <Text style={[styles.label, isDark && styles.textDark]}>
+//                 Name*
+//               </Text>
+//               <TextInput
+//                 style={[styles.input, isDark && styles.inputDark]}
+//                 value={name}
+//                 onChangeText={setName}
+//                 placeholder="Your name"
+//                 placeholderTextColor={colors.secondaryText}
+//               />
+//             </View>
+
+//             <View style={styles.inputGroup}>
+//               <Text style={[styles.label, isDark && styles.textDark]}>
+//                 Birthday*
+//               </Text>
+//               <TextInput
+//                 style={[styles.input, isDark && styles.inputDark]}
+//                 value={birthday}
+//                 onChangeText={(text) => {
+//                   // Remove any non-numeric characters
+//                   const numbers = text.replace(/[^\d]/g, "");
+//                   if (numbers.length <= 8) {
+//                     // Format as YYYY-MM-DD
+//                     let formatted = numbers;
+//                     if (numbers.length > 4) {
+//                       formatted = numbers.slice(0, 4) + "-" + numbers.slice(4);
+//                     }
+//                     if (numbers.length > 6) {
+//                       formatted =
+//                         formatted.slice(0, 7) + "-" + formatted.slice(7);
+//                     }
+//                     setBirthday(formatted);
+
+//                     // Calculate age if birthday is complete
+//                     if (formatted.length === 10) {
+//                       const calculatedAge = calculateAge(formatted);
+//                       setAge(calculatedAge);
+//                     }
+//                   }
+//                 }}
+//                 placeholder="YYYY-MM-DD"
+//                 placeholderTextColor={colors.secondaryText}
+//                 keyboardType="number-pad"
+//                 maxLength={10}
+//               />
+//               {age !== null && (
+//                 <Text style={[styles.ageText, isDark && styles.textDark]}>
+//                   Age: {age}
+//                 </Text>
+//               )}
+//             </View>
+
+//             <View style={styles.inputGroup}>
+//               <Text style={[styles.label, isDark && styles.textDark]}>
+//                 City
+//               </Text>
+//               <TextInput
+//                 style={[styles.input, isDark && styles.inputDark]}
+//                 value={city}
+//                 onChangeText={setCity}
+//                 placeholder="Your city"
+//                 placeholderTextColor={isDark ? "#999" : "#777"}
+//               />
+//             </View>
+//           </View>
+
+//           <View style={styles.section}>
+//             <Text style={[styles.sectionTitle, isDark && styles.textDark]}>
+//               Professional Information
+//             </Text>
+
+//             <View style={styles.inputGroup}>
+//               <Text style={[styles.label, isDark && styles.textDark]}>
+//                 Occupation
+//               </Text>
+//               <TextInput
+//                 style={[styles.input, isDark && styles.inputDark]}
+//                 value={occupation}
+//                 onChangeText={setOccupation}
+//                 placeholder="Your job title"
+//                 placeholderTextColor={isDark ? "#999" : "#777"}
+//               />
+//             </View>
+
+//             <View style={styles.inputGroup}>
+//               <Text style={[styles.label, isDark && styles.textDark]}>
+//                 Experience Level
+//               </Text>
+//               <ExperienceLevelSelector
+//                 selected={experienceLevel}
+//                 onChange={setExperienceLevel}
+//                 isDark={isDark}
+//               />
+//             </View>
+
+//             <View style={styles.inputGroup}>
+//               <Text style={[styles.label, isDark && styles.textDark]}>
+//                 Education
+//               </Text>
+//               <TextInput
+//                 style={[styles.input, isDark && styles.inputDark]}
+//                 value={education}
+//                 onChangeText={setEducation}
+//                 placeholder="Your educational background"
+//                 placeholderTextColor={isDark ? "#999" : "#777"}
+//               />
+//             </View>
+
+//             <View style={styles.inputGroup}>
+//               <Text style={[styles.label, isDark && styles.textDark]}>
+//                 Industry Categories
+//               </Text>
+//               <IndustrySelector
+//                 selected={industryCategories}
+//                 onChange={setIndustryCategories}
+//                 isDark={isDark}
+//               />
+//             </View>
+
+//             {/* Skills are removed temporarily */}
+//             {/* <View style={styles.inputGroup}>
+//               <Text style={[styles.label, isDark && styles.textDark]}>Skills</Text>
+//               <View style={styles.tagsContainer}>
+//                 {skills.map((skill, index) => (
+//                   <View key={index} style={styles.tag}>
+//                     <Text style={styles.tagText}>{skill}</Text>
+//                     <TouchableOpacity onPress={() => handleRemoveSkill(index)}>
+//                       <Ionicons name="close-circle" size={18} color="#fff" />
+//                     </TouchableOpacity>
+//                   </View>
+//                 ))}
+//               </View>
+//               <View style={styles.tagInput}>
+//                 <TextInput
+//                   style={[styles.input, isDark && styles.inputDark]}
+//                   placeholder="Add a skill"
+//                   placeholderTextColor={isDark ? '#999' : '#777'}
+//                   onSubmitEditing={(e) => {
+//                     handleAddSkill(e.nativeEvent.text);
+//                     e.currentTarget.clear();
+//                   }}
+//                 />
+//               </View>
+//             </View> */}
+//           </View>
+
+//           <View style={styles.section}>
+//             <Text style={[styles.sectionTitle, isDark && styles.textDark]}>
+//               Personal Information
+//             </Text>
+
+//             <View style={styles.inputGroup}>
+//               <Text style={[styles.label, isDark && styles.textDark]}>Bio</Text>
+//               <TextInput
+//                 style={[styles.textArea, isDark && styles.inputDark]}
+//                 value={bio}
+//                 onChangeText={setBio}
+//                 placeholder="Tell us about yourself..."
+//                 placeholderTextColor={isDark ? "#999" : "#777"}
+//                 multiline
+//                 numberOfLines={4}
+//               />
+//             </View>
+
+//             <View style={styles.inputGroup}>
+//               <Text style={[styles.label, isDark && styles.textDark]}>
+//                 Interests
+//               </Text>
+//               <InterestSelector
+//                 selected={interests}
+//                 onChange={setInterests}
+//                 isDark={isDark}
+//               />
+//             </View>
+
+//             <View style={styles.inputGroup}>
+//               <Text style={[styles.label, isDark && styles.textDark]}>
+//                 Favorite Neighborhoods
+//               </Text>
+//               <NeighborhoodSelector
+//                 selected={neighborhoods}
+//                 onChange={setNeighborhoods}
+//                 isDark={isDark}
+//               />
+//             </View>
+
+//             <View style={styles.inputGroup}>
+//               <Text style={[styles.label, isDark && styles.textDark]}>
+//                 Favorite Cafes
+//               </Text>
+//               <CafeSelector
+//                 selected={favoriteCafes}
+//                 onChange={setFavoriteCafes}
+//                 isDark={isDark}
+//               />
+//             </View>
+//           </View>
+
+//           <TouchableOpacity
+//             style={styles.button}
+//             onPress={saveProfile}
+//             disabled={loading}
+//           >
+//             {loading ? (
+//               <ActivityIndicator color="#fff" />
+//             ) : (
+//               <Text style={styles.buttonText}>Save Profile</Text>
+//             )}
+//           </TouchableOpacity>
+//         </View>
+//       </ScrollView>
+//     </KeyboardAvoidingView>
+//   );
+// }
 
 const styles = StyleSheet.create({
   // Common styles
