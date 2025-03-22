@@ -194,7 +194,7 @@ export default function CafeSelector({
                     onChange(selected.filter((_, i) => i !== index))
                   }
                 >
-                  <Text style={styles.cafeText}>{cafe}</Text>
+                  <Text style={styles.cafeText}>{cafe.name}</Text>
                   <Ionicons name="close-circle" size={20} color="white" />
                 </TouchableOpacity>
               ))}
