@@ -6,13 +6,13 @@ import {
   ActivityIndicator,
   StyleSheet,
   Modal,
+  Image
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
-
 
 interface CafeSelectorProps {
   selected: string[];
@@ -56,6 +56,10 @@ export default function CafeSelector({
 
         if (userLocation && userLocation.coords) {
           setLocation(userLocation.coords);
+          fetchCafes(
+            userLocation.coords.latitude,
+            userLocation.coords.longitude,
+          );
         } else {
           setErrorMsg("Could not fetch location. Please try again.");
         }
@@ -69,8 +73,6 @@ export default function CafeSelector({
     getLocation();
   }, []);
 
-  
-
   const handleSelect = (place: any) => {
     const cafeString = place.description;
     if (!selected.includes(cafeString) && selected.length < maxSelections) {
@@ -82,15 +84,20 @@ export default function CafeSelector({
   const fetchCafes = async (lat, lng) => {
     try {
       const response = await fetch(
-        `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=2000&type=cafe&key=${process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY}`
+        `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=2000&type=cafe&key=${process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY}`,
       );
       const data = await response.json();
       setCafes(data.results);
-      setLoading(false);
+      setIsLoading(false);
     } catch (error) {
       console.error("Error fetching cafes:", error);
-      setLoading(false);
+      setIsLoading(false);
     }
+  };
+
+  // Function to fetch the image URL of the cafe using the photo_reference
+  const getCafeImage = (photoReference: string) => {
+    return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=${process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY}`;
   };
 
   return (
@@ -172,11 +179,9 @@ export default function CafeSelector({
                       title={cafe.name}
                       description={cafe.vicinity}
                       onPress={() => handleSelect(cafe)}
-                    />
+                    />  
                   ))}
-                  
                 </MapView>
-            
               ) : null}
             </View>
 
@@ -263,5 +268,13 @@ const styles = StyleSheet.create({
   map: {
     width: "100%",
     height: "100%",
+  },
+  cafeImage: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    marginTop: 5,
+    borderWidth: 2,
+    borderColor: "#fff",
   },
 });
