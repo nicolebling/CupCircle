@@ -189,7 +189,7 @@ export default function CafeSelector({
               {selected.map((cafe, index) => (
                 <TouchableOpacity
                   key={index}
-                  style={[styles.cafeItem, { backgroundColor: colors.primary }]}
+                  style={[styles.cafeItem, { backgroundColor: colors.input }]}
                   onPress={() =>
                     onChange(selected.filter((_, i) => i !== index))
                   }
@@ -260,7 +260,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   cafeText: {
-    color: "white",
+    color: "black",
     fontSize: 16,
     flex: 1,
     marginRight: 8,
