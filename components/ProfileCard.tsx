@@ -12,6 +12,7 @@ import {
   ScrollView,
   TextInput,
   ActivityIndicator,
+  SafeAreaView,
 } from "react-native";
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
@@ -25,7 +26,7 @@ import ExperienceLevelSelector from "./ExperienceLevelSelector";
 import InterestSelector from "./InterestSelector";
 import { useAuth } from "@/contexts/AuthContext";
 import Badge from "./Badge";
-import ProfileForm from "./ProfileForm";
+import ProfileForm from "@/components/ProfileForm";
 
 // Map of interests to emojis
 const INTEREST_EMOJIS: Record<string, string> = {
@@ -209,6 +210,8 @@ export default function ProfileCard({
   const [error, setError] = useState("");
   const [isEditMode, setIsEditMode] = useState(false);
 
+  const [profileData, setProfileData] = useState(null);
+
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSaving, setIsSaving] = useState(false);
 
@@ -260,6 +263,7 @@ export default function ProfileCard({
       }
 
       setUserData(data);
+      setProfileData(data);
     } catch (error) {
       console.error("Failed to fetch profile:", error);
       Alert.alert("Error", "Failed to load profile information");
@@ -1042,7 +1046,17 @@ export default function ProfileCard({
   // Edit mode or Onboarding mode
   return (
     <SafeAreaView>
-      <ProfileForm />
+      <Text>Hihihihihihi</Text>
+      <ProfileForm
+        userId={user.id}
+        isNewUser={false}
+        initialData={profileData}
+        onSave={(updatedData) => {
+          handleProfileSave(updatedData);
+          setIsEditMode(false);
+        }}
+        onCancel={() => setIsEditMode(false)}
+      />
     </SafeAreaView>
   );
 }
