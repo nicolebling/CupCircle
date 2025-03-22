@@ -1,11 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Modal } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ActivityIndicator,
+  StyleSheet,
+  Modal,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
-
 
 interface CafeSelectorProps {
   selected: string[];
@@ -35,14 +41,17 @@ export default function CafeSelector({
         let { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== "granted") {
           setErrorMsg("Permission to access location was denied");
-          Alert.alert("Permission Denied", "Please enable location permissions in settings.");
+          Alert.alert(
+            "Permission Denied",
+            "Please enable location permissions in settings.",
+          );
           return;
         }
 
-        let userLocation = await Location.getCurrentPositionAsync({ 
-          accuracy: Location.Accuracy.High 
+        let userLocation = await Location.getCurrentPositionAsync({
+          accuracy: Location.Accuracy.High,
         });
-        
+
         if (userLocation && userLocation.coords) {
           setLocation(userLocation.coords);
         } else {
@@ -113,7 +122,9 @@ export default function CafeSelector({
               {isLoading ? (
                 <ActivityIndicator size="large" color={colors.primary} />
               ) : errorMsg ? (
-                <Text style={[styles.errorText, { color: colors.text }]}>{errorMsg}</Text>
+                <Text style={[styles.errorText, { color: colors.text }]}>
+                  {errorMsg}
+                </Text>
               ) : location ? (
                 <MapView
                   style={styles.map}
@@ -125,9 +136,9 @@ export default function CafeSelector({
                   }}
                 >
                   <Marker
-                    coordinate={{ 
-                      latitude: location.latitude, 
-                      longitude: location.longitude 
+                    coordinate={{
+                      latitude: location.latitude,
+                      longitude: location.longitude,
                     }}
                     title="Your Location"
                   />
@@ -158,7 +169,7 @@ export default function CafeSelector({
 
 const styles = StyleSheet.create({
   errorText: {
-    textAlign: 'center',
+    textAlign: "center",
     marginVertical: 20,
     fontSize: 16,
   },
@@ -216,7 +227,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   map: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
   },
 });

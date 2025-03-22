@@ -12,13 +12,18 @@
       "API_URL": "https://cupcircle-api.yourusername.replit.app"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "This app requires location access to function properly.",
+        "NSLocationAlwaysUsageDescription": "This app needs location access even in the background."
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": ["ACCESS_FINE_LOCATION", "ACCESS_COARSE_LOCATION"]
     },
     "web": {
       "bundler": "metro",
@@ -34,6 +39,13 @@
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow CupCircle to access your location?",
+          "locationWhenInUsePermission": "Allow CupCircle to access your location only while using the app?"
         }
       ]
     ],
