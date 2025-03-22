@@ -258,9 +258,11 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 8,
     marginBottom: 8,
+    backgroundColor: "white",
+    borderWidth: 1,
   },
   cafeText: {
-    color: "white",
+    color: colors.text,
     fontSize: 16,
     flex: 1,
     marginRight: 8,
