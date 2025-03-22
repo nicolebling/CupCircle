@@ -1047,19 +1047,21 @@ export default function ProfileCard({
   return (
     <SafeAreaView>
       <Text>Hihihihihihi</Text>
-      <ProfileForm
-        userId={user.id}
-        isNewUser={false}
-        initialData={profileData}
-        onSave={(updatedData) => {
-          handleProfileSave(updatedData);
-          setIsEditMode(false);
-        }}
-        onCancel={() => setIsEditMode(false)}
-      />
+      {isEditMode ? (
+        <ProfileForm
+          userId={user.id}
+          isNewUser={false}
+          initialData={profileData}
+          onSave={(updatedData) => {
+            handleProfileSave(updatedData);
+            setIsEditMode(false);
+          }}
+          onCancel={() => setIsEditMode(false)}
+        />
+      ) : null}
     </SafeAreaView>
   );
-}
+  
 //     <KeyboardAvoidingView
 //       behavior={Platform.OS === "ios" ? "padding" : "height"}
 //       style={styles.container}
