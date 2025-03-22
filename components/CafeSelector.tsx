@@ -26,10 +26,12 @@ export default function CafeSelector({
 
   const [location, setLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const getLocation = async () => {
       try {
+        setIsLoading(true);
         let { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== "granted") {
           setErrorMsg("Permission to access location was denied");
@@ -37,20 +39,23 @@ export default function CafeSelector({
           return;
         }
 
-      let userLocation = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High });
+        let userLocation = await Location.getCurrentPositionAsync({ 
+          accuracy: Location.Accuracy.High 
+        });
+        
         if (userLocation && userLocation.coords) {
-          setLocation(userLocation.coords); // ✅ Safely setting state
+          setLocation(userLocation.coords);
         } else {
           setErrorMsg("Could not fetch location. Please try again.");
         }
       } catch (error) {
         setErrorMsg("Error fetching location: " + error.message);
       } finally {
-        setLoading(false); // ✅ Stop loading regardless of success/failure
+        setIsLoading(false);
       }
     };
 
-    getLocation(); // ✅ Calling function inside useEffect
+    getLocation();
   }, []);
 
   const handleSelect = (place: any) => {
@@ -105,20 +110,29 @@ export default function CafeSelector({
               </TouchableOpacity>
             </View>
             <View style={styles.container}>
-              <MapView
-                style={styles.map}
-                initialRegion={{
-                  latitude: location.latitude,
-                  longitude: location.longitude,
-                  latitudeDelta: 0.05,
-                  longitudeDelta: 0.05,
-                }}
-              >
-                <Marker
-                    coordinate={{ latitude: location.latitude, longitude: location.longitude }}
+              {isLoading ? (
+                <ActivityIndicator size="large" color={colors.primary} />
+              ) : errorMsg ? (
+                <Text style={[styles.errorText, { color: colors.text }]}>{errorMsg}</Text>
+              ) : location ? (
+                <MapView
+                  style={styles.map}
+                  initialRegion={{
+                    latitude: location.latitude,
+                    longitude: location.longitude,
+                    latitudeDelta: 0.05,
+                    longitudeDelta: 0.05,
+                  }}
+                >
+                  <Marker
+                    coordinate={{ 
+                      latitude: location.latitude, 
+                      longitude: location.longitude 
+                    }}
                     title="Your Location"
                   />
                 </MapView>
+              ) : null}
             </View>
 
             <View style={styles.selectedCafes}>
@@ -143,6 +157,11 @@ export default function CafeSelector({
 }
 
 const styles = StyleSheet.create({
+  errorText: {
+    textAlign: 'center',
+    marginVertical: 20,
+    fontSize: 16,
+  },
   container: {
     flex: 1,
   },
