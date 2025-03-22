@@ -13,7 +13,6 @@ import {
   TextInput,
   ActivityIndicator,
 } from "react-native";
-import { Cake, BriefcaseBusiness } from "@expo/vector-icons/build/Icons";
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import * as ImagePicker from "expo-image-picker";
@@ -161,8 +160,8 @@ const EMPTY_PROFILE: UserProfileData = {
   photo: "https://via.placeholder.com/150",
   birthday: "",
   occupation: "",
-  experience_level: "",
-  industry_categories: [],
+  experienceLevel: "",
+  industries: [],
   skills: [],
   experience: "",
   education: "",
@@ -734,45 +733,40 @@ export default function ProfileCard({
             )}
           </View>
 
-          <View style={styles.detailsWrapper}>
-            <View style={styles.centered}>
+          <View style={styles.nameRow}>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
               <Text style={[styles.name, { color: colors.text }]}>
                 {profile.name}
+                {profile.occupation && (
+                  <View
+                    style={[
+                      styles.tag,
+                      { backgroundColor: colors.primary + "20", marginLeft: 8 },
+                    ]}
+                  >
+                    <Text style={[styles.tagText, { color: colors.primary }]}>
+                      {profile.occupation}
+                    </Text>
+                  </View>
+                )}
               </Text>
-
-              {profile.occupation && profile.age && (
-                <View style={styles.infoRow}>
-                  <Cake size={16} color={colors.text} />
-                  <Text style={styles.infoText}>{profile.age}</Text>
-
-                  <View style={styles.divider} />
-
-                  <BriefcaseBusiness size={16} color={colors.text} />
-                  <Text style={styles.infoText}>{profile.occupation}</Text>
-
-                  {profile.experienceLevel && (
-                    <>
-                      <View style={styles.divider} />
-                      <Badge text={profile.experienceLevel} />
-                    </>
-                  )}
-                </View>
-              )}
             </View>
+
+            {profile.location && (
+              <View style={styles.locationContainer}>
+                <Ionicons
+                  name="location"
+                  size={16}
+                  color={colors.secondaryText}
+                />
+                <Text
+                  style={[styles.location, { color: colors.secondaryText }]}
+                >
+                  {profile.location}
+                </Text>
+              </View>
+            )}
           </View>
-
-          {profile.location && (
-            <View style={styles.locationContainer}>
-              <Ionicons
-                name="location"
-                size={16}
-                color={colors.secondaryText}
-              />
-              <Text style={[styles.location, { color: colors.secondaryText }]}>
-                {profile.location}
-              </Text>
-            </View>
-          )}
 
           {/* Personal Information */}
           <View style={styles.section}>

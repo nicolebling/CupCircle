@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Modal } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
-import MapView from 'react-native-maps';
+import MapView, { Marker } from "react-native-maps";
+import * as Location from "expo-location";
 
 
 interface CafeSelectorProps {
@@ -23,6 +23,35 @@ export default function CafeSelector({
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const [modalVisible, setModalVisible] = useState(false);
+
+  const [location, setLocation] = useState(null);
+  const [errorMsg, setErrorMsg] = useState(null);
+
+  useEffect(() => {
+    const getLocation = async () => {
+      try {
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted") {
+          setErrorMsg("Permission to access location was denied");
+          Alert.alert("Permission Denied", "Please enable location permissions in settings.");
+          return;
+        }
+
+      let userLocation = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High });
+        if (userLocation && userLocation.coords) {
+          setLocation(userLocation.coords); // ✅ Safely setting state
+        } else {
+          setErrorMsg("Could not fetch location. Please try again.");
+        }
+      } catch (error) {
+        setErrorMsg("Error fetching location: " + error.message);
+      } finally {
+        setLoading(false); // ✅ Stop loading regardless of success/failure
+      }
+    };
+
+    getLocation(); // ✅ Calling function inside useEffect
+  }, []);
 
   const handleSelect = (place: any) => {
     const cafeString = place.description;
@@ -76,45 +105,21 @@ export default function CafeSelector({
               </TouchableOpacity>
             </View>
             <View style={styles.container}>
-              <MapView style={styles.map} />
+              <MapView
+                style={styles.map}
+                initialRegion={{
+                  latitude: location.latitude,
+                  longitude: location.longitude,
+                  latitudeDelta: 0.05,
+                  longitudeDelta: 0.05,
+                }}
+              >
+                <Marker
+                    coordinate={{ latitude: location.latitude, longitude: location.longitude }}
+                    title="Your Location"
+                  />
+                </MapView>
             </View>
-
-            {/* <GooglePlacesAutocomplete
-              placeholder="Search for cafes..."
-              onPress={(data) => {
-                console.log("Selected place:", data);
-                handleSelect(data);
-              }}
-              onFail={(error) => console.error("Places API error:", error)}
-              query={{
-                key: process.env['GOOGLE_MAPS_API_KEY'],
-                language: "en",
-              }}
-              requestUrl={{
-                url: "https://maps.googleapis.com/maps/api",
-                useOnPlatform: "all",
-              }}
-              styles={{
-                textInput: {
-                  height: 40,
-                  borderWidth: 1,
-                  borderColor: colors.border,
-                  borderRadius: 8,
-                  paddingHorizontal: 12,
-                  color: colors.text,
-                  backgroundColor: colors.card,
-                },
-                listView: {
-                  backgroundColor: colors.background,
-                  zIndex: 1000, //To popover the component outwards
-                    position: 'absolute',
-                    top: 45
-                },
-                description: {
-                  color: colors.text,
-                },
-              }}
-            /> */}
 
             <View style={styles.selectedCafes}>
               {selected.map((cafe, index) => (
