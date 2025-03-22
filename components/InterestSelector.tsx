@@ -1,13 +1,13 @@
 
 import React, { useState, useMemo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, Modal, TextInput } from 'react-native';
-import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
+import { Ionicons, FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
 // Map of interests to emojis
-const INTEREST_EMOJIS: Record<string, string | { icon: string; type: 'fa5' }> = {
-  "Reading": { icon: "book", type: 'fa5' },
+const INTEREST_EMOJIS: Record<string, string | { icon: string; type: 'fa5' | 'material' }> = {
+  "Reading": { icon: "book-open-page-variant", type: 'material' },
   "Writing": "✍️",
   "Self-Development": "🌱",
   "Mindfulness": "🧘",
@@ -151,8 +151,12 @@ export default function InterestSelector({
   
   const getInterestEmoji = (interest: string) => {
     const emoji = INTEREST_EMOJIS[interest] || "🔖";
-    if (typeof emoji === 'object' && emoji.type === 'fa5') {
-      return <FontAwesome5 name={emoji.icon} size={18} color={colors.text} />;
+    if (typeof emoji === 'object') {
+      if (emoji.type === 'fa5') {
+        return <FontAwesome5 name={emoji.icon} size={18} color={colors.text} />;
+      } else if (emoji.type === 'material') {
+        return <MaterialCommunityIcons name={emoji.icon} size={18} color={colors.text} />;
+      }
     }
     return emoji;
   };
