@@ -522,6 +522,9 @@ export default function ProfileCard({
 
       setProfileData(data);
       setIsEditMode(false);
+      
+      // Refetch profile to ensure we have latest data
+      await fetchProfile();
     } catch (error) {
       console.error("Error saving profile:", error);
       Alert.alert("Error", "Failed to save profile changes");
