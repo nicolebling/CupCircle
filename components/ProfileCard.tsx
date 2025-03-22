@@ -520,7 +520,9 @@ export default function ProfileCard({
 
       if (error) throw error;
 
+      // Update both local states with the new data
       setProfileData(data);
+      setUserData(data);
       setIsEditMode(false);
       
       // Refetch profile to ensure we have latest data
