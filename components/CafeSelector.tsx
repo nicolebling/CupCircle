@@ -78,14 +78,8 @@ export default function CafeSelector({
   }, []);
 
   const handleSelect = (place: any) => {
-    console.log("here");
-    console.log(place);
-    const cafeString = place.description;
-
-    setSelectedCafe(place);
-
-    if (!selected.includes(cafeString) && selected.length < maxSelections) {
-      onChange([...selected, cafeString]);
+    if (!selected.includes(place) && selected.length < maxSelections) {
+      onChange([...selected, place]);
     }
   };
 
@@ -263,7 +257,7 @@ export default function CafeSelector({
                     }
                   >
                     <Text style={styles.cafeText}>
-                      {selectedCafe?.name ?? "Unnamed Cafe"}
+                      {cafe?.name || cafe || "Unnamed Cafe"}
                     </Text>
                     <Ionicons name="close-circle" size={20} color="black" />
                   </TouchableOpacity>
