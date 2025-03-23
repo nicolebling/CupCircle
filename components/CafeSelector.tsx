@@ -8,13 +8,13 @@ import {
   Modal,
   Image,
   Button,
+  TouchableWithoutFeedback,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import MapView, { Marker, Callout } from "react-native-maps";
 import * as Location from "expo-location";
-
 
 interface CafeSelectorProps {
   selected: string[];
@@ -37,6 +37,8 @@ export default function CafeSelector({
   const [errorMsg, setErrorMsg] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [cafes, setCafes] = useState([]);
+
+  const [selectedCafe, setSelectedCafe] = useState(null);
 
   useEffect(() => {
     const getLocation = async () => {
@@ -76,11 +78,14 @@ export default function CafeSelector({
   }, []);
 
   const handleSelect = (place: any) => {
+    console.log("here");
+    console.log(place);
     const cafeString = place.description;
+
+    setSelectedCafe(place);
 
     if (!selected.includes(cafeString) && selected.length < maxSelections) {
       onChange([...selected, cafeString]);
-      setModalVisible(false);
     }
   };
 
@@ -184,51 +189,59 @@ export default function CafeSelector({
                       onPress={() => {}}
                     >
                       {/* Callout content */}
-                      <Callout>
-                        <View style={{ padding: 10, width: 200 }}>
-                          <Text style={{ fontWeight: "bold", marginBottom: 5 }}>
-                            {cafe.name}
-                          </Text>
-                          <Text
-                            style={{ fontWeight: "light", marginBottom: 5 }}
-                          >
-                            {cafe.vicinity}
-                          </Text>
-                          {getCafeImage ? (
-                            <Image
-                              source={{
-                                uri: getCafeImage(
-                                  cafe.photos[0].photo_reference,
-                                ),
-                              }}
-                              style={{
-                                width: 120,
-                                height: 120,
-                                borderRadius: 10,
-                              }}
-                              resizeMode="cover"
-                            />
-                          ) : (
-                            <Text>No image available</Text>
-                          )}
-                        </View>
+                      <Callout onPress={() => handleSelect(cafe)}>
+                        <TouchableWithoutFeedback>
+                          <View style={{ padding: 10, width: 200 }}>
+                            <Text
+                              style={{ fontWeight: "bold", marginBottom: 5 }}
+                            >
+                              {cafe.name}
+                            </Text>
+                            <Text
+                              style={{ fontWeight: "300", marginBottom: 5 }}
+                            >
+                              {cafe.vicinity}
+                            </Text>
 
-                        {/* Add Button inside Callout */}
-                        <TouchableOpacity
-                          style={{
-                            backgroundColor: Colors.light.primary, // Customize your button color
-                            padding: 10,
-                            borderRadius: 5,
-                            marginTop: 10,
-                          }}
-                          onPress={() => {
-                            handleSelect(cafe);
-                          }}
-                        >
-                          <Text style={{ color: "white", textAlign: "center"}}>
-                            Select Cafe
-                          </Text>
-                        </TouchableOpacity>
+                            {cafe.photos && cafe.photos.length > 0 ? (
+                              <Image
+                                source={{
+                                  uri: getCafeImage(
+                                    cafe.photos[0].photo_reference,
+                                  ),
+                                }}
+                                style={{
+                                  width: 120,
+                                  height: 120,
+                                  borderRadius: 10,
+                                }}
+                                resizeMode="cover"
+                              />
+                            ) : (
+                              <Text>No image available</Text>
+                            )}
+
+                            <View pointerEvents="box-none">
+                              <TouchableOpacity
+                                style={{
+                                  backgroundColor: Colors.light.primary,
+                                  padding: 10,
+                                  borderRadius: 5,
+                                  marginTop: 10,
+                                }}
+                              >
+                                <Text
+                                  style={{
+                                    color: "white",
+                                    textAlign: "center",
+                                  }}
+                                >
+                                  Select Cafe
+                                </Text>
+                              </TouchableOpacity>
+                            </View>
+                          </View>
+                        </TouchableWithoutFeedback>
                       </Callout>
                     </Marker>
                   ))}
@@ -236,19 +249,26 @@ export default function CafeSelector({
               ) : null}
             </View>
 
+            
+
             <View style={styles.selectedCafes}>
-              {selected.map((cafe, index) => (
-                <TouchableOpacity
-                  key={index}
-                  style={[styles.cafeItem, { backgroundColor: colors.input }]}
-                  onPress={() =>
-                    onChange(selected.filter((_, i) => i !== index))
-                  }
-                >
-                  <Text style={styles.cafeText}>{cafe}</Text>
-                  <Ionicons name="close-circle" size={20} color="black" />
-                </TouchableOpacity>
-              ))}
+              {selected.map((cafe, index) => {
+                console.log("Selected Cafes:", selected); // Log each cafe object
+                return (
+                  <TouchableOpacity
+                    key={index}
+                    style={[styles.cafeItem, { backgroundColor: colors.input }]}
+                    onPress={() =>
+                      onChange(selected.filter((_, i) => i !== index))
+                    }
+                  >
+                    <Text style={styles.cafeText}>
+                      {selectedCafe?.name ?? "Unnamed Cafe"}
+                    </Text>
+                    <Ionicons name="close-circle" size={20} color="black" />
+                  </TouchableOpacity>
+                );
+              })}
             </View>
           </View>
         </View>
