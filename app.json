@@ -15,7 +15,8 @@
       "supportsTablet": true,
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "This app requires location access to function properly.",
-        "NSLocationAlwaysUsageDescription": "This app needs location access even in the background."
+        "NSLocationAlwaysUsageDescription": "This app needs location access even in the background.",
+        "NSPhotoLibraryUsageDescription": "We need access to your photo library to upload images."
       }
     },
     "android": {
@@ -23,7 +24,12 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "permissions": ["ACCESS_FINE_LOCATION", "ACCESS_COARSE_LOCATION"]
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "READ_MEDIA_IMAGES",
+        "CAMERA"
+      ]
     },
     "web": {
       "bundler": "metro",

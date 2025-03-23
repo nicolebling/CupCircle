@@ -6,13 +6,15 @@ import {
   ActivityIndicator,
   StyleSheet,
   Modal,
-  Image
+  Image,
+  Button,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import MapView, { Marker } from "react-native-maps";
+import MapView, { Marker, Callout } from "react-native-maps";
 import * as Location from "expo-location";
+
 
 interface CafeSelectorProps {
   selected: string[];
@@ -75,6 +77,7 @@ export default function CafeSelector({
 
   const handleSelect = (place: any) => {
     const cafeString = place.description;
+
     if (!selected.includes(cafeString) && selected.length < maxSelections) {
       onChange([...selected, cafeString]);
       setModalVisible(false);
@@ -178,8 +181,56 @@ export default function CafeSelector({
                       }}
                       title={cafe.name}
                       description={cafe.vicinity}
-                      onPress={() => handleSelect(cafe)}
-                    />  
+                      onPress={() => {}}
+                    >
+                      {/* Callout content */}
+                      <Callout>
+                        <View style={{ padding: 10, width: 200 }}>
+                          <Text style={{ fontWeight: "bold", marginBottom: 5 }}>
+                            {cafe.name}
+                          </Text>
+                          <Text
+                            style={{ fontWeight: "light", marginBottom: 5 }}
+                          >
+                            {cafe.vicinity}
+                          </Text>
+                          {getCafeImage ? (
+                            <Image
+                              source={{
+                                uri: getCafeImage(
+                                  cafe.photos[0].photo_reference,
+                                ),
+                              }}
+                              style={{
+                                width: 120,
+                                height: 120,
+                                borderRadius: 10,
+                              }}
+                              resizeMode="cover"
+                            />
+                          ) : (
+                            <Text>No image available</Text>
+                          )}
+                        </View>
+
+                        {/* Add Button inside Callout */}
+                        <TouchableOpacity
+                          style={{
+                            backgroundColor: Colors.light.primary, // Customize your button color
+                            padding: 10,
+                            borderRadius: 5,
+                            marginTop: 10,
+                          }}
+                          onPress={() => {
+                            handleSelect(cafe);
+                          }}
+                        >
+                          <Text style={{ color: "white", textAlign: "center"}}>
+                            Select Cafe
+                          </Text>
+                        </TouchableOpacity>
+                      </Callout>
+                    </Marker>
                   ))}
                 </MapView>
               ) : null}
@@ -195,7 +246,7 @@ export default function CafeSelector({
                   }
                 >
                   <Text style={styles.cafeText}>{cafe}</Text>
-                  <Ionicons name="close-circle" size={20} color="white" />
+                  <Ionicons name="close-circle" size={20} color="black" />
                 </TouchableOpacity>
               ))}
             </View>

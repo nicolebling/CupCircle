@@ -69,6 +69,8 @@ export default function ProfileForm({
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  
+
   useEffect(() => {
     if (!isNewUser) {
       fetchProfile();
@@ -149,6 +151,15 @@ export default function ProfileForm({
     setFavoriteCafes(favoriteCafes.filter((_, i) => i !== index));
   };
 
+  const requestPermission = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert("Permission Required", "Please enable media library access in settings.");
+      return false;
+    }
+    return true;
+  };
+
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -164,7 +175,12 @@ export default function ProfileForm({
 
   const uploadImage = async (uri: string) => {
     try {
+
       setLoading(true);
+
+      // Ensure permission is granted
+      const hasPermission = await requestPermission();
+      if (!hasPermission) return;
 
       const filename = uri.split("/").pop();
       const fileExt = filename?.split(".").pop();

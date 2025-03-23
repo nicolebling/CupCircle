@@ -323,9 +323,23 @@ export default function ProfileCard({
     }
   };
 
-  const uploadImage = async (uri: string) => {
+  const requestPermission = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert("Permission Denied", "Enable media access in settings.");
+    }
+  };
+
+  const uploadImage = async (URI: string) => {
     try {
       setLoading(true);
+
+      // Request permission before proceeding
+      const hasPermission = await requestPermission();
+      if (!hasPermission) {
+        setLoading(false);
+        return;
+      }
 
       const filename = uri.split("/").pop();
       const fileExt = filename?.split(".").pop();
@@ -1046,7 +1060,9 @@ export default function ProfileCard({
 
   // Edit mode or Onboarding mode
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: colors.background }]}
+    >
       {isEditMode ? (
         <ScrollView>
           <ProfileForm
