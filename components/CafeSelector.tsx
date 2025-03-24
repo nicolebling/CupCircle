@@ -14,7 +14,7 @@ import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import MapView, { Marker, Callout } from "react-native-maps";
 import * as Location from "expo-location";
-import Carousel from "react-native-snap-carousel"; // Carousel component
+
 
 interface CafeSelectorProps {
   selected: string[];
@@ -22,6 +22,26 @@ interface CafeSelectorProps {
   maxSelections?: number;
   isDark?: boolean;
 }
+
+const retroMapStyle = [
+  { elementType: 'geometry', stylers: [{ color: '#f5f5f5' }] },
+  { elementType: 'labels.text.fill', stylers: [{ color: '#616161' }] },
+  { elementType: 'labels.text.stroke', stylers: [{ color: '#f5f5f5' }] },
+  { featureType: 'administrative.land_parcel', elementType: 'labels.text.fill', stylers: [{ color: '#bdbdbd' }] },
+  { featureType: 'poi', elementType: 'geometry', stylers: [{ color: '#eeeeee' }] },
+  { featureType: 'poi', elementType: 'labels.text.fill', stylers: [{ color: '#757575' }] },
+  { featureType: 'poi.park', elementType: 'geometry', stylers: [{ color: '#e5e5e5' }] },
+  { featureType: 'poi.park', elementType: 'labels.text.fill', stylers: [{ color: '#9e9e9e' }] },
+  { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#ffffff' }] },
+  { featureType: 'road.arterial', elementType: 'labels.text.fill', stylers: [{ color: '#757575' }] },
+  { featureType: 'road.highway', elementType: 'geometry', stylers: [{ color: '#dadada' }] },
+  { featureType: 'road.highway', elementType: 'labels.text.fill', stylers: [{ color: '#616161' }] },
+  { featureType: 'road.local', elementType: 'labels.text.fill', stylers: [{ color: '#9e9e9e' }] },
+  { featureType: 'transit.line', elementType: 'geometry', stylers: [{ color: '#e5e5e5' }] },
+  { featureType: 'transit.station', elementType: 'geometry', stylers: [{ color: '#eeeeee' }] },
+  { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#c9c9c9' }] },
+  { featureType: 'water', elementType: 'labels.text.fill', stylers: [{ color: '#9e9e9e' }] },
+];
 
 export default function CafeSelector({
   selected = [],
@@ -37,8 +57,7 @@ export default function CafeSelector({
   const [errorMsg, setErrorMsg] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [cafes, setCafes] = useState([]);
-
-  const [carouselImages, setCarouselImages] = useState([]); // To store images for the carousel
+  const [initialRegion, setInitialRegion] = useState(null); // Store initial region for first load
 
 
   const [region, setRegion] = useState({
@@ -47,9 +66,9 @@ export default function CafeSelector({
     latitudeDelta: 0.05,
     longitudeDelta: 0.05,
   });
-
-
-
+ 
+ 
+  
 
   useEffect(() => {
     const getLocation = async () => {
@@ -58,10 +77,6 @@ export default function CafeSelector({
         let { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== "granted") {
           setErrorMsg("Permission to access location was denied");
-          Alert.alert(
-            "Permission Denied",
-            "Please enable location permissions in settings.",
-          );
           return;
         }
 
@@ -71,10 +86,23 @@ export default function CafeSelector({
 
         if (userLocation && userLocation.coords) {
           setLocation(userLocation.coords);
-          fetchCafes(
-            userLocation.coords.latitude,
-            userLocation.coords.longitude,
-          );
+          // Set initialRegion only once
+          if (!initialRegion) {
+            setInitialRegion({
+              latitude: userLocation.coords.latitude,
+              longitude: userLocation.coords.longitude,
+              latitudeDelta: 0.05,
+              longitudeDelta: 0.05,
+            });
+          }
+          // Set region to current user location
+          setRegion({
+            latitude: userLocation.coords.latitude,
+            longitude: userLocation.coords.longitude,
+            latitudeDelta: 0.05,
+            longitudeDelta: 0.05,
+          });
+          fetchCafes(userLocation.coords.latitude, userLocation.coords.longitude);
         } else {
           setErrorMsg("Could not fetch location. Please try again.");
         }
@@ -86,7 +114,7 @@ export default function CafeSelector({
     };
 
     getLocation();
-  }, []);
+  }, [initialRegion]);
 
   const handleSelect = (place: any) => {
     if (!selected.includes(place) && selected.length < maxSelections) {
@@ -113,23 +141,16 @@ export default function CafeSelector({
     return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=${process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY}`;
   };
 
-  // Fetch more images for the selected cafe
-  const fetchMoreCafeImages = (cafe) => {
-    const images = cafe.photos.map(photo =>
-      getCafeImage(photo.photo_reference)
-    );
-    setCarouselImages(images); // Set the images in the carouselImages state
-  };
-
 
   const handleRegionChangeComplete = (newRegion) => {
-    setRegion(newRegion);
-    // Fetch new cafes for the new region
-    setIsLoading(true); // Show loading indicator while fetching
-    fetchCafes(newRegion.latitude, newRegion.longitude).then(fetchedCafes => {
-      setCafes(fetchedCafes);
-      setIsLoading(false); // Hide loading indicator after fetching
-    });
+    setRegion(newRegion); // Save the current map region
+  };
+
+  const fetchCafesInRegion = () => {
+    if (region) {
+      setIsLoading(true);
+      fetchCafes(region.latitude, region.longitude); // Fetch cafes based on the saved region
+    }
   };
 
   return (
@@ -175,6 +196,15 @@ export default function CafeSelector({
                 <Ionicons name="close" size={24} color={colors.text} />
               </TouchableOpacity>
             </View>
+
+            {/* Button to trigger fetching cafes in the current map region */}
+            <TouchableOpacity
+              style={styles.searchButton}
+              onPress={fetchCafesInRegion}
+            >
+              <Text style={styles.searchButtonText}>Search this area</Text>
+            </TouchableOpacity>
+            
             <View style={styles.container}>
               {isLoading ? (
                 <ActivityIndicator size="large" color={colors.primary} />
@@ -182,15 +212,14 @@ export default function CafeSelector({
                 <Text style={[styles.errorText, { color: colors.text }]}>
                   {errorMsg}
                 </Text>
-              ) : location ? (
+              ) : region ? (
                 <MapView
                   style={styles.map}
-                  initialRegion={{
-                    latitude: location.latitude,
-                    longitude: location.longitude,
-                    latitudeDelta: 0.05,
-                    longitudeDelta: 0.05,
-                  }}
+                  customMapStyle={retroMapStyle} // Apply custom map style here
+                  region={region} // Bind the region state to the MapView
+                  initialRegion={initialRegion} // Set the initial region only once
+                  onRegionChangeComplete={setRegion} // Update region on map change
+                  
                 >
                   <Marker
                     coordinate={{
@@ -198,6 +227,7 @@ export default function CafeSelector({
                       longitude: location.longitude,
                     }}
                     title="Your Location"
+                    pinColor="#FF6347"
                   />
 
                   {/* Markers for cafes */}
@@ -264,21 +294,19 @@ export default function CafeSelector({
                                 )}
 
                             {cafe.photos && cafe.photos.length > 0 ? (
-                      <View style={{ width: 300, height: 200 }}>
-                        <Carousel
-                          data={cafe.photos.map(photo => getCafeImage(photo.photo_reference))}
-                          renderItem={({ item }) => (
-                            <Image
-                              source={{ uri: item }}
-                              style={styles.carouselImage}
-                            />
-                          )}
-                          sliderWidth={300}
-                          itemWidth={250}
-                          loop={true}
-                          layout={'default'}
-                        />
-                      </View>
+                              <Image
+                                source={{
+                                  uri: getCafeImage(
+                                    cafe.photos[0].photo_reference,
+                                  ),
+                                }}
+                                style={{
+                                  width: 120,
+                                  height: 120,
+                                  borderRadius: 10,
+                                }}
+                                resizeMode="cover"
+                              />
                             ) : (
                               <Text>No image available</Text>
                             )}
@@ -311,7 +339,7 @@ export default function CafeSelector({
               ) : null}
             </View>
 
-
+            
 
             <View style={styles.selectedCafes}>
               {selected.map((cafe, index) => {
@@ -402,7 +430,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     flex: 1,
     marginRight: 8,
-
+    
   },
   map: {
     width: "100%",
@@ -416,9 +444,16 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: "#fff",
   },
-  carouselImage: {
-    width: 250,
-    height: 200,
-    borderRadius: 10,
+  searchButton: {
+    backgroundColor: "#4CAF50", // Green color for the button
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 10,
+    alignItems: "center",
+  },
+  searchButtonText: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 16,
   },
 });
