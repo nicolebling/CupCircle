@@ -105,7 +105,6 @@ export default function CafeSelector({
   maxSelections = 3,
   isDark = false,
 }: CafeSelectorProps) {
-  const [toast, setToast] = useState({ visible: false, message: '' });
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const [modalVisible, setModalVisible] = useState(false);
@@ -181,11 +180,7 @@ export default function CafeSelector({
         const updatedSelection = [...selected, cafeString];
         onChange(updatedSelection);
       } else {
-        setToast({
-          visible: true,
-          message: `Maximum ${maxSelections} cafes allowed. Please remove one first.`
-        });
-        setTimeout(() => setToast({ visible: false, message: '' }), 3000);
+        showToast(`Maximum ${maxSelections} cafes allowed. Please remove one first.`, 'info');
       }
     }
   };
@@ -440,35 +435,11 @@ export default function CafeSelector({
       </Modal>
 
       
-    {toast.visible && (
-        <View style={styles.toastContainer}>
-          <Text style={styles.toastText}>{toast.message}</Text>
-        </View>
-      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  toastContainer: {
-    position: 'absolute',
-    bottom: 100,
-    left: 20,
-    right: 20,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-    padding: 15,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 9999,
-    elevation: 6,
-  },
-  toastText: {
-    color: 'white',
-    fontSize: 14,
-    textAlign: 'center',
-    fontFamily: 'K2D-Regular',
-  },
   dialogOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
