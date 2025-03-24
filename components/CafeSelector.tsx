@@ -14,6 +14,7 @@ import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import MapView, { Marker, Callout } from "react-native-maps";
 import * as Location from "expo-location";
+import Carousel from "react-native-snap-carousel"; // Carousel component
 
 interface CafeSelectorProps {
   selected: string[];
@@ -37,16 +38,18 @@ export default function CafeSelector({
   const [isLoading, setIsLoading] = useState(true);
   const [cafes, setCafes] = useState([]);
 
+  const [carouselImages, setCarouselImages] = useState([]); // To store images for the carousel
+
+
   const [region, setRegion] = useState({
     latitude: 0,
     longitude: 0,
     latitudeDelta: 0.05,
     longitudeDelta: 0.05,
   });
-
-  const [debouncedRegion, setDebouncedRegion] = useState(null);
-  const [debounceTimeout, setDebounceTimeout] = useState(null);
  
+ 
+
 
   useEffect(() => {
     const getLocation = async () => {
@@ -109,6 +112,15 @@ export default function CafeSelector({
   const getCafeImage = (photoReference: string) => {
     return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=${process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY}`;
   };
+
+  // Fetch more images for the selected cafe
+  const fetchMoreCafeImages = (cafe) => {
+    const images = cafe.photos.map(photo =>
+      getCafeImage(photo.photo_reference)
+    );
+    setCarouselImages(images); // Set the images in the carouselImages state
+  };
+
 
   const handleRegionChangeComplete = (newRegion) => {
     setRegion(newRegion);
@@ -179,7 +191,6 @@ export default function CafeSelector({
                     latitudeDelta: 0.05,
                     longitudeDelta: 0.05,
                   }}
-                  onRegionChangeComplete={handleRegionChangeComplete} // Triggered when region change is complete
                 >
                   <Marker
                     coordinate={{
@@ -253,19 +264,18 @@ export default function CafeSelector({
                                 )}
 
                             {cafe.photos && cafe.photos.length > 0 ? (
-                              <Image
-                                source={{
-                                  uri: getCafeImage(
-                                    cafe.photos[0].photo_reference,
-                                  ),
-                                }}
-                                style={{
-                                  width: 120,
-                                  height: 120,
-                                  borderRadius: 10,
-                                }}
-                                resizeMode="cover"
-                              />
+                      <Carousel
+                        data={carouselImages}
+                        renderItem={({ item }) => (
+                          <Image
+                            source={{ uri: item }}
+                            style={styles.carouselImage}
+                          />
+                        )}
+                        sliderWidth={300}
+                        itemWidth={250}
+                        loop={true}
+                      />
                             ) : (
                               <Text>No image available</Text>
                             )}
@@ -402,5 +412,10 @@ const styles = StyleSheet.create({
     marginTop: 5,
     borderWidth: 2,
     borderColor: "#fff",
+  },
+  carouselImage: {
+    width: 250,
+    height: 200,
+    borderRadius: 10,
   },
 });
