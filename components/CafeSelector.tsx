@@ -197,10 +197,6 @@ export default function CafeSelector({
     return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=${process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY}`;
   };
 
-  const handleRegionChangeComplete = (newRegion) => {
-    setRegion(newRegion); // Save the current map region
-  };
-
   const fetchCafesInRegion = () => {
     if (region) {
       setIsLoading(true);
@@ -399,7 +395,7 @@ export default function CafeSelector({
 
             <View style={styles.selectedCafes}>
               {selected.map((cafe, index) => {
-                console.log("Selected Cafes:", selected); // Log each cafe object
+        
                 return (
                   <TouchableOpacity
                     key={index}
