@@ -47,8 +47,8 @@ export default function CafeSelector({
     latitudeDelta: 0.05,
     longitudeDelta: 0.05,
   });
- 
- 
+
+
 
 
   useEffect(() => {
@@ -265,7 +265,7 @@ export default function CafeSelector({
 
                             {cafe.photos && cafe.photos.length > 0 ? (
                       <Carousel
-                        data={carouselImages}
+                        data={cafe.photos.map(photo => getCafeImage(photo.photo_reference))}
                         renderItem={({ item }) => (
                           <Image
                             source={{ uri: item }}
@@ -308,7 +308,7 @@ export default function CafeSelector({
               ) : null}
             </View>
 
-            
+
 
             <View style={styles.selectedCafes}>
               {selected.map((cafe, index) => {
@@ -399,7 +399,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     flex: 1,
     marginRight: 8,
-    
+
   },
   map: {
     width: "100%",
