@@ -12,7 +12,6 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import { useToast } from "@/hooks/use-toast";
 import MapView, { Marker, Callout } from "react-native-maps";
 import * as Location from "expo-location";
 
@@ -171,17 +170,11 @@ export default function CafeSelector({
     getLocation();
   }, [initialRegion]);
 
-  const { showToast } = useToast();
-
   const handleSelect = (place: any) => {
-    if (!selected.includes(place)) {
-      if (selected.length < maxSelections) {
-        const cafeString = `${place.name}|||${place.vicinity}`;
-        const updatedSelection = [...selected, cafeString];
-        onChange(updatedSelection);
-      } else {
-        showToast(`Maximum ${maxSelections} cafes allowed. Please remove one first.`, 'info');
-      }
+    if (!selected.includes(place) && selected.length < maxSelections) {
+      const cafeString = `${place.name}|||${place.vicinity}`;
+      const updatedSelection = [...selected, cafeString];
+      onChange(updatedSelection);
     }
   };
 
@@ -433,40 +426,11 @@ export default function CafeSelector({
           </View>
         </View>
       </Modal>
-
-      
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  dialogOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  dialogContent: {
-    width: '80%',
-    padding: 20,
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-  dialogText: {
-    fontSize: 16,
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  dialogButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-  },
-  dialogButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
   errorText: {
     textAlign: "center",
     marginVertical: 20,
