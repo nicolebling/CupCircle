@@ -172,7 +172,8 @@ export default function CafeSelector({
 
   const handleSelect = (place: any) => {
     if (!selected.includes(place) && selected.length < maxSelections) {
-      onChange([...selected, place]);
+      const updatedSelection = [...selected, place];
+      onChange(updatedSelection);
     }
   };
 

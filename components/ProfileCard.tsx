@@ -520,6 +520,27 @@ export default function ProfileCard({
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+
+  const handleCafeSelect = async (selectedCafes) => {
+    try {
+      const { data, error } = await supabase
+        .from("profiles")
+        .upsert({
+          id: user.id,
+          favorite_cafes: selectedCafes,
+          updated_at: new Date(),
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      setUserData((prev) => ({ ...prev, favorite_cafes: selectedCafes }));
+    } catch (error) {
+      console.error("Error saving cafe selections:", error);
+      Alert.alert("Error", "Failed to save cafe selections");
+    }
+  };
+
   const handleProfileSave = async (updatedData) => {
     try {
       const { data, error } = await supabase
@@ -1067,13 +1088,13 @@ export default function ProfileCard({
         <ScrollView>
           <ProfileForm
             userId={user.id}
-            isNewUser={false}
-            initialData={profileData}
+            isNewUser={false}            initialData={profileData}
             onSave={(updatedData) => {
               handleProfileSave(updatedData);
               setIsEditMode(false);
             }}
             onCancel={() => setIsEditMode(false)}
+            onCafeSelect={handleCafeSelect}
           />
         </ScrollView>
       ) : null}
