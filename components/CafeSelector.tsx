@@ -264,18 +264,21 @@ export default function CafeSelector({
                                 )}
 
                             {cafe.photos && cafe.photos.length > 0 ? (
-                      <Carousel
-                        data={cafe.photos.map(photo => getCafeImage(photo.photo_reference))}
-                        renderItem={({ item }) => (
-                          <Image
-                            source={{ uri: item }}
-                            style={styles.carouselImage}
-                          />
-                        )}
-                        sliderWidth={300}
-                        itemWidth={250}
-                        loop={true}
-                      />
+                      <View style={{ width: 300, height: 200 }}>
+                        <Carousel
+                          data={cafe.photos.map(photo => getCafeImage(photo.photo_reference))}
+                          renderItem={({ item }) => (
+                            <Image
+                              source={{ uri: item }}
+                              style={styles.carouselImage}
+                            />
+                          )}
+                          sliderWidth={300}
+                          itemWidth={250}
+                          loop={true}
+                          layout={'default'}
+                        />
+                      </View>
                             ) : (
                               <Text>No image available</Text>
                             )}
