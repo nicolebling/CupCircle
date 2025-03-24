@@ -12,6 +12,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { useToast } from "@/hooks/use-toast";
 import MapView, { Marker, Callout } from "react-native-maps";
 import * as Location from "expo-location";
 
@@ -170,7 +171,7 @@ export default function CafeSelector({
     getLocation();
   }, [initialRegion]);
 
-  const [showMaxDialog, setShowMaxDialog] = useState(false);
+  const { showToast } = useToast();
 
   const handleSelect = (place: any) => {
     if (!selected.includes(place)) {
@@ -179,7 +180,7 @@ export default function CafeSelector({
         const updatedSelection = [...selected, cafeString];
         onChange(updatedSelection);
       } else {
-        setShowMaxDialog(true);
+        showToast(`Maximum ${maxSelections} cafes allowed. Please remove one first.`, 'info');
       }
     }
   };
@@ -433,27 +434,7 @@ export default function CafeSelector({
         </View>
       </Modal>
 
-      {/* Max selections dialog */}
-      <Modal
-        visible={showMaxDialog}
-        transparent={true}
-        animationType="fade"
-        onRequestClose={() => setShowMaxDialog(false)}
-      >
-        <View style={styles.dialogOverlay}>
-          <View style={[styles.dialogContent, { backgroundColor: colors.background }]}>
-            <Text style={[styles.dialogText, { color: colors.text }]}>
-              You've already selected {maxSelections} cafes. Please remove one to add another.
-            </Text>
-            <TouchableOpacity
-              style={[styles.dialogButton, { backgroundColor: colors.primary }]}
-              onPress={() => setShowMaxDialog(false)}
-            >
-              <Text style={styles.dialogButtonText}>OK</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+      
     </View>
   );
 }
