@@ -257,7 +257,9 @@ export default function CafeSelector({
             </TouchableOpacity>
 
             <View style={styles.container}>
-              {errorMsg ? (
+              {isLoading ? (
+                <ActivityIndicator size="large" color={colors.primary} />
+              ) : errorMsg ? (
                 <Text style={[styles.errorText, { color: colors.text }]}>
                   {errorMsg}
                 </Text>
@@ -420,35 +422,11 @@ export default function CafeSelector({
           </View>
         </View>
       </Modal>
-
-      {/* Loading Overlay */}
-      {isLoading && (
-        <View style={styles.loadingOverlay}>
-          <ActivityIndicator size="large" color={colors.primary} />
-          <Text style={styles.loadingText}>Searching cafes...</Text>
-        </View>
-      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  loadingOverlay: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: [{ translateX: -50 }, { translateY: -50 }],
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-    padding: 20,
-    borderRadius: 10,
-    alignItems: 'center',
-    zIndex: 1000,
-  },
-  loadingText: {
-    marginTop: 10,
-    fontSize: 16,
-    fontFamily: 'K2D-Regular',
-  },
   errorText: {
     textAlign: "center",
     marginVertical: 20,
