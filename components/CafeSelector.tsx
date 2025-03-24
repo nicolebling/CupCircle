@@ -172,7 +172,11 @@ export default function CafeSelector({
 
   const handleSelect = (place: any) => {
     if (!selected.includes(place) && selected.length < maxSelections) {
-      const updatedSelection = [...selected, place];
+      const simplifiedCafe = {
+        name: place.name,
+        vicinity: place.vicinity
+      };
+      const updatedSelection = [...selected, simplifiedCafe];
       onChange(updatedSelection);
     }
   };
