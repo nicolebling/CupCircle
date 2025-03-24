@@ -243,9 +243,6 @@ export default function ProfileForm({
         updated_at: new Date(),
       };
 
-      console.log("Neighborhoods being saved:", neighborhoods);
-      console.log("Favorite cafes being saved:", favoriteCafes);
-
       console.log(
         "Profile data being sent:",
         JSON.stringify(profileData, null, 2),
