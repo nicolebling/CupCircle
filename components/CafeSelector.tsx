@@ -172,11 +172,8 @@ export default function CafeSelector({
 
   const handleSelect = (place: any) => {
     if (!selected.includes(place) && selected.length < maxSelections) {
-      const simplifiedCafe = {
-        name: place.name,
-        vicinity: place.vicinity
-      };
-      const updatedSelection = [...selected, simplifiedCafe];
+      const cafeString = `${place.name}|||${place.vicinity}`;
+      const updatedSelection = [...selected, cafeString];
       onChange(updatedSelection);
     }
   };
@@ -415,10 +412,10 @@ export default function CafeSelector({
                       style={{ flexDirection: "column", flex: 1, height: 40 }}
                     >
                       <Text style={[styles.cafeText, { fontWeight: "bold" }]}>
-                        {cafe?.name || cafe || "Cafe"}
+                        {cafe ? cafe.split('|||')[0] : "Cafe"}
                       </Text>
                       <Text style={styles.cafeText}>
-                        {cafe?.vicinity || cafe || "Address"}
+                        {cafe ? cafe.split('|||')[1] : "Address"}
                       </Text>
                     </View>
                     <Ionicons name="close-circle" size={20} color="black" />
