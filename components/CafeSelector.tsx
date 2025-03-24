@@ -170,11 +170,17 @@ export default function CafeSelector({
     getLocation();
   }, [initialRegion]);
 
+  const [showMaxDialog, setShowMaxDialog] = useState(false);
+
   const handleSelect = (place: any) => {
-    if (!selected.includes(place) && selected.length < maxSelections) {
-      const cafeString = `${place.name}|||${place.vicinity}`;
-      const updatedSelection = [...selected, cafeString];
-      onChange(updatedSelection);
+    if (!selected.includes(place)) {
+      if (selected.length < maxSelections) {
+        const cafeString = `${place.name}|||${place.vicinity}`;
+        const updatedSelection = [...selected, cafeString];
+        onChange(updatedSelection);
+      } else {
+        setShowMaxDialog(true);
+      }
     }
   };
 
@@ -426,11 +432,60 @@ export default function CafeSelector({
           </View>
         </View>
       </Modal>
+
+      {/* Max selections dialog */}
+      <Modal
+        visible={showMaxDialog}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowMaxDialog(false)}
+      >
+        <View style={styles.dialogOverlay}>
+          <View style={[styles.dialogContent, { backgroundColor: colors.background }]}>
+            <Text style={[styles.dialogText, { color: colors.text }]}>
+              You've already selected {maxSelections} cafes. Please remove one to add another.
+            </Text>
+            <TouchableOpacity
+              style={[styles.dialogButton, { backgroundColor: colors.primary }]}
+              onPress={() => setShowMaxDialog(false)}
+            >
+              <Text style={styles.dialogButtonText}>OK</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  dialogOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  dialogContent: {
+    width: '80%',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  dialogText: {
+    fontSize: 16,
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  dialogButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+  },
+  dialogButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
   errorText: {
     textAlign: "center",
     marginVertical: 20,
