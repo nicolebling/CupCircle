@@ -461,7 +461,8 @@ export default function ProfileCard({
 
       console.log("Profile saved successfully:", data);
       Alert.alert("Success", "Your profile has been saved");
-      router.replace("/(tabs)/matching");
+      await fetchProfile(); // Fetch updated profile data
+      setIsEditMode(false); // Exit edit mode
     } catch (error: any) {
       console.error("Error saving profile:", error);
       setError("Failed to save profile. Please try again.");
