@@ -15,7 +15,6 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import MapView, { Marker, Callout } from "react-native-maps";
 import * as Location from "expo-location";
 
-
 interface CafeSelectorProps {
   selected: string[];
   onChange: (cafes: string[]) => void;
@@ -24,23 +23,79 @@ interface CafeSelectorProps {
 }
 
 const retroMapStyle = [
-  { elementType: 'geometry', stylers: [{ color: '#f5f5f5' }] },
-  { elementType: 'labels.text.fill', stylers: [{ color: '#616161' }] },
-  { elementType: 'labels.text.stroke', stylers: [{ color: '#f5f5f5' }] },
-  { featureType: 'administrative.land_parcel', elementType: 'labels.text.fill', stylers: [{ color: '#bdbdbd' }] },
-  { featureType: 'poi', elementType: 'geometry', stylers: [{ color: '#eeeeee' }] },
-  { featureType: 'poi', elementType: 'labels.text.fill', stylers: [{ color: '#757575' }] },
-  { featureType: 'poi.park', elementType: 'geometry', stylers: [{ color: '#e5e5e5' }] },
-  { featureType: 'poi.park', elementType: 'labels.text.fill', stylers: [{ color: '#9e9e9e' }] },
-  { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#ffffff' }] },
-  { featureType: 'road.arterial', elementType: 'labels.text.fill', stylers: [{ color: '#757575' }] },
-  { featureType: 'road.highway', elementType: 'geometry', stylers: [{ color: '#dadada' }] },
-  { featureType: 'road.highway', elementType: 'labels.text.fill', stylers: [{ color: '#616161' }] },
-  { featureType: 'road.local', elementType: 'labels.text.fill', stylers: [{ color: '#9e9e9e' }] },
-  { featureType: 'transit.line', elementType: 'geometry', stylers: [{ color: '#e5e5e5' }] },
-  { featureType: 'transit.station', elementType: 'geometry', stylers: [{ color: '#eeeeee' }] },
-  { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#c9c9c9' }] },
-  { featureType: 'water', elementType: 'labels.text.fill', stylers: [{ color: '#9e9e9e' }] },
+  { elementType: "geometry", stylers: [{ color: "#f5f5f5" }] },
+  { elementType: "labels.text.fill", stylers: [{ color: "#616161" }] },
+  { elementType: "labels.text.stroke", stylers: [{ color: "#f5f5f5" }] },
+  {
+    featureType: "administrative.land_parcel",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#bdbdbd" }],
+  },
+  {
+    featureType: "poi",
+    elementType: "geometry",
+    stylers: [{ color: "#eeeeee" }],
+  },
+  {
+    featureType: "poi",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#757575" }],
+  },
+  {
+    featureType: "poi.park",
+    elementType: "geometry",
+    stylers: [{ color: "#e5e5e5" }],
+  },
+  {
+    featureType: "poi.park",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#9e9e9e" }],
+  },
+  {
+    featureType: "road",
+    elementType: "geometry",
+    stylers: [{ color: "#ffffff" }],
+  },
+  {
+    featureType: "road.arterial",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#757575" }],
+  },
+  {
+    featureType: "road.highway",
+    elementType: "geometry",
+    stylers: [{ color: "#dadada" }],
+  },
+  {
+    featureType: "road.highway",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#616161" }],
+  },
+  {
+    featureType: "road.local",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#9e9e9e" }],
+  },
+  {
+    featureType: "transit.line",
+    elementType: "geometry",
+    stylers: [{ color: "#e5e5e5" }],
+  },
+  {
+    featureType: "transit.station",
+    elementType: "geometry",
+    stylers: [{ color: "#eeeeee" }],
+  },
+  {
+    featureType: "water",
+    elementType: "geometry",
+    stylers: [{ color: "#c9c9c9" }],
+  },
+  {
+    featureType: "water",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#9e9e9e" }],
+  },
 ];
 
 export default function CafeSelector({
@@ -59,16 +114,12 @@ export default function CafeSelector({
   const [cafes, setCafes] = useState([]);
   const [initialRegion, setInitialRegion] = useState(null); // Store initial region for first load
 
-
   const [region, setRegion] = useState({
     latitude: 0,
     longitude: 0,
     latitudeDelta: 0.05,
     longitudeDelta: 0.05,
   });
- 
- 
-  
 
   useEffect(() => {
     const getLocation = async () => {
@@ -102,7 +153,10 @@ export default function CafeSelector({
             latitudeDelta: 0.05,
             longitudeDelta: 0.05,
           });
-          fetchCafes(userLocation.coords.latitude, userLocation.coords.longitude);
+          fetchCafes(
+            userLocation.coords.latitude,
+            userLocation.coords.longitude,
+          );
         } else {
           setErrorMsg("Could not fetch location. Please try again.");
         }
@@ -140,7 +194,6 @@ export default function CafeSelector({
   const getCafeImage = (photoReference: string) => {
     return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=${process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY}`;
   };
-
 
   const handleRegionChangeComplete = (newRegion) => {
     setRegion(newRegion); // Save the current map region
@@ -204,7 +257,7 @@ export default function CafeSelector({
             >
               <Text style={styles.searchButtonText}>Search this area</Text>
             </TouchableOpacity>
-            
+
             <View style={styles.container}>
               {isLoading ? (
                 <ActivityIndicator size="large" color={colors.primary} />
@@ -219,7 +272,6 @@ export default function CafeSelector({
                   region={region} // Bind the region state to the MapView
                   initialRegion={initialRegion} // Set the initial region only once
                   onRegionChangeComplete={setRegion} // Update region on map change
-                  
                 >
                   <Marker
                     coordinate={{
@@ -257,41 +309,45 @@ export default function CafeSelector({
                               {cafe.vicinity}
                             </Text>
 
-
-                                {/* Show the rating */}
-                                {cafe.rating && (
-                                  <View style={{ flexDirection: "row", marginBottom: 5 }}>
-                                    {Array.from({ length: 5 }, (_, index) => {
-                                      if (index < Math.floor(cafe.rating)) {
-                                        return (
-                                          <Ionicons
-                                            key={index}
-                                            name="star"
-                                            size={16}
-                                            color="gold"
-                                          />
-                                        );
-                                      } else if (index < Math.ceil(cafe.rating)) {
-                                        return (
-                                          <Ionicons
-                                            key={index}
-                                            name="star-half"
-                                            size={16}
-                                            color="gold"
-                                          />
-                                        );
-                                      }
-                                      return (
-                                        <Ionicons
-                                          key={index}
-                                          name="star-outline"
-                                          size={16}
-                                          color="gold"
-                                        />
-                                      );
-                                    })}
-                                  </View>
-                                )}
+                            {/* Show the rating */}
+                            {cafe.rating && (
+                              <View
+                                style={{
+                                  flexDirection: "row",
+                                  marginBottom: 5,
+                                }}
+                              >
+                                {Array.from({ length: 5 }, (_, index) => {
+                                  if (index < Math.floor(cafe.rating)) {
+                                    return (
+                                      <Ionicons
+                                        key={index}
+                                        name="star"
+                                        size={16}
+                                        color="gold"
+                                      />
+                                    );
+                                  } else if (index < Math.ceil(cafe.rating)) {
+                                    return (
+                                      <Ionicons
+                                        key={index}
+                                        name="star-half"
+                                        size={16}
+                                        color="gold"
+                                      />
+                                    );
+                                  }
+                                  return (
+                                    <Ionicons
+                                      key={index}
+                                      name="star-outline"
+                                      size={16}
+                                      color="gold"
+                                    />
+                                  );
+                                })}
+                              </View>
+                            )}
 
                             {cafe.photos && cafe.photos.length > 0 ? (
                               <Image
@@ -339,8 +395,6 @@ export default function CafeSelector({
               ) : null}
             </View>
 
-            
-
             <View style={styles.selectedCafes}>
               {selected.map((cafe, index) => {
                 console.log("Selected Cafes:", selected); // Log each cafe object
@@ -352,14 +406,16 @@ export default function CafeSelector({
                       onChange(selected.filter((_, i) => i !== index))
                     }
                   >
-                    <View style={{ flexDirection: 'column', flex: 1, height: 40}}>
-                    <Text style={[styles.cafeText, { fontWeight: 'bold',  }]}>
-                      {cafe?.name || cafe || "Cafe"}
-                    </Text>
-                       <Text style={styles.cafeText}>
-                      {cafe?.vicinity || cafe || "Address"}
-                    </Text>
-                      </View>
+                    <View
+                      style={{ flexDirection: "column", flex: 1, height: 40 }}
+                    >
+                      <Text style={[styles.cafeText, { fontWeight: "bold" }]}>
+                        {cafe?.name || cafe || "Cafe"}
+                      </Text>
+                      <Text style={styles.cafeText}>
+                        {cafe?.vicinity || cafe || "Address"}
+                      </Text>
+                    </View>
                     <Ionicons name="close-circle" size={20} color="black" />
                   </TouchableOpacity>
                 );
@@ -430,7 +486,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     flex: 1,
     marginRight: 8,
-    
   },
   map: {
     width: "100%",
