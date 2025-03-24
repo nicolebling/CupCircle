@@ -461,7 +461,24 @@ export default function ProfileCard({
 
       console.log("Profile saved successfully:", data);
       Alert.alert("Success", "Your profile has been saved");
-      await fetchProfile(); // Fetch updated profile data
+      
+      // Update all local state values with the saved data
+      const savedData = data[0]; // Get first result since upsert returns an array
+      setName(savedData.name || "");
+      setOccupation(savedData.occupation || "");
+      setBio(savedData.bio || "");
+      setAge(savedData.age || null);
+      setExperienceLevel(savedData.experience_level || "");
+      setEducation(savedData.education || "");
+      setCity(savedData.city || "");
+      setIndustryCategories(savedData.industry_categories || []);
+      setSkills(savedData.skills || []);
+      setNeighborhoods(savedData.neighborhoods || []);
+      setFavoriteCafes(savedData.favorite_cafes || []);
+      setInterests(savedData.interests || []);
+      setAvatar(savedData.photo_url || "");
+      
+      setUserData(savedData);
       setIsEditMode(false); // Exit edit mode
     } catch (error: any) {
       console.error("Error saving profile:", error);
