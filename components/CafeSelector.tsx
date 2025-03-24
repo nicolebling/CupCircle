@@ -7,7 +7,6 @@ import {
   StyleSheet,
   Modal,
   Image,
-  Button,
   TouchableWithoutFeedback,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
@@ -38,7 +37,16 @@ export default function CafeSelector({
   const [isLoading, setIsLoading] = useState(true);
   const [cafes, setCafes] = useState([]);
 
-  const [selectedCafe, setSelectedCafe] = useState(null);
+  const [region, setRegion] = useState({
+    latitude: 0,
+    longitude: 0,
+    latitudeDelta: 0.05,
+    longitudeDelta: 0.05,
+  });
+
+  const [debouncedRegion, setDebouncedRegion] = useState(null);
+  const [debounceTimeout, setDebounceTimeout] = useState(null);
+ 
 
   useEffect(() => {
     const getLocation = async () => {
@@ -86,7 +94,7 @@ export default function CafeSelector({
   const fetchCafes = async (lat, lng) => {
     try {
       const response = await fetch(
-        `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=2000&type=cafe&key=${process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY}`,
+        `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=2000&type=cafe&keyword=coffee&key=${process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY}`,
       );
       const data = await response.json();
       setCafes(data.results);
@@ -100,6 +108,16 @@ export default function CafeSelector({
   // Function to fetch the image URL of the cafe using the photo_reference
   const getCafeImage = (photoReference: string) => {
     return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=${process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY}`;
+  };
+
+  const handleRegionChangeComplete = (newRegion) => {
+    setRegion(newRegion);
+    // Fetch new cafes for the new region
+    setIsLoading(true); // Show loading indicator while fetching
+    fetchCafes(newRegion.latitude, newRegion.longitude).then(fetchedCafes => {
+      setCafes(fetchedCafes);
+      setIsLoading(false); // Hide loading indicator after fetching
+    });
   };
 
   return (
@@ -161,6 +179,7 @@ export default function CafeSelector({
                     latitudeDelta: 0.05,
                     longitudeDelta: 0.05,
                   }}
+                  onRegionChangeComplete={handleRegionChangeComplete} // Triggered when region change is complete
                 >
                   <Marker
                     coordinate={{
@@ -196,6 +215,42 @@ export default function CafeSelector({
                             >
                               {cafe.vicinity}
                             </Text>
+
+
+                                {/* Show the rating */}
+                                {cafe.rating && (
+                                  <View style={{ flexDirection: "row", marginBottom: 5 }}>
+                                    {Array.from({ length: 5 }, (_, index) => {
+                                      if (index < Math.floor(cafe.rating)) {
+                                        return (
+                                          <Ionicons
+                                            key={index}
+                                            name="star"
+                                            size={16}
+                                            color="gold"
+                                          />
+                                        );
+                                      } else if (index < Math.ceil(cafe.rating)) {
+                                        return (
+                                          <Ionicons
+                                            key={index}
+                                            name="star-half"
+                                            size={16}
+                                            color="gold"
+                                          />
+                                        );
+                                      }
+                                      return (
+                                        <Ionicons
+                                          key={index}
+                                          name="star-outline"
+                                          size={16}
+                                          color="gold"
+                                        />
+                                      );
+                                    })}
+                                  </View>
+                                )}
 
                             {cafe.photos && cafe.photos.length > 0 ? (
                               <Image
@@ -256,9 +311,14 @@ export default function CafeSelector({
                       onChange(selected.filter((_, i) => i !== index))
                     }
                   >
-                    <Text style={styles.cafeText}>
-                      {cafe?.name || cafe || "Unnamed Cafe"}
+                    <View style={{ flexDirection: 'column', flex: 1, height: 40}}>
+                    <Text style={[styles.cafeText, { fontWeight: 'bold',  }]}>
+                      {cafe?.name || cafe || "Cafe"}
                     </Text>
+                       <Text style={styles.cafeText}>
+                      {cafe?.vicinity || cafe || "Address"}
+                    </Text>
+                      </View>
                     <Ionicons name="close-circle" size={20} color="black" />
                   </TouchableOpacity>
                 );
@@ -301,7 +361,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 20,
-    height: "80%",
+    height: "90%",
   },
   modalHeader: {
     flexDirection: "row",
@@ -320,7 +380,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    padding: 12,
+    padding: 20,
     borderRadius: 8,
     marginBottom: 8,
   },
@@ -329,6 +389,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     flex: 1,
     marginRight: 8,
+    
   },
   map: {
     width: "100%",
