@@ -10,6 +10,7 @@ import {
   Platform,
   Alert,
   ActivityIndicator,
+  Button,
   Image,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -17,7 +18,6 @@ import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { useAuth } from "../../provider/AuthProvider";
 import * as FileSystem from "expo-file-system";
-import { decode } from "base64-arraybuffer";
 import { FileObject } from "@supabase/storage-js";
 
 import { supabase } from "@/lib/supabase";
@@ -30,6 +30,7 @@ import ExperienceLevelSelector from "@/components/ExperienceLevelSelector";
 import NeighborhoodSelector from "@/components/NeighborhoodSelector";
 import CafeSelector from "@/components/CafeSelector";
 import ImageItem from "@/components/ImageItem";
+import { decode } from 'base64-arraybuffer';
 
 type ProfileFormProps = {
   userId: string;
@@ -68,7 +69,6 @@ export default function ProfileForm({
   const [interests, setInterests] = useState<string[]>([]);
   const [error, setError] = useState("");
   const [isEditMode, setIsEditMode] = useState(false);
-
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
@@ -164,21 +164,30 @@ export default function ProfileForm({
   };
 
   const pickImage = async () => {
+
+    // Ensure permission is granted
+    const hasPermission = await requestPermission();
+    if (!hasPermission) return;
+    
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [1, 1],
       quality: 0.8,
+      base64: true, //Add this line
     });
 
     if (!result.canceled && result.assets && result.assets.length > 0) {
       uploadImage(result.assets[0].uri);
     }
+
+    console.log(result);
   };
 
   const uploadImage = async (uri: string) => {
     try {
       setLoading(true);
+      console.log(uri);
 
       // Ensure permission is granted
       const hasPermission = await requestPermission();
@@ -191,9 +200,11 @@ export default function ProfileForm({
       const response = await fetch(uri);
       const blob = await response.blob();
 
-      const { error: uploadError } = await supabase.storage
+      const { error: uploadError } = await supabase
+        .storage
         .from("photos")
-        .upload(filePath, blob);
+        .upload(filePath, decode('base64FileData'), {
+                 contentType: 'image/png'});
 
       if (uploadError) {
         throw uploadError;
@@ -316,13 +327,12 @@ export default function ProfileForm({
 
   const handleDateChange = (event, selectedDate) => {
     if (selectedDate) {
+      setBirthday(selectedDate); // store as Date object
       const formattedDate = selectedDate.toISOString().split("T")[0];
-      setBirthday(selectedDate);
       setAge(calculateAge(formattedDate));
     }
-    setShowDatePicker(false); // hide picker after selection
+    setShowDatePicker(false);
   };
-
   if (loading && !isNewUser) {
     return (
       <View style={styles.loadingContainer}>
@@ -401,7 +411,7 @@ export default function ProfileForm({
                 <TouchableOpacity onPress={() => setShowDatePicker(true)}>
                   <Text style={{ paddingVertical: 10 }}>
                     {birthday
-                      ? birthday.toLocaleDateString(undefined, {
+                      ? new Date(birthday).toLocaleDateString(undefined, {
                           year: "numeric",
                           month: "long",
                           day: "numeric",
@@ -409,19 +419,16 @@ export default function ProfileForm({
                       : "Select your birthday"}
                   </Text>
                 </TouchableOpacity>
-r
                 {showDatePicker && (
                   <DateTimePicker
-                    value={birthday || new Date()}
+                    value={birthday ? new Date(birthday) : new Date()}
                     mode="date"
                     display="spinner"
                     onChange={handleDateChange}
                     maximumDate={new Date()}
                   />
                 )}
-
-                {age !== null && <Text>Age: {age}</Text>}
-              </View>
+              </View>Date
 
               {age !== null && (
                 <Text style={[styles.ageText, isDark && styles.textDark]}>
