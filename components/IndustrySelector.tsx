@@ -209,10 +209,14 @@ export default function IndustrySelector({
                     ]}
                     onPress={() => toggleIndustry(industry)}
                   >
+                    <Text style={[styles.tagText, { color: colors.text }]}>
+                      {industry}
+                    </Text>
                     <Ionicons
                       name="close-circle"
                       size={16}
                       color={colors.primary}
+                      style={{ marginLeft: 6 }}
                     />
                   </TouchableOpacity>
                 ))}
