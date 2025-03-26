@@ -314,6 +314,15 @@ export default function ProfileForm({
     return age;
   };
 
+  const handleDateChange = (event, selectedDate) => {
+    if (selectedDate) {
+      const formattedDate = selectedDate.toISOString().split("T")[0];
+      setBirthday(selectedDate);
+      setAge(calculateAge(formattedDate));
+    }
+    setShowDatePicker(false); // hide picker after selection
+  };
+
   if (loading && !isNewUser) {
     return (
       <View style={styles.loadingContainer}>
@@ -387,39 +396,33 @@ export default function ProfileForm({
               <Text style={[styles.label, isDark && styles.textDark]}>
                 Birthday*
               </Text>
-              <TouchableOpacity
-                style={[styles.input, isDark && styles.inputDark]}
-                onPress={() => setShowDatePicker(true)}
-              >
-                <Text
-                  style={[
-                    { color: birthday ? colors.text : colors.secondaryText },
-                  ]}
-                >
-                  {birthday
-                    ? new Date(birthday).toLocaleDateString()
-                    : "Select Birthday"}
-                </Text>
-              </TouchableOpacity>
-              {showDatePicker && (
-                <DateTimePicker
-                  value={birthday ? new Date(birthday) : new Date()}
-                  mode="date"
-                  display="default"
-                  onChange={(event, selectedDate) => {
-                    setShowDatePicker(false);
-                    if (selectedDate) {
-                      const formattedDate = selectedDate
-                        .toISOString()
-                        .split("T")[0];
-                      setBirthday(formattedDate);
-                      const calculatedAge = calculateAge(formattedDate);
-                      setAge(calculatedAge);
-                    }
-                  }}
-                  maximumDate={new Date()}
-                />
-              )}
+
+              <View style={styles.inputGroup}>
+                <TouchableOpacity onPress={() => setShowDatePicker(true)}>
+                  <Text style={{ paddingVertical: 10 }}>
+                    {birthday
+                      ? birthday.toLocaleDateString(undefined, {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        })
+                      : "Select your birthday"}
+                  </Text>
+                </TouchableOpacity>
+r
+                {showDatePicker && (
+                  <DateTimePicker
+                    value={birthday || new Date()}
+                    mode="date"
+                    display="spinner"
+                    onChange={handleDateChange}
+                    maximumDate={new Date()}
+                  />
+                )}
+
+                {age !== null && <Text>Age: {age}</Text>}
+              </View>
+
               {age !== null && (
                 <Text style={[styles.ageText, isDark && styles.textDark]}>
                   Age: {age}
