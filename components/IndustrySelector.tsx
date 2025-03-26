@@ -113,23 +113,47 @@ export default function IndustrySelector({
         ]}
         onPress={() => setModalVisible(true)}
       >
-        <Text
-          style={[
-            styles.selectorText,
-            {
-              color:
-                Array.isArray(selected) && selected.length
-                  ? colors.text
-                  : colors.secondaryText,
-            },
-          ]}
-        >
-          {Array.isArray(selected) && selected.length
-            ? selected.join(", ")
-            : "Select industries (max 3)"}
-        </Text>
+        <View style={styles.selectorContent}>
+          <Text
+            style={[
+              styles.selectorText,
+              {
+                color:
+                  Array.isArray(selected) && selected.length
+                    ? colors.text
+                    : colors.secondaryText,
+              },
+            ]}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {Array.isArray(selected) && selected.length
+              ? selected.join(", ")
+              : "Select industries (max 3)"}
+          </Text>
+        </View>
         <Ionicons name="chevron-down" size={20} color={colors.secondaryText} />
       </TouchableOpacity>
+
+      {Array.isArray(selected) && selected.length > 0 && (
+        <View style={styles.selectedContainer}>
+          {selected.map((industry, index) => (
+            <View
+              key={index}
+              style={[
+                styles.selectedBubble,
+                { backgroundColor: colors.primary + "20" },
+              ]}
+            >
+              <Text
+                style={[styles.selectedBubbleText, { color: colors.primary }]}
+              >
+                {industry}
+              </Text>
+            </View>
+          ))}
+        </View>
+      )}
 
       {Array.isArray(selected) && selected.length > 0 && (
         <View style={styles.selectedContainer}>
@@ -258,12 +282,31 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 12,
-    marginBottom: 16,
+    marginBottom: 8,
     backgroundColor: "#f8f8f8",
+  },
+  selectorContent: {
+    flex: 1,
   },
   selectorText: {
     fontFamily: "K2D-Regular",
     fontSize: 16,
+  },
+  selectedContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginBottom: 16,
+  },
+  selectedBubble: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    marginRight: 8,
+    marginBottom: 8,
+  },
+  selectedBubbleText: {
+    fontFamily: "K2D-Medium",
+    fontSize: 12,
   },
   selectedContainer: {
     flexDirection: "row",
