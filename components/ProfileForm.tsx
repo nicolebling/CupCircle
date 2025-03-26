@@ -187,24 +187,35 @@ export default function ProfileForm({
   const uploadImage = async (uri: string) => {
     try {
       setLoading(true);
-      console.log(uri);
+      console.log('Starting upload for:', uri);
 
       // Ensure permission is granted
       const hasPermission = await requestPermission();
       if (!hasPermission) return;
 
-      const filename = uri.split("/").pop();
-      const fileExt = filename?.split(".").pop();
-      const filePath = `${userId}/${Date.now()}.${fileExt}`;
-
+      // Get the base64 data directly from the image picker
       const response = await fetch(uri);
       const blob = await response.blob();
+      
+      // Convert blob to base64
+      const reader = new FileReader();
+      const base64Promise = new Promise((resolve) => {
+        reader.onload = () => {
+          const base64 = reader.result?.toString().split(',')[1];
+          resolve(base64);
+        };
+      });
+      reader.readAsDataURL(blob);
+      const base64Data = await base64Promise;
 
+      const filePath = `${userId}/${Date.now()}.png`;
+      
       const { error: uploadError } = await supabase
         .storage
         .from("photos")
-        .upload(filePath, decode('base64FileData'), {
-                 contentType: 'image/png'});
+        .upload(filePath, decode(base64Data as string), {
+          contentType: 'image/png'
+        });
 
       if (uploadError) {
         throw uploadError;
