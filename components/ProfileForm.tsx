@@ -70,6 +70,7 @@ export default function ProfileForm({
   const [error, setError] = useState("");
   const [isEditMode, setIsEditMode] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [tempDate, setTempDate] = useState(birthday ? new Date(birthday) : new Date());
 
   useEffect(() => {
     if (!isNewUser) {
@@ -161,6 +162,14 @@ export default function ProfileForm({
       return false;
     }
     return true;
+  };
+
+  const handleConfirm = () => {
+    const formattedDate = tempDate.toISOString().split("T")[0];
+    setBirthday(formattedDate); // Update birthday
+    const calculatedAge = calculateAge(formattedDate);
+    setAge(calculatedAge); // Update age based on new birthday
+    setShowDatePicker(false); // Close the date picker after confirmation
   };
 
   const pickImage = async () => {
@@ -419,7 +428,10 @@ export default function ProfileForm({
               </Text>
 
               <View style={styles.inputGroup}>
-                <TouchableOpacity onPress={() => setShowDatePicker(true)}>
+                <TouchableOpacity
+                  style={[styles.input, isDark && styles.inputDark]}
+                  onPress={() => setShowDatePicker(true)} // Show DateTimePicker when tapped
+                >
                   <Text style={{ paddingVertical: 10 }}>
                     {birthday
                       ? new Date(birthday).toLocaleDateString(undefined, {
@@ -430,16 +442,22 @@ export default function ProfileForm({
                       : "Select your birthday"}
                   </Text>
                 </TouchableOpacity>
+
                 {showDatePicker && (
-                  <DateTimePicker
-                    value={birthday ? new Date(birthday) : new Date()}
-                    mode="date"
-                    display="spinner"
-                    onChange={handleDateChange}
-                    maximumDate={new Date()}
-                  />
+                  <View>
+                    <DateTimePicker
+                      value={tempDate}
+                      mode="date"
+                      display="spinner"
+                      onChange={handleDateChange}
+                      maximumDate={new Date()}
+                    />
+                    <TouchableOpacity onPress={handleConfirm}>
+                      <Text>Confirm Birthday</Text>
+                    </TouchableOpacity>
+                  </View>
                 )}
-              </View>Date
+              </View>
 
               {age !== null && (
                 <Text style={[styles.ageText, isDark && styles.textDark]}>
