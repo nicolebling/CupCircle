@@ -461,8 +461,6 @@ export default function ProfileCard({
 
       console.log("Profile saved successfully:", data);
       Alert.alert("Success", "Your profile has been saved");
-      await fetchProfile(); // Fetch updated profile data
-      setIsEditMode(false); // Exit edit mode
     } catch (error: any) {
       console.error("Error saving profile:", error);
       setError("Failed to save profile. Please try again.");
@@ -972,7 +970,7 @@ export default function ProfileCard({
               )}
 
             {/* Skills */}
-            {profile.skills && profile.skills.length > 0 && (
+            {/* {profile.skills && profile.skills.length > 0 && (
               <>
                 <Text style={[styles.label, { color: colors.secondaryText }]}>
                   Skills
@@ -993,7 +991,7 @@ export default function ProfileCard({
                   ))}
                 </View>
               </>
-            )}
+            )} */}
 
             {/* Interests */}
             {profile.interests && profile.interests.length > 0 && (
@@ -1011,7 +1009,7 @@ export default function ProfileCard({
                       ]}
                     >
                       <Text style={[styles.tagText, { color: colors.primary }]}>
-                        {INTEREST_EMOJIS[interest] || "🔖"} {interest}
+                        {interest}
                       </Text>
                     </View>
                   ))}
@@ -1089,7 +1087,8 @@ export default function ProfileCard({
         <ScrollView>
           <ProfileForm
             userId={user.id}
-            isNewUser={false}            initialData={profileData}
+            isNewUser={false}
+            initialData={profileData}
             onSave={(updatedData) => {
               handleProfileSave(updatedData);
               setIsEditMode(false);

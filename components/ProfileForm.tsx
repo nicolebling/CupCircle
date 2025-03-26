@@ -69,8 +69,6 @@ export default function ProfileForm({
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  
-
   useEffect(() => {
     if (!isNewUser) {
       fetchProfile();
@@ -154,7 +152,10 @@ export default function ProfileForm({
   const requestPermission = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
-      Alert.alert("Permission Required", "Please enable media library access in settings.");
+      Alert.alert(
+        "Permission Required",
+        "Please enable media library access in settings.",
+      );
       return false;
     }
     return true;
@@ -175,7 +176,6 @@ export default function ProfileForm({
 
   const uploadImage = async (uri: string) => {
     try {
-
       setLoading(true);
 
       // Ensure permission is granted
@@ -331,7 +331,6 @@ export default function ProfileForm({
           <Text style={[styles.title, isDark && styles.titleDark]}>
             {isNewUser ? "Complete Your Profile" : "Edit Profile"}
           </Text>
-          
 
           {error ? (
             <View style={styles.errorContainer}>
@@ -486,6 +485,17 @@ export default function ProfileForm({
               <IndustrySelector
                 selected={industryCategories}
                 onChange={setIndustryCategories}
+                isDark={isDark}
+              />
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={[styles.label, isDark && styles.textDark]}>
+                Interests
+              </Text>
+              <InterestSelector
+                selected={interests}
+                onChange={setInterests}
                 isDark={isDark}
               />
             </View>
