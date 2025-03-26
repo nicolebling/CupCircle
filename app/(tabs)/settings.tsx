@@ -1,21 +1,20 @@
-
-import React, { useState } from 'react';
+import React from 'react';
 import { SafeAreaView, ScrollView, StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useColorScheme } from '@/hooks/useColorScheme';
+import { useRouter } from 'expo-router';
 import Colors from '@/constants/Colors';
+import { useColorScheme } from '@/hooks/useColorScheme';
 import { useAuth } from '@/contexts/AuthContext';
-import { router } from 'expo-router';
 
 export default function SettingsScreen() {
+  const router = useRouter();
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme ?? 'light'];
   const { signOut } = useAuth();
 
-  const [notifications, setNotifications] = useState(true);
-  const [darkMode, setDarkMode] = useState(false);
+  const [notifications, setNotifications] = React.useState(true);
+  const [darkMode, setDarkMode] = React.useState(false);
 
-  // Toggle functions
   const handleNotificationsToggle = () => {
     setNotifications(!notifications);
   };
@@ -24,23 +23,21 @@ export default function SettingsScreen() {
     setDarkMode(!darkMode);
   };
 
-  // Return to profile
   const handleBackPress = () => {
     router.back();
   };
 
-  // Handle logout
   const handleLogout = async () => {
     try {
       await signOut();
-      // The router navigation is handled in AuthContext
+      // Router navigation handled in AuthContext
     } catch (error) {
       console.error('Logout error:', error);
     }
   };
 
   React.useEffect(() => {
-    navigation.setOptions({
+    router.setParams({
       headerLeft: () => (
         <TouchableOpacity onPress={handleBackPress} style={{ marginLeft: 8 }}>
           <Ionicons name="chevron-back" size={24} color={colors.text} />
@@ -51,12 +48,11 @@ export default function SettingsScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-
       <ScrollView style={styles.content}>
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>Account</Text>
-          
-          <TouchableOpacity 
+
+          <TouchableOpacity
             style={[styles.settingItem, { borderColor: colors.border }]}
           >
             <View style={styles.settingContent}>
@@ -65,8 +61,8 @@ export default function SettingsScreen() {
             </View>
             <Ionicons name="chevron-forward" size={20} color={colors.secondaryText} />
           </TouchableOpacity>
-          
-          <TouchableOpacity 
+
+          <TouchableOpacity
             style={[styles.settingItem, { borderColor: colors.border }]}
           >
             <View style={styles.settingContent}>
@@ -76,59 +72,59 @@ export default function SettingsScreen() {
             <Ionicons name="chevron-forward" size={20} color={colors.secondaryText} />
           </TouchableOpacity>
         </View>
-        
+
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>Preferences</Text>
-          
+
           <View style={[styles.settingItem, { borderColor: colors.border }]}>
             <View style={styles.settingContent}>
               <Ionicons name="notifications-outline" size={22} color={colors.text} />
               <Text style={[styles.settingText, { color: colors.text }]}>Notifications</Text>
             </View>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={[
-                styles.toggle, 
+                styles.toggle,
                 notifications ? { backgroundColor: colors.primary } : { backgroundColor: colors.border }
               ]}
               onPress={handleNotificationsToggle}
             >
-              <View 
+              <View
                 style={[
-                  styles.toggleKnob, 
+                  styles.toggleKnob,
                   notifications ? { right: 2 } : { left: 2 },
                   { backgroundColor: 'white' }
-                ]} 
+                ]}
               />
             </TouchableOpacity>
           </View>
-          
+
           <View style={[styles.settingItem, { borderColor: colors.border }]}>
             <View style={styles.settingContent}>
               <Ionicons name="moon-outline" size={22} color={colors.text} />
               <Text style={[styles.settingText, { color: colors.text }]}>Dark Mode</Text>
             </View>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={[
-                styles.toggle, 
+                styles.toggle,
                 darkMode ? { backgroundColor: colors.primary } : { backgroundColor: colors.border }
               ]}
               onPress={handleDarkModeToggle}
             >
-              <View 
+              <View
                 style={[
-                  styles.toggleKnob, 
+                  styles.toggleKnob,
                   darkMode ? { right: 2 } : { left: 2 },
                   { backgroundColor: 'white' }
-                ]} 
+                ]}
               />
             </TouchableOpacity>
           </View>
         </View>
-        
+
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>Support</Text>
-          
-          <TouchableOpacity 
+
+          <TouchableOpacity
             style={[styles.settingItem, { borderColor: colors.border }]}
           >
             <View style={styles.settingContent}>
@@ -137,8 +133,8 @@ export default function SettingsScreen() {
             </View>
             <Ionicons name="chevron-forward" size={20} color={colors.secondaryText} />
           </TouchableOpacity>
-          
-          <TouchableOpacity 
+
+          <TouchableOpacity
             style={[styles.settingItem, { borderColor: colors.border }]}
           >
             <View style={styles.settingContent}>
@@ -147,8 +143,8 @@ export default function SettingsScreen() {
             </View>
             <Ionicons name="chevron-forward" size={20} color={colors.secondaryText} />
           </TouchableOpacity>
-          
-          <TouchableOpacity 
+
+          <TouchableOpacity
             style={[styles.settingItem, { borderColor: colors.border }]}
           >
             <View style={styles.settingContent}>
@@ -158,8 +154,8 @@ export default function SettingsScreen() {
             <Ionicons name="chevron-forward" size={20} color={colors.secondaryText} />
           </TouchableOpacity>
         </View>
-        
-        <TouchableOpacity 
+
+        <TouchableOpacity
           style={[styles.logoutButton, { borderColor: colors.border }]}
           onPress={handleLogout}
         >
