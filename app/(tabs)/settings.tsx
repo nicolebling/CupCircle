@@ -33,14 +33,14 @@ export default function SettingsScreen() {
   };
 
   React.useEffect(() => {
-    router.setParams({
+    navigation.setOptions({
       headerLeft: () => (
-        <TouchableOpacity onPress={() => router.push('/(tabs)/profile')} style={{ marginLeft: 8 }}>
+        <TouchableOpacity onPress={() => router.push('/(tabs)/profile')} style={{ marginLeft: 16 }}>
           <Ionicons name="chevron-back" size={24} color={colors.text} />
         </TouchableOpacity>
       ),
     });
-  }, [colors.text, router]);
+  }, [colors.text]);
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
