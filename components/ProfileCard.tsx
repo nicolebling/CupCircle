@@ -260,6 +260,7 @@ export default function ProfileCard({
         setInterests(data.interests || []);
 
         console.log("Profile data loaded into form state");
+        console.log(data.favorite_cafes);
       }
 
       setUserData(data);
