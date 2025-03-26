@@ -300,7 +300,7 @@ export default function SettingsPage() {
               Terms of Service
               <ChevronRight className="w-4 h-4" />
             </Button>
-
+            
             <LegalContent
               type="privacy"
               isOpen={showPrivacyPolicy}
