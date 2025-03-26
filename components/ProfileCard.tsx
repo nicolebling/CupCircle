@@ -780,19 +780,17 @@ export default function ProfileCard({
           </View>
 
           {/* Profile Photo */}
-          <View style={styles.photoContainer}>
-            {profile.photo_url ? (
-              <Image
-                source={{ uri: profile.photo_url }}
-                style={styles.image}
-                resizeMode="cover"
-              />
-            ) : (
-              <View style={[styles.image, { backgroundColor: "#1A1A1A", justifyContent: 'center', alignItems: 'center' }]}>
-                <Ionicons name="person" size={60} color="#ffffff" />
-              </View>
-            )}
-          </View>
+          {profile.photo_url ? (
+            <Image
+              source={{ uri: profile.photo_url }}
+              style={styles.image}
+              resizeMode="cover"
+            />
+          ) : (
+            <View style={[styles.image, { backgroundColor: "#1A1A1A", justifyContent: 'center', alignItems: 'center' }]}>
+              <Ionicons name="person" size={60} color="#ffffff" />
+            </View>
+          )}
           <View style={styles.nameRow}>
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               <Text style={[styles.name, { color: colors.text }]}>
@@ -1227,11 +1225,7 @@ const styles = StyleSheet.create({
   },
 
   // User profile styles
-  photoContainer: {
-    alignItems: "center",
-    marginBottom: 24,
-    position: "relative",
-  },
+  
   profilePhoto: {
     width: 120,
     height: 120,
