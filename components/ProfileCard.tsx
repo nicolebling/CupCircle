@@ -1024,13 +1024,13 @@ export default function ProfileCard({
               </>
             )}
 
-            {profile.favoriteCafes && profile.favoriteCafes.length > 0 && (
+            {profile.favorite_cafes && profile.favorite_cafes.length > 0 && (
               <>
                 <Text style={[styles.label, { color: colors.secondaryText }]}>
                   Favorite Cafes
                 </Text>
                 <View style={styles.tagsContainer}>
-                  {profile.favoriteCafes.map((cafe, index) => {
+                  {profile.favorite_cafes.map((cafe, index) => {
                     const [cafeName, cafeAddress] = cafe.split('|||');
                     return (
                       <View
