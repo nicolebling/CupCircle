@@ -774,7 +774,7 @@ export default function ProfileCard({
         <View
           style={[
             styles.userCard,
-            { backgroundColor: colors.card, borderColor: colors.border },
+            { backgroundColor: colors.card, borderColor: colors.border, padding: 0 },
           ]}
         >
           {/* Header */}
@@ -782,19 +782,17 @@ export default function ProfileCard({
           </View>
 
           {/* Profile Photo */}
-          <View style={styles.photoContainer}>
-            {profile.photo_url ? (
-              <Image
-                source={{ uri: profile.photo_url }}
-                style={styles.image}
-                resizeMode="cover"
-              />
-            ) : (
-              <View style={[styles.image, { backgroundColor: "#1A1A1A", justifyContent: 'center', alignItems: 'center' }]}>
-                <Ionicons name="person" size={60} color="#ffffff" />
-              </View>
-            )}
-          </View>
+          {profile.photo_url ? (
+            <Image
+              source={{ uri: profile.photo_url }}
+              style={styles.image}
+              resizeMode="cover"
+            />
+          ) : (
+            <View style={[styles.image, { backgroundColor: "#1A1A1A", justifyContent: 'center', alignItems: 'center' }]}>
+              <Ionicons name="person" size={60} color="#ffffff" />
+            </View>
+          )}
           <View style={styles.nameRow}>
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               <Text style={[styles.name, { color: colors.text }]}>
@@ -1097,7 +1095,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     overflow: "hidden",
     marginBottom: 16,
-    padding: 16,
     margin: 16,
   },
   header: {
