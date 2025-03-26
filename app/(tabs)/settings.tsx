@@ -23,10 +23,6 @@ export default function SettingsScreen() {
     setDarkMode(!darkMode);
   };
 
-  const handleBackPress = () => {
-    router.back();
-  };
-
   const handleLogout = async () => {
     try {
       await signOut();
@@ -39,12 +35,12 @@ export default function SettingsScreen() {
   React.useEffect(() => {
     router.setParams({
       headerLeft: () => (
-        <TouchableOpacity onPress={handleBackPress} style={{ marginLeft: 8 }}>
+        <TouchableOpacity onPress={() => router.push('/(tabs)/profile')} style={{ marginLeft: 8 }}>
           <Ionicons name="chevron-back" size={24} color={colors.text} />
         </TouchableOpacity>
       ),
     });
-  }, [colors.text]);
+  }, [colors.text, router]);
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
