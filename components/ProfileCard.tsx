@@ -1079,19 +1079,23 @@ export default function ProfileCard({
                   Favorite Cafes
                 </Text>
                 <View style={styles.tagsContainer}>
-                  {profile.favoriteCafes.map((cafe, index) => (
-                    <View
-                      key={index}
-                      style={[
-                        styles.tag,
-                        { backgroundColor: colors.primary + "20" },
-                      ]}
-                    >
-                      <Text style={[styles.tagText, { color: colors.primary }]}>
-                        {cafe}
-                      </Text>
-                    </View>
-                  ))}
+                  {profile.favoriteCafes.map((cafe, index) => {
+                    const [cafeName, cafeAddress] = cafe.split('|||');
+                    return (
+                      <View
+                        key={index}
+                        style={[
+                          styles.tag,
+                          { backgroundColor: colors.primary + "20" },
+                        ]}
+                      >
+                        <Ionicons name="cafe" size={12} color={colors.primary} style={{marginRight: 4}} />
+                        <Text style={[styles.tagText, { color: colors.primary }]}>
+                          {cafeName}
+                        </Text>
+                      </View>
+                    );
+                  })}
                 </View>
               </>
             )}
