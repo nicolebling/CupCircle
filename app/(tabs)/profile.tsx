@@ -59,6 +59,13 @@ export default function ProfileScreen() {
     }
   };
 
+  const handleEdit = () => {
+    const newEditMode = !isEditMode;
+    setIsEditMode(newEditMode);
+    navigation.setParams({ isEditMode: newEditMode });
+  };
+
+
   if (!user) {
     return null;
   }
@@ -83,7 +90,7 @@ export default function ProfileScreen() {
               styles.settingsButton,
               { backgroundColor: colors.card, borderColor: colors.border },
             ]}
-            onPress={() => setIsEditMode(!isEditMode)}
+            onPress={handleEdit}
           >
             <Ionicons
               name={isEditMode ? "close" : "create-outline"}
@@ -109,7 +116,7 @@ export default function ProfileScreen() {
         <UserProfileCard
           initialData={profileData}
           isEditMode={false}
-          onEdit={() => setIsEditMode(true)}
+          onEdit={handleEdit}
         />
       )}
     </SafeAreaView>

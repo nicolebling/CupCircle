@@ -74,12 +74,12 @@ export default function TabLayout() {
 
       <Tabs.Screen
         name="profile"
-        options={{
-          title: 'Profile',
+        options={({ route }) => ({
+          title: route.params?.isEditMode ? 'Edit Profile' : 'My Profile',
           tabBarIcon: ({ color, size }) => (
             <FontAwesome5 name="user" size={size - 2} color={color} />
           ),
-        }}
+        })}
       />
 
       <Tabs.Screen

@@ -777,9 +777,6 @@ export default function ProfileCard({
         >
           {/* Header */}
           <View style={styles.header}>
-            <Text style={[styles.title, { color: colors.text }]}>
-              {getTitle()}
-            </Text>
           </View>
           <TouchableOpacity
             style={[
