@@ -1,17 +1,27 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import {
   View,
   Text,
-  TouchableOpacity,
   StyleSheet,
-  Modal,
+  TouchableOpacity,
   FlatList,
-  Dimensions,
+  Modal,
+  TextInput,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import {
+  Ionicons,
+  FontAwesome5,
+  MaterialCommunityIcons,
+  Feather,
+  EvilIcons,
+  FontAwesome,
+  FontAwesome6,
+  Entypo,
+} from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 
+// List of all interests
 const INDUSTRIES = [
   "Advertising",
   "Architecture",
@@ -58,54 +68,56 @@ const INDUSTRIES = [
   "Writing",
 ];
 
-const { width } = Dimensions.get("window");
-
-type IndustrySelectorProps = {
+interface IndustrySelectorProps {
   selected: string[];
   onChange: (industries: string[]) => void;
-  maxSelections?: number;
+  maxIndustries?: number;
   isDark?: boolean;
-};
+}
 
 export default function IndustrySelector({
-  selected,
+  selected = [],
   onChange,
-  maxSelections = 3,
+  maxIndustries = 3,
   isDark = false,
 }: IndustrySelectorProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
 
   const [modalVisible, setModalVisible] = useState(false);
-  const [tempSelected, setTempSelected] = useState<string[]>([]);
+  const [searchText, setSearchText] = useState("");
 
-  useEffect(() => {
-    // Ensure selected is always an array
-    setTempSelected(Array.isArray(selected) ? selected : []);
-  }, [selected]);
+  // Filter interests based on search text
+  const filteredIndustries = useMemo(() => {
+    if (!searchText.trim()) return INDUSTRIES;
+    return INDUSTRIES.filter((industry) =>
+      industry.toLowerCase().includes(searchText.toLowerCase()),
+    );
+  }, [searchText]);
 
+  // Handle interest selection/deselection
   const toggleIndustry = (industry: string) => {
-    if (tempSelected.includes(industry)) {
-      setTempSelected(tempSelected.filter((item) => item !== industry));
+    let newSelectedIndustries;
+
+    if (selected.includes(industry)) {
+      // Remove the interest
+      newSelectedIndustries = selected.filter((i) => i !== industry);
     } else {
-      if (tempSelected.length < maxSelections) {
-        setTempSelected([...tempSelected, industry]);
+      // Add the interest if under the limit
+      if (selected.length < maxIndustries) {
+        newSelectedIndustries = [...selected, industry];
+      } else {
+        // Show alert or toast that max limit is reached
+        console.log(`Maximum of ${maxIndustries} industries allowed`);
+        return;
       }
     }
-  };
 
-  const handleSave = () => {
-    onChange(tempSelected);
-    setModalVisible(false);
-  };
-
-  const handleCancel = () => {
-    setTempSelected(selected || []);
-    setModalVisible(false);
+    onChange(newSelectedIndustries);
   };
 
   return (
-    <View>
+    <View style={styles.container}>
       <TouchableOpacity
         style={[
           styles.selector,
@@ -113,49 +125,29 @@ export default function IndustrySelector({
         ]}
         onPress={() => setModalVisible(true)}
       >
-        <Text
-          style={[
-            styles.selectorText,
-            {
-              color:
-                Array.isArray(selected) && selected.length
-                  ? colors.text
-                  : colors.secondaryText,
-            },
-          ]}
-        >
-          {Array.isArray(selected) && selected.length
-            ? selected.join(", ")
-            : "Select industries (max 3)"}
-        </Text>
+        <View style={styles.selectorContent}>
+          {Array.isArray(selected) && selected.length > 0 ? (
+            <Text
+              style={[styles.selectorText, { color: colors.text }]}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              {selected.join(", ")}
+            </Text>
+          ) : (
+            <Text style={[styles.selectorText, { color: colors.secondaryText }]}>
+              Select your industries
+            </Text>
+          )}
+        </View>
         <Ionicons name="chevron-down" size={20} color={colors.secondaryText} />
       </TouchableOpacity>
-
-      {Array.isArray(selected) && selected.length > 0 && (
-        <View style={styles.selectedContainer}>
-          {selected.map((industry, index) => (
-            <View
-              key={index}
-              style={[
-                styles.selectedBubble,
-                { backgroundColor: colors.primary + "20" },
-              ]}
-            >
-              <Text
-                style={[styles.selectedBubbleText, { color: colors.primary }]}
-              >
-                {industry}
-              </Text>
-            </View>
-          ))}
-        </View>
-      )}
 
       <Modal
         visible={modalVisible}
         transparent={true}
         animationType="slide"
-        onRequestClose={handleCancel}
+        onRequestClose={() => setModalVisible(false)}
       >
         <View style={styles.modalOverlay}>
           <View
@@ -166,52 +158,92 @@ export default function IndustrySelector({
           >
             <View style={styles.modalHeader}>
               <Text style={[styles.modalTitle, { color: colors.text }]}>
-                Select Industries (max {maxSelections})
+                Select Industries ({selected.length}/{maxIndustries})
               </Text>
+              <TouchableOpacity onPress={() => setModalVisible(false)}>
+                <Ionicons name="close" size={24} color={colors.text} />
+              </TouchableOpacity>
+            </View>
+
+            <View
+              style={[
+                styles.searchContainer,
+                { backgroundColor: colors.card, borderColor: colors.border },
+              ]}
+            >
+              <Ionicons name="search" size={20} color={colors.secondaryText} />
+              <TextInput
+                style={[styles.searchInput, { color: colors.text }]}
+                placeholder="Search industries..."
+                placeholderTextColor={colors.secondaryText}
+                value={searchText}
+                onChangeText={setSearchText}
+              />
+              {searchText.length > 0 && (
+                <TouchableOpacity onPress={() => setSearchText("")}>
+                  <Ionicons
+                    name="close-circle"
+                    size={20}
+                    color={colors.secondaryText}
+                  />
+                </TouchableOpacity>
+              )}
+            </View>
+
+            <View style={styles.selectedPreview}>
               <Text
-                style={[styles.selectionCount, { color: colors.secondaryText }]}
+                style={[styles.previewTitle, { color: colors.secondaryText }]}
               >
-                {tempSelected.length}/{maxSelections} selected
+                Selected:
               </Text>
+              <View style={styles.tagsContainer}>
+                {selected.map((industry) => (
+                  <TouchableOpacity
+                    key={industry}
+                    style={[
+                      styles.tag,
+                      {
+                        backgroundColor: colors.primary + "20",
+                        borderColor: colors.primary,
+                      },
+                    ]}
+                    onPress={() => toggleIndustry(industry)}
+                  >
+                    <Ionicons
+                      name="close-circle"
+                      size={16}
+                      color={colors.primary}
+                    />
+                  </TouchableOpacity>
+                ))}
+              </View>
             </View>
 
             <FlatList
-              data={INDUSTRIES}
+              data={filteredIndustries}
               keyExtractor={(item) => item}
-              numColumns={3}
-              columnWrapperStyle={styles.columnWrapper}
               renderItem={({ item }) => {
-                const isSelected = tempSelected.includes(item);
+                const isSelected = selected.includes(item);
                 return (
                   <TouchableOpacity
                     style={[
                       styles.industryItem,
-                      isSelected
-                        ? { backgroundColor: colors.primary }
-                        : {
-                            backgroundColor: colors.card,
-                            borderColor: colors.border,
-                          },
+                      isSelected && { backgroundColor: colors.primary + "10" },
                     ]}
                     onPress={() => toggleIndustry(item)}
-                    disabled={
-                      tempSelected.length >= maxSelections && !isSelected
-                    }
                   >
-                    <Text
-                      style={[
-                        styles.industryText,
-                        { color: isSelected ? "white" : colors.text },
-                      ]}
-                    >
-                      {item}
-                    </Text>
+                    <View style={styles.industryContent}>
+                      <Text
+                        style={[styles.industryText, { color: colors.text }]}
+                      >
+                        {item}
+                      </Text>
+                    </View>
                     {isSelected && (
                       <Ionicons
                         name="checkmark-circle"
-                        size={16}
-                        color="white"
-                        style={styles.checkIcon}
+                        size={20}
+                        color={colors.primary}
                       />
                     )}
                   </TouchableOpacity>
@@ -220,28 +252,12 @@ export default function IndustrySelector({
               contentContainerStyle={styles.industriesList}
             />
 
-            <View style={styles.modalFooter}>
-              <TouchableOpacity
-                style={[
-                  styles.modalButton,
-                  styles.cancelButton,
-                  { borderColor: colors.border },
-                ]}
-                onPress={handleCancel}
-              >
-                <Text style={{ color: colors.text }}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.modalButton,
-                  styles.saveButton,
-                  { backgroundColor: colors.primary },
-                ]}
-                onPress={handleSave}
-              >
-                <Text style={styles.saveButtonText}>Save</Text>
-              </TouchableOpacity>
-            </View>
+            <TouchableOpacity
+              style={[styles.doneButton, { backgroundColor: colors.primary }]}
+              onPress={() => setModalVisible(false)}
+            >
+              <Text style={styles.doneButtonText}>Done</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </Modal>
@@ -250,112 +266,129 @@ export default function IndustrySelector({
 }
 
 const styles = StyleSheet.create({
+  container: {
+    width: "100%",
+  },
   selector: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    height: 48,
-    borderWidth: 1,
+    height: 50,
     borderRadius: 8,
-    paddingHorizontal: 12,
-    marginBottom: 16,
+    borderWidth: 1,
+    paddingHorizontal: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     backgroundColor: "#f8f8f8",
+  },
+  selectorContent: {
+    flex: 1,
   },
   selectorText: {
     fontFamily: "K2D-Regular",
     fontSize: 16,
   },
-  selectedContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    marginTop: -8,
-    marginBottom: 16,
-  },
-  selectedBubble: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-    marginRight: 8,
-    marginBottom: 8,
-  },
-  selectedBubbleText: {
-    fontFamily: "K2D-Medium",
-    fontSize: 12,
-  },
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: "rgba(0,0,0,0.5)",
     justifyContent: "flex-end",
   },
   modalContent: {
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    padding: 20,
+    paddingTop: 16,
+    paddingBottom: 24,
     height: "80%",
   },
   modalHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 20,
+    paddingHorizontal: 16,
+    paddingBottom: 16,
   },
   modalTitle: {
-    fontFamily: "K2D-Bold",
-    fontSize: 20,
+    fontFamily: "K2D-SemiBold",
+    fontSize: 18,
   },
-  selectionCount: {
+  searchContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderRadius: 8,
+    marginHorizontal: 16,
+    paddingHorizontal: 12,
+    height: 44,
+    marginBottom: 16,
+  },
+  searchInput: {
+    flex: 1,
+    height: "100%",
+    marginLeft: 8,
+    fontFamily: "K2D-Regular",
+    fontSize: 16,
+  },
+  selectedPreview: {
+    paddingHorizontal: 16,
+    marginBottom: 12,
+  },
+  previewTitle: {
     fontFamily: "K2D-Medium",
     fontSize: 14,
+    marginBottom: 8,
   },
-  industriesList: {
-    paddingBottom: 20,
+  tagsContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
   },
-  industryItem: {
-    minWidth: 100,
-    maxWidth: (width - 60) / 3,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    borderRadius: 8,
-    marginHorizontal: 4,
+  tag: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    marginRight: 8,
     marginBottom: 8,
     borderWidth: 1,
+  },
+  tagText: {
+    fontFamily: "K2D-Medium",
+    fontSize: 14,
+    marginRight: 6,
+  },
+  industriesList: {
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+  },
+  industryItem: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    alignSelf: "flex-start",
+    paddingVertical: 12,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    marginBottom: 4,
   },
-  columnWrapper: {
-    justifyContent: "flex-start",
+  industryContent: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  emojiText: {
+    fontSize: 18,
+    marginRight: 12,
   },
   industryText: {
     fontFamily: "K2D-Regular",
-    fontSize: 13,
-    flex: 1,
-  },
-  checkIcon: {
-    marginLeft: 6,
-  },
-  modalFooter: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 20,
-  },
-  modalButton: {
-    padding: 12,
-    borderRadius: 8,
-    flex: 1,
-    alignItems: "center",
-  },
-  cancelButton: {
-    marginRight: 8,
-    borderWidth: 1,
-  },
-  saveButton: {
-    marginLeft: 8,
-  },
-  saveButtonText: {
-    color: "white",
-    fontFamily: "K2D-Medium",
     fontSize: 16,
+  },
+  doneButton: {
+    marginHorizontal: 16,
+    height: 50,
+    borderRadius: 25,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  doneButtonText: {
+    fontFamily: "K2D-SemiBold",
+    fontSize: 16,
+    color: "#FFFFFF",
   },
 });

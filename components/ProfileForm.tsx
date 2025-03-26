@@ -488,43 +488,6 @@ export default function ProfileForm({
                 isDark={isDark}
               />
             </View>
-
-            <View style={styles.inputGroup}>
-              <Text style={[styles.label, isDark && styles.textDark]}>
-                Interests
-              </Text>
-              <InterestSelector
-                selected={interests}
-                onChange={setInterests}
-                isDark={isDark}
-              />
-            </View>
-
-            {/* Skills are removed temporarily */}
-            {/* <View style={styles.inputGroup}>
-              <Text style={[styles.label, isDark && styles.textDark]}>Skills</Text>
-              <View style={styles.tagsContainer}>
-                {skills.map((skill, index) => (
-                  <View key={index} style={styles.tag}>
-                    <Text style={styles.tagText}>{skill}</Text>
-                    <TouchableOpacity onPress={() => handleRemoveSkill(index)}>
-                      <Ionicons name="close-circle" size={18} color="#fff" />
-                    </TouchableOpacity>
-                  </View>
-                ))}
-              </View>
-              <View style={styles.tagInput}>
-                <TextInput
-                  style={[styles.input, isDark && styles.inputDark]}
-                  placeholder="Add a skill"
-                  placeholderTextColor={isDark ? '#999' : '#777'}
-                  onSubmitEditing={(e) => {
-                    handleAddSkill(e.nativeEvent.text);
-                    e.currentTarget.clear();
-                  }}
-                />
-              </View>
-            </View> */}
           </View>
 
           <View style={styles.section}>
