@@ -12,6 +12,7 @@ import {
   ActivityIndicator,
   Image,
 } from "react-native";
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { useAuth } from "../../provider/AuthProvider";
@@ -50,6 +51,7 @@ export default function ProfileForm({
   const isDark = colorScheme === "dark";
 
   const [loading, setLoading] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [name, setName] = useState("");
   const [avatar, setAvatar] = useState("");
   const [occupation, setOccupation] = useState("");
@@ -386,36 +388,31 @@ export default function ProfileForm({
               <Text style={[styles.label, isDark && styles.textDark]}>
                 Birthday*
               </Text>
-              <TextInput
+              <TouchableOpacity 
                 style={[styles.input, isDark && styles.inputDark]}
-                value={birthday}
-                onChangeText={(text) => {
-                  // Remove any non-numeric characters
-                  const numbers = text.replace(/[^\d]/g, "");
-                  if (numbers.length <= 8) {
-                    // Format as YYYY-MM-DD
-                    let formatted = numbers;
-                    if (numbers.length > 4) {
-                      formatted = numbers.slice(0, 4) + "-" + numbers.slice(4);
-                    }
-                    if (numbers.length > 6) {
-                      formatted =
-                        formatted.slice(0, 7) + "-" + formatted.slice(7);
-                    }
-                    setBirthday(formatted);
-
-                    // Calculate age if birthday is complete
-                    if (formatted.length === 10) {
-                      const calculatedAge = calculateAge(formatted);
+                onPress={() => setShowDatePicker(true)}
+              >
+                <Text style={[{ color: birthday ? colors.text : colors.secondaryText }]}>
+                  {birthday ? new Date(birthday).toLocaleDateString() : "Select Birthday"}
+                </Text>
+              </TouchableOpacity>
+              {showDatePicker && (
+                <DateTimePicker
+                  value={birthday ? new Date(birthday) : new Date()}
+                  mode="date"
+                  display="default"
+                  onChange={(event, selectedDate) => {
+                    setShowDatePicker(false);
+                    if (selectedDate) {
+                      const formattedDate = selectedDate.toISOString().split('T')[0];
+                      setBirthday(formattedDate);
+                      const calculatedAge = calculateAge(formattedDate);
                       setAge(calculatedAge);
                     }
-                  }
-                }}
-                placeholder="YYYY-MM-DD"
-                placeholderTextColor={colors.secondaryText}
-                keyboardType="number-pad"
-                maxLength={10}
-              />
+                  }}
+                  maximumDate={new Date()}
+                />
+              )}
               {age !== null && (
                 <Text style={[styles.ageText, isDark && styles.textDark]}>
                   Age: {age}

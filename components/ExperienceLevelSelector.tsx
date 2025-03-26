@@ -62,7 +62,7 @@ export default function ExperienceLevelSelector({
 
       {Array.isArray(selected) && selected.length > 0 && (
         <View style={styles.selectedContainer}>
-          {selected.map((industry, index) => (
+          {selected.map((experience_level, index) => (
             <View
               key={index}
               style={[
@@ -231,5 +231,22 @@ const styles = StyleSheet.create({
   coffeeThemeText: {
     fontFamily: 'K2D-Regular',
     fontSize: 14,
-  }
+  },
+  selectedContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginTop: 10,
+    marginBottom: 16,
+  },
+  selectedBubble: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    marginRight: 8,
+    marginBottom: 8,
+  },
+  selectedBubbleText: {
+    fontFamily: "K2D-Medium",
+    fontSize: 12,
+  },
 });
