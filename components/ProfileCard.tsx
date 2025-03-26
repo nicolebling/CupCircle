@@ -866,7 +866,7 @@ export default function ProfileCard({
               </>
             )}
             <Text style={[styles.label, { color: colors.secondaryText }]}>
-              About Me
+              About
             </Text>
             <Text style={[styles.value, { color: colors.text }]}>
               {profile.bio}
