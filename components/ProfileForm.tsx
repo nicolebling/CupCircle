@@ -369,9 +369,7 @@ export default function ProfileForm({
     >
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.formContainer}>
-          <Text style={[styles.title, isDark && styles.titleDark]}>
-            {isNewUser ? "Complete Your Profile" : "Edit Profile"}
-          </Text>
+          
 
           {error ? (
             <View style={styles.errorContainer}>
