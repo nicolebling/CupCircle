@@ -800,14 +800,12 @@ export default function ProfileCard({
             {profile.photo_url ? (
               <Image
                 source={{ uri: profile.photo_url }}
-                style={styles.profilePhoto}
+                style={styles.image}
                 resizeMode="cover"
               />
             ) : (
-              <View
-                style={[styles.profilePhoto, { backgroundColor: "#1A1A1A" }]}
-              >
-                <Ionicons name="person" size={40} color="#ffffff" />
+              <View style={[styles.image, { backgroundColor: "#1A1A1A", justifyContent: 'center', alignItems: 'center' }]}>
+                <Ionicons name="person" size={60} color="#ffffff" />
               </View>
             )}
           </View>
@@ -994,7 +992,7 @@ export default function ProfileCard({
               </View>
             )}
           </View>
-          
+
           {/* Location */}
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>
