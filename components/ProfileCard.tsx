@@ -768,9 +768,7 @@ export default function ProfileCard({
   // For user profile view (non-edit)
   if (isUserProfile && !isEditMode && !isOnboarding) {
     return (
-      <ScrollView>
-
-      
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
         <View
           style={[
             styles.userCard,
@@ -1079,8 +1077,7 @@ const styles = StyleSheet.create({
   card: {
     width: width - 32,
     borderRadius: 16,
-    borderWidth: 1,
-    overflow: "hidden",
+    borderWidth: 1,    overflow: "hidden",
     marginHorizontal: 16,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
