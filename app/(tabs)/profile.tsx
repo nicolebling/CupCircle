@@ -78,16 +78,28 @@ export default function ProfileScreen() {
   React.useEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity
-          onPress={handleEdit}
-          style={{ marginRight: 15 }}
-        >
-          <Ionicons
-            name={isEditMode ? "close" : "create-outline"}
-            size={24}
-            color={colors.text}
-          />
-        </TouchableOpacity>
+        <View style={{ flexDirection: 'row' }}>
+          <TouchableOpacity
+            onPress={handleEdit}
+            style={{ marginRight: 15 }}
+          >
+            <Ionicons
+              name={isEditMode ? "close" : "create-outline"}
+              size={24}
+              color={colors.text}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => router.push("/settings")}
+            style={{ marginRight: 15 }}
+          >
+            <Ionicons
+              name="settings-outline"
+              size={24}
+              color={colors.text}
+            />
+          </TouchableOpacity>
+        </View>
       ),
     });
   }, [isEditMode, colors.text]);
@@ -97,15 +109,6 @@ export default function ProfileScreen() {
       style={[styles.container, { backgroundColor: colors.background }]}
     >
       <View style={styles.header}>
-        <TouchableOpacity
-          style={[
-            styles.settingsButton,
-            { backgroundColor: colors.card, borderColor: colors.border },
-          ]}
-          onPress={() => signOut()}
-        >
-          <Ionicons name="log-out-outline" size={20} color="#FF3B30" />
-        </TouchableOpacity>
         <View style={styles.headerContent}>
         </View>
       </View>
