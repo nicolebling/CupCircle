@@ -58,6 +58,27 @@ export default function ExperienceLevelSelector({
         </Text>
         <Ionicons name="chevron-down" size={20} color={colors.secondaryText} />
       </TouchableOpacity>
+
+
+      {Array.isArray(selected) && selected.length > 0 && (
+        <View style={styles.selectedContainer}>
+          {selected.map((industry, index) => (
+            <View
+              key={index}
+              style={[
+                styles.selectedBubble,
+                { backgroundColor: colors.primary + "20" },
+              ]}
+            >
+              <Text
+                style={[styles.selectedBubbleText, { color: colors.primary }]}
+              >
+                {industry}
+              </Text>
+            </View>
+          ))}
+        </View>
+      )}
       
       <Modal
         visible={modalVisible}

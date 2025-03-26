@@ -188,6 +188,7 @@ export default function ProfileForm({
 
       const response = await fetch(uri);
       const blob = await response.blob();
+      
 
       const { error: uploadError } = await supabase.storage
         .from("photos")
@@ -434,6 +435,20 @@ export default function ProfileForm({
                 placeholderTextColor={isDark ? "#999" : "#777"}
               />
             </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={[styles.label, isDark && styles.textDark]}>Bio</Text>
+              <TextInput
+                style={[styles.textArea, isDark && styles.inputDark]}
+                value={bio}
+                onChangeText={setBio}
+                placeholder="Tell us about yourself..."
+                placeholderTextColor={isDark ? "#999" : "#777"}
+                multiline
+                numberOfLines={4}
+              />
+            </View>
+            
           </View>
 
           <View style={styles.section}>
@@ -494,19 +509,6 @@ export default function ProfileForm({
             <Text style={[styles.sectionTitle, isDark && styles.textDark]}>
               Personal Information
             </Text>
-
-            <View style={styles.inputGroup}>
-              <Text style={[styles.label, isDark && styles.textDark]}>Bio</Text>
-              <TextInput
-                style={[styles.textArea, isDark && styles.inputDark]}
-                value={bio}
-                onChangeText={setBio}
-                placeholder="Tell us about yourself..."
-                placeholderTextColor={isDark ? "#999" : "#777"}
-                multiline
-                numberOfLines={4}
-              />
-            </View>
 
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isDark && styles.textDark]}>

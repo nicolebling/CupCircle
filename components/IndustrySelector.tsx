@@ -135,13 +135,35 @@ export default function IndustrySelector({
               {selected.join(", ")}
             </Text>
           ) : (
-            <Text style={[styles.selectorText, { color: colors.secondaryText }]}>
+            <Text
+              style={[styles.selectorText, { color: colors.secondaryText }]}
+            >
               Select your industries
             </Text>
           )}
         </View>
         <Ionicons name="chevron-down" size={20} color={colors.secondaryText} />
       </TouchableOpacity>
+
+      {Array.isArray(selected) && selected.length > 0 && (
+        <View style={styles.selectedContainer}>
+          {selected.map((industry, index) => (
+            <View
+              key={index}
+              style={[
+                styles.selectedBubble,
+                { backgroundColor: colors.primary + "20" },
+              ]}
+            >
+              <Text
+                style={[styles.selectedBubbleText, { color: colors.primary }]}
+              >
+                {industry}
+              </Text>
+            </View>
+          ))}
+        </View>
+      )}
 
       <Modal
         visible={modalVisible}
@@ -352,6 +374,23 @@ const styles = StyleSheet.create({
     marginRight: 8,
     marginBottom: 8,
     borderWidth: 1,
+  },
+  selectedContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginTop: 10,
+    marginBottom: 16,
+  },
+  selectedBubble: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    marginRight: 8,
+    marginBottom: 8,
+  },
+  selectedBubbleText: {
+    fontFamily: "K2D-Medium",
+    fontSize: 12,
   },
   tagText: {
     fontFamily: "K2D-Medium",

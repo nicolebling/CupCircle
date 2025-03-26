@@ -21,56 +21,6 @@ import {
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 
-// Map of interests to emojis
-const INTEREST_EMOJIS: Record<
-  string,
-  string | { icon: string; type: "fa5" | "material" }
-> = {
-  Reading: { icon: "book-open", type: "feather" },
-  Writing: { icon: "pencil", type: "evil" },
-  "Self-Development": { icon: "flower-pollen", type: "material" },
-  Mindfulness: { icon: "flower-outline", type: "ionicons" },
-  Languages: { icon: "language", type: "fa" },
-  Psychology: { icon: "brain", type: "fa5" },
-  Philosophy: "💭",
-  Education: "🎓",
-  Mentoring: "👨‍🏫",
-  Leadership: "👑",
-  Technology: "💻",
-  Business: "💼",
-  Startups: "🚀",
-  Innovation: "💡",
-  Sustainability: "♻️",
-  "Social Impact": "🤝",
-  Marketing: "📢",
-  Design: "🎨",
-  Finance: "💰",
-  Entrepreneurship: "🏆",
-  "Public Speaking": "🎤",
-  Networking: "🔗",
-  "Project Management": "📋",
-  "Data Science": "📊",
-  Photography: "📷",
-  Travel: "✈️",
-  Cooking: "👨‍🍳",
-  Music: "🎵",
-  Art: "🖼️",
-  Sports: "⚽",
-  Gaming: "🎮",
-  Fashion: "👔",
-  Fitness: "💪",
-  Hiking: "🥾",
-  Movies: "🎬",
-  Theatre: "🎭",
-  Dance: "💃",
-  "Food & Wine": "🍷",
-  Coffee: "☕",
-  Tea: "🍵",
-  Yoga: "🧘‍♀️",
-  Meditation: "🧘‍♂️",
-  Podcasts: "🎧",
-  Blogging: "📝",
-};
 
 // List of all interests
 const INTERESTS = [
@@ -168,37 +118,6 @@ export default function InterestSelector({
     onChange(newSelectedInterests);
   };
 
-  const getInterestEmoji = (interest: string) => {
-    const emoji = INTEREST_EMOJIS[interest] || "🔖";
-
-    if (typeof emoji === "object") {
-      if (emoji.type === "fa5") {
-        return <FontAwesome5 name={emoji.icon} size={18} color={colors.text} />;
-      } else if (emoji.type === "material") {
-        return (
-          <MaterialCommunityIcons
-            name={emoji.icon}
-            size={18}
-            color={colors.text}
-          />
-        );
-      } else if (emoji.type === "feather") {
-        return <Feather name={emoji.icon} size={18} color={colors.text} />;
-      } else if (emoji.type === "evil") {
-        return <EvilIcons name={emoji.icon} size={18} color={colors.text} />;
-      } else if (emoji.type === "ionicons") {
-        return <Ionicons name={emoji.icon} size={18} color={colors.text} />;
-      } else if (emoji.type === "fa") {
-        return <FontAwesome name={emoji.icon} size={18} color={colors.text} />;
-      } else if (emoji.type === "fa6") {
-        return <FontAwesome6 name={emoji.icon} size={18} color={colors.text} />;
-      } else if (emoji.type === "entypo") {
-        return <Entypo name={emoji.icon} size={18} color={colors.text} />;
-      }
-    }
-
-    return emoji;
-  };
   return (
     <View style={styles.container}>
       <TouchableOpacity
@@ -215,7 +134,7 @@ export default function InterestSelector({
               numberOfLines={1}
               ellipsizeMode="tail"
             >
-              {selected.map((i) => `${getInterestEmoji(i)} ${i}`).join(", ")}
+              {selected.join(", ")}
             </Text>
           ) : (
             <Text
@@ -227,6 +146,26 @@ export default function InterestSelector({
         </View>
         <Ionicons name="chevron-down" size={20} color={colors.secondaryText} />
       </TouchableOpacity>
+
+      {Array.isArray(selected) && selected.length > 0 && (
+        <View style={styles.selectedContainer}>
+          {selected.map((industry, index) => (
+            <View
+              key={index}
+              style={[
+                styles.selectedBubble,
+                { backgroundColor: colors.primary + "20" },
+              ]}
+            >
+              <Text
+                style={[styles.selectedBubbleText, { color: colors.primary }]}
+              >
+                {industry}
+              </Text>
+            </View>
+          ))}
+        </View>
+      )}
 
       <Modal
         visible={modalVisible}
@@ -295,7 +234,7 @@ export default function InterestSelector({
                     onPress={() => toggleInterest(interest)}
                   >
                     <Text style={[styles.tagText, { color: colors.text }]}>
-                      {getInterestEmoji(interest)} {interest}
+                       {interest}
                     </Text>
                     <Ionicons
                       name="close-circle"
@@ -321,9 +260,6 @@ export default function InterestSelector({
                     onPress={() => toggleInterest(item)}
                   >
                     <View style={styles.interestContent}>
-                      <Text style={styles.emojiText}>
-                        {getInterestEmoji(item)}
-                      </Text>
                       <Text
                         style={[styles.interestText, { color: colors.text }]}
                       >
@@ -430,6 +366,23 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
   },
+  selectedContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginTop: 10,
+    marginBottom: 16,
+  },
+  selectedBubble: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    marginRight: 8,
+    marginBottom: 8,
+  },
+  selectedBubbleText: {
+    fontFamily: "K2D-Medium",
+    fontSize: 12,
+  },
   tag: {
     flexDirection: "row",
     alignItems: "center",
@@ -461,10 +414,6 @@ const styles = StyleSheet.create({
   interestContent: {
     flexDirection: "row",
     alignItems: "center",
-  },
-  emojiText: {
-    fontSize: 18,
-    marginRight: 12,
   },
   interestText: {
     fontFamily: "K2D-Regular",
