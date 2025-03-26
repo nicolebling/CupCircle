@@ -769,6 +769,8 @@ export default function ProfileCard({
   if (isUserProfile && !isEditMode && !isOnboarding) {
     return (
       <ScrollView>
+
+      
         <View
           style={[
             styles.userCard,
