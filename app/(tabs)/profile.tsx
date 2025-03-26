@@ -75,6 +75,23 @@ export default function ProfileScreen() {
     return null;
   }
 
+  React.useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity
+          onPress={handleEdit}
+          style={{ marginRight: 15 }}
+        >
+          <Ionicons
+            name={isEditMode ? "close" : "create-outline"}
+            size={24}
+            color={colors.text}
+          />
+        </TouchableOpacity>
+      ),
+    });
+  }, [isEditMode, colors.text]);
+
   return (
     <SafeAreaView
       style={[styles.container, { backgroundColor: colors.background }]}
@@ -90,19 +107,6 @@ export default function ProfileScreen() {
           <Ionicons name="log-out-outline" size={20} color="#FF3B30" />
         </TouchableOpacity>
         <View style={styles.headerContent}>
-          <TouchableOpacity
-            style={[
-              styles.settingsButton,
-              { backgroundColor: colors.card, borderColor: colors.border },
-            ]}
-            onPress={handleEdit}
-          >
-            <Ionicons
-              name={isEditMode ? "close" : "create-outline"}
-              size={20}
-              color={colors.text}
-            />
-          </TouchableOpacity>
         </View>
       </View>
 

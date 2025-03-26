@@ -778,19 +778,6 @@ export default function ProfileCard({
           {/* Header */}
           <View style={styles.header}>
           </View>
-          <TouchableOpacity
-            style={[
-              styles.settingsButton,
-              { backgroundColor: colors.card, borderColor: colors.border },
-            ]}
-            onPress={() => setIsEditMode(!isEditMode)}
-          >
-            <Ionicons
-              name={isEditMode ? "close" : "create-outline"}
-              size={20}
-              color={colors.text}
-            />
-          </TouchableOpacity>
 
           {/* Profile Photo */}
           <View style={styles.photoContainer}>
@@ -1418,5 +1405,15 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
+  },
+  settingsButton: {
+    position: "absolute",
+    top: 16,
+    right: 16,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
