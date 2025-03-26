@@ -1036,12 +1036,26 @@ export default function ProfileCard({
                         key={index}
                         style={[
                           styles.tag,
-                          { backgroundColor: colors.primary + "20" },
+                          { 
+                            backgroundColor: colors.primary + "20",
+                            flexDirection: 'column',
+                            alignItems: 'flex-start',
+                            padding: 8
+                          },
                         ]}
                       >
-                        <Ionicons name="cafe" size={12} color={colors.primary} style={{marginRight: 4}} />
-                        <Text style={[styles.tagText, { color: colors.primary }]}>
-                          {cafeName}
+                        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
+                          <Ionicons name="cafe" size={12} color={colors.primary} style={{marginRight: 4}} />
+                          <Text style={[styles.tagText, { color: colors.primary, fontFamily: 'K2D-Medium' }]}>
+                            {cafeName}
+                          </Text>
+                        </View>
+                        <Text style={[styles.tagText, { 
+                          color: colors.secondaryText, 
+                          fontSize: 10,
+                          fontFamily: 'K2D-Regular'
+                        }]}>
+                          {cafeAddress}
                         </Text>
                       </View>
                     );
