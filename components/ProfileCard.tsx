@@ -777,23 +777,20 @@ export default function ProfileCard({
             { backgroundColor: colors.card, borderColor: colors.border, padding: 0 },
           ]}
         >
-          {/* Header */}
-          <View style={styles.header}>
-          </View>
-
           {/* Profile Photo */}
           {profile.photo_url ? (
             <Image
               source={{ uri: profile.photo_url }}
-              style={styles.image}
+              style={[styles.image, { marginTop: 0 }]}
               resizeMode="cover"
             />
           ) : (
-            <View style={[styles.image, { backgroundColor: "#1A1A1A", justifyContent: 'center', alignItems: 'center' }]}>
+            <View style={[styles.image, { backgroundColor: "#1A1A1A", justifyContent: 'center', alignItems: 'center', marginTop: 0 }]}>
               <Ionicons name="person" size={60} color="#ffffff" />
             </View>
           )}
-          <View style={styles.nameRow}>
+          <View style={{ padding: 16 }}>
+            <View style={styles.nameRow}>
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               <Text style={[styles.name, { color: colors.text }]}>
                 {profile.name}
@@ -1046,6 +1043,7 @@ export default function ProfileCard({
                 </View>
               </>
             )}
+          </View>
           </View>
         </View>
       </ScrollView>
