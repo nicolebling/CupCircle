@@ -12,7 +12,7 @@ import {
   ActivityIndicator,
   Image,
 } from "react-native";
-import DateTimePicker from '@react-native-community/datetimepicker';
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { useAuth } from "../../provider/AuthProvider";
@@ -190,7 +190,6 @@ export default function ProfileForm({
 
       const response = await fetch(uri);
       const blob = await response.blob();
-      
 
       const { error: uploadError } = await supabase.storage
         .from("photos")
@@ -388,12 +387,18 @@ export default function ProfileForm({
               <Text style={[styles.label, isDark && styles.textDark]}>
                 Birthday*
               </Text>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={[styles.input, isDark && styles.inputDark]}
                 onPress={() => setShowDatePicker(true)}
               >
-                <Text style={[{ color: birthday ? colors.text : colors.secondaryText }]}>
-                  {birthday ? new Date(birthday).toLocaleDateString() : "Select Birthday"}
+                <Text
+                  style={[
+                    { color: birthday ? colors.text : colors.secondaryText },
+                  ]}
+                >
+                  {birthday
+                    ? new Date(birthday).toLocaleDateString()
+                    : "Select Birthday"}
                 </Text>
               </TouchableOpacity>
               {showDatePicker && (
@@ -404,7 +409,9 @@ export default function ProfileForm({
                   onChange={(event, selectedDate) => {
                     setShowDatePicker(false);
                     if (selectedDate) {
-                      const formattedDate = selectedDate.toISOString().split('T')[0];
+                      const formattedDate = selectedDate
+                        .toISOString()
+                        .split("T")[0];
                       setBirthday(formattedDate);
                       const calculatedAge = calculateAge(formattedDate);
                       setAge(calculatedAge);
@@ -445,7 +452,6 @@ export default function ProfileForm({
                 numberOfLines={4}
               />
             </View>
-            
           </View>
 
           <View style={styles.section}>
