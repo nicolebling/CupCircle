@@ -206,25 +206,62 @@ export default function CafeSelector({
 
   return (
     <View>
-      <TouchableOpacity
-        style={[
-          styles.selector,
-          { backgroundColor: colors.input, borderColor: colors.border },
-        ]}
-        onPress={() => setModalVisible(true)}
-      >
-        <Text
+      <View>
+        <TouchableOpacity
           style={[
-            styles.selectorText,
-            { color: selected.length ? colors.text : colors.secondaryText },
+            styles.selector,
+            { backgroundColor: colors.input, borderColor: colors.border },
           ]}
+          onPress={() => setModalVisible(true)}
         >
-          {selected.length
-            ? `${selected.length} cafe${selected.length === 1 ? "" : "s"} selected`
-            : "Select favorite cafes"}
-        </Text>
-        <Ionicons name="chevron-down" size={20} color={colors.secondaryText} />
-      </TouchableOpacity>
+          <Text
+            style={[
+              styles.selectorText,
+              { color: selected.length ? colors.text : colors.secondaryText },
+            ]}
+          >
+            {selected.length
+              ? `${selected.length} cafe${selected.length === 1 ? "" : "s"} selected`
+              : "Select favorite cafes"}
+          </Text>
+          <Ionicons name="chevron-down" size={20} color={colors.secondaryText} />
+        </TouchableOpacity>
+
+        {selected.length > 0 && (
+          <View style={styles.selectedTagsContainer}>
+            {selected.map((cafe, index) => {
+              const [cafeName, cafeAddress] = cafe.split('|||');
+              return (
+                <View
+                  key={index}
+                  style={[
+                    styles.selectedTag,
+                    { backgroundColor: colors.primary + "20" },
+                  ]}
+                >
+                  <View style={styles.tagContent}>
+                    <Ionicons name="cafe" size={12} color={colors.primary} style={styles.tagIcon} />
+                    <View>
+                      <Text style={[styles.tagName, { color: colors.primary }]}>
+                        {cafeName}
+                      </Text>
+                      <Text style={[styles.tagAddress, { color: colors.secondaryText }]}>
+                        {cafeAddress}
+                      </Text>
+                    </View>
+                    <TouchableOpacity 
+                      onPress={() => onChange(selected.filter((_, i) => i !== index))}
+                      style={styles.removeButton}
+                    >
+                      <Ionicons name="close-circle" size={16} color={colors.primary} />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              );
+            })}
+          </View>
+        )}
+      </View>
 
       <Modal
         visible={modalVisible}
@@ -427,6 +464,32 @@ export default function CafeSelector({
 }
 
 const styles = StyleSheet.create({
+  selectedTagsContainer: {
+    marginTop: 8,
+  },
+  selectedTag: {
+    borderRadius: 8,
+    marginBottom: 6,
+    padding: 8,
+  },
+  tagContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  tagIcon: {
+    marginRight: 8,
+  },
+  tagName: {
+    fontSize: 14,
+    fontFamily: 'K2D-Medium',
+  },
+  tagAddress: {
+    fontSize: 12,
+    marginTop: 2,
+  },
+  removeButton: {
+    marginLeft: 'auto',
+  },
   errorText: {
     textAlign: "center",
     marginVertical: 20,
