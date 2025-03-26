@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { SafeAreaView, StyleSheet, View, TouchableOpacity } from "react-native";
+import { SafeAreaView, StyleSheet, View, TouchableOpacity, Alert } from "react-native";
 import { supabase } from "@/lib/supabase";
 import Colors from "@/constants/Colors";
 import ProfileForm from "@/components/ProfileForm";
@@ -56,6 +56,8 @@ export default function ProfileScreen() {
 
       setProfileData(data);
       setIsEditMode(false);
+      navigation.setParams({ isEditMode: false }); //Added this line
+
     } catch (error) {
       console.error("Error saving profile:", error);
       Alert.alert("Error", "Failed to save profile changes");
@@ -109,10 +111,7 @@ export default function ProfileScreen() {
           userId={user.id}
           isNewUser={false}
           initialData={profileData}
-          onSave={(updatedData) => {
-            handleProfileSave(updatedData);
-            setIsEditMode(false);
-          }}
+          onSave={handleProfileSave}
           onCancel={() => setIsEditMode(false)}
         />
       ) : (
