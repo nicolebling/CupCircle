@@ -969,30 +969,6 @@ export default function ProfileCard({
                 </>
               )}
 
-            {/* Skills */}
-            {/* {profile.skills && profile.skills.length > 0 && (
-              <>
-                <Text style={[styles.label, { color: colors.secondaryText }]}>
-                  Skills
-                </Text>
-                <View style={styles.tagsContainer}>
-                  {profile.skills.map((skill, index) => (
-                    <View
-                      key={index}
-                      style={[
-                        styles.tag,
-                        { backgroundColor: colors.primary + "20" },
-                      ]}
-                    >
-                      <Text style={[styles.tagText, { color: colors.primary }]}>
-                        {skill}
-                      </Text>
-                    </View>
-                  ))}
-                </View>
-              </>
-            )} */}
-
             {/* Interests */}
             {profile.interests && profile.interests.length > 0 && (
               <View style={styles.section}>
@@ -1017,6 +993,7 @@ export default function ProfileCard({
               </View>
             )}
           </View>
+          
           {/* Location */}
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>
