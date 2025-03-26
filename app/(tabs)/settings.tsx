@@ -39,15 +39,18 @@ export default function SettingsScreen() {
     }
   };
 
-  return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
+  React.useEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => (
+        <TouchableOpacity onPress={handleBackPress} style={{ marginLeft: 8 }}>
           <Ionicons name="chevron-back" size={24} color={colors.text} />
         </TouchableOpacity>
-        <Text style={[styles.title, { color: colors.text }]}>Settings</Text>
-        <View style={styles.spacer} />
-      </View>
+      ),
+    });
+  }, [colors.text]);
+
+  return (
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
 
       <ScrollView style={styles.content}>
         <View style={styles.section}>
@@ -171,24 +174,6 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 20,
-  },
-  backButton: {
-    padding: 4,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    fontFamily: 'K2D-Bold',
-  },
-  spacer: {
-    width: 32,
   },
   content: {
     flex: 1,
