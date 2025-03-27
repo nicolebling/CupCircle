@@ -561,18 +561,22 @@ export default function ProfileCard({
             )}
           </View>
 
-          {profile.occupation && (
-            <View
-              style={[
-                styles.tag,
-                { backgroundColor: colors.primary + "20", marginTop: 8 },
-              ]}
-            >
-              <Text style={[styles.occupation, { color: colors.primary }]}>
-                {profile.occupation}
-              </Text>
-            </View>
-          )}
+          <View
+            style={[
+              styles.occupationBadge,
+              { backgroundColor: colors.primary + "20" },
+            ]}
+          >
+            <Ionicons
+              name="briefcase-outline"
+              size={14}
+              color={colors.primary}
+              style={styles.occupationIcon}
+            />
+            <Text style={[styles.occupation, { color: colors.primary }]}>
+              {profile.occupation}
+            </Text>
+          </View>
 
           <View style={styles.divider} />
 
@@ -737,29 +741,27 @@ export default function ProfileCard({
             </View>
           )}
 
-
+          
           <View style={{ padding: 16 }}>
             <View style={styles.nameRow}>
-
+            
               <Text style={[styles.name, { color: colors.text }]}>
                 {profile.name}
-                {profile.age && <Text>{profile.age}</Text>}
+                {profile.occupation && (
+                  <View
+                    style={[
+                      styles.tag,
+                      { backgroundColor: colors.primary + "20", marginLeft: 8 },
+                    ]}
+                  >
+                    <Text style={[styles.occupation, { color: colors.primary }]}>
+                      {profile.occupation}
+                    </Text>
+                  </View>
+                )}
               </Text>
-            </View>
-
-            {profile.occupation && (
-              <View
-                style={[
-                  styles.tag,
-                  { backgroundColor: colors.primary + "20", marginTop: 8 },
-                ]}
-              >
-                <Text style={[styles.occupation, { color: colors.primary }]}>
-                  {profile.occupation}
-                </Text>
-              </View>
-            )}
-
+           
+              
 
             {profile.location && (
               <View style={styles.locationContainer}>
@@ -776,11 +778,11 @@ export default function ProfileCard({
               </View>
             )}
           </View>
-
+            
           {/* Personal Information */}
           <View style={styles.section}>
 
-
+            
             <Text style={[styles.sectionTitle, { color: colors.text }]}>
               Personal Information
             </Text>
@@ -792,20 +794,20 @@ export default function ProfileCard({
               {profile.birthday || "Not provided"}
               {"\n"}
 
-
+              
               <Text style={[styles.label, { color: colors.secondaryText }]}>
                 Age {profile.age}
               </Text>
             </Text>
 
-
+            
             <Text style={[styles.label, { color: colors.secondaryText }]}>
               City
             </Text>
             <Text style={[styles.value, { color: colors.text }]}>
               {profile.city}
 
-
+              
             </Text>
             {profile.education && (
               <>
@@ -818,7 +820,7 @@ export default function ProfileCard({
               </>
             )}
 
-
+            
             <Text style={[styles.label, { color: colors.secondaryText }]}>
               About
             </Text>
@@ -826,7 +828,7 @@ export default function ProfileCard({
               {profile.bio}
             </Text>
 
-
+            
           </View>
           {/* Professional Details */}
           <View style={styles.section}>
@@ -1111,7 +1113,7 @@ const styles = StyleSheet.create({
   },
   occupationBadge: {
     flexDirection: "row",
-    alignItems"center",
+    alignItems: "center",
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 16,
