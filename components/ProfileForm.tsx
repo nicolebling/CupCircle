@@ -40,6 +40,46 @@ type ProfileFormProps = {
   onCancel?: () => void;
 };
 
+const EmploymentHistoryEntry = ({ employment, onChange, onDelete, isDark }) => {
+  return (
+    <View style={[styles.employmentEntry, isDark && styles.employmentEntryDark]}>
+      <View style={styles.employmentInputGroup}>
+        <TextInput
+          style={[styles.input, isDark && styles.inputDark]}
+          value={employment.company}
+          onChangeText={(text) => onChange({ ...employment, company: text })}
+          placeholder="Company"
+        />
+        <TextInput
+          style={[styles.input, isDark && styles.inputDark]}
+          value={employment.position}
+          onChangeText={(text) => onChange({ ...employment, position: text })}
+          placeholder="Position"
+        />
+      </View>
+      <View style={styles.employmentInputGroup}>
+        <TextInput
+          style={[styles.input, isDark && styles.inputDark]}
+          value={employment.fromDate}
+          onChangeText={(text) => onChange({ ...employment, fromDate: text })}
+          placeholder="From"
+          keyboardType="number-pad"
+        />
+        <TextInput
+          style={[styles.input, isDark && styles.inputDark]}
+          value={employment.toDate}
+          onChangeText={(text) => onChange({ ...employment, toDate: text })}
+          placeholder="To"
+          keyboardType="number-pad"
+        />
+      </View>
+      <TouchableOpacity style={styles.deleteButton} onPress={onDelete}>
+        <Text>Delete</Text>
+      </TouchableOpacity>
+    </View>
+  );
+};
+
 export default function ProfileForm({
   userId,
   isNewUser = true,
@@ -73,6 +113,9 @@ export default function ProfileForm({
   const [tempDate, setTempDate] = useState(
     birthday ? new Date(birthday) : new Date(),
   );
+  const [employmentHistory, setEmploymentHistory] = useState([
+    { company: "", position: "", fromDate: "", toDate: "" },
+  ]);
 
   useEffect(() => {
     if (!isNewUser) {
@@ -273,6 +316,7 @@ export default function ProfileForm({
         neighborhoods: neighborhoods,
         favorite_cafes: favoriteCafes,
         interests: interests,
+        employmentHistory, // Include employment history
         updated_at: new Date(),
       };
 
@@ -314,6 +358,7 @@ export default function ProfileForm({
           neighborhoods,
           favorite_cafes: favoriteCafes,
           interests,
+          employmentHistory,
         });
       }
     } catch (error: any) {
@@ -519,9 +564,43 @@ export default function ProfileForm({
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={[styles.label, isDark && styles.textDark]}>
-                Education
-              </Text>
+              <Text style={[styles.label, isDark && styles.textDark]}>Employment History</Text>
+              {employmentHistory.map((employment, index) => (
+                <EmploymentHistoryEntry
+                  key={index}
+                  employment={employment}
+                  onChange={(updated) => {
+                    const newHistory = [...employmentHistory];
+                    newHistory[index] = updated;
+                    setEmploymentHistory(newHistory);
+                  }}
+                  onDelete={() => {
+                    const newHistory = employmentHistory.filter((_, i) => i !== index);
+                    setEmploymentHistory(newHistory);
+                  }}
+                  isDark={isDark}
+                />
+              ))}
+              <TouchableOpacity
+                style={[styles.addButton, { backgroundColor: colors.primary }]}
+                onPress={() => {
+                  setEmploymentHistory([
+                    {
+                      company: '',
+                      position: '',
+                      fromDate: '',
+                      toDate: '',
+                    },
+                    ...employmentHistory,
+                  ]);
+                }}
+              >
+                <Text style={styles.addButtonText}>Add Employment</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={[styles.label, isDark && styles.textDark]}>Education</Text>
               <TextInput
                 style={[styles.input, isDark && styles.inputDark]}
                 value={education}
@@ -672,11 +751,13 @@ const styles = StyleSheet.create({
     padding: 12,
     fontSize: 16,
     color: "#333",
+    marginBottom: 5, // Added marginBottom for better spacing
   },
   inputDark: {
     backgroundColor: "#333",
     borderColor: "#555",
     color: "#fff",
+    marginBottom: 5, // Added marginBottom for better spacing
   },
   textArea: {
     backgroundColor: "#f8f8f8",
@@ -753,5 +834,33 @@ const styles = StyleSheet.create({
     marginTop: 5,
     fontSize: 14,
     color: "#555",
+  },
+  addButton: {
+    padding: 10,
+    borderRadius: 8,
+    marginTop: 10,
+    alignItems: "center",
+  },
+  addButtonText: {
+    color: "#fff",
+    fontSize: 16,
+  },
+  employmentEntry: {
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 8,
+    padding: 10,
+  },
+  employmentEntryDark: {
+    borderColor: "#555",
+  },
+  employmentInputGroup: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 5,
+  },
+  deleteButton: {
+    marginTop: 5,
   },
 });
