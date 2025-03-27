@@ -43,30 +43,28 @@ type ProfileFormProps = {
 const EmploymentHistoryEntry = ({ employment, onChange, onDelete, isDark }) => {
   return (
     <View style={[styles.employmentEntry, isDark && styles.employmentEntryDark]}>
+      <TextInput
+        style={[styles.input, isDark && styles.inputDark]}
+        value={employment.company}
+        onChangeText={(text) => onChange({ ...employment, company: text })}
+        placeholder="Company"
+      />
+      <TextInput
+        style={[styles.input, isDark && styles.inputDark]}
+        value={employment.position}
+        onChangeText={(text) => onChange({ ...employment, position: text })}
+        placeholder="Position"
+      />
       <View style={styles.employmentInputGroup}>
         <TextInput
-          style={[styles.input, isDark && styles.inputDark]}
-          value={employment.company}
-          onChangeText={(text) => onChange({ ...employment, company: text })}
-          placeholder="Company"
-        />
-        <TextInput
-          style={[styles.input, isDark && styles.inputDark]}
-          value={employment.position}
-          onChangeText={(text) => onChange({ ...employment, position: text })}
-          placeholder="Position"
-        />
-      </View>
-      <View style={styles.employmentInputGroup}>
-        <TextInput
-          style={[styles.input, isDark && styles.inputDark]}
+          style={[styles.input, isDark && styles.inputDark, styles.halfWidth]}
           value={employment.fromDate}
           onChangeText={(text) => onChange({ ...employment, fromDate: text })}
           placeholder="From"
           keyboardType="number-pad"
         />
         <TextInput
-          style={[styles.input, isDark && styles.inputDark]}
+          style={[styles.input, isDark && styles.inputDark, styles.halfWidth]}
           value={employment.toDate}
           onChangeText={(text) => onChange({ ...employment, toDate: text })}
           placeholder="To"
@@ -858,9 +856,14 @@ const styles = StyleSheet.create({
   employmentInputGroup: {
     flexDirection: "row",
     justifyContent: "space-between",
+    gap: 10, // Adds space between inputs
     marginBottom: 5,
+  },
+  halfWidth: {
+    flex: 1, // Makes each input take up half the row
   },
   deleteButton: {
     marginTop: 5,
+    alignSelf: "flex-end", // Aligns delete button to the right
   },
 });
