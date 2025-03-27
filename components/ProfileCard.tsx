@@ -28,7 +28,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import Badge from "./Badge";
 import ProfileForm from "@/components/ProfileForm";
 
-
 const { width } = Dimensions.get("window");
 
 // Function to get coffee theme based on experience level
@@ -606,7 +605,7 @@ export default function ProfileCard({
                   <Text
                     style={[styles.interestText, { color: colors.primary }]}
                   >
-                   {interest}
+                    {interest}
                   </Text>
                 </View>
               ))}
@@ -725,7 +724,11 @@ export default function ProfileCard({
         <View
           style={[
             styles.userCard,
-            { backgroundColor: colors.card, borderColor: colors.border, padding: 0 },
+            {
+              backgroundColor: colors.card,
+              borderColor: colors.border,
+              padding: 0,
+            },
           ]}
         >
           {/* Profile Photo */}
@@ -736,162 +739,179 @@ export default function ProfileCard({
               resizeMode="cover"
             />
           ) : (
-            <View style={[styles.image, { backgroundColor: "#1A1A1A", justifyContent: 'center', alignItems: 'center', marginTop: 0 }]}>
+            <View
+              style={[
+                styles.image,
+                {
+                  backgroundColor: "#1A1A1A",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  marginTop: 0,
+                },
+              ]}
+            >
               <Ionicons name="person" size={60} color="#ffffff" />
             </View>
           )}
 
-          
           <View style={{ padding: 16 }}>
             <View style={styles.nameRow}>
-            
               <Text style={[styles.name, { color: colors.text }]}>
                 {profile.name}
-                {profile.occupation && (
-                  <View
-                    style={[
-                      styles.tag,
-                      { backgroundColor: colors.primary + "20", marginLeft: 8 },
-                    ]}
-                  >
-                    <Text style={[styles.occupation, { color: colors.primary }]}>
-                      {profile.occupation}
-                    </Text>
-                  </View>
-                )}
               </Text>
-           
-              
+            </View>
 
-            {profile.location && (
-              <View style={styles.locationContainer}>
-                <Ionicons
-                  name="location"
-                  size={16}
-                  color={colors.secondaryText}
-                />
-                <Text
-                  style={[styles.location, { color: colors.secondaryText }]}
-                >
-                  {profile.location}
+            {profile.occupation && (
+              <View
+                style={[
+                  styles.tag,
+                  {
+                    backgroundColor: colors.primary + "20",
+                    alignSelf: "flex-start",
+                    marginTop: 4,
+                  },
+                ]}
+              >
+                <Text style={[styles.occupation, { color: colors.primary }]}>
+                  {profile.occupation}
                 </Text>
               </View>
             )}
-          </View>
-            
-          {/* Personal Information */}
-          <View style={styles.section}>
 
-            
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>
-              Personal Information
-            </Text>
-
-            <Text style={[styles.label, { color: colors.secondaryText }]}>
-              Birthday
-            </Text>
-            <Text style={[styles.value, { color: colors.text }]}>
-              {profile.birthday || "Not provided"}
-              {"\n"}
-
-              
+            {/* Personal Information */}
+            <View style={styles.section}>
               <Text style={[styles.label, { color: colors.secondaryText }]}>
-                Age {profile.age}
+                About
               </Text>
-            </Text>
+              <Text style={[styles.value, { color: colors.text }]}>
+                {profile.bio}
+              </Text>
 
-            
-            <Text style={[styles.label, { color: colors.secondaryText }]}>
-              City
-            </Text>
-            <Text style={[styles.value, { color: colors.text }]}>
-              {profile.city}
+              <Text style={[styles.label, { color: colors.secondaryText }]}>
+                Birthday
+              </Text>
+              <Text style={[styles.value, { color: colors.text }]}>
+                {profile.birthday || "Not provided"}
+                {"\n"}
 
-              
-            </Text>
-            {profile.education && (
-              <>
                 <Text style={[styles.label, { color: colors.secondaryText }]}>
-                  Education
+                  Age {profile.age}
                 </Text>
-                <Text style={[styles.value, { color: colors.text }]}>
-                  {profile.education}
-                </Text>
-              </>
-            )}
+              </Text>
 
-            
-            <Text style={[styles.label, { color: colors.secondaryText }]}>
-              About
-            </Text>
-            <Text style={[styles.value, { color: colors.text }]}>
-              {profile.bio}
-            </Text>
-
-            
-          </View>
-          {/* Professional Details */}
-          <View style={styles.section}>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>
-              Professional Details
-            </Text>
-
-            {/* Occupation */}
-            <Text style={[styles.label, { color: colors.secondaryText }]}>
-              Occupation
-            </Text>
-            <Text style={[styles.value, { color: colors.text }]}>
-              {profile.occupation}
-            </Text>
-
-            {/* Experience Level */}
-            {profile.experience_level && (
-              <>
-                <Text style={[styles.label, { color: colors.secondaryText }]}>
-                  Experience Level
-                </Text>
-                <View
-                  style={[
-                    styles.coffeeExperienceContainer,
-                    {
-                      flexDirection: "row",
-                      justifyContent: "flex-start",
-                      alignItems: "center",
-                    },
-                  ]}
-                >
-                  <Text style={[styles.value, { color: colors.text }]}>
-                    {profile.experience_level || ""}
-                    {"\t"}
-                    <Ionicons
-                      name="cafe"
-                      size={14}
-                      color={getCoffeeColor(profile.experience_level || "")}
-                    />
-                    <Text
-                      style={[
-                        styles.coffeeBadgeText,
-                        {
-                          color: getCoffeeColor(profile.experience_level || ""),
-                        },
-                      ]}
-                    >
-                      {getCoffeeTheme(profile.experience_level || "")}
-                    </Text>
-                  </Text>
-                </View>
-              </>
-            )}
-
-            {/* Industry Categories */}
-            {profile.industry_categories &&
-              profile.industry_categories.length > 0 && (
+              {profile.education && (
                 <>
                   <Text style={[styles.label, { color: colors.secondaryText }]}>
-                    Industries
+                    Education
+                  </Text>
+                  <Text style={[styles.value, { color: colors.text }]}>
+                    {profile.education}
+                  </Text>
+                </>
+              )}
+
+              <Text style={[styles.label, { color: colors.secondaryText }]}>
+                City
+              </Text>
+              <Text style={[styles.value, { color: colors.text }]}>
+                {profile.city}
+              </Text>
+            </View>
+
+            <View style={styles.divider} />
+
+            {/* Professional Details */}
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                Professional Details
+              </Text>
+
+              {/* Occupation */}
+              <Text style={[styles.label, { color: colors.secondaryText }]}>
+                Occupation
+              </Text>
+              <Text style={[styles.value, { color: colors.text }]}>
+                {profile.occupation}
+              </Text>
+
+              {/* Experience Level */}
+              {profile.experience_level && (
+                <>
+                  <Text style={[styles.label, { color: colors.secondaryText }]}>
+                    Experience Level
+                  </Text>
+                  <View
+                    style={[
+                      styles.coffeeExperienceContainer,
+                      {
+                        flexDirection: "row",
+                        justifyContent: "flex-start",
+                        alignItems: "center",
+                      },
+                    ]}
+                  >
+                    <Text style={[styles.value, { color: colors.text }]}>
+                      {profile.experience_level || ""}
+                      {"\t"}
+                      <Ionicons
+                        name="cafe"
+                        size={14}
+                        color={getCoffeeColor(profile.experience_level || "")}
+                      />
+                      <Text
+                        style={[
+                          styles.coffeeBadgeText,
+                          {
+                            color: getCoffeeColor(
+                              profile.experience_level || "",
+                            ),
+                          },
+                        ]}
+                      >
+                        {getCoffeeTheme(profile.experience_level || "")}
+                      </Text>
+                    </Text>
+                  </View>
+                </>
+              )}
+
+              {/* Industry Categories */}
+              {profile.industry_categories &&
+                profile.industry_categories.length > 0 && (
+                  <>
+                    <Text
+                      style={[styles.label, { color: colors.secondaryText }]}
+                    >
+                      Industries
+                    </Text>
+                    <View style={styles.tagsContainer}>
+                      {profile.industry_categories.map((industry, index) => (
+                        <View
+                          key={index}
+                          style={[
+                            styles.tag,
+                            { backgroundColor: colors.primary + "20" },
+                          ]}
+                        >
+                          <Text
+                            style={[styles.tagText, { color: colors.primary }]}
+                          >
+                            {industry}
+                          </Text>
+                        </View>
+                      ))}
+                    </View>
+                  </>
+                )}
+
+              {/* Interests */}
+              {profile.interests && profile.interests.length > 0 && (
+                <View style={styles.section}>
+                  <Text style={[styles.label, { color: colors.secondaryText }]}>
+                    Interests
                   </Text>
                   <View style={styles.tagsContainer}>
-                    {profile.industry_categories.map((industry, index) => (
+                    {profile.interests.map((interest, index) => (
                       <View
                         key={index}
                         style={[
@@ -902,7 +922,41 @@ export default function ProfileCard({
                         <Text
                           style={[styles.tagText, { color: colors.primary }]}
                         >
-                          {industry}
+                          {interest}
+                        </Text>
+                      </View>
+                    ))}
+                  </View>
+                </View>
+              )}
+            </View>
+
+            <View style={styles.divider} />
+
+            {/* Location */}
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                Location Preferences
+              </Text>
+
+              {profile.neighborhoods && profile.neighborhoods.length > 0 && (
+                <>
+                  <Text style={[styles.label, { color: colors.secondaryText }]}>
+                    Neighborhoods
+                  </Text>
+                  <View style={styles.tagsContainer}>
+                    {profile.neighborhoods.map((neighborhood, index) => (
+                      <View
+                        key={index}
+                        style={[
+                          styles.tag,
+                          { backgroundColor: colors.primary + "20" },
+                        ]}
+                      >
+                        <Text
+                          style={[styles.tagText, { color: colors.primary }]}
+                        >
+                          {neighborhood}
                         </Text>
                       </View>
                     ))}
@@ -910,101 +964,71 @@ export default function ProfileCard({
                 </>
               )}
 
-            {/* Interests */}
-            {profile.interests && profile.interests.length > 0 && (
-              <View style={styles.section}>
-                <Text style={[styles.label, { color: colors.secondaryText }]}>
-                  Interests
-                </Text>
-                <View style={styles.tagsContainer}>
-                  {profile.interests.map((interest, index) => (
-                    <View
-                      key={index}
-                      style={[
-                        styles.tag,
-                        { backgroundColor: colors.primary + "20" },
-                      ]}
-                    >
-                      <Text style={[styles.tagText, { color: colors.primary }]}>
-                        {interest}
-                      </Text>
-                    </View>
-                  ))}
-                </View>
-              </View>
-            )}
-          </View>
-
-          {/* Location */}
-          <View style={styles.section}>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>
-              Location Preferences
-            </Text>
-
-            {profile.neighborhoods && profile.neighborhoods.length > 0 && (
-              <>
-                <Text style={[styles.label, { color: colors.secondaryText }]}>
-                  Neighborhoods
-                </Text>
-                <View style={styles.tagsContainer}>
-                  {profile.neighborhoods.map((neighborhood, index) => (
-                    <View
-                      key={index}
-                      style={[
-                        styles.tag,
-                        { backgroundColor: colors.primary + "20" },
-                      ]}
-                    >
-                      <Text style={[styles.tagText, { color: colors.primary }]}>
-                        {neighborhood}
-                      </Text>
-                    </View>
-                  ))}
-                </View>
-              </>
-            )}
-
-            {profile.favorite_cafes && profile.favorite_cafes.length > 0 && (
-              <>
-                <Text style={[styles.label, { color: colors.secondaryText }]}>
-                  Favorite Cafes
-                </Text>
-                <View style={styles.tagsContainer}>
-                  {profile.favorite_cafes.map((cafe, index) => {
-                    const [cafeName, cafeAddress] = cafe.split('|||');
-                    return (
-                      <View
-                        key={index}
-                        style={[
-                          styles.tag,
-                          { 
-                            backgroundColor: colors.primary + "20",
-                            flexDirection: 'column',
-                            alignItems: 'flex-start',
-                            padding: 8
-                          },
-                        ]}
-                      >
-                        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
-                          <Ionicons name="cafe" size={12} color={colors.primary} style={{marginRight: 4}} />
-                          <Text style={[styles.tagText, { color: colors.primary, fontFamily: 'K2D-Medium' }]}>
-                            {cafeName}
+              {profile.favorite_cafes && profile.favorite_cafes.length > 0 && (
+                <>
+                  <Text style={[styles.label, { color: colors.secondaryText }]}>
+                    Favorite Cafes
+                  </Text>
+                  <View style={styles.tagsContainer}>
+                    {profile.favorite_cafes.map((cafe, index) => {
+                      const [cafeName, cafeAddress] = cafe.split("|||");
+                      return (
+                        <View
+                          key={index}
+                          style={[
+                            styles.tag,
+                            {
+                              backgroundColor: colors.primary + "20",
+                              flexDirection: "column",
+                              alignItems: "flex-start",
+                              padding: 8,
+                            },
+                          ]}
+                        >
+                          <View
+                            style={{
+                              flexDirection: "row",
+                              alignItems: "center",
+                              marginBottom: 4,
+                            }}
+                          >
+                            <Ionicons
+                              name="cafe"
+                              size={12}
+                              color={colors.primary}
+                              style={{ marginRight: 4 }}
+                            />
+                            <Text
+                              style={[
+                                styles.tagText,
+                                {
+                                  color: colors.primary,
+                                  fontFamily: "K2D-Medium",
+                                },
+                              ]}
+                            >
+                              {cafeName}
+                            </Text>
+                          </View>
+                          <Text
+                            style={[
+                              styles.tagText,
+                              {
+                                color: colors.secondaryText,
+                                fontSize: 10,
+                                fontFamily: "K2D-Regular",
+                              },
+                            ]}
+                          >
+                            {cafeAddress}
                           </Text>
                         </View>
-                        <Text style={[styles.tagText, { 
-                          color: colors.secondaryText, 
-                          fontSize: 10,
-                          fontFamily: 'K2D-Regular'
-                        }]}>
-                          {cafeAddress}
-                        </Text>
-                      </View>
-                    );
-                  })}
-                </View>
-              </>
-            )}
-          </View>
+                      );
+                    })}
+                  </View>
+                </>
+              )}
+            </View>
           </View>
         </View>
       </ScrollView>
@@ -1040,7 +1064,7 @@ const styles = StyleSheet.create({
   card: {
     width: width - 32,
     borderRadius: 16,
-    borderWidth: 1,    
+    borderWidth: 1,
     overflow: "hidden",
     marginHorizontal: 16,
     shadowColor: "#000",

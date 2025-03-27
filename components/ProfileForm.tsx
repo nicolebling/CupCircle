@@ -30,7 +30,7 @@ import ExperienceLevelSelector from "@/components/ExperienceLevelSelector";
 import NeighborhoodSelector from "@/components/NeighborhoodSelector";
 import CafeSelector from "@/components/CafeSelector";
 import ImageItem from "@/components/ImageItem";
-import { decode } from 'base64-arraybuffer';
+import { decode } from "base64-arraybuffer";
 
 type ProfileFormProps = {
   userId: string;
@@ -70,7 +70,9 @@ export default function ProfileForm({
   const [error, setError] = useState("");
   const [isEditMode, setIsEditMode] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [tempDate, setTempDate] = useState(birthday ? new Date(birthday) : new Date());
+  const [tempDate, setTempDate] = useState(
+    birthday ? new Date(birthday) : new Date(),
+  );
 
   useEffect(() => {
     if (!isNewUser) {
@@ -173,11 +175,10 @@ export default function ProfileForm({
   };
 
   const pickImage = async () => {
-
     // Ensure permission is granted
     const hasPermission = await requestPermission();
     if (!hasPermission) return;
-    
+
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
@@ -196,7 +197,7 @@ export default function ProfileForm({
   const uploadImage = async (uri: string) => {
     try {
       setLoading(true);
-      console.log('Starting upload for:', uri);
+      console.log("Starting upload for:", uri);
 
       // Ensure permission is granted
       const hasPermission = await requestPermission();
@@ -205,12 +206,12 @@ export default function ProfileForm({
       // Get the base64 data directly from the image picker
       const response = await fetch(uri);
       const blob = await response.blob();
-      
+
       // Convert blob to base64
       const reader = new FileReader();
       const base64Promise = new Promise((resolve) => {
         reader.onload = () => {
-          const base64 = reader.result?.toString().split(',')[1];
+          const base64 = reader.result?.toString().split(",")[1];
           resolve(base64);
         };
       });
@@ -218,12 +219,11 @@ export default function ProfileForm({
       const base64Data = await base64Promise;
 
       const filePath = `${userId}/${Date.now()}.png`;
-      
-      const { error: uploadError } = await supabase
-        .storage
+
+      const { error: uploadError } = await supabase.storage
         .from("photos")
         .upload(filePath, decode(base64Data as string), {
-          contentType: 'image/png'
+          contentType: "image/png",
         });
 
       if (uploadError) {
@@ -369,8 +369,6 @@ export default function ProfileForm({
     >
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.formContainer}>
-          
-
           {error ? (
             <View style={styles.errorContainer}>
               <Ionicons
