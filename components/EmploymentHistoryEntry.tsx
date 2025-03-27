@@ -38,16 +38,18 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
         onChangeText={(text) => onChange({ ...employment, company: text })}
       />
 
-      <Text style={[styles.label, { color: colors.secondaryText, marginTop: 12 }]}>Position</Text>
-      <TextInput
-        style={[styles.input, styles.fullWidthInput, { backgroundColor: colors.input, color: colors.text }]}
-        placeholder="Job title"
-        placeholderTextColor={colors.secondaryText}
-        value={employment.position}
-        onChangeText={(text) => onChange({ ...employment, position: text })}
-      />
+      <View style={styles.positionContainer}>
+        <Text style={[styles.label, { color: colors.secondaryText }]}>Position</Text>
+        <TextInput
+          style={[styles.input, styles.fullWidthInput, { backgroundColor: colors.input, color: colors.text }]}
+          placeholder="Job title"
+          placeholderTextColor={colors.secondaryText}
+          value={employment.position}
+          onChangeText={(text) => onChange({ ...employment, position: text })}
+        />
+      </View>
 
-      <View style={styles.dateContainer}>
+      <View style={styles.datesRow}>
         <View style={styles.dateField}>
           <Text style={[styles.label, { color: colors.secondaryText }]}>From</Text>
           <TextInput
@@ -59,7 +61,7 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
           />
         </View>
 
-        <View style={[styles.dateField, styles.dateFieldRight]}>
+        <View style={[styles.dateField, { marginLeft: 12 }]}>
           <Text style={[styles.label, { color: colors.secondaryText }]}>To</Text>
           <TextInput
             style={[styles.input, { backgroundColor: colors.input, color: colors.text }]}
@@ -103,16 +105,16 @@ const styles = StyleSheet.create({
   fullWidthInput: {
     width: '100%',
   },
-  dateContainer: {
+  positionContainer: {
+    marginTop: 16,
+  },
+  datesRow: {
     flexDirection: 'row',
-    marginTop: 12,
-    gap: 12,
+    marginTop: 16,
+    justifyContent: 'space-between',
   },
   dateField: {
     flex: 1,
-  },
-  dateFieldRight: {
-    marginLeft: 8,
   },
   deleteButton: {
     padding: 4,
