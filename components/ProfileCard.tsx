@@ -971,7 +971,7 @@ export default function ProfileCard({
                   </Text>
                   <View style={styles.tagsContainer}>
                     {profile.favorite_cafes.map((cafe, index) => {
-                      const [cafeName, cafeAddress] = cafe.split("|||");
+                      const [cafeName, cafeAddress] = cafe ? cafe.split("|||") : ['', ''];
                       return (
                         <View
                           key={index}
