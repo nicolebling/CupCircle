@@ -40,43 +40,7 @@ type ProfileFormProps = {
   onCancel?: () => void;
 };
 
-const EmploymentHistoryEntry = ({ employment, onChange, onDelete, isDark }) => {
-  return (
-    <View style={[styles.employmentEntry, isDark && styles.employmentEntryDark]}>
-      <TextInput
-        style={[styles.input, isDark && styles.inputDark]}
-        value={employment.company}
-        onChangeText={(text) => onChange({ ...employment, company: text })}
-        placeholder="Company"
-      />
-      <TextInput
-        style={[styles.input, isDark && styles.inputDark]}
-        value={employment.position}
-        onChangeText={(text) => onChange({ ...employment, position: text })}
-        placeholder="Position"
-      />
-      <View style={styles.employmentInputGroup}>
-        <TextInput
-          style={[styles.input, isDark && styles.inputDark, styles.halfWidth]}
-          value={employment.fromDate}
-          onChangeText={(text) => onChange({ ...employment, fromDate: text })}
-          placeholder="From"
-          keyboardType="number-pad"
-        />
-        <TextInput
-          style={[styles.input, isDark && styles.inputDark, styles.halfWidth]}
-          value={employment.toDate}
-          onChangeText={(text) => onChange({ ...employment, toDate: text })}
-          placeholder="To"
-          keyboardType="number-pad"
-        />
-      </View>
-      <TouchableOpacity style={styles.deleteButton} onPress={onDelete}>
-        <Text>Delete</Text>
-      </TouchableOpacity>
-    </View>
-  );
-};
+import EmploymentHistoryEntry from './EmploymentHistoryEntry';
 
 export default function ProfileForm({
   userId,
