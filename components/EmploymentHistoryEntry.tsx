@@ -22,49 +22,53 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
   const colors = Colors[isDark ? 'dark' : 'light'];
 
   return (
-    <View style={styles.container}>
-      <View style={styles.row}>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={[styles.input, { backgroundColor: colors.input, color: colors.text }]}
-            placeholder="Company"
-            placeholderTextColor={colors.secondaryText}
-            value={employment.company}
-            onChangeText={(text) => onChange({ ...employment, company: text })}
-          />
-        </View>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={[styles.input, { backgroundColor: colors.input, color: colors.text }]}
-            placeholder="Position"
-            placeholderTextColor={colors.secondaryText}
-            value={employment.position}
-            onChangeText={(text) => onChange({ ...employment, position: text })}
-          />
-        </View>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={styles.header}>
+        <Text style={[styles.label, { color: colors.secondaryText }]}>Company</Text>
+        <TouchableOpacity onPress={onDelete} style={styles.deleteButton}>
+          <Ionicons name="trash-outline" size={20} color={colors.text} />
+        </TouchableOpacity>
       </View>
-      <View style={styles.row}>
-        <View style={styles.inputContainer}>
+      
+      <TextInput
+        style={[styles.input, styles.fullWidthInput, { backgroundColor: colors.input, color: colors.text }]}
+        placeholder="Company name"
+        placeholderTextColor={colors.secondaryText}
+        value={employment.company}
+        onChangeText={(text) => onChange({ ...employment, company: text })}
+      />
+
+      <Text style={[styles.label, { color: colors.secondaryText, marginTop: 12 }]}>Position</Text>
+      <TextInput
+        style={[styles.input, styles.fullWidthInput, { backgroundColor: colors.input, color: colors.text }]}
+        placeholder="Job title"
+        placeholderTextColor={colors.secondaryText}
+        value={employment.position}
+        onChangeText={(text) => onChange({ ...employment, position: text })}
+      />
+
+      <View style={styles.dateContainer}>
+        <View style={styles.dateField}>
+          <Text style={[styles.label, { color: colors.secondaryText }]}>From</Text>
           <TextInput
             style={[styles.input, { backgroundColor: colors.input, color: colors.text }]}
-            placeholder="From (MM/YYYY)"
+            placeholder="MM/YYYY"
             placeholderTextColor={colors.secondaryText}
             value={employment.fromDate}
             onChangeText={(text) => onChange({ ...employment, fromDate: text })}
           />
         </View>
-        <View style={styles.inputContainer}>
+
+        <View style={[styles.dateField, styles.dateFieldRight]}>
+          <Text style={[styles.label, { color: colors.secondaryText }]}>To</Text>
           <TextInput
             style={[styles.input, { backgroundColor: colors.input, color: colors.text }]}
-            placeholder="To (MM/YYYY)"
+            placeholder="MM/YYYY or Present"
             placeholderTextColor={colors.secondaryText}
             value={employment.toDate}
             onChangeText={(text) => onChange({ ...employment, toDate: text })}
           />
         </View>
-        <TouchableOpacity onPress={onDelete} style={styles.deleteButton}>
-          <Ionicons name="trash-outline" size={24} color={colors.text} />
-        </TouchableOpacity>
       </View>
     </View>
   );
@@ -72,15 +76,22 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
 
 const styles = StyleSheet.create({
   container: {
+    padding: 16,
+    borderRadius: 12,
     marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#ddd',
   },
-  row: {
+  header: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 8,
   },
-  inputContainer: {
-    flex: 1,
-    marginRight: 8,
+  label: {
+    fontSize: 12,
+    fontWeight: '500',
+    marginBottom: 4,
   },
   input: {
     borderWidth: 1,
@@ -89,9 +100,21 @@ const styles = StyleSheet.create({
     padding: 12,
     fontSize: 16,
   },
+  fullWidthInput: {
+    width: '100%',
+  },
+  dateContainer: {
+    flexDirection: 'row',
+    marginTop: 12,
+    gap: 12,
+  },
+  dateField: {
+    flex: 1,
+  },
+  dateFieldRight: {
+    marginLeft: 8,
+  },
   deleteButton: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 8,
+    padding: 4,
   },
 });
