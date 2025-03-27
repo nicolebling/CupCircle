@@ -778,6 +778,8 @@ export default function ProfileCard({
               </View>
             )}
 
+            <View style={styles.divider} />
+
             {/* Personal Information */}
             <View style={styles.section}>
               <Text style={[styles.label, { color: colors.secondaryText }]}>
@@ -1094,7 +1096,7 @@ const styles = StyleSheet.create({
   // Matching card styles
   image: {
     width: "100%",
-    height: 240,
+    height: 360,
     resizeMode: "cover",
   },
   content: {
