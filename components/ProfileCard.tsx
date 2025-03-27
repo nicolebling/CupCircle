@@ -28,53 +28,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import Badge from "./Badge";
 import ProfileForm from "@/components/ProfileForm";
 
-// Map of interests to emojis
-const INTEREST_EMOJIS: Record<string, string> = {
-  Reading: "📚",
-  Writing: "✍️",
-  "Self-Development": "🌱",
-  Mindfulness: "🧘",
-  Languages: "🗣️",
-  Psychology: "🧠",
-  Philosophy: "💭",
-  Education: "🎓",
-  Mentoring: "👨‍🏫",
-  Leadership: "👑",
-  Technology: "💻",
-  Business: "💼",
-  Startups: "🚀",
-  Innovation: "💡",
-  Sustainability: "♻️",
-  "Social Impact": "🤝",
-  Marketing: "📢",
-  Design: "🎨",
-  Finance: "💰",
-  Entrepreneurship: "🏆",
-  "Public Speaking": "🎤",
-  Networking: "🔗",
-  "Project Management": "📋",
-  "Data Science": "📊",
-  Photography: "📷",
-  Travel: "✈️",
-  Cooking: "👨‍🍳",
-  Music: "🎵",
-  Art: "🖼️",
-  Sports: "⚽",
-  Gaming: "🎮",
-  Fashion: "👔",
-  Fitness: "💪",
-  Hiking: "🥾",
-  Movies: "🎬",
-  Theatre: "🎭",
-  Dance: "💃",
-  "Food & Wine": "🍷",
-  Coffee: "☕",
-  Tea: "🍵",
-  Yoga: "🧘‍♀️",
-  Meditation: "🧘‍♂️",
-  Podcasts: "🎧",
-  Blogging: "📝",
-};
 
 const { width } = Dimensions.get("window");
 
@@ -653,7 +606,7 @@ export default function ProfileCard({
                   <Text
                     style={[styles.interestText, { color: colors.primary }]}
                   >
-                    {INTEREST_EMOJIS[interest] || "🔖"} {interest}
+                   {interest}
                   </Text>
                 </View>
               ))}
@@ -787,9 +740,11 @@ export default function ProfileCard({
               <Ionicons name="person" size={60} color="#ffffff" />
             </View>
           )}
+
+          
           <View style={{ padding: 16 }}>
             <View style={styles.nameRow}>
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
+            
               <Text style={[styles.name, { color: colors.text }]}>
                 {profile.name}
                 {profile.occupation && (
@@ -799,13 +754,14 @@ export default function ProfileCard({
                       { backgroundColor: colors.primary + "20", marginLeft: 8 },
                     ]}
                   >
-                    <Text style={[styles.tagText, { color: colors.primary }]}>
+                    <Text style={[styles.occupation, { color: colors.primary }]}>
                       {profile.occupation}
                     </Text>
                   </View>
                 )}
               </Text>
-            </View>
+           
+              
 
             {profile.location && (
               <View style={styles.locationContainer}>
@@ -822,16 +778,13 @@ export default function ProfileCard({
               </View>
             )}
           </View>
+            
           {/* Personal Information */}
           <View style={styles.section}>
+
+            
             <Text style={[styles.sectionTitle, { color: colors.text }]}>
               Personal Information
-            </Text>
-            <Text style={[styles.label, { color: colors.secondaryText }]}>
-              Name
-            </Text>
-            <Text style={[styles.value, { color: colors.text }]}>
-              {profile.name}
             </Text>
 
             <Text style={[styles.label, { color: colors.secondaryText }]}>
@@ -840,15 +793,21 @@ export default function ProfileCard({
             <Text style={[styles.value, { color: colors.text }]}>
               {profile.birthday || "Not provided"}
               {"\n"}
+
+              
               <Text style={[styles.label, { color: colors.secondaryText }]}>
                 Age {profile.age}
               </Text>
             </Text>
+
+            
             <Text style={[styles.label, { color: colors.secondaryText }]}>
               City
             </Text>
             <Text style={[styles.value, { color: colors.text }]}>
               {profile.city}
+
+              
             </Text>
             {profile.education && (
               <>
@@ -860,12 +819,16 @@ export default function ProfileCard({
                 </Text>
               </>
             )}
+
+            
             <Text style={[styles.label, { color: colors.secondaryText }]}>
               About
             </Text>
             <Text style={[styles.value, { color: colors.text }]}>
               {profile.bio}
             </Text>
+
+            
           </View>
           {/* Professional Details */}
           <View style={styles.section}>
@@ -1077,7 +1040,8 @@ const styles = StyleSheet.create({
   card: {
     width: width - 32,
     borderRadius: 16,
-    borderWidth: 1,    overflow: "hidden",
+    borderWidth: 1,    
+    overflow: "hidden",
     marginHorizontal: 16,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
