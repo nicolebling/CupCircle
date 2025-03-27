@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
@@ -20,6 +20,42 @@ type Props = {
 
 export default function EmploymentHistoryEntry({ employment, onChange, onDelete, isDark }: Props) {
   const colors = Colors[isDark ? 'dark' : 'light'];
+  const [isEditing, setIsEditing] = useState(true);
+  const [localEmployment, setLocalEmployment] = useState(employment);
+
+  const handleSave = () => {
+    onChange(localEmployment);
+    setIsEditing(false);
+  };
+
+  const handleEdit = () => {
+    setIsEditing(true);
+  };
+
+  if (!isEditing) {
+    return (
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <View style={styles.header}>
+          <Text style={[styles.companyName, { color: colors.text }]}>{localEmployment.company}</Text>
+          <View style={styles.buttonGroup}>
+            <TouchableOpacity onPress={handleEdit} style={styles.actionButton}>
+              <Ionicons name="pencil" size={20} color={colors.text} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={onDelete} style={styles.actionButton}>
+              <Ionicons name="trash-outline" size={20} color={colors.text} />
+            </TouchableOpacity>
+          </View>
+        </View>
+        
+        <Text style={[styles.position, { color: colors.text }]}>{localEmployment.position}</Text>
+        <View style={styles.datesRow}>
+          <Text style={[styles.dateText, { color: colors.secondaryText }]}>
+            {localEmployment.fromDate} - {localEmployment.toDate}
+          </Text>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -34,8 +70,8 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
         style={[styles.input, styles.fullWidthInput, { backgroundColor: colors.input, color: colors.text }]}
         placeholder="Company name"
         placeholderTextColor={colors.secondaryText}
-        value={employment.company}
-        onChangeText={(text) => onChange({ ...employment, company: text })}
+        value={localEmployment.company}
+        onChangeText={(text) => setLocalEmployment({ ...localEmployment, company: text })}
       />
 
       <View style={styles.positionContainer}>
@@ -44,8 +80,8 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
           style={[styles.input, styles.fullWidthInput, { backgroundColor: colors.input, color: colors.text }]}
           placeholder="Job title"
           placeholderTextColor={colors.secondaryText}
-          value={employment.position}
-          onChangeText={(text) => onChange({ ...employment, position: text })}
+          value={localEmployment.position}
+          onChangeText={(text) => setLocalEmployment({ ...localEmployment, position: text })}
         />
       </View>
 
@@ -56,8 +92,8 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
             style={[styles.input, { backgroundColor: colors.input, color: colors.text }]}
             placeholder="MM/YYYY"
             placeholderTextColor={colors.secondaryText}
-            value={employment.fromDate}
-            onChangeText={(text) => onChange({ ...employment, fromDate: text })}
+            value={localEmployment.fromDate}
+            onChangeText={(text) => setLocalEmployment({ ...localEmployment, fromDate: text })}
           />
         </View>
 
@@ -67,10 +103,19 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
             style={[styles.input, { backgroundColor: colors.input, color: colors.text }]}
             placeholder="MM/YYYY or Present"
             placeholderTextColor={colors.secondaryText}
-            value={employment.toDate}
-            onChangeText={(text) => onChange({ ...employment, toDate: text })}
+            value={localEmployment.toDate}
+            onChangeText={(text) => setLocalEmployment({ ...localEmployment, toDate: text })}
           />
         </View>
+      </View>
+
+      <View style={styles.actionRow}>
+        <TouchableOpacity 
+          style={[styles.saveButton, { backgroundColor: colors.primary }]} 
+          onPress={handleSave}
+        >
+          <Text style={styles.saveButtonText}>Save</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -117,6 +162,40 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   deleteButton: {
+    padding: 4,
+  },
+  actionRow: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    marginTop: 16,
+    gap: 12,
+  },
+  saveButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+  },
+  saveButtonText: {
+    color: '#FFFFFF',
+    fontWeight: '600',
+  },
+  companyName: {
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  position: {
+    fontSize: 16,
+    marginTop: 4,
+  },
+  dateText: {
+    fontSize: 14,
+    marginTop: 4,
+  },
+  buttonGroup: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  actionButton: {
     padding: 4,
   },
 });
