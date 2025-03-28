@@ -569,15 +569,13 @@ export default function ProfileForm({
                       );
                       return;
                     }
-                    setEmploymentHistory([
-                      {
-                        company: '',
-                        position: '',
-                        fromDate: '',
-                        toDate: '',
-                      },
-                      ...employmentHistory,
-                    ]);
+                    const emptyEntry = {
+                      company: '',
+                      position: '',
+                      fromDate: '',
+                      toDate: '',
+                    };
+                    setEmploymentHistory([emptyEntry, ...employmentHistory]);
                   }}
                 >
                   <Ionicons name="add-circle" size={24} color={colors.primary} />
