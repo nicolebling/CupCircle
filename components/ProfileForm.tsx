@@ -412,7 +412,7 @@ export default function ProfileForm({
                 </View>
               )}
               <View style={styles.editButton}>
-                <Ionicons name="pencil" size={20} color="#666" />
+                <Ionicons name="camera" size={20} color="#666" />
               </View>
             </TouchableOpacity>
           </View>
