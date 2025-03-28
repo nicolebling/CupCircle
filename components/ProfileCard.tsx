@@ -850,55 +850,6 @@ export default function ProfileCard({
             {/* Professional Details */}
             <View style={styles.section}>
 
-              {/* Occupation */}
-              <Text style={[styles.label, { color: colors.secondaryText }]}>
-                Occupation
-              </Text>
-              <Text style={[styles.value, { color: colors.text }]}>
-                {profile.occupation}
-              </Text>
-
-              {/* Experience Level */}
-              {profile.experience_level && (
-                <>
-                  <Text style={[styles.label, { color: colors.secondaryText }]}>
-                    Experience Level
-                  </Text>
-                  <View
-                    style={[
-                      styles.coffeeExperienceContainer,
-                      {
-                        flexDirection: "row",
-                        justifyContent: "flex-start",
-                        alignItems: "center",
-                      },
-                    ]}
-                  >
-                    <Text style={[styles.value, { color: colors.text }]}>
-                      {profile.experience_level || ""}
-                      {"\t"}
-                      <Ionicons
-                        name="cafe"
-                        size={14}
-                        color={getCoffeeColor(profile.experience_level || "")}
-                      />
-                      <Text
-                        style={[
-                          styles.coffeeBadgeText,
-                          {
-                            color: getCoffeeColor(
-                              profile.experience_level || "",
-                            ),
-                          },
-                        ]}
-                      >
-                        {getCoffeeTheme(profile.experience_level || "")}
-                      </Text>
-                    </Text>
-                  </View>
-                </>
-              )}
-
               {/* Industry Categories */}
               {profile.industry_categories &&
                 profile.industry_categories.length > 0 && (
