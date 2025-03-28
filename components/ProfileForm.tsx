@@ -559,15 +559,13 @@ export default function ProfileForm({
                       );
                       return;
                     }
-                    setEmploymentHistory([
-                      {
-                        company: "",
-                        position: "",
-                        fromDate: "",
-                        toDate: "",
-                      },
-                      ...employmentHistory,
-                    ]);
+                    const emptyEntry = {
+                      company: "",
+                      position: "",
+                      fromDate: "",
+                      toDate: "",
+                    };
+                    setEmploymentHistory([emptyEntry, ...employmentHistory]);
                   }}
                 >
                   <Ionicons
