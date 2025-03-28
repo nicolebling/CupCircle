@@ -386,23 +386,23 @@ export default function ProfileForm({
             </View>
           ) : null}
 
-          <TouchableOpacity style={styles.avatarContainer} onPress={pickImage}>
+          <TouchableOpacity onPress={pickImage}>
             {avatar ? (
-              <View style={styles.avatarWrapper}>
-                <Image
-                  source={{ uri: avatar }}
-                  style={{ width: 120, height: 120, borderRadius: 60 }}
-                  resizeMode="cover"
-                />
-              </View>
+              <Image
+                source={{ uri: avatar }}
+                style={styles.image}
+                resizeMode="cover"
+              />
             ) : (
-              <View style={styles.avatarPlaceholder}>
-                <Ionicons name="person" size={80} color="#ccc" />
+              <View style={[styles.image, { backgroundColor: "#1A1A1A", justifyContent: "center", alignItems: "center" }]}>
+                <Ionicons name="person" size={60} color="#ffffff" />
               </View>
             )}
-            <Text style={[styles.avatarText, isDark && styles.textDark]}>
-              {avatar ? "Change Photo" : "Add Photo"}
-            </Text>
+            <View style={styles.changePhotoButton}>
+              <Text style={[styles.avatarText, isDark && styles.textDark]}>
+                {avatar ? "Change Photo" : "Add Photo"}
+              </Text>
+            </View>
           </TouchableOpacity>
 
           <View style={styles.section}>
@@ -745,26 +745,19 @@ const styles = StyleSheet.create({
     height: 120,
     textAlignVertical: "top",
   },
-  avatarContainer: {
-    alignItems: "center",
-    marginBottom: 30,
+  image: {
+    width: width - 32,
+    height: width - 32,
+    resizeMode: "cover",
   },
-  avatarWrapper: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: "#f0f0f0",
-    justifyContent: "center",
-    alignItems: "center",
-    overflow: "hidden",
-  },
-  avatarPlaceholder: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: "#f0f0f0",
-    justifyContent: "center",
-    alignItems: "center",
+  changePhotoButton: {
+    position: 'absolute',
+    bottom: 16,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    padding: 8,
   },
   avatarText: {
     marginTop: 10,
