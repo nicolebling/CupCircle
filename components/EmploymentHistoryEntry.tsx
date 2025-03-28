@@ -124,7 +124,24 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
             placeholder="MM/YYYY"
             placeholderTextColor={colors.secondaryText}
             value={localEmployment.fromDate}
-            onChangeText={(text) => setLocalEmployment({ ...localEmployment, fromDate: text })}
+            onChangeText={(text) => {
+              // Remove any non-numeric characters
+              const numbers = text.replace(/\D/g, '');
+              
+              // Format as MM/YYYY if there are enough numbers
+              if (numbers.length >= 6) {
+                const month = numbers.slice(0, 2);
+                const year = numbers.slice(2, 6);
+                setLocalEmployment({ ...localEmployment, fromDate: `${month}/${year}` });
+              } else {
+                // If user includes a slash, keep it
+                if (text.includes('/')) {
+                  setLocalEmployment({ ...localEmployment, fromDate: text });
+                } else {
+                  setLocalEmployment({ ...localEmployment, fromDate: numbers });
+                }
+              }
+            }}
           />
         </View>
 
@@ -136,7 +153,24 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
               placeholder="MM/YYYY"
               placeholderTextColor={colors.secondaryText}
               value={localEmployment.toDate}
-              onChangeText={(text) => setLocalEmployment({ ...localEmployment, toDate: text })}
+              onChangeText={(text) => {
+              // Remove any non-numeric characters
+              const numbers = text.replace(/\D/g, '');
+              
+              // Format as MM/YYYY if there are enough numbers
+              if (numbers.length >= 6) {
+                const month = numbers.slice(0, 2);
+                const year = numbers.slice(2, 6);
+                setLocalEmployment({ ...localEmployment, toDate: `${month}/${year}` });
+              } else {
+                // If user includes a slash, keep it
+                if (text.includes('/')) {
+                  setLocalEmployment({ ...localEmployment, toDate: text });
+                } else {
+                  setLocalEmployment({ ...localEmployment, toDate: numbers });
+                }
+              }
+            }}
             />
           ) : (
             <Text style={[styles.input, { backgroundColor: colors.input, color: colors.text, textAlignVertical: 'center' }]}>
