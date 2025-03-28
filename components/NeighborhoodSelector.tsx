@@ -76,6 +76,26 @@ export default function NeighborhoodSelector({
         <Ionicons name="chevron-down" size={20} color={colors.secondaryText} />
       </TouchableOpacity>
 
+      {Array.isArray(selected) && selected.length > 0 && (
+        <View style={styles.selectedContainer}>
+          {selected.map((neighborhood, index) => (
+            <View
+              key={index}
+              style={[
+                styles.selectedBubble,
+                { backgroundColor: colors.primary + "20" },
+              ]}
+            >
+              <Text
+                style={[styles.selectedBubbleText, { color: colors.primary }]}
+              >
+                {neighborhood}
+              </Text>
+            </View>
+          ))}
+        </View>
+      )}
+
       <Modal
         visible={modalVisible}
         transparent={true}
@@ -258,5 +278,22 @@ const styles = StyleSheet.create({
   neighborhoodText: {
     fontFamily: 'K2D-Regular',
     fontSize: 16,
-  }
+  },
+  selectedContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginTop: 10,
+    marginBottom: 16,
+  },
+  selectedBubble: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    marginRight: 8,
+    marginBottom: 8,
+  },
+  selectedBubbleText: {
+    fontFamily: "K2D-Medium",
+    fontSize: 12,
+  },
 });
