@@ -200,6 +200,24 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
 
       <View style={styles.actionRow}>
         <TouchableOpacity 
+          style={[
+            styles.presentButton,
+            { backgroundColor: isPresentJob ? colors.primary : colors.input }
+          ]}
+          onPress={() => {
+            setIsPresentJob(!isPresentJob);
+            setLocalEmployment({ 
+              ...localEmployment, 
+              toDate: !isPresentJob ? 'Present' : '' 
+            });
+          }}
+        >
+          <Text style={[styles.presentButtonText, { color: isPresentJob ? '#fff' : colors.text }]}>
+            Present Job
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
           style={[styles.saveButton, { backgroundColor: colors.primary }]} 
           onPress={handleSave}
         >
@@ -266,10 +284,11 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   actionRow: {
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    marginTop: 16,
-    gap: 12,
+     flexDirection: 'row',
+      justifyContent: 'flex-end',  // Align to right
+      alignItems: 'center',
+      marginTop: 16,
+      gap: 12,  // Space between buttons
   },
   saveButton: {
     paddingVertical: 8,
