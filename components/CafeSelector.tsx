@@ -236,7 +236,7 @@ export default function CafeSelector({
                   key={index}
                   style={[
                     styles.selectedTag,
-                    { backgroundColor: colors.primary + "20" },
+                    { backgroundColor: "transparent", borderWidth: 1, borderColor: colors.primary },
                   ]}
                 >
                   <View style={styles.tagContent}>

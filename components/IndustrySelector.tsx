@@ -152,7 +152,7 @@ export default function IndustrySelector({
               key={index}
               style={[
                 styles.selectedBubble,
-                { backgroundColor: colors.primary + "20" },
+                { backgroundColor: "transparent", borderWidth: 1, borderColor: colors.primary },
               ]}
             >
               <Text
