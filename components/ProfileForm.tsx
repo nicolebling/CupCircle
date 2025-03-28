@@ -133,6 +133,8 @@ export default function ProfileForm({
         }
         setEmploymentHistory(employmentData);
 
+        console.log(data.employment);
+
         console.log("Profile data loaded into form state");
       }
     } catch (error) {
