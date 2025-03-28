@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
@@ -19,14 +19,27 @@ type Props = {
 
 export default function EmploymentHistoryEntry({ employment, onChange, onDelete, isDark }: Props) {
   const colors = Colors[isDark ? 'dark' : 'light'];
-  const [isEditing, setIsEditing] = useState(!employment || !employment.company);
+  const [isEditing, setIsEditing] = useState(true);
   const [localEmployment, setLocalEmployment] = useState({
-    company: employment?.company || '',
-    position: employment?.position || '',
-    fromDate: employment?.fromDate || '',
-    toDate: employment?.toDate || ''
+    company: '',
+    position: '',
+    fromDate: '',
+    toDate: ''
   });
-  const [isPresentJob, setIsPresentJob] = useState(employment?.toDate === 'Present');
+  const [isPresentJob, setIsPresentJob] = useState(false);
+
+  useEffect(() => {
+    if (employment?.company) {
+      setIsEditing(false);
+      setLocalEmployment({
+        company: employment.company,
+        position: employment.position,
+        fromDate: employment.fromDate,
+        toDate: employment.toDate
+      });
+      setIsPresentJob(employment.toDate === 'Present');
+    }
+  }, [employment]);
 
   const handleSave = () => {
     // Check if all fields are empty
