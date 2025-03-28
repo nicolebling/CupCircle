@@ -1090,8 +1090,8 @@ const styles = StyleSheet.create({
 
   // Matching card styles
   image: {
-    width: "100%",
-    height: 360,
+    width: width - 32, // Full width of card minus margins
+    height: width - 32, // Same as width for 1:1 ratio
     resizeMode: "cover",
   },
   content: {
