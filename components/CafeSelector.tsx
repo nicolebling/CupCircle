@@ -582,7 +582,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     flex: 1,
     marginRight: 8,
-    z
   },
   map: {
     width: "100%",
