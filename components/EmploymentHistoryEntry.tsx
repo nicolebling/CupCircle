@@ -19,7 +19,7 @@ type Props = {
 
 export default function EmploymentHistoryEntry({ employment, onChange, onDelete, isDark }: Props) {
   const colors = Colors[isDark ? 'dark' : 'light'];
-  const [isEditing, setIsEditing] = useState(true);
+  const [isEditing, setIsEditing] = useState(!employment?.company);
   const [localEmployment, setLocalEmployment] = useState(employment || {
     company: '',
     position: '',
