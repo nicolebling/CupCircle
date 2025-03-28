@@ -26,6 +26,7 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
     fromDate: '',
     toDate: ''
   });
+  const [isPresentJob, setIsPresentJob] = useState(false);
 
   const handleSave = () => {
     // Check if all fields are empty
@@ -44,7 +45,7 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
     const isMissing = !localEmployment.company || 
                      !localEmployment.position || 
                      !localEmployment.fromDate || 
-                     !localEmployment.toDate;
+                     (!localEmployment.toDate && !isPresentJob);
 
     if (isMissing) {
       Alert.alert(
@@ -129,15 +130,39 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
 
         <View style={[styles.dateField, { marginLeft: 12 }]}>
           <Text style={[styles.label, { color: colors.secondaryText }]}>To</Text>
-          <TextInput
-            style={[styles.input, { backgroundColor: colors.input, color: colors.text }]}
-            placeholder="MM/YYYY"
-            placeholderTextColor={colors.secondaryText}
-            value={localEmployment.toDate}
-            onChangeText={(text) => setLocalEmployment({ ...localEmployment, toDate: text })}
-          />
+          {!isPresentJob ? (
+            <TextInput
+              style={[styles.input, { backgroundColor: colors.input, color: colors.text }]}
+              placeholder="MM/YYYY"
+              placeholderTextColor={colors.secondaryText}
+              value={localEmployment.toDate}
+              onChangeText={(text) => setLocalEmployment({ ...localEmployment, toDate: text })}
+            />
+          ) : (
+            <Text style={[styles.input, { backgroundColor: colors.input, color: colors.text, textAlignVertical: 'center' }]}>
+              Present
+            </Text>
+          )}
         </View>
       </View>
+      <TouchableOpacity
+        style={[
+          styles.presentButton,
+          { backgroundColor: isPresentJob ? colors.primary : colors.input }
+        ]}
+        onPress={() => {
+          setIsPresentJob(!isPresentJob);
+          if (!isPresentJob) {
+            setLocalEmployment({ ...localEmployment, toDate: 'Present' });
+          } else {
+            setLocalEmployment({ ...localEmployment, toDate: '' });
+          }
+        }}
+      >
+        <Text style={[styles.presentButtonText, { color: isPresentJob ? '#fff' : colors.text }]}>
+          Present Job
+        </Text>
+      </TouchableOpacity>
 
       <View style={styles.actionRow}>
         <TouchableOpacity 
@@ -152,6 +177,17 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
 }
 
 const styles = StyleSheet.create({
+  presentButton: {
+    padding: 8,
+    borderRadius: 8,
+    marginTop: 12,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  presentButtonText: {
+    fontWeight: '600',
+  },
   container: {
     padding: 16,
     borderRadius: 12,
