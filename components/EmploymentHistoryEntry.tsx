@@ -187,6 +187,7 @@ const styles = StyleSheet.create({
   },
   presentButtonText: {
     fontWeight: '600',
+    
   },
   container: {
     padding: 16,
