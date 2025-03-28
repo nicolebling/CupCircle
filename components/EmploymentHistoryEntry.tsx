@@ -24,6 +24,32 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
   const [localEmployment, setLocalEmployment] = useState(employment);
 
   const handleSave = () => {
+    // Check if all fields are empty
+    const isEmpty = !localEmployment.company && 
+                   !localEmployment.position && 
+                   !localEmployment.fromDate && 
+                   !localEmployment.toDate;
+
+    if (isEmpty) {
+      // If everything is empty, delete the entry
+      onDelete();
+      return;
+    }
+
+    // Check if any required field is missing
+    const isMissing = !localEmployment.company || 
+                     !localEmployment.position || 
+                     !localEmployment.fromDate || 
+                     !localEmployment.toDate;
+
+    if (isMissing) {
+      Alert.alert(
+        "Incomplete Entry",
+        "Please fill in all fields for the employment history entry."
+      );
+      return;
+    }
+
     onChange(localEmployment);
     setIsEditing(false);
   };
