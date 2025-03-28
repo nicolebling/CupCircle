@@ -179,24 +179,6 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
           )}
         </View>
       </View>
-      <TouchableOpacity
-        style={[
-          styles.presentButton,
-          { backgroundColor: isPresentJob ? colors.primary : colors.input }
-        ]}
-        onPress={() => {
-          setIsPresentJob(!isPresentJob);
-          if (!isPresentJob) {
-            setLocalEmployment({ ...localEmployment, toDate: 'Present' });
-          } else {
-            setLocalEmployment({ ...localEmployment, toDate: '' });
-          }
-        }}
-      >
-        <Text style={[styles.presentButtonText, { color: isPresentJob ? '#fff' : colors.text }]}>
-          Present Job
-        </Text>
-      </TouchableOpacity>
 
       <View style={styles.actionRow}>
         <TouchableOpacity 
