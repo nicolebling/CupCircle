@@ -54,6 +54,19 @@ export const profileService = {
         console.error("Supabase error:", error);
         throw error;
       }
+
+      // Parse employment data if it exists
+      if (data && data.employment) {
+        try {
+          data.employment = typeof data.employment === 'string' 
+            ? JSON.parse(data.employment) 
+            : data.employment;
+        } catch (e) {
+          console.error("Error parsing employment data:", e);
+          data.employment = [];
+        }
+      }
+
       console.log("Profile data:", data);
       return data;
     } catch (error) {

@@ -119,7 +119,19 @@ export default function ProfileForm({
         setFavoriteCafes(data.favorite_cafes || []);
         setInterests(data.interests || []);
         setAvatar(data.photo_url || "");
-        setEmploymentHistory(data.employment || []);
+        
+        // Handle employment data
+        let employmentData = [];
+        if (data.employment) {
+          try {
+            employmentData = Array.isArray(data.employment) 
+              ? data.employment 
+              : JSON.parse(data.employment);
+          } catch (e) {
+            console.error("Error parsing employment data:", e);
+          }
+        }
+        setEmploymentHistory(employmentData);
 
         console.log("Profile data loaded into form state");
       }
