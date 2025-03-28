@@ -72,11 +72,6 @@ export default function NeighborhoodSelector({
           <Text style={[styles.selectorText, { color: selected.length ? colors.text : colors.secondaryText }]}>
             {selected.length ? `${selected.length} neighborhoods selected` : 'Select neighborhoods'}
           </Text>
-          {selected.length > 0 && (
-            <View style={[styles.badge, { backgroundColor: colors.primary }]}>
-              <Text style={styles.badgeText}>{selected.length}</Text>
-            </View>
-          )}
         </View>
         <Ionicons name="chevron-down" size={20} color={colors.secondaryText} />
       </TouchableOpacity>
@@ -159,6 +154,8 @@ export default function NeighborhoodSelector({
               }}
               contentContainerStyle={styles.neighborhoodsList}
             />
+
+            
           </View>
         </View>
       </Modal>
