@@ -132,7 +132,7 @@ export default function IndustrySelector({
               numberOfLines={1}
               ellipsizeMode="tail"
             >
-              {selected.join(", ")}
+              {selected.length} industries selected
             </Text>
           ) : (
             <Text
