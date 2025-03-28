@@ -574,7 +574,7 @@ export default function ProfileForm({
           </View>
 
           <View style={styles.divider} />
-          
+
           <View style={styles.section}>
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isDark && styles.textDark]}>
@@ -689,13 +689,13 @@ const styles = StyleSheet.create({
     padding: 12,
     fontSize: 16,
     color: "#333",
-    marginBottom: 5, // Added marginBottom for better spacing
+    marginBottom: 5,
   },
   inputDark: {
     backgroundColor: "#333",
     borderColor: "#555",
     color: "#fff",
-    marginBottom: 5, // Added marginBottom for better spacing
+    marginBottom: 5,
   },
   textArea: {
     backgroundColor: "#f8f8f8",
@@ -754,14 +754,15 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   tag: {
-    backgroundColor: "#0097FB",
-    borderRadius: 20,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
     flexDirection: "row",
     alignItems: "center",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
     marginRight: 8,
     marginBottom: 8,
+    borderWidth: 1,
+    backgroundColor: "transparent",
   },
   tagText: {
     color: "#fff",
@@ -816,15 +817,15 @@ const styles = StyleSheet.create({
   employmentInputGroup: {
     flexDirection: "row",
     justifyContent: "space-between",
-    gap: 10, // Adds space between inputs
+    gap: 10,
     marginBottom: 5,
   },
   halfWidth: {
-    flex: 1, // Makes each input take up half the row
+    flex: 1,
   },
   deleteButton: {
     marginTop: 5,
-    alignSelf: "flex-end", // Aligns delete button to the right
+    alignSelf: "flex-end",
   },
   divider: {
     height: 1,

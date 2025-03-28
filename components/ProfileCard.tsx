@@ -766,7 +766,9 @@ export default function ProfileCard({
                 style={[
                   styles.tag,
                   {
-                    backgroundColor: colors.primary + "20",
+                    backgroundColor: 'transparent',
+                    borderWidth: 1,
+                    borderColor: colors.primary,
                     alignSelf: "flex-start",
                     marginTop: 4,
                   },
@@ -880,7 +882,7 @@ export default function ProfileCard({
                           key={index}
                           style={[
                             styles.tag,
-                            { backgroundColor: colors.primary + "20" },
+                            { backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.primary },
                           ]}
                         >
                           <Text
@@ -906,7 +908,7 @@ export default function ProfileCard({
                         key={index}
                         style={[
                           styles.tag,
-                          { backgroundColor: colors.primary + "20" },
+                          { backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.primary },
                         ]}
                       >
                         <Text
@@ -940,7 +942,7 @@ export default function ProfileCard({
                         key={index}
                         style={[
                           styles.tag,
-                          { backgroundColor: colors.primary + "20" },
+                          { backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.primary },
                         ]}
                       >
                         <Text
@@ -968,7 +970,9 @@ export default function ProfileCard({
                           style={[
                             styles.tag,
                             {
-                              backgroundColor: colors.primary + "20",
+                              backgroundColor: 'transparent',
+                              borderWidth: 1,
+                              borderColor: colors.primary,
                               flexDirection: "column",
                               alignItems: "flex-start",
                               padding: 8,
@@ -1247,8 +1251,8 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     marginRight: 8,
     marginBottom: 8,
-    flexDirection: "row",
-    alignItems: "center",
+    borderWidth: 1,
+    backgroundColor: "transparent",
   },
   tagText: {
     fontFamily: "K2D-Medium",
