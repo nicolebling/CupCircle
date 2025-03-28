@@ -617,7 +617,7 @@ export default function ProfileForm({
             </View>
             
 
-            <View style={styles.inputGroup}>
+            <View style={[styles.inputGroup, { marginBottom: 20 }]}>
               <Text style={[styles.label, isDark && styles.textDark]}>
                 Favorite Cafes
               </Text>
@@ -626,6 +626,65 @@ export default function ProfileForm({
                 onChange={setFavoriteCafes}
                 isDark={isDark}
               />
+              <View style={styles.tagsContainer}>
+                {favoriteCafes.map((cafe, index) => {
+                  const [cafeName, cafeAddress] = cafe ? cafe.split('|||') : ['', ''];
+                  return (
+                    <View
+                      key={index}
+                      style={[
+                        styles.tag,
+                        {
+                          backgroundColor: colors.primary + "20",
+                          flexDirection: "column",
+                          alignItems: "flex-start",
+                          padding: 8,
+                          marginRight: 8,
+                          marginBottom: 8,
+                        },
+                      ]}
+                    >
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          marginBottom: 4,
+                        }}
+                      >
+                        <Ionicons
+                          name="cafe"
+                          size={12}
+                          color={colors.primary}
+                          style={{ marginRight: 4 }}
+                        />
+                        <Text
+                          style={[
+                            styles.tagText,
+                            {
+                              color: colors.primary,
+                              fontFamily: "K2D-Medium",
+                            },
+                          ]}
+                        >
+                          {cafeName}
+                        </Text>
+                      </View>
+                      <Text
+                        style={[
+                          styles.tagText,
+                          {
+                            color: colors.secondaryText,
+                            fontSize: 10,
+                            fontFamily: "K2D-Regular",
+                          },
+                        ]}
+                      >
+                        {cafeAddress}
+                      </Text>
+                    </View>
+                  );
+                })}
+              </View>
             </View>
           </View>
 
