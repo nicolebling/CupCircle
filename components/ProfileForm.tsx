@@ -562,6 +562,13 @@ export default function ProfileForm({
                 <Text style={[styles.label, isDark && styles.textDark]}>Employment (Optional)</Text>
                 <TouchableOpacity
                   onPress={() => {
+                    if (employmentHistory.length >= 3) {
+                      Alert.alert(
+                        "Maximum Entries Reached",
+                        "You can only add up to 3 employment history entries."
+                      );
+                      return;
+                    }
                     setEmploymentHistory([
                       {
                         company: '',
