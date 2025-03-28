@@ -389,26 +389,26 @@ export default function ProfileForm({
             </View>
           ) : null}
 
-          <TouchableOpacity onPress={pickImage}>
-            {avatar ? (
-              <Image
-                source={{ uri: avatar }}
-                style={styles.image}
-                resizeMode="cover"
-              />
-            ) : (
-              <View style={[styles.image, { backgroundColor: "#1A1A1A", justifyContent: "center", alignItems: "center" }]}>
-                <Ionicons name="person" size={60} color="#ffffff" />
+          <View style={styles.photoContainer}>
+            <TouchableOpacity onPress={pickImage} style={styles.imageWrapper}>
+              {avatar ? (
+                <Image
+                  source={{ uri: avatar }}
+                  style={styles.image}
+                  resizeMode="cover"
+                />
+              ) : (
+                <View style={[styles.image, { backgroundColor: "#1A1A1A", justifyContent: "center", alignItems: "center" }]}>
+                  <Ionicons name="person" size={60} color="#ffffff" />
+                </View>
+              )}
+              <View style={styles.editButton}>
+                <Ionicons name="pencil" size={20} color="#666" />
               </View>
-            )}
-            <View style={styles.changePhotoButton}>
-              <Text style={[styles.avatarText, isDark && styles.textDark]}>
-                {avatar ? "Change Photo" : "Add Photo"}
-              </Text>
-            </View>
-          </TouchableOpacity>
+            </TouchableOpacity>
+          </View>
 
-          <View style={styles.section}>
+          <View style={[styles.section, { marginTop: 24 }]}>
             <Text style={[styles.sectionTitle, isDark && styles.textDark]}>
               Basic Information
             </Text>
@@ -748,21 +748,40 @@ const styles = StyleSheet.create({
     height: 120,
     textAlignVertical: "top",
   },
-  image: {
+  photoContainer: {
+    alignItems: 'center',
+    width: '100%',
+  },
+  imageWrapper: {
+    position: 'relative',
     width: width - 32,
     height: width - 32,
+  },
+  image: {
+    width: '100%',
+    height: '100%',
     resizeMode: "cover",
     borderRadius: 16,
     overflow: "hidden",
   },
-  changePhotoButton: {
+  editButton: {
     position: 'absolute',
-    bottom: 16,
-    left: 0,
-    right: 0,
+    top: 12,
+    right: 12,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    padding: 8,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   avatarText: {
     marginTop: 10,
