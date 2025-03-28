@@ -34,7 +34,7 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
 
   if (!isEditing) {
     return (
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={[styles.container, { backgroundColor: colors.input }]}>
         <View style={styles.header}>
           <Text style={[styles.companyName, { color: colors.text }]}>{localEmployment.company}</Text>
           <View style={styles.buttonGroup}>
@@ -58,7 +58,7 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <View style={[styles.container, { backgroundColor: colors.input }]}>
       <View style={styles.header}>
         <Text style={[styles.label, { color: colors.secondaryText }]}>Company</Text>
         <TouchableOpacity onPress={onDelete} style={styles.deleteButton}>

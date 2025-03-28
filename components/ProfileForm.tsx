@@ -278,7 +278,7 @@ export default function ProfileForm({
         neighborhoods: neighborhoods,
         favorite_cafes: favoriteCafes,
         interests: interests,
-        employmentHistory, // Include employment history
+        //employmentHistory, 
         updated_at: new Date(),
       };
 
@@ -320,7 +320,7 @@ export default function ProfileForm({
           neighborhoods,
           favorite_cafes: favoriteCafes,
           interests,
-          employmentHistory,
+          //employmentHistory,
         });
       }
     } catch (error: any) {
@@ -483,6 +483,17 @@ export default function ProfileForm({
             </View>
 
             <View style={styles.inputGroup}>
+              <Text style={[styles.label, isDark && styles.textDark]}>Education</Text>
+              <TextInput
+                style={[styles.input, isDark && styles.inputDark]}
+                value={education}
+                onChangeText={setEducation}
+                placeholder="Your educational background"
+                placeholderTextColor={isDark ? "#999" : "#777"}
+              />
+            </View>
+
+            <View style={styles.inputGroup}>
               <Text style={[styles.label, isDark && styles.textDark]}>Bio</Text>
               <TextInput
                 style={[styles.textArea, isDark && styles.inputDark]}
@@ -526,7 +537,30 @@ export default function ProfileForm({
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={[styles.label, isDark && styles.textDark]}>Employment History</Text>
+              <Text style={[styles.label, isDark && styles.textDark]}>
+                Industry Categories
+              </Text>
+              <IndustrySelector
+                selected={industryCategories}
+                onChange={setIndustryCategories}
+                isDark={isDark}
+              />
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={[styles.label, isDark && styles.textDark]}>
+                Interests
+              </Text>
+              <InterestSelector
+                selected={interests}
+                onChange={setInterests}
+                isDark={isDark}
+              />
+            </View>
+
+
+            <View style={styles.inputGroup}>
+              <Text style={[styles.label, isDark && styles.textDark]}>Employment (Optional)</Text>
               {employmentHistory.map((employment, index) => (
                 <EmploymentHistoryEntry
                   key={index}
@@ -561,45 +595,16 @@ export default function ProfileForm({
               </TouchableOpacity>
             </View>
 
-            <View style={styles.inputGroup}>
-              <Text style={[styles.label, isDark && styles.textDark]}>Education</Text>
-              <TextInput
-                style={[styles.input, isDark && styles.inputDark]}
-                value={education}
-                onChangeText={setEducation}
-                placeholder="Your educational background"
-                placeholderTextColor={isDark ? "#999" : "#777"}
-              />
-            </View>
-
-            <View style={styles.inputGroup}>
-              <Text style={[styles.label, isDark && styles.textDark]}>
-                Industry Categories
-              </Text>
-              <IndustrySelector
-                selected={industryCategories}
-                onChange={setIndustryCategories}
-                isDark={isDark}
-              />
-            </View>
+            
           </View>
+
+          
 
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, isDark && styles.textDark]}>
               Personal Information
             </Text>
-
-            <View style={styles.inputGroup}>
-              <Text style={[styles.label, isDark && styles.textDark]}>
-                Interests
-              </Text>
-              <InterestSelector
-                selected={interests}
-                onChange={setInterests}
-                isDark={isDark}
-              />
-            </View>
-
+            
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isDark && styles.textDark]}>
                 Favorite Neighborhoods
@@ -610,6 +615,7 @@ export default function ProfileForm({
                 isDark={isDark}
               />
             </View>
+            
 
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isDark && styles.textDark]}>
