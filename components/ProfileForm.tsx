@@ -752,6 +752,8 @@ const styles = StyleSheet.create({
     width: width - 32,
     height: width - 32,
     resizeMode: "cover",
+    borderRadius: 16,
+    overflow: "hidden",
   },
   changePhotoButton: {
     position: 'absolute',
