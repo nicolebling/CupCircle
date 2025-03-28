@@ -432,27 +432,42 @@ export default function CafeSelector({
 
             <View style={styles.selectedCafes}>
               {selected.map((cafe, index) => {
-        
+                const [cafeName, cafeAddress] = cafe ? cafe.split('|||') : ['', ''];
                 return (
-                  <TouchableOpacity
+                  <View
                     key={index}
-                    style={[styles.cafeItem, { backgroundColor: colors.input }]}
-                    onPress={() =>
-                      onChange(selected.filter((_, i) => i !== index))
-                    }
+                    style={[
+                      styles.tag,
+                      {
+                        backgroundColor: colors.primary + "20",
+                        marginBottom: 8,
+                        padding: 8,
+                      },
+                    ]}
                   >
-                    <View
-                      style={{ flexDirection: "column", flex: 1, height: 40 }}
-                    >
-                      <Text style={[styles.cafeText, { fontWeight: "bold" }]}>
-                        {cafe ? cafe.split('|||')[0] : "Cafe"}
-                      </Text>
-                      <Text style={styles.cafeText}>
-                        {cafe ? cafe.split('|||')[1] : "Address"}
-                      </Text>
+                    <View style={styles.tagContent}>
+                      <Ionicons
+                        name="cafe"
+                        size={12}
+                        color={colors.primary}
+                        style={{ marginRight: 8 }}
+                      />
+                      <View>
+                        <Text style={[styles.tagName, { color: colors.primary }]}>
+                          {cafeName}
+                        </Text>
+                        <Text style={[styles.tagAddress, { color: colors.secondaryText }]}>
+                          {cafeAddress}
+                        </Text>
+                      </View>
+                      <TouchableOpacity
+                        onPress={() => onChange(selected.filter((_, i) => i !== index))}
+                        style={styles.removeButton}
+                      >
+                        <Ionicons name="close-circle" size={16} color={colors.primary} />
+                      </TouchableOpacity>
                     </View>
-                    <Ionicons name="close-circle" size={20} color="black" />
-                  </TouchableOpacity>
+                  </View>
                 );
               })}
             </View>
@@ -464,6 +479,25 @@ export default function CafeSelector({
 }
 
 const styles = StyleSheet.create({
+  tag: {
+    borderRadius: 8,
+  },
+  tagContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  tagName: {
+    fontSize: 14,
+    fontFamily: 'K2D-Medium',
+  },
+  tagAddress: {
+    fontSize: 12,
+    fontFamily: 'K2D-Regular',
+    marginTop: 2,
+  },
+  removeButton: {
+    marginLeft: 'auto',
+  },
   selectedTagsContainer: {
     marginTop: 8,
   },
@@ -509,6 +543,7 @@ const styles = StyleSheet.create({
   },
   selectorText: {
     fontSize: 16,
+    fontFamily: 'K2D-Regular',
   },
   modalOverlay: {
     flex: 1,
@@ -529,7 +564,7 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: 20,
-    fontWeight: "bold",
+    fontFamily: 'K2D-Bold',
   },
   selectedCafes: {
     marginTop: 20,
