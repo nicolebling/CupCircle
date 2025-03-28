@@ -119,7 +119,11 @@ export default function ProfileForm({
         setFavoriteCafes(data.favorite_cafes || []);
         setInterests(data.interests || []);
         setAvatar(data.photo_url || "");
-        setEmploymentHistory(data.employment || []);
+        // Parse employment data if it exists
+        const employmentData = data.employment ? 
+          data.employment.map(emp => typeof emp === 'string' ? JSON.parse(emp) : emp) 
+          : [];
+        setEmploymentHistory(employmentData);
 
         console.log("Profile data loaded into form state");
       }
