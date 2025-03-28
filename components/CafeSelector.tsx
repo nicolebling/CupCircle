@@ -480,7 +480,13 @@ export default function CafeSelector({
 
 const styles = StyleSheet.create({
   tag: {
-    borderRadius: 8,
+    borderRadius: 16,
+    backgroundColor: "transparent",
+    borderWidth: 1,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    marginRight: 8,
+    marginBottom: 8,
   },
   tagContent: {
     flexDirection: 'row',

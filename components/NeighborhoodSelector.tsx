@@ -83,7 +83,7 @@ export default function NeighborhoodSelector({
               key={index}
               style={[
                 styles.selectedBubble,
-                { backgroundColor: colors.primary + "20" },
+                { backgroundColor: "transparent", borderWidth:1, borderColor: colors.primary}
               ]}
             >
               <Text
@@ -154,20 +154,21 @@ export default function NeighborhoodSelector({
                     style={[
                       styles.neighborhoodItem,
                       {
-                        backgroundColor: isSelected ? colors.primary : colors.background,
-                        borderColor: colors.border
+                        backgroundColor: "transparent",
+                        borderWidth: 1,
+                        borderColor: isSelected ? colors.primary : colors.border
                       }
                     ]}
                     onPress={() => toggleNeighborhood(item)}
                   >
                     <Text style={[
                       styles.neighborhoodText,
-                      { color: isSelected ? 'white' : colors.text }
+                      { color: isSelected ? colors.primary : colors.text }
                     ]}>
                       {item}
                     </Text>
                     {isSelected && (
-                      <Ionicons name="checkmark-circle" size={20} color="white" />
+                      <Ionicons name="checkmark-circle" size={20} color={colors.primary} />
                     )}
                   </TouchableOpacity>
                 );
@@ -175,7 +176,7 @@ export default function NeighborhoodSelector({
               contentContainerStyle={styles.neighborhoodsList}
             />
 
-            
+
           </View>
         </View>
       </Modal>
@@ -242,6 +243,8 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 20,
     marginRight: 8,
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   boroughText: {
     fontFamily: 'K2D-Medium',
@@ -271,7 +274,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 12,
     paddingHorizontal: 16,
-    borderWidth: 1,
     borderRadius: 8,
     marginBottom: 8,
   },

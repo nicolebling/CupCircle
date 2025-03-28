@@ -386,6 +386,13 @@ const styles = StyleSheet.create({
   tag: {
     flexDirection: "row",
     alignItems: "center",
+    backgroundColor: "transparent",
+    borderWidth: 1,
+    borderRadius: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    marginRight: 8,
+    marginBottom: 8,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
