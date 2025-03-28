@@ -134,7 +134,7 @@ export default function InterestSelector({
               numberOfLines={1}
               ellipsizeMode="tail"
             >
-              {selected.join(", ")}
+              {selected.length} interests selected
             </Text>
           ) : (
             <Text
