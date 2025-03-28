@@ -564,19 +564,6 @@ export default function ProfileForm({
                 <Text style={[styles.label, isDark && styles.textDark]}>Employment (Optional)</Text>
                 <TouchableOpacity
                   onPress={() => {
-                    // Check if there's any incomplete entry
-                    const hasIncompleteEntry = employmentHistory.some(entry => 
-                      !entry.company || !entry.position || !entry.fromDate || !entry.toDate
-                    );
-                    
-                    if (hasIncompleteEntry) {
-                      Alert.alert(
-                        "Incomplete Entry",
-                        "Please complete or remove the existing employment entry before adding a new one."
-                      );
-                      return;
-                    }
-                    
                     setEmploymentHistory([
                       {
                         company: '',
