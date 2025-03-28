@@ -19,27 +19,20 @@ type Props = {
 
 export default function EmploymentHistoryEntry({ employment, onChange, onDelete, isDark }: Props) {
   const colors = Colors[isDark ? 'dark' : 'light'];
-  const [isEditing, setIsEditing] = useState(true);
-  const [localEmployment, setLocalEmployment] = useState({
-    company: '',
-    position: '',
-    fromDate: '',
-    toDate: ''
-  });
-  const [isPresentJob, setIsPresentJob] = useState(false);
+  const [isEditing, setIsEditing] = useState(!employment?.company);
+  const [localEmployment, setLocalEmployment] = useState(() => ({
+    company: employment?.company || '',
+    position: employment?.position || '',
+    fromDate: employment?.fromDate || '',
+    toDate: employment?.toDate || ''
+  }));
+  const [isPresentJob, setIsPresentJob] = useState(employment?.toDate === 'Present');
 
   useEffect(() => {
     if (employment?.company) {
       setIsEditing(false);
-      setLocalEmployment({
-        company: employment.company,
-        position: employment.position,
-        fromDate: employment.fromDate,
-        toDate: employment.toDate
-      });
-      setIsPresentJob(employment.toDate === 'Present');
     }
-  }, [employment]);
+  }, [employment?.company]);
 
   const handleSave = () => {
     // Check if all fields are empty
