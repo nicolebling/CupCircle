@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -21,7 +20,12 @@ type Props = {
 export default function EmploymentHistoryEntry({ employment, onChange, onDelete, isDark }: Props) {
   const colors = Colors[isDark ? 'dark' : 'light'];
   const [isEditing, setIsEditing] = useState(true);
-  const [localEmployment, setLocalEmployment] = useState(employment);
+  const [localEmployment, setLocalEmployment] = useState({
+    company: '',
+    position: '',
+    fromDate: '',
+    toDate: ''
+  });
 
   const handleSave = () => {
     // Check if all fields are empty
@@ -72,7 +76,7 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
             </TouchableOpacity>
           </View>
         </View>
-        
+
         <Text style={[styles.position, { color: colors.text }]}>{localEmployment.position}</Text>
         <View style={styles.datesRow}>
           <Text style={[styles.dateText, { color: colors.secondaryText }]}>
@@ -91,7 +95,7 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
           <Ionicons name="trash-outline" size={20} color={colors.text} />
         </TouchableOpacity>
       </View>
-      
+
       <TextInput
         style={[styles.input, styles.fullWidthInput, { backgroundColor: colors.input, color: colors.text }]}
         placeholder="Company name"
