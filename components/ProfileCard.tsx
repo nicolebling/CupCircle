@@ -379,6 +379,7 @@ export default function ProfileCard({
         neighborhoods,
         favorite_cafes: favoriteCafes,
         interests,
+        employment: employmentHistory, // Add employment history array
         updated_at: new Date(),
       };
 
