@@ -815,10 +815,7 @@ export default function ProfileCard({
 
             {/* Professional Details */}
             <View style={styles.section}>
-              <Text style={[styles.sectionTitle, { color: colors.text }]}>
-                Professional Details
-              </Text>
-
+             
               {/* Occupation */}
               <Text style={[styles.label, { color: colors.secondaryText }]}>
                 Occupation
