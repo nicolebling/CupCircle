@@ -762,21 +762,55 @@ export default function ProfileCard({
               </Text>
             </View>
 
-            {profile.occupation && (
+            <View
+              style={[
+                styles.tag,
+                {
+                  backgroundColor: "transparent",
+                  borderWidth: 1,
+                  borderColor: colors.primary,
+                  alignSelf: "flex-start",
+                  marginTop: 4,
+                },
+              ]}
+            >
+              <Text style={[styles.occupation, { color: colors.primary }]}>
+                {profile.occupation}
+              </Text>
+            </View>
+
+            {profile.experience_level && (
               <View
                 style={[
                   styles.tag,
                   {
-                    backgroundColor: 'transparent',
+                    backgroundColor: "transparent",
                     borderWidth: 1,
                     borderColor: colors.primary,
                     alignSelf: "flex-start",
                     marginTop: 4,
+                    flexDirection: "row",
+                    alignItems: "center",
                   },
                 ]}
               >
                 <Text style={[styles.occupation, { color: colors.primary }]}>
-                  {profile.occupation}
+                  {profile.experience_level}
+                  {"\t"}
+                  <Ionicons
+                    name="cafe"
+                    size={14}
+                    color={getCoffeeColor(profile.experience_level)}
+                  />
+                  <Text
+                    style={[
+                      styles.coffeeBadgeText,
+                      { color: getCoffeeColor(profile.experience_level) },
+                    ]}
+                  >
+                    {" "}
+                    {getCoffeeTheme(profile.experience_level)}
+                  </Text>
                 </Text>
               </View>
             )}
@@ -815,7 +849,7 @@ export default function ProfileCard({
 
             {/* Professional Details */}
             <View style={styles.section}>
-             
+
               {/* Occupation */}
               <Text style={[styles.label, { color: colors.secondaryText }]}>
                 Occupation
