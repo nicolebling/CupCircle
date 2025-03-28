@@ -124,9 +124,14 @@ export default function ProfileForm({
         let employmentData = [];
         if (data.employment) {
           try {
-            employmentData = Array.isArray(data.employment) 
-              ? data.employment 
-              : JSON.parse(data.employment);
+            // Parse the employment data array
+            if (Array.isArray(data.employment)) {
+              employmentData = data.employment.map(entry => 
+                typeof entry === 'string' ? JSON.parse(entry) : entry
+              );
+            } else {
+              employmentData = [JSON.parse(data.employment)];
+            }
           } catch (e) {
             console.error("Error parsing employment data:", e);
           }
