@@ -75,9 +75,7 @@ export default function ProfileForm({
   const [tempDate, setTempDate] = useState(
     birthday ? new Date(birthday) : new Date(),
   );
-  const [employmentHistory, setEmploymentHistory] = useState([
-    { company: "", position: "", fromDate: "", toDate: "" },
-  ]);
+  const [employmentHistory, setEmploymentHistory] = useState([]);
 
   useEffect(() => {
     if (!isNewUser) {

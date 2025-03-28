@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal, FlatList, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -69,9 +68,16 @@ export default function NeighborhoodSelector({
         style={[styles.selector, { backgroundColor: colors.input, borderColor: colors.border }]}
         onPress={() => setModalVisible(true)}
       >
-        <Text style={[styles.selectorText, { color: selected.length ? colors.text : colors.secondaryText }]}>
-          {selected.length ? selected.join(', ') : 'Select neighborhoods'}
-        </Text>
+        <View style={styles.selectorContent}>
+          <Text style={[styles.selectorText, { color: selected.length ? colors.text : colors.secondaryText }]}>
+            {selected.length ? `${selected.length} neighborhoods selected` : 'Select neighborhoods'}
+          </Text>
+          {selected.length > 0 && (
+            <View style={[styles.badge, { backgroundColor: colors.primary }]}>
+              <Text style={styles.badgeText}>{selected.length}</Text>
+            </View>
+          )}
+        </View>
         <Ionicons name="chevron-down" size={20} color={colors.secondaryText} />
       </TouchableOpacity>
 
@@ -173,6 +179,21 @@ const styles = StyleSheet.create({
   selectorText: {
     fontFamily: 'K2D-Regular',
     fontSize: 16,
+  },
+  selectorContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  badge: {
+    borderRadius: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    marginLeft: 8,
+  },
+  badgeText: {
+    fontFamily: 'K2D-Bold',
+    fontSize: 14,
+    color: 'white',
   },
   modalOverlay: {
     flex: 1,
