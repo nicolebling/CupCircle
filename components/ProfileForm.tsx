@@ -119,6 +119,7 @@ export default function ProfileForm({
         setFavoriteCafes(data.favorite_cafes || []);
         setInterests(data.interests || []);
         setAvatar(data.photo_url || "");
+        setEmploymentHistory(data.employment || []);
 
         console.log("Profile data loaded into form state");
       }
@@ -279,7 +280,7 @@ export default function ProfileForm({
         neighborhoods: neighborhoods,
         favorite_cafes: favoriteCafes,
         interests: interests,
-        //employmentHistory,
+        employment: employmentHistory,
         updated_at: new Date(),
       };
 
