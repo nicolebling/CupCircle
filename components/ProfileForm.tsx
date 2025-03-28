@@ -376,7 +376,11 @@ export default function ProfileForm({
       style={styles.container}
     >
       <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={styles.formContainer}>
+        <View style={[
+          styles.card,
+          { backgroundColor: colors.card, borderColor: colors.border }
+        ]}>
+          <View style={styles.formContainer}>
           {error ? (
             <View style={styles.errorContainer}>
               <Ionicons
@@ -650,6 +654,7 @@ export default function ProfileForm({
               <Text style={styles.buttonText}>Save Profile</Text>
             )}
           </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -659,6 +664,18 @@ export default function ProfileForm({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  card: {
+    borderRadius: 16,
+    borderWidth: 1,
+    overflow: "hidden",
+    marginBottom: 16,
+    margin: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   loadingContainer: {
     flex: 1,
