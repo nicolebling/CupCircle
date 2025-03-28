@@ -560,7 +560,24 @@ export default function ProfileForm({
 
 
             <View style={styles.inputGroup}>
-              <Text style={[styles.label, isDark && styles.textDark]}>Employment (Optional)</Text>
+              <View style={styles.sectionHeader}>
+                <Text style={[styles.label, isDark && styles.textDark]}>Employment (Optional)</Text>
+                <TouchableOpacity
+                  onPress={() => {
+                    setEmploymentHistory([
+                      {
+                        company: '',
+                        position: '',
+                        fromDate: '',
+                        toDate: '',
+                      },
+                      ...employmentHistory,
+                    ]);
+                  }}
+                >
+                  <Ionicons name="add-circle" size={24} color={colors.primary} />
+                </TouchableOpacity>
+              </View>
               {employmentHistory.map((employment, index) => (
                 <EmploymentHistoryEntry
                   key={index}
@@ -577,22 +594,7 @@ export default function ProfileForm({
                   isDark={isDark}
                 />
               ))}
-              <TouchableOpacity
-                style={[styles.addButton, { backgroundColor: colors.primary }]}
-                onPress={() => {
-                  setEmploymentHistory([
-                    {
-                      company: '',
-                      position: '',
-                      fromDate: '',
-                      toDate: '',
-                    },
-                    ...employmentHistory,
-                  ]);
-                }}
-              >
-                <Text style={styles.addButtonText}>Add Employment</Text>
-              </TouchableOpacity>
+              
             </View>
 
             
@@ -812,6 +814,12 @@ const styles = StyleSheet.create({
   addButtonText: {
     color: "#fff",
     fontSize: 16,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
   },
   employmentEntry: {
     marginBottom: 10,
