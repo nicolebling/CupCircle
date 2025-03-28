@@ -789,13 +789,6 @@ export default function ProfileCard({
                 {profile.bio}
               </Text>
 
-              <Text style={[styles.label, { color: colors.secondaryText }]}>
-                Age
-              </Text>
-              <Text style={[styles.value, { color: colors.text }]}>
-                {profile.age}
-              </Text>
-
               {profile.education && (
                 <>
                   <Text style={[styles.label, { color: colors.secondaryText }]}>

@@ -15,7 +15,7 @@ import {
   Dimensions,
 } from "react-native";
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get("window");
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
@@ -43,7 +43,7 @@ type ProfileFormProps = {
   onCancel?: () => void;
 };
 
-import EmploymentHistoryEntry from './EmploymentHistoryEntry';
+import EmploymentHistoryEntry from "./EmploymentHistoryEntry";
 
 export default function ProfileForm({
   userId,
@@ -279,7 +279,7 @@ export default function ProfileForm({
         neighborhoods: neighborhoods,
         favorite_cafes: favoriteCafes,
         interests: interests,
-        //employmentHistory, 
+        //employmentHistory,
         updated_at: new Date(),
       };
 
@@ -398,7 +398,16 @@ export default function ProfileForm({
                   resizeMode="cover"
                 />
               ) : (
-                <View style={[styles.image, { backgroundColor: "#1A1A1A", justifyContent: "center", alignItems: "center" }]}>
+                <View
+                  style={[
+                    styles.image,
+                    {
+                      backgroundColor: "#1A1A1A",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    },
+                  ]}
+                >
                   <Ionicons name="person" size={60} color="#ffffff" />
                 </View>
               )}
@@ -409,10 +418,6 @@ export default function ProfileForm({
           </View>
 
           <View style={[styles.section, { marginTop: 24 }]}>
-            <Text style={[styles.sectionTitle, isDark && styles.textDark]}>
-              Basic Information
-            </Text>
-
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isDark && styles.textDark]}>
                 Name*
@@ -424,50 +429,6 @@ export default function ProfileForm({
                 placeholder="Your name"
                 placeholderTextColor={colors.secondaryText}
               />
-            </View>
-
-            <View style={styles.inputGroup}>
-              <Text style={[styles.label, isDark && styles.textDark]}>
-                Birthday*
-              </Text>
-
-              <View style={styles.inputGroup}>
-                <TouchableOpacity
-                  style={[styles.input, isDark && styles.inputDark]}
-                  onPress={() => setShowDatePicker(true)} // Show DateTimePicker when tapped
-                >
-                  <Text style={{ paddingVertical: 10 }}>
-                    {birthday
-                      ? new Date(birthday).toLocaleDateString(undefined, {
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                        })
-                      : "Select your birthday"}
-                  </Text>
-                </TouchableOpacity>
-
-                {showDatePicker && (
-                  <View>
-                    <DateTimePicker
-                      value={tempDate}
-                      mode="date"
-                      display="spinner"
-                      onChange={handleDateChange}
-                      maximumDate={new Date()}
-                    />
-                    <TouchableOpacity onPress={handleConfirm}>
-                      <Text>Confirm Birthday</Text>
-                    </TouchableOpacity>
-                  </View>
-                )}
-              </View>
-
-              {age !== null && (
-                <Text style={[styles.ageText, isDark && styles.textDark]}>
-                  Age: {age}
-                </Text>
-              )}
             </View>
 
             <View style={styles.inputGroup}>
@@ -484,7 +445,9 @@ export default function ProfileForm({
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={[styles.label, isDark && styles.textDark]}>Education</Text>
+              <Text style={[styles.label, isDark && styles.textDark]}>
+                Education
+              </Text>
               <TextInput
                 style={[styles.input, isDark && styles.inputDark]}
                 value={education}
@@ -508,11 +471,9 @@ export default function ProfileForm({
             </View>
           </View>
 
-          <View style={styles.section}>
-            <Text style={[styles.sectionTitle, isDark && styles.textDark]}>
-              Professional Information
-            </Text>
+          <View style={styles.divider} />
 
+          <View style={styles.section}>
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isDark && styles.textDark]}>
                 Occupation
@@ -559,31 +520,36 @@ export default function ProfileForm({
               />
             </View>
 
-
             <View style={styles.inputGroup}>
               <View style={styles.sectionHeader}>
-                <Text style={[styles.label, isDark && styles.textDark]}>Employment (Optional)</Text>
+                <Text style={[styles.label, isDark && styles.textDark]}>
+                  Employment (Optional)
+                </Text>
                 <TouchableOpacity
                   onPress={() => {
                     if (employmentHistory.length >= 3) {
                       Alert.alert(
                         "Maximum Entries Reached",
-                        "You can only add up to 3 employment history entries."
+                        "You can only add up to 3 employment history entries.",
                       );
                       return;
                     }
                     setEmploymentHistory([
                       {
-                        company: '',
-                        position: '',
-                        fromDate: '',
-                        toDate: '',
+                        company: "",
+                        position: "",
+                        fromDate: "",
+                        toDate: "",
                       },
                       ...employmentHistory,
                     ]);
                   }}
                 >
-                  <Ionicons name="add-circle" size={24} color={colors.primary} />
+                  <Ionicons
+                    name="add-circle"
+                    size={24}
+                    color={colors.primary}
+                  />
                 </TouchableOpacity>
               </View>
               {employmentHistory.map((employment, index) => (
@@ -596,25 +562,20 @@ export default function ProfileForm({
                     setEmploymentHistory(newHistory);
                   }}
                   onDelete={() => {
-                    const newHistory = employmentHistory.filter((_, i) => i !== index);
+                    const newHistory = employmentHistory.filter(
+                      (_, i) => i !== index,
+                    );
                     setEmploymentHistory(newHistory);
                   }}
                   isDark={isDark}
                 />
               ))}
-              
             </View>
-
-            
           </View>
 
+          <View style={styles.divider} />
           
-
           <View style={styles.section}>
-            <Text style={[styles.sectionTitle, isDark && styles.textDark]}>
-              Personal Information
-            </Text>
-            
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isDark && styles.textDark]}>
                 Favorite Neighborhoods
@@ -625,7 +586,6 @@ export default function ProfileForm({
                 isDark={isDark}
               />
             </View>
-            
 
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isDark && styles.textDark]}>
@@ -749,32 +709,32 @@ const styles = StyleSheet.create({
     textAlignVertical: "top",
   },
   photoContainer: {
-    alignItems: 'center',
-    width: '100%',
+    alignItems: "center",
+    width: "100%",
   },
   imageWrapper: {
-    position: 'relative',
+    position: "relative",
     width: width - 32,
     height: width - 32,
   },
   image: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
     resizeMode: "cover",
     borderRadius: 16,
     overflow: "hidden",
   },
   editButton: {
-    position: 'absolute',
+    position: "absolute",
     top: 12,
     right: 12,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 20,
     width: 40,
     height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 2,
@@ -838,9 +798,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 10,
   },
   employmentEntry: {
@@ -865,5 +825,10 @@ const styles = StyleSheet.create({
   deleteButton: {
     marginTop: 5,
     alignSelf: "flex-end", // Aligns delete button to the right
+  },
+  divider: {
+    height: 1,
+    backgroundColor: "#F97415",
+    marginBottom: 32,
   },
 });
