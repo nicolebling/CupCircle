@@ -26,13 +26,7 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
     fromDate: employment?.fromDate || '',
     toDate: employment?.toDate || ''
   });
-  const [isPresentJob, setIsPresentJob] = useState(localEmployment.toDate === 'Present');
-    company: '',
-    position: '',
-    fromDate: '',
-    toDate: ''
-  });
-  const [isPresentJob, setIsPresentJob] = useState(false);
+  const [isPresentJob, setIsPresentJob] = useState(employment?.toDate === 'Present');
 
   const handleSave = () => {
     // Check if all fields are empty
