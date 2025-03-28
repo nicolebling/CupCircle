@@ -214,10 +214,12 @@ const styles = StyleSheet.create({
   presentButton: {
     padding: 8,
     borderRadius: 8,
-    marginTop: 12,
     alignItems: 'center',
     borderWidth: 1,
     borderColor: '#ddd',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+     
   },
   presentButtonText: {
     fontWeight: '600',
@@ -267,7 +269,7 @@ const styles = StyleSheet.create({
   },
   actionRow: {
      flexDirection: 'row',
-      justifyContent: 'flex-end',  // Align to right
+      justifyContent: 'space-between',  // Align to right
       alignItems: 'center',
       marginTop: 16,
       gap: 12,  // Space between buttons
