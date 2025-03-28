@@ -439,7 +439,9 @@ export default function CafeSelector({
                     style={[
                       styles.tag,
                       {
-                        backgroundColor: colors.primary + "20",
+                        backgroundColor: "transparent",
+                        borderWidth: 1,
+                        borderColor: colors.primary,
                         marginBottom: 8,
                         padding: 8,
                       },
