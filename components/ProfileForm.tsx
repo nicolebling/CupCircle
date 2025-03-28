@@ -573,8 +573,7 @@ export default function ProfileForm({
                       company: '',
                       position: '',
                       fromDate: '',
-                      toDate: '',
-                      isNew: true // Add flag to identify new entries
+                      toDate: ''
                     };
                     setEmploymentHistory([newEntry, ...employmentHistory]);
                   }}
