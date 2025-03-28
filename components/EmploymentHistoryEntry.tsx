@@ -101,7 +101,7 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
           <Text style={[styles.label, { color: colors.secondaryText }]}>To</Text>
           <TextInput
             style={[styles.input, { backgroundColor: colors.input, color: colors.text }]}
-            placeholder="MM/YYYY or Present"
+            placeholder="MM/YYYY"
             placeholderTextColor={colors.secondaryText}
             value={localEmployment.toDate}
             onChangeText={(text) => setLocalEmployment({ ...localEmployment, toDate: text })}
