@@ -1,6 +1,13 @@
 
 import { query } from '../services/database';
 
+export interface Employment {
+  company: string;
+  position: string;
+  fromDate: string;
+  toDate: string;
+}
+
 export interface Profile {
   id: string;
   user_id: string;
@@ -9,6 +16,7 @@ export interface Profile {
   occupation?: string;
   photo?: string;
   bio?: string;
+  employment?: Employment[];
   industry_categories?: string[];
   skills?: string[];
   neighborhoods?: string[];

@@ -65,11 +65,17 @@ export const profileService = {
   // Save profile (create or update)
   async saveProfile(profileData: Partial<Profile> & { user_id: string }) {
     try {
+      // Convert employment array to JSON string if it exists
+      const formattedData = {
+        ...profileData,
+        employment: profileData.employment ? JSON.stringify(profileData.employment) : null,
+      };
+      
       const { data, error } = await supabase
         .from("profiles")
         .upsert({
           id: profileData.user_id,
-          ...profileData,
+          ...formattedData,
           updated_at: new Date().toISOString(),
         })
         .select()
