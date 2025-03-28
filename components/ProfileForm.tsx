@@ -12,7 +12,10 @@ import {
   ActivityIndicator,
   Button,
   Image,
+  Dimensions,
 } from "react-native";
+
+const { width } = Dimensions.get('window');
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
