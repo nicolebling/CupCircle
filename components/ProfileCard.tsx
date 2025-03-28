@@ -790,10 +790,15 @@ export default function ProfileCard({
               </Text>
 
               <Text style={[styles.label, { color: colors.secondaryText }]}>
-                Age
+                Birthday
               </Text>
               <Text style={[styles.value, { color: colors.text }]}>
-                {profile.age}
+                {profile.birthday || "Not provided"}
+                {"\n"}
+
+                <Text style={[styles.label, { color: colors.secondaryText }]}>
+                  Age {profile.age}
+                </Text>
               </Text>
 
               {profile.education && (

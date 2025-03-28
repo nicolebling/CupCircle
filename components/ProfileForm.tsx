@@ -562,20 +562,15 @@ export default function ProfileForm({
                 <Text style={[styles.label, isDark && styles.textDark]}>Employment (Optional)</Text>
                 <TouchableOpacity
                   onPress={() => {
-                    if (employmentHistory.length >= 3) {
-                      Alert.alert(
-                        "Maximum Entries Reached",
-                        "You can only add up to 3 employment history entries."
-                      );
-                      return;
-                    }
-                    const newEntry = {
-                      company: '',
-                      position: '',
-                      fromDate: '',
-                      toDate: ''
-                    };
-                    setEmploymentHistory([newEntry, ...employmentHistory]);
+                    setEmploymentHistory([
+                      {
+                        company: '',
+                        position: '',
+                        fromDate: '',
+                        toDate: '',
+                      },
+                      ...employmentHistory,
+                    ]);
                   }}
                 >
                   <Ionicons name="add-circle" size={24} color={colors.primary} />
@@ -583,7 +578,7 @@ export default function ProfileForm({
               </View>
               {employmentHistory.map((employment, index) => (
                 <EmploymentHistoryEntry
-                  key={`${index}-${Date.now()}`}
+                  key={index}
                   employment={employment}
                   onChange={(updated) => {
                     const newHistory = [...employmentHistory];
@@ -622,7 +617,7 @@ export default function ProfileForm({
             </View>
             
 
-            <View style={styles.inputGroup}>
+            <View style={[styles.inputGroup, { marginBottom: 20 }]}>
               <Text style={[styles.label, isDark && styles.textDark]}>
                 Favorite Cafes
               </Text>
@@ -631,6 +626,65 @@ export default function ProfileForm({
                 onChange={setFavoriteCafes}
                 isDark={isDark}
               />
+              <View style={styles.tagsContainer}>
+                {favoriteCafes.map((cafe, index) => {
+                  const [cafeName, cafeAddress] = cafe ? cafe.split('|||') : ['', ''];
+                  return (
+                    <View
+                      key={index}
+                      style={[
+                        styles.tag,
+                        {
+                          backgroundColor: colors.primary + "20",
+                          flexDirection: "column",
+                          alignItems: "flex-start",
+                          padding: 8,
+                          marginRight: 8,
+                          marginBottom: 8,
+                        },
+                      ]}
+                    >
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          marginBottom: 4,
+                        }}
+                      >
+                        <Ionicons
+                          name="cafe"
+                          size={12}
+                          color={colors.primary}
+                          style={{ marginRight: 4 }}
+                        />
+                        <Text
+                          style={[
+                            styles.tagText,
+                            {
+                              color: colors.primary,
+                              fontFamily: "K2D-Medium",
+                            },
+                          ]}
+                        >
+                          {cafeName}
+                        </Text>
+                      </View>
+                      <Text
+                        style={[
+                          styles.tagText,
+                          {
+                            color: colors.secondaryText,
+                            fontSize: 10,
+                            fontFamily: "K2D-Regular",
+                          },
+                        ]}
+                      >
+                        {cafeAddress}
+                      </Text>
+                    </View>
+                  );
+                })}
+              </View>
             </View>
           </View>
 

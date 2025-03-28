@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
@@ -21,12 +21,7 @@ type Props = {
 export default function EmploymentHistoryEntry({ employment, onChange, onDelete, isDark }: Props) {
   const colors = Colors[isDark ? 'dark' : 'light'];
   const [isEditing, setIsEditing] = useState(true);
-  const [localEmployment, setLocalEmployment] = useState({
-    company: employment?.company || '',
-    position: employment?.position || '',
-    fromDate: employment?.fromDate || '',
-    toDate: employment?.toDate || ''
-  });
+  const [localEmployment, setLocalEmployment] = useState(employment);
 
   const handleSave = () => {
     // Check if all fields are empty
