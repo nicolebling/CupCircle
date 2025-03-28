@@ -583,7 +583,7 @@ export default function ProfileForm({
               </View>
               {employmentHistory.map((employment, index) => (
                 <EmploymentHistoryEntry
-                  key={index}
+                  key={`${index}-${Date.now()}`}
                   employment={employment}
                   onChange={(updated) => {
                     const newHistory = [...employmentHistory];
