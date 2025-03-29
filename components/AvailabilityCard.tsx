@@ -63,12 +63,13 @@ const styles = StyleSheet.create({
   timeSlotInfo: {
     flexDirection: 'row',
     alignItems: 'center',
+    flexShrink: 1, // Allow the timeSlotInfo to shrink when needed
   },
   icon: {
     marginRight: 12,
   },
   textContainer: {
-    flex: 1,
+    flexShrink: 1, // Prevents the text container from taking excessive space
   },
   timeRange: {
     fontFamily: 'K2D-SemiBold',
