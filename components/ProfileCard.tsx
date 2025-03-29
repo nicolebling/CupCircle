@@ -10,22 +10,14 @@ import {
   Alert,
   TouchableOpacity,
   ScrollView,
-  TextInput,
   ActivityIndicator,
   SafeAreaView,
 } from "react-native";
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import * as ImagePicker from "expo-image-picker";
 import { supabase } from "@/lib/supabase";
-import { router } from "expo-router";
-import Button from "./ui/Button";
 import { Ionicons } from "@expo/vector-icons";
-import IndustrySelector from "./IndustrySelector";
-import ExperienceLevelSelector from "./ExperienceLevelSelector";
-import InterestSelector from "./InterestSelector";
 import { useAuth } from "@/contexts/AuthContext";
-import Badge from "./Badge";
 import ProfileForm from "@/components/ProfileForm";
 
 const { width } = Dimensions.get("window");
@@ -137,9 +129,6 @@ export default function ProfileCard({
   isUserProfile = false,
   // isEditMode = false,
   isOnboarding = false,
-  isLoading = false,
-  onSave,
-  onCancel,
   onLike,
   onSkip,
   userId,
@@ -147,37 +136,9 @@ export default function ProfileCard({
 }: ProfileCardProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
-  const isDark = colorScheme === "dark";
-
-  const [userData, setUserData] = useState<UserProfileData>(profile);
   const [loading, setLoading] = useState(false);
-  const [name, setName] = useState("");
-  const [username, setUsername] = useState("");
-  const [avatar, setAvatar] = useState("");
-  const [occupation, setOccupation] = useState("");
-  const [bio, setBio] = useState("");
-  const [age, setAge] = useState("");
-  const [experienceLevel, setExperienceLevel] = useState("");
-  const [education, setEducation] = useState("");
-  const [city, setCity] = useState("");
-  const [industryCategories, setIndustryCategories] = useState<string[]>([]);
-  const [skills, setSkills] = useState<string[]>([]);
-  const [neighborhoods, setNeighborhoods] = useState<string[]>([]);
-  const [favoriteCafes, setFavoriteCafes] = useState<string[]>([]);
-  const [employmentHistory, setEmploymentHistory] = useState<Array<{
-    company: string;
-    position: string;
-    fromDate: string;
-    toDate: string;
-  }>>([]);
-  const [interests, setInterests] = useState<string[]>([]);
-  const [error, setError] = useState("");
   const [isEditMode, setIsEditMode] = useState(false);
-
   const [profileData, setProfileData] = useState(null);
-
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (!isNewUser) {
@@ -207,23 +168,7 @@ export default function ProfileCard({
 
       console.log("Profile data fetched:", data);
 
-
       if (data) {
-        setName(data.name || "");
-        setUsername(data.username || "");
-        setAvatar(data.photo_url || "");
-        setOccupation(data.occupation || "");
-        setBio(data.bio || "");
-        setAge(data.age ? data.age.toString() : "");
-        setExperienceLevel(data.experience_level || "");
-        setEducation(data.education || "");
-        setCity(data.city || "");
-        setIndustryCategories(data.industry_categories || []);
-        setSkills(data.skills || []);
-        setNeighborhoods(data.neighborhoods || []);
-        setFavoriteCafes(data.favorite_cafes || []);
-        setInterests(data.interests || []);
-
         // Parse and set employment data
         console.log("Raw employment data:", data.employment);
         if (data.employment) {
@@ -231,243 +176,30 @@ export default function ProfileCard({
             let employmentData = [];
             // Parse the employment data array
             if (Array.isArray(data.employment)) {
-              console.log("Employment is an array");
-              employmentData = data.employment.map(entry => {
-                console.log("Processing entry:", entry);
-                return typeof entry === 'string' ? JSON.parse(entry) : entry;
+              employmentData = data.employment.map((entry) => {
+                return typeof entry === "string" ? JSON.parse(entry) : entry;
               });
             } else {
-              console.log("Employment is not an array");
               employmentData = [JSON.parse(data.employment)];
             }
             console.log("Processed employment data:", employmentData);
-            setEmploymentHistory(employmentData);
           } catch (e) {
             console.error("Error parsing employment data:", e);
             console.error("Error details:", e.message);
           }
         } else {
           console.log("No employment data found");
-          setEmploymentHistory([]);
         }
-
-        console.log("Profile data loaded into form state");
-        console.log(data.favorite_cafes);
       }
-
-      setUserData(data);
       setProfileData(data);
     } catch (error) {
-      console.error("Failed to fetch profile:", error);
       Alert.alert("Error", "Failed to load profile information");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleAddSkill = (skill: string) => {
-    if (skill.trim() && !skills.includes(skill.trim())) {
-      setSkills([...skills, skill.trim()]);
-    }
-  };
-
-  const handleRemoveSkill = (index: number) => {
-    setSkills(skills.filter((_, i) => i !== index));
-  };
-
-  const handleAddNeighborhood = (neighborhood: string) => {
-    if (neighborhood.trim() && !neighborhoods.includes(neighborhood.trim())) {
-      setNeighborhoods([...neighborhoods, neighborhood.trim()]);
-    }
-  };
-
-  const handleRemoveNeighborhood = (index: number) => {
-    setNeighborhoods(neighborhoods.filter((_, i) => i !== index));
-  };
-
-  // Function to handle edit button press
-  const handleEdit = () => {
-    if (onSave) {
-      // This will trigger edit mode in the parent component
-      onSave(userData);
-    }
-  };
-
-  const handleAddCafe = (cafe: string) => {
-    if (cafe.trim() && !favoriteCafes.includes(cafe.trim())) {
-      setFavoriteCafes([...favoriteCafes, cafe.trim()]);
-    }
-  };
-
-  const handleRemoveCafe = (index: number) => {
-    setFavoriteCafes(favoriteCafes.filter((_, i) => i !== index));
-  };
-
-  const pickImage = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.8,
-    });
-
-    if (!result.canceled && result.assets && result.assets.length > 0) {
-      uploadImage(result.assets[0].uri);
-    }
-  };
-
-  const requestPermission = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== "granted") {
-      Alert.alert("Permission Denied", "Enable media access in settings.");
-    }
-  };
-
-  const uploadImage = async (URI: string) => {
-    try {
-      setLoading(true);
-
-      // Request permission before proceeding
-      const hasPermission = await requestPermission();
-      if (!hasPermission) {
-        setLoading(false);
-        return;
-      }
-
-      const filename = uri.split("/").pop();
-      const fileExt = filename?.split(".").pop();
-      const filePath = `${userId}/${Date.now()}.${fileExt}`;
-
-      const response = await fetch(uri);
-      const blob = await response.blob();
-
-      const { error: uploadError } = await supabase.storage
-        .from("avatars")
-        .upload(filePath, blob);
-
-      if (uploadError) {
-        throw uploadError;
-      }
-
-      const { data } = supabase.storage.from("avatars").getPublicUrl(filePath);
-
-      setAvatar(data.publicUrl);
-    } catch (error) {
-      console.error("Error uploading image:", error);
-      Alert.alert("Error", "Failed to upload image. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const validateForm = () => {
-    if (!name.trim()) {
-      setError("Name is required");
-      return false;
-    }
-
-    if (age && isNaN(Number(age))) {
-      setError("Age must be a number");
-      return false;
-    }
-
-    return true;
-  };
-
   const { user } = useAuth();
-
-  const saveProfile = async () => {
-    console.log("Starting saveProfile function");
-    if (!validateForm()) return;
-
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
-    if (userError || !user?.id) {
-      console.error("No authenticated user found:", userError?.message);
-      return;
-    }
-
-    try {
-      console.log("Setting loading state and clearing errors");
-      setLoading(true);
-      setError("");
-
-      console.log("Current user:", user);
-      console.log("Using user ID:", user.id);
-
-      const ageNumber = age ? parseInt(age) : null;
-      console.log("Parsed age:", ageNumber);
-
-      console.log("Preparing to save profile for user ID:", user.id);
-      console.log("Auth context user data:", { user });
-
-      const profileData = {
-        id: user.id, // Use the ID from AuthContext
-        name,
-        username,
-        occupation,
-        photo_url: avatar,
-        bio,
-        age: ageNumber,
-        experience_level: experienceLevel,
-        education,
-        city,
-        industry_categories: industryCategories,
-        skills,
-        neighborhoods,
-        favorite_cafes: favoriteCafes,
-        interests,
-        employment: employmentHistory, // Add employment history array
-        updated_at: new Date(),
-      };
-
-      console.log(
-        "Profile data being sent:",
-        JSON.stringify(profileData, null, 2),
-      );
-
-      console.log(
-        "Profile data being sent to Supabase:",
-        JSON.stringify(profileData, null, 2),
-      );
-
-      const { data, error } = await supabase
-        .from("profiles")
-        .upsert(profileData, { onConflict: "id" })
-        .select();
-
-      console.log("Supabase response:", { data, error });
-
-      if (error) {
-        console.error("Supabase error response:", error);
-        console.error("Error details:", JSON.stringify(error, null, 2));
-        console.error("Error code:", error.code);
-        console.error("Error message:", error.message);
-        console.error("Error hint:", error.hint);
-        Alert.alert(
-          "Profile Save Error",
-          error?.message || "Failed to save profile. Please try again.",
-        );
-        throw error;
-      }
-
-      console.log("Profile saved successfully:", data);
-      Alert.alert("Success", "Your profile has been saved");
-    } catch (error: any) {
-      console.error("Error saving profile:", error);
-      setError("Failed to save profile. Please try again.");
-      if (error.code === "23505") {
-        Alert.alert(
-          "Duplicate Key Error",
-          "A profile with this ID already exists. Please contact support.",
-        );
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
 
   if (loading && !isNewUser) {
     return (
@@ -477,42 +209,6 @@ export default function ProfileCard({
       </View>
     );
   }
-
-  const getTitle = () => {
-    if (isOnboarding) return "Complete Your Profile";
-    if (isEditMode) return "Edit Profile";
-    if (isUserProfile) return "My Profile";
-    return profile.name || "Profile";
-  };
-
-  const handleChange = (field: keyof UserProfileData, value: any) => {
-    setUserData((prev) => ({ ...prev, [field]: value }));
-
-    // Clear error for this field if it exists
-    if (errors[field]) {
-      setErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors[field];
-        return newErrors;
-      });
-    }
-  };
-
-  const validateForm2 = (): boolean => {
-    const newErrors: Record<string, string> = {};
-
-    if (!userData.name) newErrors.name = "Name is required";
-    if (isUserProfile && !userData.birthday) newErrors.age = "Age is required";
-    if (!userData.occupation) newErrors.occupation = "Occupation is required";
-    if (!userData.bio) newErrors.bio = "Bio is required";
-    if (userData.bio.length > 500)
-      newErrors.bio = "Bio must be less than 500 characters";
-
-    // Add more validation as needed
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
 
   const handleCafeSelect = async (selectedCafes) => {
     try {
@@ -527,7 +223,6 @@ export default function ProfileCard({
         .single();
 
       if (error) throw error;
-      setUserData((prev) => ({ ...prev, favorite_cafes: selectedCafes }));
     } catch (error) {
       console.error("Error saving cafe selections:", error);
       Alert.alert("Error", "Failed to save cafe selections");
@@ -549,7 +244,6 @@ export default function ProfileCard({
       if (error) throw error;
 
       setProfileData(data);
-      setUserData(data);
       setIsEditMode(false);
     } catch (error) {
       console.error("Error saving profile:", error);
@@ -889,7 +583,6 @@ export default function ProfileCard({
 
             {/* Professional Details */}
             <View style={styles.section}>
-
               {/* Industry Categories */}
               {profile.industry_categories &&
                 profile.industry_categories.length > 0 && (
@@ -905,7 +598,11 @@ export default function ProfileCard({
                           key={index}
                           style={[
                             styles.tag,
-                            { backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.primary },
+                            {
+                              backgroundColor: "transparent",
+                              borderWidth: 1,
+                              borderColor: colors.primary,
+                            },
                           ]}
                         >
                           <Text
@@ -931,7 +628,11 @@ export default function ProfileCard({
                         key={index}
                         style={[
                           styles.tag,
-                          { backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.primary },
+                          {
+                            backgroundColor: "transparent",
+                            borderWidth: 1,
+                            borderColor: colors.primary,
+                          },
                         ]}
                       >
                         <Text
@@ -965,7 +666,11 @@ export default function ProfileCard({
                         key={index}
                         style={[
                           styles.tag,
-                          { backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.primary },
+                          {
+                            backgroundColor: "transparent",
+                            borderWidth: 1,
+                            borderColor: colors.primary,
+                          },
                         ]}
                       >
                         <Text
@@ -986,33 +691,42 @@ export default function ProfileCard({
                   <Text style={[styles.label, { color: colors.secondaryText }]}>
                     Employment
                   </Text>
-                  {(typeof profile.employment === 'string' 
-                    ? JSON.parse(profile.employment) 
+                  {(typeof profile.employment === "string"
+                    ? JSON.parse(profile.employment)
                     : profile.employment
                   ).map((job, index) => (
-                    <View 
-                      key={index} 
+                    <View
+                      key={index}
                       style={[
                         styles.employmentCard,
-                        { 
+                        {
                           backgroundColor: colors.card,
                           borderWidth: 1,
-                          borderColor: colors.primary + '40',
+                          borderColor: colors.primary + "40",
                           marginBottom: 12,
                           borderRadius: 8,
-                          padding: 12
-                        }
+                          padding: 12,
+                        },
                       ]}
                     >
                       <View style={styles.employmentHeader}>
-                        <Text style={[styles.companyName, { color: colors.text }]}>
+                        <Text
+                          style={[styles.companyName, { color: colors.text }]}
+                        >
                           {job.company}
                         </Text>
-                        <Text style={[styles.position, { color: colors.primary }]}>
+                        <Text
+                          style={[styles.position, { color: colors.primary }]}
+                        >
                           {job.position}
                         </Text>
                       </View>
-                      <Text style={[styles.dateRange, { color: colors.secondaryText }]}>
+                      <Text
+                        style={[
+                          styles.dateRange,
+                          { color: colors.secondaryText },
+                        ]}
+                      >
                         {job.fromDate} - {job.toDate}
                       </Text>
                     </View>
@@ -1027,14 +741,16 @@ export default function ProfileCard({
                   </Text>
                   <View style={styles.tagsContainer}>
                     {profile.favorite_cafes.map((cafe, index) => {
-                      const [cafeName, cafeAddress] = cafe ? cafe.split("|||") : ['', ''];
+                      const [cafeName, cafeAddress] = cafe
+                        ? cafe.split("|||")
+                        : ["", ""];
                       return (
                         <View
                           key={index}
                           style={[
                             styles.tag,
                             {
-                              backgroundColor: 'transparent',
+                              backgroundColor: "transparent",
                               borderWidth: 1,
                               borderColor: colors.primary,
                               flexDirection: "column",
@@ -1127,16 +843,16 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   companyName: {
-    fontFamily: 'K2D-SemiBold',
+    fontFamily: "K2D-SemiBold",
     fontSize: 16,
     marginBottom: 2,
   },
   position: {
-    fontFamily: 'K2D-Medium',
+    fontFamily: "K2D-Medium",
     fontSize: 14,
   },
   dateRange: {
-    fontFamily: 'K2D-Regular',
+    fontFamily: "K2D-Regular",
     fontSize: 12,
   },
   // Common styles
