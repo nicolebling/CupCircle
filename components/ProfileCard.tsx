@@ -275,40 +275,53 @@ export default function ProfileCard({
         )}
 
         <View style={styles.content}>
-          <View style={styles.nameRow}>
-            <Text style={[styles.name, { color: colors.text }]}>
-              {profile.name} {profile.age && <Text>{profile.age}</Text>}
-            </Text>
-            {profile.location && (
-              <View style={styles.locationContainer}>
-                <Ionicons
-                  name="location"
-                  size={16}
-                  color={colors.secondaryText}
-                />
-                <Text
-                  style={[styles.location, { color: colors.secondaryText }]}
-                >
-                  {profile.location}
+          <View style={styles.headerContainer}>
+            <View style={styles.photoContainer}>
+              {profile.photo_url ? (
+                <Image source={{ uri: profile.photo_url }} style={styles.profilePhoto} />
+              ) : (
+                <View style={[styles.profilePhoto, { backgroundColor: "#1A1A1A", justifyContent: "center", alignItems: "center" }]}>
+                  <Ionicons name="person" size={40} color="#ffffff" />
+                </View>
+              )}
+            </View>
+
+            <View style={styles.headerInfo}>
+              <Text style={[styles.name, { color: colors.text }]}>
+                {profile.name} {profile.age && <Text>({profile.age})</Text>}
+              </Text>
+
+              <View style={styles.positionContainer}>
+                <Text style={[styles.position, { color: colors.primary }]}>
+                  {profile.occupation}
                 </Text>
+                {profile.experience_level && (
+                  <Text style={[styles.experience, { color: colors.secondaryText }]}>
+                    • {profile.experience_level}
+                    <Ionicons
+                      name="cafe"
+                      size={12}
+                      color={getCoffeeColor(profile.experience_level)}
+                      style={{ marginLeft: 4 }}
+                    />
+                  </Text>
+                )}
               </View>
-            )}
+
+              {profile.city && (
+                <View style={styles.locationContainer}>
+                  <Ionicons name="location-outline" size={14} color={colors.secondaryText} />
+                  <Text style={[styles.location, { color: colors.secondaryText }]}>
+                    {profile.city}
+                  </Text>
+                </View>
+              )}
+            </View>
           </View>
 
-          <View
-            style={[
-              styles.occupationBadge,
-              { backgroundColor: colors.primary + "20" },
-            ]}
-          >
-            <Ionicons
-              name="briefcase-outline"
-              size={14}
-              color={colors.primary}
-              style={styles.occupationIcon}
-            />
-            <Text style={[styles.occupation, { color: colors.primary }]}>
-              {profile.occupation}
+          <View style={styles.bioContainer}>
+            <Text style={[styles.bioText, { color: colors.text }]}>
+              {profile.bio}
             </Text>
           </View>
 
@@ -490,64 +503,56 @@ export default function ProfileCard({
           )}
 
           <View style={{ padding: 16 }}>
-            <View style={styles.nameRow}>
-              <Text style={[styles.name, { color: colors.text }]}>
-                {profile.name}
-              </Text>
-            </View>
-
-            <View
-              style={[
-                styles.tag,
-                {
-                  backgroundColor: "transparent",
-                  borderWidth: 1,
-                  borderColor: colors.primary,
-                  alignSelf: "flex-start",
-                  marginTop: 4,
-                },
-              ]}
-            >
-              <Text style={[styles.occupation, { color: colors.primary }]}>
-                {profile.occupation}
-              </Text>
-            </View>
-
-            {profile.experience_level && (
-              <View
-                style={[
-                  styles.tag,
-                  {
-                    backgroundColor: "transparent",
-                    borderWidth: 1,
-                    borderColor: colors.primary,
-                    alignSelf: "flex-start",
-                    marginTop: 4,
-                    flexDirection: "row",
-                    alignItems: "center",
-                  },
-                ]}
-              >
-                <Text style={[styles.occupation, { color: colors.primary }]}>
-                  {profile.experience_level}
-                  {"\t"}
-                  <Ionicons
-                    name="cafe"
-                    size={14}
-                    color={getCoffeeColor(profile.experience_level)}
-                  />
-                  <Text
-                    style={[
-                      styles.coffeeBadgeText,
-                      { color: getCoffeeColor(profile.experience_level) },
-                    ]}
-                  >
-                    {" "}
-                    {getCoffeeTheme(profile.experience_level)}
-                  </Text>
-                </Text>
+            <View style={styles.headerContainer}>
+              <View style={styles.photoContainer}>
+                {profile.photo_url ? (
+                  <Image source={{ uri: profile.photo_url }} style={styles.profilePhoto} />
+                ) : (
+                  <View style={[styles.profilePhoto, { backgroundColor: "#1A1A1A", justifyContent: "center", alignItems: "center" }]}>
+                    <Ionicons name="person" size={40} color="#ffffff" />
+                  </View>
+                )}
               </View>
-            )}
+
+              <View style={styles.headerInfo}>
+                <Text style={[styles.name, { color: colors.text }]}>
+                  {profile.name} {profile.age && <Text>({profile.age})</Text>}
+                </Text>
+
+                <View style={styles.positionContainer}>
+                  <Text style={[styles.position, { color: colors.primary }]}>
+                    {profile.occupation}
+                  </Text>
+                  {profile.experience_level && (
+                    <Text style={[styles.experience, { color: colors.secondaryText }]}>
+                      • {profile.experience_level}
+                      <Ionicons
+                        name="cafe"
+                        size={12}
+                        color={getCoffeeColor(profile.experience_level)}
+                        style={{ marginLeft: 4 }}
+                      />
+                    </Text>
+                  )}
+                </View>
+
+                {profile.city && (
+                  <View style={styles.locationContainer}>
+                    <Ionicons name="location-outline" size={14} color={colors.secondaryText} />
+                    <Text style={[styles.location, { color: colors.secondaryText }]}>
+                      {profile.city}
+                    </Text>
+                  </View>
+                )}
+              </View>
+            </View>
+
+            <View style={styles.bioContainer}>
+              <Text style={[styles.bioText, { color: colors.text }]}>
+                {profile.bio}
+              </Text>
+            </View>
+
 
             <View style={styles.divider} />
 
@@ -629,7 +634,7 @@ export default function ProfileCard({
                   )}
                 </>
               )}
-              
+
               {/* Industry Categories */}
               {profile.industry_categories &&
                 profile.industry_categories.length > 0 && (
@@ -731,7 +736,7 @@ export default function ProfileCard({
                 </>
               )}
 
-              
+
 
               {profile.favorite_cafes && profile.favorite_cafes.length > 0 && (
                 <>
@@ -1191,5 +1196,43 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     justifyContent: "center",
     alignItems: "center",
+  },
+  headerContainer: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    marginBottom: 16,
+  },
+  photoContainer: {
+    marginRight: 16,
+  },
+  profilePhoto: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+  },
+  headerInfo: {
+    flex: 1,
+  },
+  positionContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  position: {
+    fontFamily: "K2D-Medium",
+    fontSize: 16,
+  },
+  experience: {
+    fontFamily: "K2D-Regular",
+    fontSize: 14,
+    marginLeft: 8,
+  },
+  bioContainer: {
+    marginBottom: 16,
+  },
+  bioText: {
+    fontFamily: "K2D-Regular",
+    fontSize: 14,
+    lineHeight: 20,
   },
 });
