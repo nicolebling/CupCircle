@@ -212,6 +212,19 @@ export default function ProfileCard({
         setFavoriteCafes(data.favorite_cafes || []);
         setInterests(data.interests || []);
 
+        // Parse and set employment data
+        let employmentData = [];
+        if (data.employment) {
+          try {
+            employmentData = typeof data.employment === 'string' 
+              ? JSON.parse(data.employment) 
+              : data.employment;
+          } catch (e) {
+            console.error("Error parsing employment data:", e);
+          }
+        }
+        setEmploymentHistory(employmentData);
+
         console.log("Profile data loaded into form state");
         console.log(data.favorite_cafes);
       }
