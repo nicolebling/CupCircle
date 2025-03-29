@@ -80,11 +80,10 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   deleteButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    marginLeft: 8,
   },
 });
