@@ -621,8 +621,8 @@ export default function ProfileCard({
                 <>
                   <Text
                     style={[
-                      styles.sectionTitle,
-                      { color: colors.text, marginBottom: 16 },
+                      styles.label,
+                      { color: colors.secondaryText, marginBottom: 16 },
                     ]}
                   >
                     Experience
