@@ -148,8 +148,10 @@ export default function ProfileForm({
         if (data.career_transitions) {
           try {
             transitionsData = Array.isArray(data.career_transitions)
-              ? data.career_transitions
-              : JSON.parse(data.career_transitions);
+              ? data.career_transitions.map(transition => 
+                  typeof transition === 'string' ? JSON.parse(transition) : transition
+                )
+              : [JSON.parse(data.career_transitions)];
           } catch (e) {
             console.error("Error parsing career transitions data:", e);
           }
