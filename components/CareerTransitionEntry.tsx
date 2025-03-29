@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -55,10 +54,14 @@ export default function CareerTransitionEntry({ transition, onChange, onDelete, 
     return (
       <View style={[styles.container, { backgroundColor: colors.input }]}>
         <View style={styles.header}>
-          <View style={styles.transitionText}>
-            <Text style={[styles.position, { color: colors.text }]}>{localTransition.position1}</Text>
-            <Ionicons name="arrow-forward" size={20} color={colors.text} style={styles.arrow} />
-            <Text style={[styles.position, { color: colors.text }]}>{localTransition.position2}</Text>
+          <View style={styles.transitionContent}>
+            <View style={styles.position1Container}>
+              <Text style={[styles.position, { color: colors.text }]}>{localTransition.position1}</Text>
+              <View style={styles.arrow}>
+                <Ionicons name="arrow-forward" size={20} color={colors.primary} />
+              </View>
+            </View>
+            <Text style={[styles.position, styles.position2, { color: colors.text }]}>{localTransition.position2}</Text>
           </View>
           <View style={styles.buttonGroup}>
             <TouchableOpacity onPress={() => setIsEditing(true)} style={styles.actionButton}>
@@ -104,8 +107,8 @@ export default function CareerTransitionEntry({ transition, onChange, onDelete, 
         />
       </View>
 
-      <TouchableOpacity 
-        style={[styles.saveButton, { backgroundColor: colors.primary }]} 
+      <TouchableOpacity
+        style={[styles.saveButton, { backgroundColor: colors.primary }]}
         onPress={handleSave}
       >
         <Text style={styles.saveButtonText}>Save</Text>
@@ -127,16 +130,24 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  transitionText: {
+  transitionContent: {
+    flex: 1,
+  },
+  position1Container: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  arrow: {
-    marginHorizontal: 8,
-  },
   position: {
     fontSize: 16,
-    fontFamily: 'K2D-Regular',
+    fontFamily: "K2D-Regular",
+  },
+  position2: {
+    marginTop: 4,
+    paddingRight: 8,
+  },
+  arrow: {
+    marginHorizontal: 8,
+    alignSelf: 'center',
   },
   label: {
     fontSize: 12,
