@@ -701,7 +701,7 @@ export default function ProfileCard({
                       const transition = JSON.parse(transitionString);
                       return (
                         <View key={index} style={styles.transitionContainer}>
-                          <View style={styles.timelineDot} />
+                          
                           <View style={styles.transitionCard}>
                             <View style={styles.transitionText}>
                               <Text style={[styles.position, { color: colors.text }]}>
@@ -949,7 +949,7 @@ const styles = StyleSheet.create({
   },
   transitionCard: {
     flex: 1,
-    marginLeft: 16,
+    
   },
   transitionText: {
     flexDirection: 'row',
