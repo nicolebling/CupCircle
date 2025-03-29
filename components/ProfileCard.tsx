@@ -834,7 +834,7 @@ const styles = StyleSheet.create({
     width: 1,
     position: 'absolute',
     left: 3.5,
-    top: 14,
+    top: 24,
     bottom: -24,
     backgroundColor: '#ccc',
   },
