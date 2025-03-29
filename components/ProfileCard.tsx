@@ -207,6 +207,7 @@ export default function ProfileCard({
 
       console.log("Profile data fetched:", data);
 
+
       if (data) {
         setName(data.name || "");
         setUsername(data.username || "");
@@ -224,9 +225,9 @@ export default function ProfileCard({
         setInterests(data.interests || []);
 
         // Parse and set employment data
-        // Parse and set employment data
         if (data.employment) {
           try {
+            
             let employmentData = data.employment;
             if (typeof employmentData === 'string') {
               employmentData = JSON.parse(employmentData);
