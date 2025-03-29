@@ -29,20 +29,6 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
   const [isPresentJob, setIsPresentJob] = useState(employment?.toDate === 'Present');
 
   const handleChange = (field, value) => {
-    // Validate date format (MM/YYYY) and year
-    if (field === 'fromDate' || field === 'toDate') {
-      const dateRegex = /^(0[1-9]|1[0-2])\/\d{4}$/;
-      if (!dateRegex.test(value) && value !== 'Present') {
-        Alert.alert('Invalid Date Format', 'Please use MM/YYYY format.');
-        return;
-      }
-      const [month, year] = value.split('/');
-      const currentYear = new Date().getFullYear();
-      if (parseInt(year) > currentYear && value !== 'Present') {
-        Alert.alert('Invalid Year', 'Year cannot be in the future.');
-        return;
-      }
-    }
     setLocalEmployment(prevState => ({
       ...prevState,
       [field]: value
@@ -71,6 +57,34 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
         "Please fill in all fields for the employment history entry."
       );
       return;
+    }
+
+    // Validate date formats
+    const dateRegex = /^(0[1-9]|1[0-2])\/\d{4}$/;
+    const currentYear = new Date().getFullYear();
+
+    // Validate fromDate
+    if (!dateRegex.test(localEmployment.fromDate)) {
+      Alert.alert('Invalid Date Format', 'From date must be in MM/YYYY format (e.g., 03/2024)');
+      return;
+    }
+    const [fromMonth, fromYear] = localEmployment.fromDate.split('/');
+    if (parseInt(fromYear) > currentYear) {
+      Alert.alert('Invalid Year', 'From date cannot be in the future');
+      return;
+    }
+
+    // Validate toDate if not Present
+    if (!isPresentJob && localEmployment.toDate !== 'Present') {
+      if (!dateRegex.test(localEmployment.toDate)) {
+        Alert.alert('Invalid Date Format', 'To date must be in MM/YYYY format (e.g., 03/2024)');
+        return;
+      }
+      const [toMonth, toYear] = localEmployment.toDate.split('/');
+      if (parseInt(toYear) > currentYear) {
+        Alert.alert('Invalid Year', 'To date cannot be in the future');
+        return;
+      }
     }
 
     onChange(localEmployment);
