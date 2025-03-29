@@ -833,9 +833,9 @@ const styles = StyleSheet.create({
   timelineLine: {
     width: 2,
     position: 'absolute',
-    left: 4,
+    left: 4.5,
     top: 20,
-    bottom: 0,
+    bottom: -10,
     backgroundColor: '#ccc',
   },
   employmentHeader: {
