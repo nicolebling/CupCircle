@@ -54,13 +54,17 @@ export default function AvailabilityScreen() {
       if (error) throw error;
 
       // Ensure dates are properly parsed and sorted
-      const formattedData = (data || []).map((slot) => ({
-        ...slot,
-        date: new Date(slot.date),
-        startTime: slot.start_time,
-        endTime: slot.end_time,
-        // avail_id: parseInt(slot.avail_id, 10), //added to parse avail_id as int
-      }));
+      const formattedData = (data || []).map((slot) => {
+        // Create date without timezone conversion
+        const [year, month, day] = slot.date.split('-').map(Number);
+        const date = new Date(year, month - 1, day); // month is 0-based in JS
+        return {
+          ...slot,
+          date,
+          startTime: slot.start_time,
+          endTime: slot.end_time,
+        };
+      });
 
       // Sort by date and time
       const sortedData = formattedData.sort((a, b) => {
