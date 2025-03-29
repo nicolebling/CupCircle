@@ -93,6 +93,7 @@ export type UserProfileData = {
   favoriteCafes?: string[];
   interests: string[];
   matchedCafe?: boolean;
+  employment: string[];
 };
 
 type ProfileCardProps = {
@@ -940,7 +941,7 @@ export default function ProfileCard({
               )}
 
               {/* Employment History Section */}
-              {/* Employment History Section */}
+              
               {profile.employment && (
                 <>
                   <Text style={[styles.label, { color: colors.secondaryText }]}>
