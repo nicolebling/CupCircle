@@ -1132,7 +1132,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   coffeeExperienceContainer: {
-    marginBottom: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 8,
   },
   coffeeBadge: {
     flexDirection: "row",
@@ -1216,7 +1218,7 @@ const styles = StyleSheet.create({
   },
   photoContainer: {
     marginBottom: 16,
-    alignItems: 'center',
+    alignItems: "center",
   },
   profilePhoto: {
     width: 120,
@@ -1224,8 +1226,8 @@ const styles = StyleSheet.create({
     borderRadius: 60,
   },
   headerInfo: {
-    width: '100%',
-    alignItems: 'center',
+    width: "100%",
+    alignItems: "center",
   },
   positionContainer: {
     flexDirection: "row",
