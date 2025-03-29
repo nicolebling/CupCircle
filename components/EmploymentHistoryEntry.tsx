@@ -68,7 +68,7 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
 
     // Validate fromDate
     if (!dateRegex.test(localEmployment.fromDate)) {
-      Alert.alert('Invalid Date Format', 'From date must be in MM/YYYY format (e.g., 03/2024)');
+      Alert.alert('Invalid Date Format', 'From date must be in MM/YYYY format ');
       return;
     }
     const [fromMonth, fromYear] = localEmployment.fromDate.split('/');
@@ -80,7 +80,7 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
     // Validate toDate if not Present
     if (!isPresentJob && localEmployment.toDate !== 'Present') {
       if (!dateRegex.test(localEmployment.toDate)) {
-        Alert.alert('Invalid Date Format', 'To date must be in MM/YYYY format (e.g., 03/2024)');
+        Alert.alert('Invalid Date Format', 'To date must be in MM/YYYY format');
         return;
       }
       const [toMonth, toYear] = localEmployment.toDate.split('/');
@@ -156,7 +156,7 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
           <Text style={[styles.label, { color: colors.secondaryText }]}>From</Text>
           <TextInput
             style={[styles.input, { backgroundColor: colors.input, color: colors.text }]}
-            placeholder="MM/YYYY (e.g., 03/2024)"
+            placeholder="MM/YYYY"
             placeholderTextColor={colors.secondaryText}
             value={localEmployment.fromDate}
             onChangeText={(value) => handleChange('fromDate', value)}
@@ -168,7 +168,7 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
           {!isPresentJob ? (
             <TextInput
               style={[styles.input, { backgroundColor: colors.input, color: colors.text }]}
-              placeholder="MM/YYYY (e.g., 03/2024)"
+              placeholder="MM/YYYY"
               placeholderTextColor={colors.secondaryText}
               value={localEmployment.toDate}
               onChangeText={(value) => handleChange('toDate', value)}

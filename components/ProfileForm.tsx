@@ -16,23 +16,17 @@ import {
 } from "react-native";
 
 const { width } = Dimensions.get("window");
-import DateTimePicker from "@react-native-community/datetimepicker";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
-import { useAuth } from "../../provider/AuthProvider";
-import * as FileSystem from "expo-file-system";
-import { FileObject } from "@supabase/storage-js";
 
 import { supabase } from "@/lib/supabase";
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import { router } from "expo-router";
 import IndustrySelector from "@/components/IndustrySelector";
 import InterestSelector from "@/components/InterestSelector";
 import ExperienceLevelSelector from "@/components/ExperienceLevelSelector";
 import NeighborhoodSelector from "@/components/NeighborhoodSelector";
 import CafeSelector from "@/components/CafeSelector";
-import ImageItem from "@/components/ImageItem";
 import { decode } from "base64-arraybuffer";
 
 type ProfileFormProps = {
@@ -57,7 +51,6 @@ export default function ProfileForm({
   const isDark = colorScheme === "dark";
 
   const [loading, setLoading] = useState(false);
-  const [showDatePicker, setShowDatePicker] = useState(false);
   const [name, setName] = useState("");
   const [avatar, setAvatar] = useState("");
   const [occupation, setOccupation] = useState("");
@@ -163,29 +156,6 @@ export default function ProfileForm({
     }
   };
 
-  const handleRemoveSkill = (index: number) => {
-    setSkills(skills.filter((_, i) => i !== index));
-  };
-
-  const handleAddNeighborhood = (neighborhood: string) => {
-    if (neighborhood.trim() && !neighborhoods.includes(neighborhood.trim())) {
-      setNeighborhoods([...neighborhoods, neighborhood.trim()]);
-    }
-  };
-
-  const handleRemoveNeighborhood = (index: number) => {
-    setNeighborhoods(neighborhoods.filter((_, i) => i !== index));
-  };
-
-  const handleAddCafe = (cafe: string) => {
-    if (cafe.trim() && !favoriteCafes.includes(cafe.trim())) {
-      setFavoriteCafes([...favoriteCafes, cafe.trim()]);
-    }
-  };
-
-  const handleRemoveCafe = (index: number) => {
-    setFavoriteCafes(favoriteCafes.filter((_, i) => i !== index));
-  };
 
   const requestPermission = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -199,13 +169,6 @@ export default function ProfileForm({
     return true;
   };
 
-  const handleConfirm = () => {
-    const formattedDate = tempDate.toISOString().split("T")[0];
-    setBirthday(formattedDate); // Update birthday
-    const calculatedAge = calculateAge(formattedDate);
-    setAge(calculatedAge); // Update age based on new birthday
-    setShowDatePicker(false); // Close the date picker after confirmation
-  };
 
   const pickImage = async () => {
     // Ensure permission is granted
@@ -223,8 +186,6 @@ export default function ProfileForm({
     if (!result.canceled && result.assets && result.assets.length > 0) {
       uploadImage(result.assets[0].uri);
     }
-
-    console.log(result);
   };
 
   const uploadImage = async (uri: string) => {
@@ -379,23 +340,6 @@ export default function ProfileForm({
     }
     return age;
   };
-
-  const handleDateChange = (event, selectedDate) => {
-    if (selectedDate) {
-      setBirthday(selectedDate); // store as Date object
-      const formattedDate = selectedDate.toISOString().split("T")[0];
-      setAge(calculateAge(formattedDate));
-    }
-    setShowDatePicker(false);
-  };
-  if (loading && !isNewUser) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#0097FB" />
-        <Text style={styles.loadingText}>Loading your profile...</Text>
-      </View>
-    );
-  }
 
   const addEmploymentEntry = () => {
     if (employmentHistory.length >= 3) {
