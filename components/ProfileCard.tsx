@@ -159,6 +159,7 @@ export default function ProfileCard({
   const [skills, setSkills] = useState<string[]>([]);
   const [neighborhoods, setNeighborhoods] = useState<string[]>([]);
   const [favoriteCafes, setFavoriteCafes] = useState<string[]>([]);
+  const [employmentHistory, setEmploymentHistory] = useState<string[]>([]);
   const [interests, setInterests] = useState<string[]>([]);
   const [error, setError] = useState("");
   const [isEditMode, setIsEditMode] = useState(false);
