@@ -532,23 +532,21 @@ export default function ProfileCard({
                   <Text style={[styles.position, { color: colors.text }]}>
                     {profile.occupation}
                   </Text>
-                  {profile.experience_level && (
-                    <Text
-                      style={[
-                        styles.experience,
-                        { color: colors.secondaryText },
-                      ]}
-                    >
-                      • {profile.experience_level}
-                      <Ionicons
-                        name="cafe"
-                        size={12}
-                        color={getCoffeeColor(profile.experience_level)}
-                        style={{ marginLeft: 4 }}
-                      />
-                    </Text>
-                  )}
                 </View>
+
+                {/* {profile.experience_level && (
+          <View style={[styles.positionContainer, { justifyContent: 'center' }]}>
+                  <Text
+                    style={[
+                      styles.experience,
+                      { color: colors.secondaryText },
+                    ]}
+                  >
+                    {profile.experience_level}
+                   
+                  </Text>
+            </View>
+                )} */}
 
                 {profile.city && (
                   <View style={[styles.locationContainer, { justifyContent: 'center' }]}>
@@ -963,7 +961,7 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: "#EFE9D3",
+    backgroundColor: "#DFDFDF",
     marginBottom: 16,
   },
   sectionTitle: {
