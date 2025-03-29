@@ -311,7 +311,7 @@ export default function ProfileCard({
                   <Text
                     style={[styles.experience, { color: colors.secondaryText }]}
                   >
-                    • {profile.experience_level}
+                    {profile.experience_level}
                     <Ionicons
                       name="cafe"
                       size={12}
