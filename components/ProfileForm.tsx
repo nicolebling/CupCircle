@@ -412,9 +412,18 @@ export default function ProfileForm({
   };
 
   const updateEmploymentEntry = (index, updatedEntry) => {
-    setEmploymentHistory(prevHistory =>
-      prevHistory.map((entry, i) => (i === index ? { ...updatedEntry } : entry))
-    );
+    setEmploymentHistory(prevHistory => {
+      const newHistory = prevHistory.map((entry, i) => 
+        i === index ? { ...updatedEntry } : entry
+      );
+      
+      // Sort entries by date (most recent first)
+      return newHistory.sort((a, b) => {
+        const dateA = a.toDate === 'Present' ? new Date() : new Date(a.toDate.split('/')[1], a.toDate.split('/')[0]);
+        const dateB = b.toDate === 'Present' ? new Date() : new Date(b.toDate.split('/')[1], b.toDate.split('/')[0]);
+        return dateB.getTime() - dateA.getTime();
+      });
+    });
   };
 
   const deleteEmploymentEntry = (index) => {
