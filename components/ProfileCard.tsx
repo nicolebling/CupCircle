@@ -278,9 +278,21 @@ export default function ProfileCard({
           <View style={styles.headerContainer}>
             <View style={styles.photoContainer}>
               {profile.photo_url ? (
-                <Image source={{ uri: profile.photo_url }} style={styles.profilePhoto} />
+                <Image
+                  source={{ uri: profile.photo_url }}
+                  style={styles.profilePhoto}
+                />
               ) : (
-                <View style={[styles.profilePhoto, { backgroundColor: "#1A1A1A", justifyContent: "center", alignItems: "center" }]}>
+                <View
+                  style={[
+                    styles.profilePhoto,
+                    {
+                      backgroundColor: "#1A1A1A",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    },
+                  ]}
+                >
                   <Ionicons name="person" size={40} color="#ffffff" />
                 </View>
               )}
@@ -296,7 +308,9 @@ export default function ProfileCard({
                   {profile.occupation}
                 </Text>
                 {profile.experience_level && (
-                  <Text style={[styles.experience, { color: colors.secondaryText }]}>
+                  <Text
+                    style={[styles.experience, { color: colors.secondaryText }]}
+                  >
                     • {profile.experience_level}
                     <Ionicons
                       name="cafe"
@@ -310,8 +324,14 @@ export default function ProfileCard({
 
               {profile.city && (
                 <View style={styles.locationContainer}>
-                  <Ionicons name="location-outline" size={14} color={colors.secondaryText} />
-                  <Text style={[styles.location, { color: colors.secondaryText }]}>
+                  <Ionicons
+                    name="location-outline"
+                    size={14}
+                    color={colors.secondaryText}
+                  />
+                  <Text
+                    style={[styles.location, { color: colors.secondaryText }]}
+                  >
                     {profile.city}
                   </Text>
                 </View>
@@ -479,36 +499,25 @@ export default function ProfileCard({
             },
           ]}
         >
-          {/* Profile Photo */}
-          {profile.photo_url ? (
-            <Image
-              source={{ uri: profile.photo_url }}
-              style={[styles.image, { marginTop: 0 }]}
-              resizeMode="cover"
-            />
-          ) : (
-            <View
-              style={[
-                styles.image,
-                {
-                  backgroundColor: "#1A1A1A",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  marginTop: 0,
-                },
-              ]}
-            >
-              <Ionicons name="person" size={60} color="#ffffff" />
-            </View>
-          )}
-
           <View style={{ padding: 16 }}>
             <View style={styles.headerContainer}>
               <View style={styles.photoContainer}>
                 {profile.photo_url ? (
-                  <Image source={{ uri: profile.photo_url }} style={styles.profilePhoto} />
+                  <Image
+                    source={{ uri: profile.photo_url }}
+                    style={styles.profilePhoto}
+                  />
                 ) : (
-                  <View style={[styles.profilePhoto, { backgroundColor: "#1A1A1A", justifyContent: "center", alignItems: "center" }]}>
+                  <View
+                    style={[
+                      styles.profilePhoto,
+                      {
+                        backgroundColor: "#1A1A1A",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      },
+                    ]}
+                  >
                     <Ionicons name="person" size={40} color="#ffffff" />
                   </View>
                 )}
@@ -516,15 +525,20 @@ export default function ProfileCard({
 
               <View style={styles.headerInfo}>
                 <Text style={[styles.name, { color: colors.text }]}>
-                  {profile.name} {profile.age && <Text>({profile.age})</Text>}
+                  {profile.name}
                 </Text>
 
                 <View style={styles.positionContainer}>
-                  <Text style={[styles.position, { color: colors.primary }]}>
+                  <Text style={[styles.position, { color: colors.text }]}>
                     {profile.occupation}
                   </Text>
                   {profile.experience_level && (
-                    <Text style={[styles.experience, { color: colors.secondaryText }]}>
+                    <Text
+                      style={[
+                        styles.experience,
+                        { color: colors.secondaryText },
+                      ]}
+                    >
                       • {profile.experience_level}
                       <Ionicons
                         name="cafe"
@@ -538,8 +552,14 @@ export default function ProfileCard({
 
                 {profile.city && (
                   <View style={styles.locationContainer}>
-                    <Ionicons name="location-outline" size={14} color={colors.secondaryText} />
-                    <Text style={[styles.location, { color: colors.secondaryText }]}>
+                    <Ionicons
+                      name="location-outline"
+                      size={14}
+                      color={colors.secondaryText}
+                    />
+                    <Text
+                      style={[styles.location, { color: colors.secondaryText }]}
+                    >
                       {profile.city}
                     </Text>
                   </View>
@@ -553,43 +573,10 @@ export default function ProfileCard({
               </Text>
             </View>
 
-
-            <View style={styles.divider} />
-
-            {/* Personal Information */}
-            <View style={styles.section}>
-              <Text style={[styles.label, { color: colors.secondaryText }]}>
-                About
-              </Text>
-              <Text style={[styles.value, { color: colors.text }]}>
-                {profile.bio}
-              </Text>
-
-              {profile.education && (
-                <>
-                  <Text style={[styles.label, { color: colors.secondaryText }]}>
-                    Education
-                  </Text>
-                  <Text style={[styles.value, { color: colors.text }]}>
-                    {profile.education}
-                  </Text>
-                </>
-              )}
-
-              <Text style={[styles.label, { color: colors.secondaryText }]}>
-                City
-              </Text>
-              <Text style={[styles.value, { color: colors.text }]}>
-                {profile.city}
-              </Text>
-            </View>
-
             <View style={styles.divider} />
 
             {/* Professional Details */}
             <View style={styles.section}>
-
-
               {/* Employment Section */}
               {profile.employment && (
                 <>
@@ -616,22 +603,48 @@ export default function ProfileCard({
                           ]}
                         >
                           <View style={styles.employmentHeader}>
-                            <Text style={[styles.companyName, { color: colors.text }]}>
+                            <Text
+                              style={[
+                                styles.companyName,
+                                { color: colors.text },
+                              ]}
+                            >
                               {job.company}
                             </Text>
-                            <Text style={[styles.position, { color: colors.text }]}>
+                            <Text
+                              style={[styles.position, { color: colors.text }]}
+                            >
                               {job.position}
                             </Text>
                           </View>
-                          <Text style={[styles.dateRange, { color: colors.secondaryText }]}>
+                          <Text
+                            style={[
+                              styles.dateRange,
+                              { color: colors.secondaryText },
+                            ]}
+                          >
                             {job.fromDate} - {job.toDate}
                           </Text>
                         </View>
                       );
                     })
                   ) : (
-                    <Text style={{ color: 'red' }}>Employment data is not an array!</Text>
+                    <Text style={{ color: "red" }}>
+                      Employment data is not an array!
+                    </Text>
                   )}
+                </>
+              )}
+
+              {/* Education */}
+              {profile.education && (
+                <>
+                  <Text style={[styles.label, { color: colors.secondaryText }]}>
+                    Education
+                  </Text>
+                  <Text style={[styles.value, { color: colors.text }]}>
+                    {profile.education}
+                  </Text>
                 </>
               )}
 
@@ -735,8 +748,6 @@ export default function ProfileCard({
                   </View>
                 </>
               )}
-
-
 
               {profile.favorite_cafes && profile.favorite_cafes.length > 0 && (
                 <>
@@ -1201,6 +1212,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "flex-start",
     marginBottom: 16,
+    marginTop: 16,
   },
   photoContainer: {
     marginRight: 16,
