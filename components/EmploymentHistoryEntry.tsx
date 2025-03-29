@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -17,9 +18,9 @@ type Props = {
   isDark: boolean;
 };
 
-export default function EmploymentHistoryEntry({ employment, onChange, onDelete, isEditing, setIsEditing, isDark}: Props) {
+export default function EmploymentHistoryEntry({ employment, onChange, onDelete, isDark}: Props) {
   const colors = Colors[isDark ? 'dark' : 'light'];
- 
+  const [isEditing, setIsEditing] = useState(!employment?.company);
   const [localEmployment, setLocalEmployment] = useState(() => ({
     company: employment?.company || '',
     position: employment?.position || '',
@@ -27,12 +28,6 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
     toDate: employment?.toDate || ''
   }));
   const [isPresentJob, setIsPresentJob] = useState(employment?.toDate === 'Present');
-
-  useEffect(() => {
-    if (employment?.company) {
-      setIsEditing(false);
-    }
-  }, [employment?.company]);
 
   const handleChange = (field, value) => {
       setLocalEmployment(prevState => ({
@@ -195,11 +190,9 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
     paddingVertical: 8,
     paddingHorizontal: 16,
-     
   },
   presentButtonText: {
     fontWeight: '600',
-    
   },
   container: {
     padding: 16,
@@ -244,11 +237,11 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   actionRow: {
-     flexDirection: 'row',
-      justifyContent: 'space-between',  // Align to right
-      alignItems: 'center',
-      marginTop: 16,
-      gap: 12,  // Space between buttons
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 16,
+    gap: 12,
   },
   saveButton: {
     paddingVertical: 8,
