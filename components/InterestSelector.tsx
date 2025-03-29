@@ -88,6 +88,7 @@ export default function InterestSelector({
 
   const [modalVisible, setModalVisible] = useState(false);
   const [searchText, setSearchText] = useState("");
+  const [customInterest, setCustomInterest] = useState("");
 
   // Filter interests based on search text
   const filteredInterests = useMemo(() => {
@@ -116,6 +117,21 @@ export default function InterestSelector({
     }
 
     onChange(newSelectedInterests);
+  };
+
+  const handleAddCustomInterest = () => {
+    const words = customInterest.split(" ");
+    if (words.length > 10) {
+      //Ideally, replace this with a proper toast notification
+      console.log("Interest cannot exceed 100 words");
+      return;
+    }
+    const formattedInterest = words
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(" ");
+
+    toggleInterest(formattedInterest);
+    setCustomInterest("");
   };
 
   return (
@@ -189,29 +205,34 @@ export default function InterestSelector({
               </TouchableOpacity>
             </View>
 
-            <View
-              style={[
-                styles.searchContainer,
-                { backgroundColor: colors.card, borderColor: colors.border },
-              ]}
-            >
-              <Ionicons name="search" size={20} color={colors.secondaryText} />
-              <TextInput
-                style={[styles.searchInput, { color: colors.text }]}
-                placeholder="Search interests..."
-                placeholderTextColor={colors.secondaryText}
-                value={searchText}
-                onChangeText={setSearchText}
-              />
-              {searchText.length > 0 && (
-                <TouchableOpacity onPress={() => setSearchText("")}>
-                  <Ionicons
-                    name="close-circle"
-                    size={20}
-                    color={colors.secondaryText}
-                  />
+            <View style={styles.inputContainer}>
+              <View style={styles.searchContainer}>
+                <Ionicons name="search" size={20} color={colors.secondaryText} />
+                <TextInput
+                  style={[styles.searchInput, { color: colors.text }]}
+                  placeholder="Search interests..."
+                  placeholderTextColor={colors.secondaryText}
+                  value={searchText}
+                  onChangeText={setSearchText}
+                />
+              </View>
+
+              <View style={styles.customInterestContainer}>
+                <TextInput
+                  style={[styles.customInterestInput, { color: colors.text, borderColor: colors.border }]}
+                  placeholder="Add custom interest..."
+                  placeholderTextColor={colors.secondaryText}
+                  value={customInterest}
+                  onChangeText={setCustomInterest}
+                  onSubmitEditing={handleAddCustomInterest}
+                />
+                <TouchableOpacity
+                  style={[styles.addButton, { backgroundColor: colors.primary }]}
+                  onPress={handleAddCustomInterest}
+                >
+                  <Ionicons name="add" size={24} color="#FFF" />
                 </TouchableOpacity>
-              )}
+              </View>
             </View>
 
             <View style={styles.selectedPreview}>
@@ -336,6 +357,9 @@ const styles = StyleSheet.create({
     fontFamily: "K2D-SemiBold",
     fontSize: 18,
   },
+  inputContainer: {
+    marginBottom: 16,
+  },
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -344,7 +368,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     paddingHorizontal: 12,
     height: 44,
-    marginBottom: 16,
   },
   searchInput: {
     flex: 1,
@@ -352,6 +375,32 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     fontFamily: "K2D-Regular",
     fontSize: 16,
+  },
+  customInterestContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderRadius: 8,
+    marginHorizontal: 16,
+    paddingHorizontal: 12,
+    height: 44,
+    marginTop: 8,
+  },
+  customInterestInput: {
+    flex: 1,
+    height: "100%",
+    marginLeft: 8,
+    fontFamily: "K2D-Regular",
+    fontSize: 16,
+    padding: 0,
+  },
+  addButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    marginLeft: 8,
   },
   selectedPreview: {
     paddingHorizontal: 16,
