@@ -524,11 +524,11 @@ export default function ProfileCard({
               </View>
 
               <View style={styles.headerInfo}>
-                <Text style={[styles.name, { color: colors.text }]}>
+                <Text style={[styles.name, { color: colors.text, textAlign: 'center' }]}>
                   {profile.name}
                 </Text>
 
-                <View style={styles.positionContainer}>
+                <View style={[styles.positionContainer, { justifyContent: 'center' }]}>
                   <Text style={[styles.position, { color: colors.text }]}>
                     {profile.occupation}
                   </Text>
@@ -551,7 +551,7 @@ export default function ProfileCard({
                 </View>
 
                 {profile.city && (
-                  <View style={styles.locationContainer}>
+                  <View style={[styles.locationContainer, { justifyContent: 'center' }]}>
                     <Ionicons
                       name="location-outline"
                       size={14}
@@ -1209,21 +1209,23 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   headerContainer: {
-    flexDirection: "row",
-    alignItems: "flex-start",
+    flexDirection: "column",
+    alignItems: "center",
     marginBottom: 16,
     marginTop: 16,
   },
   photoContainer: {
-    marginRight: 16,
+    marginBottom: 16,
+    alignItems: 'center',
   },
   profilePhoto: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: 120,
+    height: 120,
+    borderRadius: 60,
   },
   headerInfo: {
-    flex: 1,
+    width: '100%',
+    alignItems: 'center',
   },
   positionContainer: {
     flexDirection: "row",
