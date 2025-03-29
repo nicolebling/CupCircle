@@ -534,19 +534,6 @@ export default function ProfileCard({
                   </Text>
                 </View>
 
-                {/* {profile.experience_level && (
-          <View style={[styles.positionContainer, { justifyContent: 'center' }]}>
-                  <Text
-                    style={[
-                      styles.experience,
-                      { color: colors.secondaryText },
-                    ]}
-                  >
-                    {profile.experience_level}
-                   
-                  </Text>
-            </View>
-                )} */}
 
                 {profile.city && (
                   <View style={[styles.locationContainer, { justifyContent: 'center' }]}>
@@ -581,56 +568,35 @@ export default function ProfileCard({
                   <Text style={[styles.sectionTitle, { color: colors.text, marginBottom: 16 }]}>
                     Experience
                   </Text>
-                  {Array.isArray(profile.employment) ? (
-                    profile.employment.map((jobString, index) => {
-                      // Parse each job entry from string to object
-                      const job = JSON.parse(jobString);
-                      return (
-                        <View
-                          key={index}
-                          style={[
-                            styles.employmentCard,
-                            {
-                              marginBottom: 24,
-                            },
-                          ]}
-                        >
-                          <Text
-                            style={[
-                              styles.position,
-                              { color: colors.text, fontSize: 16, marginBottom: 4 },
-                            ]}
-                          >
-                            {job.position}
-                          </Text>
-                          <Text
-                            style={[
-                              styles.companyName,
-                              { color: colors.text, fontSize: 14 },
-                            ]}
-                          >
-                            {job.company}
-                          </Text>
-                          <Text
-                            style={[
-                              styles.dateRange,
-                              { 
-                                color: colors.secondaryText,
-                                fontSize: 14,
-                                marginTop: 4,
-                              },
-                            ]}
-                          >
-                            {job.fromDate} - {job.toDate}
-                          </Text>
-                        </View>
-                      );
-                    })
-                  ) : (
-                    <Text style={{ color: "red" }}>
-                      Employment data is not an array!
-                    </Text>
-                  )}
+                  <View> {/* Added View to wrap timeline */}
+                    {Array.isArray(profile.employment) ? (
+                      profile.employment.map((jobString, index) => {
+                        // Parse each job entry from string to object
+                        const job = JSON.parse(jobString);
+                        return (
+                          <View key={index} style={styles.employmentContainer}>
+                            <View style={styles.timelineDot} />
+                            <View style={styles.employmentCard}>
+                              <Text style={[styles.position, { color: colors.text, fontSize: 16, marginBottom: 4 }]}>
+                                {job.position}
+                              </Text>
+                              <Text style={[styles.companyName, { color: colors.text, fontSize: 14 }]}>
+                                {job.company}
+                              </Text>
+                              <Text style={[styles.dateRange, { color: colors.secondaryText, fontSize: 14, marginTop: 4 }]}>
+                                {job.fromDate} - {job.toDate}
+                              </Text>
+                            </View>
+                            {index < profile.employment.length -1 && <View style={styles.timelineLine}/>}
+                          </View>
+                        );
+                      })
+                    ) : (
+                      <Text style={{ color: "red" }}>
+                        Employment data is not an array!
+                      </Text>
+                    )}
+                  </View> {/* Close added View */}
                 </>
               )}
 
@@ -849,6 +815,26 @@ export default function ProfileCard({
 const styles = StyleSheet.create({
   employmentCard: {
     marginBottom: 16,
+  },
+  employmentContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 16,
+  },
+  timelineDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#0097FB',
+    marginRight: 8,
+    marginTop: 10,
+  },
+  timelineLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#ccc',
+    marginRight: 8,
+    marginTop: 10,
   },
   employmentHeader: {
     marginBottom: 4,
