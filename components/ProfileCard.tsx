@@ -621,9 +621,27 @@ export default function ProfileCard({
                     >
                       Industries
                     </Text>
-                    <Text style={[styles.separatedText, { color: colors.primary }]}>
-                      {profile.industry_categories.join(' / ')}
-                    </Text>
+                    <View style={styles.tagsContainer}>
+                      {profile.industry_categories.map((industry, index) => (
+                        <View
+                          key={index}
+                          style={[
+                            styles.tag,
+                            {
+                              backgroundColor: "transparent",
+                              borderWidth: 1,
+                              borderColor: colors.primary,
+                            },
+                          ]}
+                        >
+                          <Text
+                            style={[styles.tagText, { color: colors.primary }]}
+                          >
+                            {industry}
+                          </Text>
+                        </View>
+                      ))}
+                    </View>
                   </>
                 )}
 
@@ -633,9 +651,27 @@ export default function ProfileCard({
                   <Text style={[styles.label, { color: colors.secondaryText }]}>
                     Interests
                   </Text>
-                  <Text style={[styles.separatedText, { color: colors.primary }]}>
-                    {profile.interests.join(' / ')}
-                  </Text>
+                  <View style={styles.tagsContainer}>
+                    {profile.interests.map((interest, index) => (
+                      <View
+                        key={index}
+                        style={[
+                          styles.tag,
+                          {
+                            backgroundColor: "transparent",
+                            borderWidth: 1,
+                            borderColor: colors.primary,
+                          },
+                        ]}
+                      >
+                        <Text
+                          style={[styles.tagText, { color: colors.primary }]}
+                        >
+                          {interest}
+                        </Text>
+                      </View>
+                    ))}
+                  </View>
                 </View>
               )}
             </View>
@@ -653,9 +689,27 @@ export default function ProfileCard({
                   <Text style={[styles.label, { color: colors.secondaryText }]}>
                     Neighborhoods
                   </Text>
-                  <Text style={[styles.separatedText, { color: colors.primary }]}>
-                    {profile.neighborhoods.join(' / ')}
-                  </Text>
+                  <View style={styles.tagsContainer}>
+                    {profile.neighborhoods.map((neighborhood, index) => (
+                      <View
+                        key={index}
+                        style={[
+                          styles.tag,
+                          {
+                            backgroundColor: "transparent",
+                            borderWidth: 1,
+                            borderColor: colors.primary,
+                          },
+                        ]}
+                      >
+                        <Text
+                          style={[styles.tagText, { color: colors.primary }]}
+                        >
+                          {neighborhood}
+                        </Text>
+                      </View>
+                    ))}
+                  </View>
                 </>
               )}
 
@@ -759,12 +813,6 @@ export default function ProfileCard({
 }
 
 const styles = StyleSheet.create({
-  separatedText: {
-    fontFamily: "K2D-Regular",
-    fontSize: 14,
-    marginBottom: 16,
-    lineHeight: 20,
-  },
   employmentCard: {
     marginBottom: 16,
   },
@@ -786,7 +834,7 @@ const styles = StyleSheet.create({
     width: 1,
     position: 'absolute',
     left: 3.5,
-    top: 24,
+    top: 14,
     bottom: -24,
     backgroundColor: '#ccc',
   },
