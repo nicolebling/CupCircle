@@ -93,7 +93,12 @@ export type UserProfileData = {
   favoriteCafes?: string[];
   interests: string[];
   matchedCafe?: boolean;
-  employment: string[];
+  employment?: Array<{
+    company: string;
+    position: string;
+    fromDate: string;
+    toDate: string;
+  }>;
 };
 
 type ProfileCardProps = {
@@ -222,12 +227,11 @@ export default function ProfileCard({
         // Parse and set employment data
         if (data.employment) {
           try {
-            const employmentData = Array.isArray(data.employment) 
-              ? data.employment 
-              : typeof data.employment === 'string'
-                ? JSON.parse(data.employment)
-                : [];
-            setEmploymentHistory(employmentData);
+            let employmentData = data.employment;
+            if (typeof employmentData === 'string') {
+              employmentData = JSON.parse(employmentData);
+            }
+            setEmploymentHistory(Array.isArray(employmentData) ? employmentData : []);
             console.log("Employment data loaded:", employmentData);
           } catch (e) {
             console.error("Error parsing employment data:", e);
