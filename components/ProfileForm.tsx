@@ -38,6 +38,7 @@ type ProfileFormProps = {
 };
 
 import EmploymentHistoryEntry from "./EmploymentHistoryEntry";
+import CareerTransitionEntry from "./CareerTransitionEntry";
 
 export default function ProfileForm({
   userId,
@@ -71,6 +72,11 @@ export default function ProfileForm({
     position: string;
     fromDate: string;
     toDate: string;
+  }>>([]);
+  
+  const [careerTransitions, setCareerTransitions] = useState<Array<{
+    position1: string;
+    position2: string;
   }>>([]);
 
   const [isEditing, setIsEditing] = useState(false);
@@ -132,6 +138,19 @@ export default function ProfileForm({
           }
         }
         setEmploymentHistory(employmentData);
+        
+        // Handle career transitions data
+        let transitionsData = [];
+        if (data.career_transitions) {
+          try {
+            transitionsData = Array.isArray(data.career_transitions) 
+              ? data.career_transitions 
+              : JSON.parse(data.career_transitions);
+          } catch (e) {
+            console.error("Error parsing career transitions data:", e);
+          }
+        }
+        setCareerTransitions(transitionsData);
 
         console.log(data.employment);
 
@@ -263,6 +282,7 @@ export default function ProfileForm({
         favorite_cafes: favoriteCafes,
         interests: interests,
         employment: employmentHistory,
+        career_transitions: careerTransitions,
         updated_at: new Date(),
       };
 
@@ -511,6 +531,47 @@ export default function ProfileForm({
                   isDark={isDark}
                   isEditing={isEditing}
                   setIsEditing={setIsEditing}
+                />
+              ))}
+            </View>
+
+            <View style={styles.inputGroup}>
+              <View style={styles.sectionHeader}>
+                <Text style={[styles.label, isDark && styles.textDark]}>
+                  Career Transitions (Optional)
+                </Text>
+                <TouchableOpacity
+                  onPress={() => {
+                    if (careerTransitions.length >= 3) {
+                      Alert.alert(
+                        "Maximum Entries Reached",
+                        "You can only add up to 3 career transition entries."
+                      );
+                      return;
+                    }
+                    setCareerTransitions(prev => [...prev, { position1: '', position2: '' }]);
+                  }}
+                >
+                  <Ionicons
+                    name="add-circle"
+                    size={24}
+                    color={colors.primary}
+                  />
+                </TouchableOpacity>
+              </View>
+              {careerTransitions.map((transition, index) => (
+                <CareerTransitionEntry
+                  key={index}
+                  transition={transition}
+                  onChange={(updated) => {
+                    const newTransitions = [...careerTransitions];
+                    newTransitions[index] = updated;
+                    setCareerTransitions(newTransitions);
+                  }}
+                  onDelete={() => {
+                    setCareerTransitions(prev => prev.filter((_, i) => i !== index));
+                  }}
+                  isDark={isDark}
                 />
               ))}
             </View>
