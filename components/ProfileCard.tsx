@@ -685,6 +685,49 @@ export default function ProfileCard({
                 </>
               )}
 
+              {/* Career Transitions Section */}
+              {profile.career_transitions && profile.career_transitions.length > 0 && (
+                <>
+                  <Text
+                    style={[
+                      styles.label,
+                      { color: colors.secondaryText, marginTop: 24, marginBottom: 16 },
+                    ]}
+                  >
+                    Career Transitions
+                  </Text>
+                  <View>
+                    {profile.career_transitions.map((transitionString, index) => {
+                      const transition = JSON.parse(transitionString);
+                      return (
+                        <View key={index} style={styles.transitionContainer}>
+                          <View style={styles.timelineDot} />
+                          <View style={styles.transitionCard}>
+                            <View style={styles.transitionText}>
+                              <Text style={[styles.position, { color: colors.text }]}>
+                                {transition.position1}
+                              </Text>
+                              <Ionicons 
+                                name="arrow-forward" 
+                                size={20} 
+                                color={colors.primary} 
+                                style={styles.transitionArrow} 
+                              />
+                              <Text style={[styles.position, { color: colors.text }]}>
+                                {transition.position2}
+                              </Text>
+                            </View>
+                          </View>
+                          {index < profile.career_transitions.length - 1 && (
+                            <View style={styles.timelineLine} />
+                          )}
+                        </View>
+                      );
+                    })}
+                  </View>
+                </>
+              )}
+
               {/* Education */}
               {profile.education && (
                 <>
@@ -898,6 +941,23 @@ export default function ProfileCard({
 }
 
 const styles = StyleSheet.create({
+  transitionContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 32,
+    position: 'relative',
+  },
+  transitionCard: {
+    flex: 1,
+    marginLeft: 16,
+  },
+  transitionText: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  transitionArrow: {
+    marginHorizontal: 12,
+  },
   employmentCard: {
     marginBottom: 16,
   },
