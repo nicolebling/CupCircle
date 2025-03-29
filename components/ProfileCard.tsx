@@ -622,9 +622,7 @@ export default function ProfileCard({
                       Industries
                     </Text>
                     <Text style={[styles.separatedText, { color: colors.text }]}>
-                      {profile.industry_categories.join(
-                        <Text style={{ color: colors.primary }}> / </Text>
-                      )}
+                      {profile.industry_categories.join(' ')}
                     </Text>
                   </>
                 )}
@@ -636,9 +634,7 @@ export default function ProfileCard({
                     Interests
                   </Text>
                   <Text style={[styles.separatedText, { color: colors.text }]}>
-                    {profile.interests.join(
-                      <Text style={{ color: colors.primary }}> / </Text>
-                    )}
+                    {profile.interests.join(' / ')}
                   </Text>
                 </View>
               )}
@@ -658,9 +654,7 @@ export default function ProfileCard({
                     Neighborhoods
                   </Text>
                   <Text style={[styles.separatedText, { color: colors.text }]}>
-                    {profile.neighborhoods.join(
-                      <Text style={{ color: colors.primary }}> / </Text>
-                    )}
+                    {profile.neighborhoods.join(' / ')}
                   </Text>
                 </>
               )}
