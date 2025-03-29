@@ -623,32 +623,6 @@ export default function ProfileForm({
                           </TouchableOpacity>
                         </View>
                       </View>
-                        <Text
-                          style={[
-                            styles.position,
-                            { color: colors.text },
-                          ]}
-                          numberOfLines={1}
-                        >
-                          {transition.position1}
-                        </Text>
-                        <View style={styles.arrow}>
-                          <Ionicons
-                            name="arrow-forward"
-                            size={20}
-                            color={colors.primary}
-                          />
-                        </View>
-                        <Text
-                          style={[
-                            styles.position,
-                            transition.position2.length > 20 && styles.position2Long,
-                            { color: colors.text },
-                          ]}
-                        >
-                          {transition.position2}
-                        </Text>
-                      </View>
                     </View>
                   </View>
               ))}
