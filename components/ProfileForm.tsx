@@ -282,6 +282,7 @@ export default function ProfileForm({
         favorite_cafes: favoriteCafes,
         interests: interests,
         employment: employmentHistory,
+        career_change: careerTransitions.map(t => `${t.position1}|${t.position2}`),
         career_transitions: careerTransitions,
         updated_at: new Date(),
       };
