@@ -572,34 +572,8 @@ export default function ProfileForm({
               {careerTransitions.map((transition, index) => (
                 <View key={index} style={styles.transitionContainer}>
                     <View style={styles.transitionCard}>
-                      <View style={[styles.transitionText, { justifyContent: 'space-between' }]}>
-                        <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
-                          <Text
-                            style={[
-                              styles.position,
-                              { color: colors.text },
-                            ]}
-                            numberOfLines={1}
-                          >
-                            {transition.position1}
-                          </Text>
-                          <View style={styles.arrow}>
-                            <Ionicons
-                              name="arrow-forward"
-                              size={20}
-                              color={colors.primary}
-                            />
-                          </View>
-                          <Text
-                            style={[
-                              styles.position,
-                              transition.position2.length > 20 && styles.position2Long,
-                              { color: colors.text },
-                            ]}
-                          >
-                            {transition.position2}
-                          </Text>
-                        </View>
+                      <View style={styles.transitionHeader}>
+                        <View style={{flex: 1}} />
                         <View style={styles.buttonGroup}>
                           <TouchableOpacity
                             onPress={() => {
@@ -622,6 +596,33 @@ export default function ProfileForm({
                             <Ionicons name="trash-outline" size={20} color={colors.text} />
                           </TouchableOpacity>
                         </View>
+                      </View>
+                      <View style={styles.transitionText}>
+                        <Text
+                          style={[
+                            styles.position,
+                            { color: colors.text },
+                          ]}
+                          numberOfLines={1}
+                        >
+                          {transition.position1}
+                        </Text>
+                        <View style={styles.arrow}>
+                          <Ionicons
+                            name="arrow-forward"
+                            size={20}
+                            color={colors.primary}
+                          />
+                        </View>
+                        <Text
+                          style={[
+                            styles.position,
+                            transition.position2.length > 20 && styles.position2Long,
+                            { color: colors.text },
+                          ]}
+                        >
+                          {transition.position2}
+                        </Text>
                       </View>
                     </View>
                   </View>
