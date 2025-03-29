@@ -939,6 +939,41 @@ export default function ProfileCard({
                 </>
               )}
 
+              {/* Employment History Section */}
+              {profile.employment && profile.employment.length > 0 && (
+                <>
+                  <Text style={[styles.label, { color: colors.secondaryText }]}>
+                    Employment History
+                  </Text>
+                  {profile.employment.map((job, index) => (
+                    <View 
+                      key={index} 
+                      style={[
+                        styles.employmentCard,
+                        { 
+                          backgroundColor: 'transparent',
+                          borderWidth: 1,
+                          borderColor: colors.primary + '40',
+                          marginBottom: 12 
+                        }
+                      ]}
+                    >
+                      <View style={styles.employmentHeader}>
+                        <Text style={[styles.companyName, { color: colors.text }]}>
+                          {job.company}
+                        </Text>
+                        <Text style={[styles.position, { color: colors.primary }]}>
+                          {job.position}
+                        </Text>
+                      </View>
+                      <Text style={[styles.dateRange, { color: colors.secondaryText }]}>
+                        {job.fromDate} - {job.toDate}
+                      </Text>
+                    </View>
+                  ))}
+                </>
+              )}
+
               {profile.favorite_cafes && profile.favorite_cafes.length > 0 && (
                 <>
                   <Text style={[styles.label, { color: colors.secondaryText }]}>
@@ -1037,6 +1072,27 @@ export default function ProfileCard({
 }
 
 const styles = StyleSheet.create({
+  employmentCard: {
+    padding: 12,
+    borderRadius: 12,
+    marginBottom: 8,
+  },
+  employmentHeader: {
+    marginBottom: 4,
+  },
+  companyName: {
+    fontFamily: 'K2D-SemiBold',
+    fontSize: 16,
+    marginBottom: 2,
+  },
+  position: {
+    fontFamily: 'K2D-Medium',
+    fontSize: 14,
+  },
+  dateRange: {
+    fontFamily: 'K2D-Regular',
+    fontSize: 12,
+  },
   // Common styles
   card: {
     width: width - 32,
