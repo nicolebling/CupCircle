@@ -67,17 +67,21 @@ export default function ProfileForm({
   const [favoriteCafes, setFavoriteCafes] = useState<string[]>([]);
   const [interests, setInterests] = useState<string[]>([]);
   const [error, setError] = useState("");
-  const [employmentHistory, setEmploymentHistory] = useState<Array<{
-    company: string;
-    position: string;
-    fromDate: string;
-    toDate: string;
-  }>>([]);
-  
-  const [careerTransitions, setCareerTransitions] = useState<Array<{
-    position1: string;
-    position2: string;
-  }>>([]);
+  const [employmentHistory, setEmploymentHistory] = useState<
+    Array<{
+      company: string;
+      position: string;
+      fromDate: string;
+      toDate: string;
+    }>
+  >([]);
+
+  const [careerTransitions, setCareerTransitions] = useState<
+    Array<{
+      position1: string;
+      position2: string;
+    }>
+  >([]);
 
   const [isEditing, setIsEditing] = useState(false);
 
@@ -120,15 +124,15 @@ export default function ProfileForm({
         setFavoriteCafes(data.favorite_cafes || []);
         setInterests(data.interests || []);
         setAvatar(data.photo_url || "");
-        
+
         // Handle employment data
         let employmentData = [];
         if (data.employment) {
           try {
             // Parse the employment data array
             if (Array.isArray(data.employment)) {
-              employmentData = data.employment.map(entry => 
-                typeof entry === 'string' ? JSON.parse(entry) : entry
+              employmentData = data.employment.map((entry) =>
+                typeof entry === "string" ? JSON.parse(entry) : entry,
               );
             } else {
               employmentData = [JSON.parse(data.employment)];
@@ -138,13 +142,13 @@ export default function ProfileForm({
           }
         }
         setEmploymentHistory(employmentData);
-        
+
         // Handle career transitions data
         let transitionsData = [];
         if (data.career_transitions) {
           try {
-            transitionsData = Array.isArray(data.career_transitions) 
-              ? data.career_transitions 
+            transitionsData = Array.isArray(data.career_transitions)
+              ? data.career_transitions
               : JSON.parse(data.career_transitions);
           } catch (e) {
             console.error("Error parsing career transitions data:", e);
@@ -170,7 +174,6 @@ export default function ProfileForm({
     }
   };
 
-
   const requestPermission = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
@@ -182,7 +185,6 @@ export default function ProfileForm({
     }
     return true;
   };
-
 
   const pickImage = async () => {
     // Ensure permission is granted
@@ -282,7 +284,6 @@ export default function ProfileForm({
         favorite_cafes: favoriteCafes,
         interests: interests,
         employment: employmentHistory,
-        career_change: careerTransitions.map(t => `${t.position1}|${t.position2}`),
         career_transitions: careerTransitions,
         updated_at: new Date(),
       };
@@ -361,34 +362,40 @@ export default function ProfileForm({
     if (employmentHistory.length >= 3) {
       Alert.alert(
         "Maximum Entries Reached",
-        "You can only add up to 3 employment history entries."
+        "You can only add up to 3 employment history entries.",
       );
       return;
     }
 
     const emptyEntry = { company: "", position: "", fromDate: "", toDate: "" };
-    setEmploymentHistory(prev => [...prev, emptyEntry]);
+    setEmploymentHistory((prev) => [...prev, emptyEntry]);
     setIsEditing(true); // Now setting edit mode to true to allow user to enter info
   };
 
   const updateEmploymentEntry = (index, updatedEntry) => {
-    setEmploymentHistory(prevHistory => {
-      const newHistory = prevHistory.map((entry, i) => 
-        i === index ? { ...updatedEntry } : entry
+    setEmploymentHistory((prevHistory) => {
+      const newHistory = prevHistory.map((entry, i) =>
+        i === index ? { ...updatedEntry } : entry,
       );
-      
+
       // Sort entries by date (most recent first)
       return newHistory.sort((a, b) => {
-        const dateA = a.toDate === 'Present' ? new Date() : new Date(a.toDate.split('/')[1], a.toDate.split('/')[0]);
-        const dateB = b.toDate === 'Present' ? new Date() : new Date(b.toDate.split('/')[1], b.toDate.split('/')[0]);
+        const dateA =
+          a.toDate === "Present"
+            ? new Date()
+            : new Date(a.toDate.split("/")[1], a.toDate.split("/")[0]);
+        const dateB =
+          b.toDate === "Present"
+            ? new Date()
+            : new Date(b.toDate.split("/")[1], b.toDate.split("/")[0]);
         return dateB.getTime() - dateA.getTime();
       });
     });
   };
 
   const deleteEmploymentEntry = (index) => {
-    setEmploymentHistory(prevHistory =>
-      prevHistory.filter((_, i) => i !== index)
+    setEmploymentHistory((prevHistory) =>
+      prevHistory.filter((_, i) => i !== index),
     );
   };
 
@@ -507,15 +514,12 @@ export default function ProfileForm({
           <View style={styles.divider} />
 
           <View style={styles.section}>
-
             <View style={styles.inputGroup}>
               <View style={styles.sectionHeader}>
                 <Text style={[styles.label, isDark && styles.textDark]}>
                   Employment (Optional)
                 </Text>
-                <TouchableOpacity
-                  onPress={addEmploymentEntry}
-                >
+                <TouchableOpacity onPress={addEmploymentEntry}>
                   <Ionicons
                     name="add-circle"
                     size={24}
@@ -546,11 +550,14 @@ export default function ProfileForm({
                     if (careerTransitions.length >= 3) {
                       Alert.alert(
                         "Maximum Entries Reached",
-                        "You can only add up to 3 career transition entries."
+                        "You can only add up to 3 career transition entries.",
                       );
                       return;
                     }
-                    setCareerTransitions(prev => [...prev, { position1: '', position2: '' }]);
+                    setCareerTransitions((prev) => [
+                      ...prev,
+                      { position1: "", position2: "" },
+                    ]);
                   }}
                 >
                   <Ionicons
@@ -570,7 +577,9 @@ export default function ProfileForm({
                     setCareerTransitions(newTransitions);
                   }}
                   onDelete={() => {
-                    setCareerTransitions(prev => prev.filter((_, i) => i !== index));
+                    setCareerTransitions((prev) =>
+                      prev.filter((_, i) => i !== index),
+                    );
                   }}
                   isDark={isDark}
                 />
@@ -589,8 +598,6 @@ export default function ProfileForm({
                 placeholderTextColor={isDark ? "#999" : "#777"}
               />
             </View>
-            
-            
 
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isDark && styles.textDark]}>
@@ -613,8 +620,6 @@ export default function ProfileForm({
                 isDark={isDark}
               />
             </View>
-
-            
           </View>
 
           <View style={styles.divider} />
