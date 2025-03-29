@@ -17,9 +17,9 @@ type Props = {
   isDark: boolean;
 };
 
-export default function EmploymentHistoryEntry({ employment, onChange, onDelete, isDark }: Props) {
+export default function EmploymentHistoryEntry({ employment, onChange, onDelete, isEditing, setIsEditing, isDark}: Props) {
   const colors = Colors[isDark ? 'dark' : 'light'];
-  const [isEditing, setIsEditing] = useState(!employment?.company);
+ 
   const [localEmployment, setLocalEmployment] = useState(() => ({
     company: employment?.company || '',
     position: employment?.position || '',
@@ -34,37 +34,41 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
     }
   }, [employment?.company]);
 
-  const handleSave = () => {
-    // Check if all fields are empty
-    const isEmpty = !localEmployment.company && 
-                   !localEmployment.position && 
-                   !localEmployment.fromDate && 
-                   !localEmployment.toDate;
-
-    if (isEmpty) {
-      // If everything is empty, delete the entry
-      onDelete();
-      return;
-    }
-
-    // Check if any required field is missing
-    const isMissing = !localEmployment.company || 
-                     !localEmployment.position || 
-                     !localEmployment.fromDate || 
-                     (!localEmployment.toDate && !isPresentJob);
-
-    if (isMissing) {
-      Alert.alert(
-        "Incomplete Entry",
-        "Please fill in all fields for the employment history entry."
-      );
-      return;
-    }
-
-    onChange(localEmployment);
-    setIsEditing(false);
+  const handleChange = (field, value) => {
+      setLocalEmployment(prevState => ({
+          ...prevState,
+          [field]: value
+      }));
   };
 
+  const handleSave = () => {
+      const isEmpty = !localEmployment.company && 
+                     !localEmployment.position && 
+                     !localEmployment.fromDate && 
+                     !localEmployment.toDate;
+
+      if (isEmpty) {
+          onDelete();
+          return;
+      }
+
+      const isMissing = !localEmployment.company || 
+                       !localEmployment.position || 
+                       !localEmployment.fromDate || 
+                       (!localEmployment.toDate && !isPresentJob);
+
+      if (isMissing) {
+          Alert.alert(
+              "Incomplete Entry",
+              "Please fill in all fields for the employment history entry."
+          );
+          return;
+      }
+
+      onChange(localEmployment);
+      setIsEditing(false);
+  };
+  
   const handleEdit = () => {
     setIsEditing(true);
   };
@@ -105,20 +109,20 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
 
       <TextInput
         style={[styles.input, styles.fullWidthInput, { backgroundColor: colors.input, color: colors.text }]}
-        placeholder="Company name"
+        placeholder="Company"
         placeholderTextColor={colors.secondaryText}
         value={localEmployment.company}
-        onChangeText={(text) => setLocalEmployment({ ...localEmployment, company: text })}
+        onChangeText={(value) => handleChange('company', value)}
       />
 
       <View style={styles.positionContainer}>
         <Text style={[styles.label, { color: colors.secondaryText }]}>Position</Text>
         <TextInput
           style={[styles.input, styles.fullWidthInput, { backgroundColor: colors.input, color: colors.text }]}
-          placeholder="Job title"
+          placeholder="Position"
           placeholderTextColor={colors.secondaryText}
           value={localEmployment.position}
-          onChangeText={(text) => setLocalEmployment({ ...localEmployment, position: text })}
+          onChangeText={(value) => handleChange('position', value)}
         />
       </View>
 
@@ -130,24 +134,7 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
             placeholder="MM/YYYY"
             placeholderTextColor={colors.secondaryText}
             value={localEmployment.fromDate}
-            onChangeText={(text) => {
-              // Remove any non-numeric characters
-              const numbers = text.replace(/\D/g, '');
-              
-              // Format as MM/YYYY if there are enough numbers
-              if (numbers.length >= 6) {
-                const month = numbers.slice(0, 2);
-                const year = numbers.slice(2, 6);
-                setLocalEmployment({ ...localEmployment, fromDate: `${month}/${year}` });
-              } else {
-                // If user includes a slash, keep it
-                if (text.includes('/')) {
-                  setLocalEmployment({ ...localEmployment, fromDate: text });
-                } else {
-                  setLocalEmployment({ ...localEmployment, fromDate: numbers });
-                }
-              }
-            }}
+            onChangeText={(value) => handleChange('fromDate', value)}
           />
         </View>
 
@@ -159,24 +146,7 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
               placeholder="MM/YYYY"
               placeholderTextColor={colors.secondaryText}
               value={localEmployment.toDate}
-              onChangeText={(text) => {
-              // Remove any non-numeric characters
-              const numbers = text.replace(/\D/g, '');
-              
-              // Format as MM/YYYY if there are enough numbers
-              if (numbers.length >= 6) {
-                const month = numbers.slice(0, 2);
-                const year = numbers.slice(2, 6);
-                setLocalEmployment({ ...localEmployment, toDate: `${month}/${year}` });
-              } else {
-                // If user includes a slash, keep it
-                if (text.includes('/')) {
-                  setLocalEmployment({ ...localEmployment, toDate: text });
-                } else {
-                  setLocalEmployment({ ...localEmployment, toDate: numbers });
-                }
-              }
-            }}
+              onChangeText={(value) => handleChange('toDate', value)}
             />
           ) : (
             <Text style={[styles.input, { backgroundColor: colors.input, color: colors.text, textAlignVertical: 'center' }]}>

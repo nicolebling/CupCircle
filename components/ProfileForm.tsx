@@ -74,6 +74,7 @@ export default function ProfileForm({
   const [interests, setInterests] = useState<string[]>([]);
   const [error, setError] = useState("");
   const [isEditMode, setIsEditMode] = useState(false);
+   const [editingIndexes, setEditingIndexes] = useState(new Set()); // Track editing state per entry
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [tempDate, setTempDate] = useState(
     birthday ? new Date(birthday) : new Date(),
@@ -84,6 +85,8 @@ export default function ProfileForm({
     fromDate: string;
     toDate: string;
   }>>([]);
+
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     if (!isNewUser) {
@@ -395,6 +398,34 @@ export default function ProfileForm({
     );
   }
 
+  const addEmploymentEntry = () => {
+    if (employmentHistory.length >= 3) {
+      Alert.alert(
+        "Maximum Entries Reached",
+        "You can only add up to 3 employment history entries."
+      );
+      return;
+    }
+
+    const emptyEntry = { company: "", position: "", fromDate: "", toDate: "" };
+    setEmploymentHistory(prev => [...prev, emptyEntry]);
+    const newIndex = employmentHistory.length;
+    setEditingIndexes(prev => new Set(prev).add(newIndex)); // Mark the new entry as being edited
+    setIsEditing(true); // Now setting edit mode to true to allow user to enter info
+  };
+
+  const updateEmploymentEntry = (index, updatedEntry) => {
+    setEmploymentHistory(prevHistory =>
+      prevHistory.map((entry, i) => (i === index ? { ...updatedEntry } : entry))
+    );
+  };
+
+  const deleteEmploymentEntry = (index) => {
+    setEmploymentHistory(prevHistory =>
+      prevHistory.filter((_, i) => i !== index)
+    );
+  };
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -551,22 +582,7 @@ export default function ProfileForm({
                   Employment (Optional)
                 </Text>
                 <TouchableOpacity
-                  onPress={() => {
-                    if (employmentHistory.length >= 3) {
-                      Alert.alert(
-                        "Maximum Entries Reached",
-                        "You can only add up to 3 employment history entries.",
-                      );
-                      return;
-                    }
-                    const emptyEntry = {
-                      company: "",
-                      position: "",
-                      fromDate: "",
-                      toDate: "",
-                    };
-                    setEmploymentHistory([emptyEntry, ...employmentHistory]);
-                  }}
+                  onPress={addEmploymentEntry}
                 >
                   <Ionicons
                     name="add-circle"
@@ -579,18 +595,11 @@ export default function ProfileForm({
                 <EmploymentHistoryEntry
                   key={index}
                   employment={employment}
-                  onChange={(updated) => {
-                    const newHistory = [...employmentHistory];
-                    newHistory[index] = updated;
-                    setEmploymentHistory(newHistory);
-                  }}
-                  onDelete={() => {
-                    const newHistory = employmentHistory.filter(
-                      (_, i) => i !== index,
-                    );
-                    setEmploymentHistory(newHistory);
-                  }}
+                  onChange={(updated) => updateEmploymentEntry(index, updated)}
+                  onDelete={() => deleteEmploymentEntry(index)}
                   isDark={isDark}
+                  isEditing={isEditing}
+                  setIsEditing={setIsEditing}
                 />
               ))}
             </View>
