@@ -88,13 +88,20 @@ export default function InterestSelector({
 
   const [modalVisible, setModalVisible] = useState(false);
   const [searchText, setSearchText] = useState("");
-  const [customInterest, setCustomInterest] = useState("");
 
   // Filter interests based on search text
   const filteredInterests = useMemo(() => {
     if (!searchText.trim()) return INTERESTS;
-    return INTERESTS.filter((interest) =>
-      interest.toLowerCase().includes(searchText.toLowerCase()),
+    const searchLower = searchText.toLowerCase();
+    const filtered = INTERESTS.filter((interest) =>
+      interest.toLowerCase().includes(searchLower)
+    );
+    return filtered;
+  }, [searchText]);
+
+  const showCustomOption = useMemo(() => {
+    return searchText.trim() && !INTERESTS.some(interest => 
+      interest.toLowerCase() === searchText.trim().toLowerCase()
     );
   }, [searchText]);
 
@@ -210,29 +217,34 @@ export default function InterestSelector({
                 <Ionicons name="search" size={20} color={colors.secondaryText} />
                 <TextInput
                   style={[styles.searchInput, { color: colors.text }]}
-                  placeholder="Search interests..."
+                  placeholder="Search or type custom interest..."
                   placeholderTextColor={colors.secondaryText}
                   value={searchText}
                   onChangeText={setSearchText}
                 />
               </View>
-
-              <View style={styles.customInterestContainer}>
-                <TextInput
-                  style={[styles.customInterestInput, { color: colors.text, borderColor: colors.border }]}
-                  placeholder="Add custom interest..."
-                  placeholderTextColor={colors.secondaryText}
-                  value={customInterest}
-                  onChangeText={setCustomInterest}
-                  onSubmitEditing={handleAddCustomInterest}
-                />
+              {showCustomOption && (
                 <TouchableOpacity
-                  style={[styles.addButton, { backgroundColor: colors.primary }]}
-                  onPress={handleAddCustomInterest}
+                  style={[styles.customOption, { borderColor: colors.border }]}
+                  onPress={() => {
+                    const words = searchText.split(" ");
+                    if (words.length > 10) {
+                      console.log("Interest cannot exceed 10 words");
+                      return;
+                    }
+                    const formattedInterest = words
+                      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                      .join(" ");
+                    toggleInterest(formattedInterest);
+                    setSearchText("");
+                  }}
                 >
-                  <Ionicons name="add" size={24} color="#FFF" />
+                  <Ionicons name="add-circle-outline" size={24} color={colors.primary} />
+                  <Text style={[styles.customOptionText, { color: colors.text }]}>
+                    Add "{searchText}" as custom interest
+                  </Text>
                 </TouchableOpacity>
-              </View>
+              )}
             </View>
 
             <View style={styles.selectedPreview}>
@@ -376,31 +388,20 @@ const styles = StyleSheet.create({
     fontFamily: "K2D-Regular",
     fontSize: 16,
   },
-  customInterestContainer: {
+  customOption: {
     flexDirection: "row",
     alignItems: "center",
-    borderWidth: 1,
-    borderRadius: 8,
     marginHorizontal: 16,
-    paddingHorizontal: 12,
-    height: 44,
     marginTop: 8,
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderStyle: "dashed",
   },
-  customInterestInput: {
-    flex: 1,
-    height: "100%",
+  customOptionText: {
     marginLeft: 8,
     fontFamily: "K2D-Regular",
-    fontSize: 16,
-    padding: 0,
-  },
-  addButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: "center",
-    alignItems: "center",
-    marginLeft: 8,
+    fontSize: 14,
   },
   selectedPreview: {
     paddingHorizontal: 16,
