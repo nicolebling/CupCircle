@@ -105,14 +105,7 @@ export default function ProfileScreen() {
   }, [isEditMode, colors.text]);
 
   return (
-    <SafeAreaView
-      style={[styles.container, { backgroundColor: colors.background }]}
-    >
-      <View style={styles.header}>
-        <View style={styles.headerContent}>
-        </View>
-      </View>
-
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       {isEditMode ? (
         <ProfileForm
           userId={user.id}
@@ -128,13 +121,14 @@ export default function ProfileScreen() {
           onEdit={handleEdit}
         />
       )}
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    marginTop: 0,
   },
   header: {
     padding: 16,
