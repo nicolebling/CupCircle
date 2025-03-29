@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -30,40 +29,54 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
   const [isPresentJob, setIsPresentJob] = useState(employment?.toDate === 'Present');
 
   const handleChange = (field, value) => {
-      setLocalEmployment(prevState => ({
-          ...prevState,
-          [field]: value
-      }));
+    // Validate date format (MM/YYYY) and year
+    if (field === 'fromDate' || field === 'toDate') {
+      const dateRegex = /^(0[1-9]|1[0-2])\/\d{4}$/;
+      if (!dateRegex.test(value) && value !== 'Present') {
+        Alert.alert('Invalid Date Format', 'Please use MM/YYYY format.');
+        return;
+      }
+      const [month, year] = value.split('/');
+      const currentYear = new Date().getFullYear();
+      if (parseInt(year) > currentYear && value !== 'Present') {
+        Alert.alert('Invalid Year', 'Year cannot be in the future.');
+        return;
+      }
+    }
+    setLocalEmployment(prevState => ({
+      ...prevState,
+      [field]: value
+    }));
   };
 
   const handleSave = () => {
-      const isEmpty = !localEmployment.company && 
-                     !localEmployment.position && 
-                     !localEmployment.fromDate && 
-                     !localEmployment.toDate;
+    const isEmpty = !localEmployment.company && 
+                   !localEmployment.position && 
+                   !localEmployment.fromDate && 
+                   !localEmployment.toDate;
 
-      if (isEmpty) {
-          onDelete();
-          return;
-      }
+    if (isEmpty) {
+      onDelete();
+      return;
+    }
 
-      const isMissing = !localEmployment.company || 
-                       !localEmployment.position || 
-                       !localEmployment.fromDate || 
-                       (!localEmployment.toDate && !isPresentJob);
+    const isMissing = !localEmployment.company || 
+                     !localEmployment.position || 
+                     !localEmployment.fromDate || 
+                     (!localEmployment.toDate && !isPresentJob);
 
-      if (isMissing) {
-          Alert.alert(
-              "Incomplete Entry",
-              "Please fill in all fields for the employment history entry."
-          );
-          return;
-      }
+    if (isMissing) {
+      Alert.alert(
+        "Incomplete Entry",
+        "Please fill in all fields for the employment history entry."
+      );
+      return;
+    }
 
-      onChange(localEmployment);
-      setIsEditing(false);
+    onChange(localEmployment);
+    setIsEditing(false);
   };
-  
+
   const handleEdit = () => {
     setIsEditing(true);
   };
@@ -126,7 +139,7 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
           <Text style={[styles.label, { color: colors.secondaryText }]}>From</Text>
           <TextInput
             style={[styles.input, { backgroundColor: colors.input, color: colors.text }]}
-            placeholder="MM/YYYY"
+            placeholder="MM/YYYY (e.g., 03/2024)"
             placeholderTextColor={colors.secondaryText}
             value={localEmployment.fromDate}
             onChangeText={(value) => handleChange('fromDate', value)}
@@ -138,7 +151,7 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
           {!isPresentJob ? (
             <TextInput
               style={[styles.input, { backgroundColor: colors.input, color: colors.text }]}
-              placeholder="MM/YYYY"
+              placeholder="MM/YYYY (e.g., 03/2024)"
               placeholderTextColor={colors.secondaryText}
               value={localEmployment.toDate}
               onChangeText={(value) => handleChange('toDate', value)}
