@@ -940,12 +940,16 @@ export default function ProfileCard({
               )}
 
               {/* Employment History Section */}
-              {profile.employment && Array.isArray(profile.employment) && profile.employment.length > 0 && (
+              {/* Employment History Section */}
+              {profile.employment && (
                 <>
                   <Text style={[styles.label, { color: colors.secondaryText }]}>
                     Employment History
                   </Text>
-                  {profile.employment.map((job, index) => (
+                  {(typeof profile.employment === 'string' 
+                    ? JSON.parse(profile.employment) 
+                    : profile.employment
+                  ).map((job, index) => (
                     <View 
                       key={index} 
                       style={[
