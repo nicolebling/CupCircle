@@ -66,11 +66,6 @@ export default function ProfileForm({
   const [favoriteCafes, setFavoriteCafes] = useState<string[]>([]);
   const [interests, setInterests] = useState<string[]>([]);
   const [error, setError] = useState("");
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [tempDate, setTempDate] = useState(
-    birthday ? new Date(birthday) : new Date(),
-  );
   const [employmentHistory, setEmploymentHistory] = useState<Array<{
     company: string;
     position: string;
@@ -309,7 +304,7 @@ export default function ProfileForm({
           neighborhoods,
           favorite_cafes: favoriteCafes,
           interests,
-          //employmentHistory,
+          employment: employmentHistory,
         });
       }
     } catch (error: any) {

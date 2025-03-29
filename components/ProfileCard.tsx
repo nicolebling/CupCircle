@@ -583,6 +583,53 @@ export default function ProfileCard({
 
             {/* Professional Details */}
             <View style={styles.section}>
+
+
+              {/* Employment Section */}
+              {profile.employment && (
+                <>
+                  <Text style={[styles.label, { color: colors.secondaryText }]}>
+                    Experience
+                  </Text>
+                  {Array.isArray(profile.employment) ? (
+                    profile.employment.map((jobString, index) => {
+                      // Parse each job entry from string to object
+                      const job = JSON.parse(jobString);
+                      return (
+                        <View
+                          key={index}
+                          style={[
+                            styles.employmentCard,
+                            {
+                              backgroundColor: colors.card,
+                              borderWidth: 1,
+                              borderColor: colors.primary,
+                              marginBottom: 12,
+                              borderRadius: 18,
+                              padding: 12,
+                            },
+                          ]}
+                        >
+                          <View style={styles.employmentHeader}>
+                            <Text style={[styles.companyName, { color: colors.text }]}>
+                              {job.company}
+                            </Text>
+                            <Text style={[styles.position, { color: colors.text }]}>
+                              {job.position}
+                            </Text>
+                          </View>
+                          <Text style={[styles.dateRange, { color: colors.secondaryText }]}>
+                            {job.fromDate} - {job.toDate}
+                          </Text>
+                        </View>
+                      );
+                    })
+                  ) : (
+                    <Text style={{ color: 'red' }}>Employment data is not an array!</Text>
+                  )}
+                </>
+              )}
+              
               {/* Industry Categories */}
               {profile.industry_categories &&
                 profile.industry_categories.length > 0 && (
@@ -684,55 +731,7 @@ export default function ProfileCard({
                 </>
               )}
 
-              {/* Employment Section */}
-
-              {profile.employment && (
-                <>
-                  <Text style={[styles.label, { color: colors.secondaryText }]}>
-                    Employment
-                  </Text>
-                  {(typeof profile.employment === "string"
-                    ? JSON.parse(profile.employment)
-                    : profile.employment
-                  ).map((job, index) => (
-                    <View
-                      key={index}
-                      style={[
-                        styles.employmentCard,
-                        {
-                          backgroundColor: colors.card,
-                          borderWidth: 1,
-                          borderColor: colors.primary + "40",
-                          marginBottom: 12,
-                          borderRadius: 8,
-                          padding: 12,
-                        },
-                      ]}
-                    >
-                      <View style={styles.employmentHeader}>
-                        <Text
-                          style={[styles.companyName, { color: colors.text }]}
-                        >
-                          {job.company}
-                        </Text>
-                        <Text
-                          style={[styles.position, { color: colors.primary }]}
-                        >
-                          {job.position}
-                        </Text>
-                      </View>
-                      <Text
-                        style={[
-                          styles.dateRange,
-                          { color: colors.secondaryText },
-                        ]}
-                      >
-                        {job.fromDate} - {job.toDate}
-                      </Text>
-                    </View>
-                  ))}
-                </>
-              )}
+              
 
               {profile.favorite_cafes && profile.favorite_cafes.length > 0 && (
                 <>
