@@ -225,20 +225,29 @@ export default function ProfileCard({
         setInterests(data.interests || []);
 
         // Parse and set employment data
+        console.log("Raw employment data:", data.employment);
         if (data.employment) {
           try {
-            
-            let employmentData = data.employment;
-            if (typeof employmentData === 'string') {
-              employmentData = JSON.parse(employmentData);
+            let employmentData = [];
+            // Parse the employment data array
+            if (Array.isArray(data.employment)) {
+              console.log("Employment is an array");
+              employmentData = data.employment.map(entry => {
+                console.log("Processing entry:", entry);
+                return typeof entry === 'string' ? JSON.parse(entry) : entry;
+              });
+            } else {
+              console.log("Employment is not an array");
+              employmentData = [JSON.parse(data.employment)];
             }
-            setEmploymentHistory(Array.isArray(employmentData) ? employmentData : []);
-            console.log("Employment data loaded:", employmentData);
+            console.log("Processed employment data:", employmentData);
+            setEmploymentHistory(employmentData);
           } catch (e) {
             console.error("Error parsing employment data:", e);
-            setEmploymentHistory([]);
+            console.error("Error details:", e.message);
           }
         } else {
+          console.log("No employment data found");
           setEmploymentHistory([]);
         }
 
@@ -971,7 +980,7 @@ export default function ProfileCard({
               )}
 
               {/* Employment Section */}
-              
+
               {profile.employment && (
                 <>
                   <Text style={[styles.label, { color: colors.secondaryText }]}>
