@@ -29,6 +29,9 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
   const [isPresentJob, setIsPresentJob] = useState(employment?.toDate === 'Present');
 
   const handleChange = (field, value) => {
+    if ((field === 'fromDate' || field === 'toDate') && value.length === 2 && !value.includes('/')) {
+      value = value + '/';
+    }
     setLocalEmployment(prevState => ({
       ...prevState,
       [field]: value
