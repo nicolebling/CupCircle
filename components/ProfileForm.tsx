@@ -886,4 +886,31 @@ const styles = StyleSheet.create({
     backgroundColor: "#ddd",
     marginBottom: 32,
   },
+  transitionContainer: {
+    marginBottom: 10,
+  },
+  transitionCard: {
+    backgroundColor: "#f8f8f8",
+    borderRadius: 8,
+    padding: 12,
+    borderWidth:1,
+    borderColor:"#ddd"
+  },
+  transitionText: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    flexWrap: "wrap",
+  },
+  arrow: {
+    marginHorizontal: 8,
+  },
+  position: {
+    fontSize: 16,
+    fontFamily: "K2D-Regular",
+    flexShrink: 1,
+  },
+  position2Long: {
+    marginTop: 8,
+    width: "100%",
+  },
 });
