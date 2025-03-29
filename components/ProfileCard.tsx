@@ -545,6 +545,32 @@ export default function ProfileCard({
                 </View>
 
                 {/* Experience Level */}
+
+                {/* <View>
+                  {profile.experience_level && (
+                    <View
+                      style={[
+                        styles.tag,
+                        {
+                          backgroundColor: "transparent",
+                          borderWidth: 1,
+                          borderColor: colors.primary,
+                          alignSelf: "flex-start",
+                          marginTop: 4,
+                          flexDirection: "row",
+                          alignItems: "center",
+                        },
+                      ]}
+                    >
+                      <Text
+                        style={[styles.occupation, { color: colors.primary }]}
+                      >
+                        {profile.occupation}
+                      </Text>
+                    </View>
+                  )}
+                </View> */}
+
                 {/* <View>
                   {profile.experience_level && (
                     <View
@@ -1210,10 +1236,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginBottom: 8,
   },
-  value: {    fontFamily: "K2D-Regular",
-    fontSize: 16,
-    marginBottom: 16,
-  },
+  value: { fontFamily: "K2D-Regular", fontSize: 16, marginBottom: 16 },
   tagsContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -1408,5 +1431,8 @@ const styles = StyleSheet.create({
     fontFamily: "K2D-Regular",
     fontSize: 14,
     lineHeight: 20,
+  },
+  transitionArrow: {
+    marginHorizontal: 8,
   },
 });

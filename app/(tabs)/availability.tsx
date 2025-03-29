@@ -501,7 +501,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginRight: 12,
-    backgroundColor: "#F5F5F5",
+    backgroundColor: "#FFF",
   },
   dayText: {
     fontFamily: "K2D-Regular, sans-serif",

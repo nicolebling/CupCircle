@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 4,
   },
   label: {
     fontSize: 12,
@@ -257,7 +257,7 @@ const styles = StyleSheet.create({
   },
   datesRow: {
     flexDirection: 'row',
-    marginTop: 16,
+    marginTop: 8,
     justifyContent: 'space-between',
   },
   dateField: {
