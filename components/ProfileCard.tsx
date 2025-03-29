@@ -158,7 +158,7 @@ export default function ProfileCard({
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
-        .eq("id", userId)
+        .eq("id", user.id)
         .single();
 
       if (error) {
@@ -169,8 +169,6 @@ export default function ProfileCard({
       console.log("Profile data fetched:", data);
 
       if (data) {
-        let processedData = { ...data };
-        
         // Parse and set employment data
         console.log("Raw employment data:", data.employment);
         if (data.employment) {
@@ -178,25 +176,22 @@ export default function ProfileCard({
             let employmentData = [];
             // Parse the employment data array
             if (Array.isArray(data.employment)) {
-              employmentData = data.employment.map((entry) => 
-                typeof entry === "string" ? JSON.parse(entry) : entry
-              );
+              employmentData = data.employment.map((entry) => {
+                return typeof entry === "string" ? JSON.parse(entry) : entry;
+              });
             } else {
               employmentData = [JSON.parse(data.employment)];
             }
             console.log("Processed employment data:", employmentData);
-            processedData.employment = employmentData;
           } catch (e) {
             console.error("Error parsing employment data:", e);
             console.error("Error details:", e.message);
-            processedData.employment = [];
           }
         } else {
           console.log("No employment data found");
-          processedData.employment = [];
         }
       }
-      setProfileData(processedData);
+      setProfileData(data);
     } catch (error) {
       Alert.alert("Error", "Failed to load profile information");
     } finally {
