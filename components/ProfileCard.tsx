@@ -17,6 +17,7 @@ import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { supabase } from "@/lib/supabase";
 import { Ionicons } from "@expo/vector-icons";
+import AnimatedProfilePhoto from "./AnimatedProfilePhoto";
 import { useAuth } from "@/contexts/AuthContext";
 import ProfileForm from "@/components/ProfileForm";
 
@@ -277,25 +278,11 @@ export default function ProfileCard({
         <View style={styles.content}>
           <View style={styles.headerContainer}>
             <View style={styles.photoContainer}>
-              {profile.photo_url ? (
-                <Image
-                  source={{ uri: profile.photo_url }}
-                  style={styles.profilePhoto}
-                />
-              ) : (
-                <View
-                  style={[
-                    styles.profilePhoto,
-                    {
-                      backgroundColor: "#1A1A1A",
-                      justifyContent: "center",
-                      alignItems: "center",
-                    },
-                  ]}
-                >
-                  <Ionicons name="person" size={40} color="#ffffff" />
-                </View>
-              )}
+              <AnimatedProfilePhoto
+                photoUrl={profile.photo_url}
+                experienceLevel={profile.experience_level}
+                size={120}
+              />
             </View>
 
             <View style={styles.headerInfo}>
