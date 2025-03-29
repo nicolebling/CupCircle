@@ -489,29 +489,27 @@ export default function ProfileCard({
             </View>
           )}
 
-          <View style={{ padding: 16 }}>
-            <View style={styles.nameRow}>
+          <View style={styles.profileHeader}>
+            <Image 
+              source={{ uri: profile.photo_url }} 
+              style={styles.profilePhoto}
+              resizeMode="cover"
+            />
+            <View style={styles.profileInfo}>
               <Text style={[styles.name, { color: colors.text }]}>
                 {profile.name}
               </Text>
-            </View>
-
-            <View
-              style={[
-                styles.tag,
-                {
-                  backgroundColor: "transparent",
-                  borderWidth: 1,
-                  borderColor: colors.primary,
-                  alignSelf: "flex-start",
-                  marginTop: 4,
-                },
-              ]}
-            >
-              <Text style={[styles.occupation, { color: colors.primary }]}>
+              <Text style={[styles.occupation, { color: colors.text }]}>
                 {profile.occupation}
               </Text>
+              <View style={styles.locationContainer}>
+                <Ionicons name="location-outline" size={16} color={colors.secondaryText} />
+                <Text style={[styles.locationText, { color: colors.secondaryText }]}>
+                  {profile.city}
+                </Text>
+              </View>
             </View>
+          </View>
 
             {profile.experience_level && (
               <View
@@ -833,6 +831,30 @@ export default function ProfileCard({
 }
 
 const styles = StyleSheet.create({
+  profileHeader: {
+    flexDirection: 'row',
+    padding: 16,
+    alignItems: 'center',
+  },
+  profilePhoto: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+  },
+  profileInfo: {
+    marginLeft: 16,
+    flex: 1,
+  },
+  locationContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 4,
+  },
+  locationText: {
+    marginLeft: 4,
+    fontSize: 14,
+    fontFamily: 'K2D-Regular',
+  },
   employmentCard: {
     padding: 12,
     borderRadius: 12,
