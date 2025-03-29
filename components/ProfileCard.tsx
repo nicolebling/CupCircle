@@ -967,10 +967,24 @@ const styles = StyleSheet.create({
   },
   transitionText: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
+    flexWrap: "wrap",
   },
-  transitionArrow: {
-    marginHorizontal: 12,
+  arrow: {
+    marginHorizontal: 8,
+  },
+  position: {
+    fontSize: 16,
+    fontFamily: "K2D-Regular",
+    flexShrink: 1,
+  },
+  position2Long: {
+    marginTop: 8,
+    width: "100%",
+  },
+  transitionArrowLong: {
+    alignSelf: "flex-start",
+    marginTop: 8,
   },
   employmentCard: {
     marginBottom: 16,
@@ -1196,8 +1210,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginBottom: 8,
   },
-  value: {
-    fontFamily: "K2D-Regular",
+  value: {    fontFamily: "K2D-Regular",
     fontSize: 16,
     marginBottom: 16,
   },
