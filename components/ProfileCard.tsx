@@ -578,7 +578,7 @@ export default function ProfileCard({
               {/* Employment Section */}
               {profile.employment && (
                 <>
-                  <Text style={[styles.label, { color: colors.secondaryText }]}>
+                  <Text style={[styles.sectionTitle, { color: colors.text, marginBottom: 16 }]}>
                     Experience
                   </Text>
                   {Array.isArray(profile.employment) ? (
@@ -591,34 +591,34 @@ export default function ProfileCard({
                           style={[
                             styles.employmentCard,
                             {
-                              backgroundColor: colors.card,
-                              borderWidth: 1,
-                              borderColor: colors.primary,
-                              marginBottom: 12,
-                              borderRadius: 18,
-                              padding: 12,
+                              marginBottom: 24,
                             },
                           ]}
                         >
-                          <View style={styles.employmentHeader}>
-                            <Text
-                              style={[
-                                styles.companyName,
-                                { color: colors.text },
-                              ]}
-                            >
-                              {job.company}
-                            </Text>
-                            <Text
-                              style={[styles.position, { color: colors.text }]}
-                            >
-                              {job.position}
-                            </Text>
-                          </View>
+                          <Text
+                            style={[
+                              styles.position,
+                              { color: colors.text, fontSize: 16, marginBottom: 4 },
+                            ]}
+                          >
+                            {job.position}
+                          </Text>
+                          <Text
+                            style={[
+                              styles.companyName,
+                              { color: colors.text, fontSize: 14 },
+                            ]}
+                          >
+                            {job.company}
+                          </Text>
                           <Text
                             style={[
                               styles.dateRange,
-                              { color: colors.secondaryText },
+                              { 
+                                color: colors.secondaryText,
+                                fontSize: 14,
+                                marginTop: 4,
+                              },
                             ]}
                           >
                             {job.fromDate} - {job.toDate}
@@ -848,25 +848,24 @@ export default function ProfileCard({
 
 const styles = StyleSheet.create({
   employmentCard: {
-    padding: 12,
-    borderRadius: 12,
-    marginBottom: 8,
+    marginBottom: 16,
   },
   employmentHeader: {
     marginBottom: 4,
   },
   companyName: {
-    fontFamily: "K2D-SemiBold",
-    fontSize: 16,
-    marginBottom: 2,
+    fontFamily: "K2D-Regular",
+    fontSize: 14,
+    color: '#666',
   },
   position: {
     fontFamily: "K2D-Medium",
-    fontSize: 14,
+    fontSize: 16,
   },
   dateRange: {
     fontFamily: "K2D-Regular",
-    fontSize: 12,
+    fontSize: 14,
+    color: '#666',
   },
   // Common styles
   card: {
