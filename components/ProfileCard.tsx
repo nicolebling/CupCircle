@@ -965,12 +965,12 @@ export default function ProfileCard({
                 </>
               )}
 
-              {/* Employment History Section */}
+              {/* Employment Section */}
               
               {profile.employment && (
                 <>
                   <Text style={[styles.label, { color: colors.secondaryText }]}>
-                    Employment History
+                    Employment
                   </Text>
                   {(typeof profile.employment === 'string' 
                     ? JSON.parse(profile.employment) 
