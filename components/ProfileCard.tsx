@@ -159,7 +159,12 @@ export default function ProfileCard({
   const [skills, setSkills] = useState<string[]>([]);
   const [neighborhoods, setNeighborhoods] = useState<string[]>([]);
   const [favoriteCafes, setFavoriteCafes] = useState<string[]>([]);
-  const [employmentHistory, setEmploymentHistory] = useState<string[]>([]);
+  const [employmentHistory, setEmploymentHistory] = useState<Array<{
+    company: string;
+    position: string;
+    fromDate: string;
+    toDate: string;
+  }>>([]);
   const [interests, setInterests] = useState<string[]>([]);
   const [error, setError] = useState("");
   const [isEditMode, setIsEditMode] = useState(false);
@@ -214,17 +219,23 @@ export default function ProfileCard({
         setInterests(data.interests || []);
 
         // Parse and set employment data
-        let employmentData = [];
+        // Parse and set employment data
         if (data.employment) {
           try {
-            employmentData = typeof data.employment === 'string' 
-              ? JSON.parse(data.employment) 
-              : data.employment;
+            const employmentData = Array.isArray(data.employment) 
+              ? data.employment 
+              : typeof data.employment === 'string'
+                ? JSON.parse(data.employment)
+                : [];
+            setEmploymentHistory(employmentData);
+            console.log("Employment data loaded:", employmentData);
           } catch (e) {
             console.error("Error parsing employment data:", e);
+            setEmploymentHistory([]);
           }
+        } else {
+          setEmploymentHistory([]);
         }
-        setEmploymentHistory(employmentData);
 
         console.log("Profile data loaded into form state");
         console.log(data.favorite_cafes);
