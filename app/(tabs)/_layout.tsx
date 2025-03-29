@@ -16,8 +16,8 @@ export default function TabLayout() {
           borderTopColor: 'transparent',
           backgroundColor: '#F97415',
           borderTopWidth: 0,
-          height: 60,
-          paddingVertical: 8,
+          height: 70,
+          paddingVertical: 12,
         },
         headerStyle: {
           backgroundColor: colors.background,
