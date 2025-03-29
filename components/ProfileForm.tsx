@@ -570,21 +570,59 @@ export default function ProfileForm({
                 </TouchableOpacity>
               </View>
               {careerTransitions.map((transition, index) => (
-                <CareerTransitionEntry
-                  key={index}
-                  transition={transition}
-                  onChange={(updated) => {
-                    const newTransitions = [...careerTransitions];
-                    newTransitions[index] = updated;
-                    setCareerTransitions(newTransitions);
-                  }}
-                  onDelete={() => {
-                    setCareerTransitions((prev) =>
-                      prev.filter((_, i) => i !== index),
-                    );
-                  }}
-                  isDark={isDark}
-                />
+                <View key={index} style={styles.transitionContainer}>
+                  <View style={styles.transitionCard}>
+                    <View style={styles.transitionText}>
+                      <Text
+                        style={[
+                          styles.position,
+                          { color: colors.text },
+                        ]}
+                        numberOfLines={1}
+                      >
+                        {transition.position1}
+                      </Text>
+                      <View style={styles.arrow}>
+                        <Ionicons
+                          name="arrow-forward"
+                          size={20}
+                          color={colors.primary}
+                        />
+                      </View>
+                      <Text
+                        style={[
+                          styles.position,
+                          transition.position2.length > 20 && styles.position2Long,
+                          { color: colors.text },
+                        ]}
+                      >
+                        {transition.position2}
+                      </Text>
+                    </View>
+                    <View style={styles.buttonGroup}>
+                      <TouchableOpacity
+                        onPress={() => {
+                          const newTransitions = [...careerTransitions];
+                          newTransitions[index] = transition;
+                          setCareerTransitions(newTransitions);
+                        }}
+                        style={styles.actionButton}
+                      >
+                        <Ionicons name="pencil" size={20} color={colors.text} />
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() => {
+                          setCareerTransitions((prev) =>
+                            prev.filter((_, i) => i !== index)
+                          );
+                        }}
+                        style={styles.actionButton}
+                      >
+                        <Ionicons name="trash-outline" size={20} color={colors.text} />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </View>
               ))}
             </View>
 
