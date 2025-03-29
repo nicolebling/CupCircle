@@ -1,17 +1,10 @@
 
-import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
-} from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import Colors from "@/constants/Colors";
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import Colors from '@/constants/Colors';
 
-type CareerTransition = {
+export type CareerTransition = {
   position1: string;
   position2: string;
 };
@@ -62,16 +55,10 @@ export default function CareerTransitionEntry({ transition, onChange, onDelete, 
     return (
       <View style={[styles.container, { backgroundColor: colors.input }]}>
         <View style={styles.header}>
-          <View style={styles.transitionContent}>
-            <Text style={[styles.position, { color: colors.text }]}>
-              {localTransition.position1}
-            </Text>
-            <View style={styles.arrow}>
-              <Ionicons name="arrow-forward" size={20} color={colors.primary} />
-            </View>
-            <Text style={[styles.position, { color: colors.text }]}>
-              {localTransition.position2}
-            </Text>
+          <View style={styles.transitionText}>
+            <Text style={[styles.position, { color: colors.text }]}>{localTransition.position1}</Text>
+            <Ionicons name="arrow-forward" size={20} color={colors.text} style={styles.arrow} />
+            <Text style={[styles.position, { color: colors.text }]}>{localTransition.position2}</Text>
           </View>
           <View style={styles.buttonGroup}>
             <TouchableOpacity onPress={() => setIsEditing(true)} style={styles.actionButton}>
@@ -88,25 +75,35 @@ export default function CareerTransitionEntry({ transition, onChange, onDelete, 
 
   return (
     <View style={[styles.container, { backgroundColor: colors.input }]}>
-      <View style={styles.editContainer}>
+      <View style={styles.header}>
+        <Text style={[styles.label, { color: colors.secondaryText }]}>Career Transition</Text>
+        <TouchableOpacity onPress={onDelete} style={styles.deleteButton}>
+          <Ionicons name="trash-outline" size={20} color={colors.text} />
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.inputContainer}>
+        <Text style={[styles.label, { color: colors.secondaryText }]}>Previous position</Text>
         <TextInput
           style={[styles.input, { backgroundColor: colors.input, color: colors.text }]}
-          placeholder="Previous Position"
+          placeholder="Position"
           placeholderTextColor={colors.secondaryText}
           value={localTransition.position1}
           onChangeText={(value) => handleChange('position1', value)}
         />
-        <View style={styles.arrow}>
-          <Ionicons name="arrow-forward" size={20} color={colors.primary} />
-        </View>
+      </View>
+
+      <View style={styles.inputContainer}>
+        <Text style={[styles.label, { color: colors.secondaryText }]}>New position</Text>
         <TextInput
           style={[styles.input, { backgroundColor: colors.input, color: colors.text }]}
-          placeholder="Current Position"
+          placeholder="Position"
           placeholderTextColor={colors.secondaryText}
           value={localTransition.position2}
           onChangeText={(value) => handleChange('position2', value)}
         />
       </View>
+
       <TouchableOpacity 
         style={[styles.saveButton, { backgroundColor: colors.primary }]} 
         onPress={handleSave}
@@ -128,7 +125,33 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    alignItems: 'center',
+  },
+  transitionText: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  arrow: {
+    marginHorizontal: 8,
+  },
+  position: {
+    fontSize: 16,
+    fontFamily: 'K2D-Regular',
+  },
+  label: {
+    fontSize: 12,
+    fontWeight: '500',
+    marginBottom: 4,
+  },
+  inputContainer: {
+    marginTop: 12,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
   },
   buttonGroup: {
     flexDirection: 'row',
@@ -137,42 +160,18 @@ const styles = StyleSheet.create({
   actionButton: {
     padding: 4,
   },
-  transitionContent: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-  },
-  editContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  position: {
-    fontSize: 16,
-    fontFamily: "K2D-Regular",
-    flexShrink: 1,
-  },
-  arrow: {
-    marginHorizontal: 8,
-    alignSelf: 'center',
-  },
-  input: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
+  deleteButton: {
+    padding: 4,
   },
   saveButton: {
-    padding: 12,
+    marginTop: 16,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
     borderRadius: 8,
     alignItems: 'center',
   },
   saveButtonText: {
     color: '#FFFFFF',
     fontWeight: '600',
-    fontFamily: "K2D-Regular",
   },
 });
