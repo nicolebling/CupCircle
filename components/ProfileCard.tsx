@@ -621,8 +621,8 @@ export default function ProfileCard({
                     >
                       Industries
                     </Text>
-                    <Text style={[styles.separatedText, { color: colors.text }]}>
-                      {profile.industry_categories.join(' ')}
+                    <Text style={[styles.separatedText, { color: colors.primary }]}>
+                      {profile.industry_categories.join(' / ')}
                     </Text>
                   </>
                 )}
@@ -633,7 +633,7 @@ export default function ProfileCard({
                   <Text style={[styles.label, { color: colors.secondaryText }]}>
                     Interests
                   </Text>
-                  <Text style={[styles.separatedText, { color: colors.text }]}>
+                  <Text style={[styles.separatedText, { color: colors.primary }]}>
                     {profile.interests.join(' / ')}
                   </Text>
                 </View>
@@ -653,7 +653,7 @@ export default function ProfileCard({
                   <Text style={[styles.label, { color: colors.secondaryText }]}>
                     Neighborhoods
                   </Text>
-                  <Text style={[styles.separatedText, { color: colors.text }]}>
+                  <Text style={[styles.separatedText, { color: colors.primary }]}>
                     {profile.neighborhoods.join(' / ')}
                   </Text>
                 </>
@@ -1151,7 +1151,8 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     marginTop: 16,
   },
-  photoContainer: {marginBottom: 16,
+  photoContainer: {
+    marginBottom: 16,
     alignItems: 'center',
   },
   profilePhoto: {
