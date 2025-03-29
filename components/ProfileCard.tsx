@@ -710,30 +710,31 @@ export default function ProfileCard({
                               style={styles.transitionContainer}
                             >
                               <View style={styles.transitionCard}>
-                                <View style={styles.transitionText}>
-                                  <Text
-                                    style={[
-                                      styles.position,
-                                      { color: colors.text },
-                                    ]}
-                                  >
-                                    {transition.position1}
-                                  </Text>
+                                <Text
+                                  style={[
+                                    styles.position,
+                                    { color: colors.text },
+                                  ]}
+                                  numberOfLines={1}
+                                >
+                                  {transition.position1}
+                                </Text>
+                                <View style={styles.transitionArrowContainer}>
                                   <Ionicons
-                                    name="arrow-forward"
+                                    name="arrow-down"
                                     size={20}
                                     color={colors.primary}
                                     style={styles.transitionArrow}
                                   />
-                                  <Text
-                                    style={[
-                                      styles.position,
-                                      { color: colors.text },
-                                    ]}
-                                  >
-                                    {transition.position2}
-                                  </Text>
                                 </View>
+                                <Text
+                                  style={[
+                                    styles.position,
+                                    { color: colors.text },
+                                  ]}
+                                >
+                                  {transition.position2}
+                                </Text>
                               </View>
                             </View>
                           );
@@ -965,12 +966,12 @@ const styles = StyleSheet.create({
   transitionCard: {
     flex: 1,
   },
-  transitionText: {
-    flexDirection: "row",
+  transitionArrowContainer: {
     alignItems: "center",
+    paddingVertical: 8,
   },
   transitionArrow: {
-    marginHorizontal: 12,
+    marginVertical: 4,
   },
   employmentCard: {
     marginBottom: 16,
