@@ -940,7 +940,7 @@ export default function ProfileCard({
               )}
 
               {/* Employment History Section */}
-              {profile.employment && profile.employment.length > 0 && (
+              {profile.employment && Array.isArray(profile.employment) && profile.employment.length > 0 && (
                 <>
                   <Text style={[styles.label, { color: colors.secondaryText }]}>
                     Employment History
@@ -951,10 +951,12 @@ export default function ProfileCard({
                       style={[
                         styles.employmentCard,
                         { 
-                          backgroundColor: 'transparent',
+                          backgroundColor: colors.card,
                           borderWidth: 1,
                           borderColor: colors.primary + '40',
-                          marginBottom: 12 
+                          marginBottom: 12,
+                          borderRadius: 8,
+                          padding: 12
                         }
                       ]}
                     >
