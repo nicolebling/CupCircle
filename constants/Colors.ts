@@ -10,11 +10,12 @@ export default {
     card: '#FFFFFF',
     text: '#1E1916',
     secondaryText: '#64748B',
-    border: '#EFE9D3',
+    border: '#ddd',
     notification: '#F97415',
     tint: '#FFF',
     tabIconDefault: 'rgba(255, 255, 255, 0.7)',
     tabIconSelected: '#FFFFFF',
     fontFamily: 'K2D-Regular',
+    divider: '#ddd',
   }
 };

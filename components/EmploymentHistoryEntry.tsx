@@ -285,14 +285,16 @@ const styles = StyleSheet.create({
   companyName: {
     fontSize: 18,
     fontWeight: '600',
+    fontFamily: "K2D-SemiBold",
   },
   position: {
     fontSize: 16,
-    marginTop: 4,
+    
+    fontFamily: "K2D-Regular",
   },
   dateText: {
     fontSize: 14,
-    marginTop: 4,
+    fontFamily: "K2D-Regular",
   },
   buttonGroup: {
     flexDirection: 'row',

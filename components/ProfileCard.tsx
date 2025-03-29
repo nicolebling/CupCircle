@@ -499,44 +499,98 @@ export default function ProfileCard({
             },
           ]}
         >
+          {/* Profile Photo */}
+          {profile.photo_url ? (
+            <Image
+              source={{ uri: profile.photo_url }}
+              style={[styles.image, { marginTop: 0 }]}
+              resizeMode="cover"
+            />
+          ) : (
+            <View
+              style={[
+                styles.image,
+                {
+                  backgroundColor: "#1A1A1A",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  marginTop: 0,
+                },
+              ]}
+            >
+              <Ionicons name="person" size={60} color="#ffffff" />
+            </View>
+          )}
           <View style={{ padding: 16 }}>
             <View style={styles.headerContainer}>
-              <View style={styles.photoContainer}>
-                {profile.photo_url ? (
-                  <Image
-                    source={{ uri: profile.photo_url }}
-                    style={styles.profilePhoto}
-                  />
-                ) : (
-                  <View
-                    style={[
-                      styles.profilePhoto,
-                      {
-                        backgroundColor: "#1A1A1A",
-                        justifyContent: "center",
-                        alignItems: "center",
-                      },
-                    ]}
-                  >
-                    <Ionicons name="person" size={40} color="#ffffff" />
-                  </View>
-                )}
-              </View>
-
               <View style={styles.headerInfo}>
-                <Text style={[styles.name, { color: colors.text, textAlign: 'center' }]}>
+                <Text
+                  style={[
+                    styles.name,
+                    { color: colors.text, textAlign: "center" },
+                  ]}
+                >
                   {profile.name}
                 </Text>
 
-                <View style={[styles.positionContainer, { justifyContent: 'center' }]}>
+                <View
+                  style={[
+                    styles.positionContainer,
+                    { justifyContent: "center" },
+                  ]}
+                >
                   <Text style={[styles.position, { color: colors.text }]}>
                     {profile.occupation}
                   </Text>
                 </View>
 
 
+                {/* Experience Level */}
+                {/* <View>
+                  {profile.experience_level && (
+                    <View
+                      style={[
+                        styles.tag,
+                        {
+                          backgroundColor: "transparent",
+                          borderWidth: 1,
+                          borderColor: colors.primary,
+                          alignSelf: "flex-start",
+                          marginTop: 4,
+                          flexDirection: "row",
+                          alignItems: "center",
+                        },
+                      ]}
+                    >
+                      <Text style={[styles.occupation, { color: colors.primary }]}>
+                        {profile.experience_level}
+                        {"\t"}
+                        <Ionicons
+                          name="cafe"
+                          size={14}
+                          color={getCoffeeColor(profile.experience_level)}
+                        />
+                        <Text
+                          style={[
+                            styles.coffeeBadgeText,
+                            { color: getCoffeeColor(profile.experience_level) },
+                          ]}
+                        >
+                          {" "}
+                          {getCoffeeTheme(profile.experience_level)}
+                        </Text>
+                      </Text>
+                    </View>
+                  )}
+                </View> */}
+
                 {profile.city && (
-                  <View style={[styles.locationContainer, { justifyContent: 'center' }]}>
+                  <View
+                    style={[
+                      styles.locationContainer,
+                      { justifyContent: "center" },
+                    ]}
+                  >
                     <Ionicons
                       name="location-outline"
                       size={14}
@@ -565,10 +619,16 @@ export default function ProfileCard({
               {/* Employment Section */}
               {profile.employment && (
                 <>
-                  <Text style={[styles.sectionTitle, { color: colors.text, marginBottom: 16 }]}>
+                  <Text
+                    style={[
+                      styles.sectionTitle,
+                      { color: colors.text, marginBottom: 16 },
+                    ]}
+                  >
                     Experience
                   </Text>
-                  <View> {/* Added View to wrap timeline */}
+                  <View>
+                    {/* Added View to wrap timeline */}
                     {Array.isArray(profile.employment) ? (
                       profile.employment.map((jobString, index) => {
                         // Parse each job entry from string to object
@@ -577,17 +637,42 @@ export default function ProfileCard({
                           <View key={index} style={styles.employmentContainer}>
                             <View style={styles.timelineDot} />
                             <View style={styles.employmentCard}>
-                              <Text style={[styles.position, { color: colors.text, fontSize: 16, marginBottom: 4 }]}>
+                              <Text
+                                style={[
+                                  styles.position,
+                                  {
+                                    color: colors.text,
+                                    fontSize: 16,
+                                    marginBottom: 4,
+                                  },
+                                ]}
+                              >
                                 {job.position}
                               </Text>
-                              <Text style={[styles.companyName, { color: colors.text, fontSize: 14 }]}>
+                              <Text
+                                style={[
+                                  styles.companyName,
+                                  { color: colors.text, fontSize: 14 },
+                                ]}
+                              >
                                 {job.company}
                               </Text>
-                              <Text style={[styles.dateRange, { color: colors.secondaryText, fontSize: 14, marginTop: 4 }]}>
+                              <Text
+                                style={[
+                                  styles.dateRange,
+                                  {
+                                    color: colors.secondaryText,
+                                    fontSize: 14,
+                                    marginTop: 4,
+                                  },
+                                ]}
+                              >
                                 {job.fromDate} - {job.toDate}
                               </Text>
                             </View>
-                            {index < profile.employment.length -1 && <View style={styles.timelineLine}/>}
+                            {index < profile.employment.length - 1 && (
+                              <View style={styles.timelineLine} />
+                            )}
                           </View>
                         );
                       })
@@ -596,7 +681,7 @@ export default function ProfileCard({
                         Employment data is not an array!
                       </Text>
                     )}
-                  </View> {/* Close added View */}
+                  </View>
                 </>
               )}
 
@@ -817,10 +902,10 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   employmentContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
+    flexDirection: "row",
+    alignItems: "flex-start",
     marginBottom: 32,
-    position: 'relative',
+    position: "relative",
   },
   timelineDot: {
     width: 8,
@@ -832,11 +917,11 @@ const styles = StyleSheet.create({
   },
   timelineLine: {
     width: 1,
-    position: 'absolute',
+    position: "absolute",
     left: 3.5,
     top: 24,
     bottom: -24,
-    backgroundColor: '#ccc',
+    backgroundColor: "#ccc",
   },
   employmentHeader: {
     marginBottom: 4,
@@ -844,7 +929,7 @@ const styles = StyleSheet.create({
   companyName: {
     fontFamily: "K2D-Regular",
     fontSize: 14,
-    color: '#666',
+    color: "#666",
   },
   position: {
     fontFamily: "K2D-Medium",
@@ -853,7 +938,7 @@ const styles = StyleSheet.create({
   dateRange: {
     fontFamily: "K2D-Regular",
     fontSize: 14,
-    color: '#666',
+    color: "#666",
   },
   // Common styles
   card: {
@@ -906,6 +991,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
   },
   locationContainer: {
+    marginTop: 8,
     flexDirection: "row",
     alignItems: "center",
   },
@@ -1201,7 +1287,7 @@ const styles = StyleSheet.create({
   },
   photoContainer: {
     marginBottom: 16,
-    alignItems: 'center',
+    alignItems: "center",
   },
   profilePhoto: {
     width: 120,
@@ -1209,13 +1295,14 @@ const styles = StyleSheet.create({
     borderRadius: 60,
   },
   headerInfo: {
-    width: '100%',
-    alignItems: 'center',
+    width: "100%",
+    alignItems: "center",
   },
   positionContainer: {
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 8,
+    marginTop: 8
   },
   position: {
     fontFamily: "K2D-Medium",
@@ -1228,6 +1315,7 @@ const styles = StyleSheet.create({
   },
   bioContainer: {
     marginBottom: 16,
+    marginTop: 22,
   },
   bioText: {
     fontFamily: "K2D-Regular",

@@ -434,49 +434,6 @@ export default function ProfileForm({
 
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isDark && styles.textDark]}>
-                City
-              </Text>
-              <TextInput
-                style={[styles.input, isDark && styles.inputDark]}
-                value={city}
-                onChangeText={setCity}
-                placeholder="Your city"
-                placeholderTextColor={isDark ? "#999" : "#777"}
-              />
-            </View>
-
-            <View style={styles.inputGroup}>
-              <Text style={[styles.label, isDark && styles.textDark]}>
-                Education
-              </Text>
-              <TextInput
-                style={[styles.input, isDark && styles.inputDark]}
-                value={education}
-                onChangeText={setEducation}
-                placeholder="Your educational background"
-                placeholderTextColor={isDark ? "#999" : "#777"}
-              />
-            </View>
-
-            <View style={styles.inputGroup}>
-              <Text style={[styles.label, isDark && styles.textDark]}>Bio</Text>
-              <TextInput
-                style={[styles.textArea, isDark && styles.inputDark]}
-                value={bio}
-                onChangeText={setBio}
-                placeholder="Tell us about yourself..."
-                placeholderTextColor={isDark ? "#999" : "#777"}
-                multiline
-                numberOfLines={4}
-              />
-            </View>
-          </View>
-
-          <View style={styles.divider} />
-
-          <View style={styles.section}>
-            <View style={styles.inputGroup}>
-              <Text style={[styles.label, isDark && styles.textDark]}>
                 Occupation
               </Text>
               <TextInput
@@ -501,25 +458,34 @@ export default function ProfileForm({
 
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isDark && styles.textDark]}>
-                Industry Categories
+                City
               </Text>
-              <IndustrySelector
-                selected={industryCategories}
-                onChange={setIndustryCategories}
-                isDark={isDark}
+              <TextInput
+                style={[styles.input, isDark && styles.inputDark]}
+                value={city}
+                onChangeText={setCity}
+                placeholder="Your city"
+                placeholderTextColor={isDark ? "#999" : "#777"}
               />
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={[styles.label, isDark && styles.textDark]}>
-                Interests
-              </Text>
-              <InterestSelector
-                selected={interests}
-                onChange={setInterests}
-                isDark={isDark}
+              <Text style={[styles.label, isDark && styles.textDark]}>Bio</Text>
+              <TextInput
+                style={[styles.textArea, isDark && styles.inputDark]}
+                value={bio}
+                onChangeText={setBio}
+                placeholder="Tell us about yourself..."
+                placeholderTextColor={isDark ? "#999" : "#777"}
+                multiline
+                numberOfLines={4}
               />
             </View>
+          </View>
+
+          <View style={styles.divider} />
+
+          <View style={styles.section}>
 
             <View style={styles.inputGroup}>
               <View style={styles.sectionHeader}>
@@ -548,6 +514,45 @@ export default function ProfileForm({
                 />
               ))}
             </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={[styles.label, isDark && styles.textDark]}>
+                Education
+              </Text>
+              <TextInput
+                style={[styles.input, isDark && styles.inputDark]}
+                value={education}
+                onChangeText={setEducation}
+                placeholder="Your educational background"
+                placeholderTextColor={isDark ? "#999" : "#777"}
+              />
+            </View>
+            
+            
+
+            <View style={styles.inputGroup}>
+              <Text style={[styles.label, isDark && styles.textDark]}>
+                Industry Categories
+              </Text>
+              <IndustrySelector
+                selected={industryCategories}
+                onChange={setIndustryCategories}
+                isDark={isDark}
+              />
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={[styles.label, isDark && styles.textDark]}>
+                Interests
+              </Text>
+              <InterestSelector
+                selected={interests}
+                onChange={setInterests}
+                isDark={isDark}
+              />
+            </View>
+
+            
           </View>
 
           <View style={styles.divider} />
@@ -657,6 +662,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginBottom: 8,
     color: "#555",
+    fontFamily: "K2D-Regular",
   },
   input: {
     backgroundColor: "#f8f8f8",
@@ -667,6 +673,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#333",
     marginBottom: 5,
+    fontFamily: "K2D-Regular",
   },
   inputDark: {
     backgroundColor: "#333",
@@ -675,6 +682,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   textArea: {
+    fontFamily: "K2D-Regular",
     backgroundColor: "#f8f8f8",
     borderWidth: 1,
     borderColor: "#ddd",
@@ -806,7 +814,7 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: "#F97415",
+    backgroundColor: "#ddd",
     marginBottom: 32,
   },
 });
