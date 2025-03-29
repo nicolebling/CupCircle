@@ -74,7 +74,6 @@ export default function ProfileForm({
   const [interests, setInterests] = useState<string[]>([]);
   const [error, setError] = useState("");
   const [isEditMode, setIsEditMode] = useState(false);
-   const [editingIndexes, setEditingIndexes] = useState(new Set()); // Track editing state per entry
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [tempDate, setTempDate] = useState(
     birthday ? new Date(birthday) : new Date(),
@@ -409,8 +408,6 @@ export default function ProfileForm({
 
     const emptyEntry = { company: "", position: "", fromDate: "", toDate: "" };
     setEmploymentHistory(prev => [...prev, emptyEntry]);
-    const newIndex = employmentHistory.length;
-    setEditingIndexes(prev => new Set(prev).add(newIndex)); // Mark the new entry as being edited
     setIsEditing(true); // Now setting edit mode to true to allow user to enter info
   };
 
