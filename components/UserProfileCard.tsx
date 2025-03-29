@@ -14,25 +14,6 @@ type UserProfileProps = {
   initialData?: UserProfileData;
 };
 
-export interface UserProfileData {
-  name: string;
-  photo: string;
-  bio: string;
-  occupation: string;
-  interests: string[];
-  industries: string[];
-  neighborhoods: string[];
-  favoriteCafes: string[];
-  employment?: Employment[];
-};
-
-interface Employment {
-  company: string;
-  position: string;
-  fromDate: string;
-  toDate: string;
-}
-
 export { UserProfileData };
 
 export default function UserProfileCard({ 
@@ -53,8 +34,7 @@ export default function UserProfileCard({
         interests: [],
         industries: [],
         neighborhoods: [],
-        favoriteCafes: [],
-        employment: [] // Added initial empty employment array
+        favoriteCafes: []
       }}
       isUserProfile={true}
       isEditMode={isEditMode}
