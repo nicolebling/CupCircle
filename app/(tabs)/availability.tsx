@@ -86,6 +86,7 @@ export default function AvailabilityScreen() {
     const result = await createSlot(selectedDate, selectedTime, endTime);
     if (result) {
       await getUserAvailability();
+      setShowAddSlot(false); // Close modal after successful add
     }
   };
 
@@ -269,18 +270,33 @@ export default function AvailabilityScreen() {
         Set your availability for coffee chats with other professionals
       </Text>
  */}
-      {showAddSlot && (
-        <>
-          {/* Calendar Section */}
-          <View style={styles.calendarContainer}>
-            <FlatList
-              horizontal
-              data={next7Days}
-              renderItem={({ item }) => {
-                const isSelected =
-                  selectedDate.toDateString() === item.toDateString();
-                const isPastDate = isPast(item) && !isToday(item);
-                const hasSlots = hasTimeSlotsOnDate(item);
+      <Modal
+        visible={showAddSlot}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowAddSlot(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { backgroundColor: colors.card }]}>
+            <View style={styles.modalHeader}>
+              <Text style={[styles.modalTitle, { color: colors.text }]}>
+                Add Availability
+              </Text>
+              <TouchableOpacity onPress={() => setShowAddSlot(false)}>
+                <Ionicons name="close" size={24} color={colors.text} />
+              </TouchableOpacity>
+            </View>
+
+            {/* Calendar Section */}
+            <View style={styles.calendarContainer}>
+              <FlatList
+                horizontal
+                data={next7Days}
+                renderItem={({ item }) => {
+                  const isSelected =
+                    selectedDate.toDateString() === item.toDateString();
+                  const isPastDate = isPast(item) && !isToday(item);
+                  const hasSlots = hasTimeSlotsOnDate(item);
 
                 return (
                   <TouchableOpacity
@@ -470,6 +486,27 @@ const styles = StyleSheet.create({
   headerButton: {
     marginRight: 15,
     padding: 8,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 16,
+    maxHeight: '80%',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontFamily: 'K2D-SemiBold',
   },
   container: {
     flex: 1,
