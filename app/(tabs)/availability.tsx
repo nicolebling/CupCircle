@@ -298,8 +298,8 @@ export default function AvailabilityScreen() {
                   const isPastDate = isPast(item) && !isToday(item);
                   const hasSlots = hasTimeSlotsOnDate(item);
 
-                  return (
-                    <TouchableOpacity
+                return (
+                  <TouchableOpacity
                     style={[
                       styles.dateButton,
                       isSelected && { backgroundColor: colors.primary },
