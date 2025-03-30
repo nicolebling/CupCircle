@@ -246,21 +246,23 @@ export default function AvailabilityScreen() {
     <SafeAreaView
       style={[styles.container, { backgroundColor: colors.background }]}
     >
-      <View style={styles.header}>
-        <Text style={[styles.subtitle, { color: colors.text }]}>
-          Set Your Availability
-        </Text>
-        <TouchableOpacity
-          style={styles.addButton}
-          onPress={() => setShowAddSlot(!showAddSlot)}
-        >
-          <Ionicons
-            name={showAddSlot ? "close-circle" : "add-circle"}
-            size={32}
-            color={colors.primary}
-          />
-        </TouchableOpacity>
-      </View>
+      <Stack.Screen
+        options={{
+          headerRight: () => (
+            <TouchableOpacity
+              style={styles.headerButton}
+              onPress={() => setShowAddSlot(!showAddSlot)}
+            >
+              <Ionicons
+                name={showAddSlot ? "close" : "add"}
+                size={24}
+                color={colors.primary}
+              />
+            </TouchableOpacity>
+          ),
+          title: "Set Your Availability",
+        }}
+      />
 
       {/* <Text style={[styles.subtitle, { color: colors.secondaryText }]}>
         Set your availability for coffee chats with other professionals
@@ -467,6 +469,10 @@ export default function AvailabilityScreen() {
 }
 
 const styles = StyleSheet.create({
+  headerButton: {
+    marginRight: 15,
+    padding: 8,
+  },
   container: {
     flex: 1,
     padding: 16,
