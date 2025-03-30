@@ -7,10 +7,8 @@ import {
   TouchableOpacity,
   FlatList,
   ActivityIndicator,
-  Modal,
 } from "react-native";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import { Stack } from "expo-router";
 import Colors from "@/constants/Colors";
 import { useAuth } from "@/contexts/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
@@ -38,8 +36,6 @@ export default function AvailabilityScreen() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
   const [showAddSlot, setShowAddSlot] = useState(false); // Added state for toggle
-  const [isModalVisible, setIsModalVisible] = useState(false); // Modal visibility state
-
 
   useEffect(() => {
     if (user?.id) {
@@ -89,7 +85,6 @@ export default function AvailabilityScreen() {
     const result = await createSlot(selectedDate, selectedTime, endTime);
     if (result) {
       await getUserAvailability();
-      setIsModalVisible(false); // Close modal after successful save
     }
   };
 
@@ -256,34 +251,98 @@ export default function AvailabilityScreen() {
           headerRight: () => (
             <TouchableOpacity
               style={styles.headerButton}
-              onPress={() => setIsModalVisible(true)} // Open modal instead of toggling showAddSlot
+              onPress={() => setShowAddSlot(!showAddSlot)}
             >
-              <Ionicons name="add" size={24} color={colors.primary} />
+              <Ionicons
+                name={showAddSlot ? "close" : "add"}
+                size={24}
+                color={colors.primary}
+              />
             </TouchableOpacity>
           ),
           title: "Set Your Availability",
         }}
       />
 
-      {/* Modal for adding time slots */}
-      <Modal
-        visible={isModalVisible}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => setIsModalVisible(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Add Time Slot</Text>
-              <TouchableOpacity onPress={() => setIsModalVisible(false)}>
-                <Ionicons name="close" size={24} color="gray" />
-              </TouchableOpacity>
-            </View>
-            <Text style={styles.selectedDateText}>
+      {/* <Text style={[styles.subtitle, { color: colors.secondaryText }]}>
+        Set your availability for coffee chats with other professionals
+      </Text>
+ */}
+      {showAddSlot && (
+        <>
+          {/* Calendar Section */}
+          <View style={styles.calendarContainer}>
+            <FlatList
+              horizontal
+              data={next7Days}
+              renderItem={({ item }) => {
+                const isSelected =
+                  selectedDate.toDateString() === item.toDateString();
+                const isPastDate = isPast(item) && !isToday(item);
+                const hasSlots = hasTimeSlotsOnDate(item);
+
+                return (
+                  <TouchableOpacity
+                    style={[
+                      styles.dateButton,
+                      isSelected && { backgroundColor: colors.primary },
+                      isPastDate && styles.disabledDate,
+                    ]}
+                    onPress={() => !isPastDate && handleDateSelect(item)}
+                    disabled={isPastDate}
+                  >
+                    <Text
+                      style={[
+                        styles.dayText,
+                        { color: isSelected ? "white" : colors.text },
+                        isPastDate && styles.disabledText,
+                      ]}
+                    >
+                      {format(item, "EEE")}
+                    </Text>
+                    <Text
+                      style={[
+                        styles.dateText,
+                        { color: isSelected ? "white" : colors.text },
+                        isPastDate && styles.disabledText,
+                      ]}
+                    >
+                      {format(item, "d")}
+                    </Text>
+                    {hasSlots && !isSelected && (
+                      <View
+                        style={[
+                          styles.dotIndicator,
+                          { backgroundColor: colors.primary },
+                        ]}
+                      />
+                    )}
+                  </TouchableOpacity>
+                );
+              }}
+              keyExtractor={(item) => item.toISOString()}
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.calendarList}
+            />
+          </View>
+
+          {/* Add Time Slot UI */}
+          <View
+            style={[
+              styles.addSlotContainer,
+              { backgroundColor: colors.card, borderColor: colors.border },
+            ]}
+          >
+            <Text style={[styles.addSlotTitle, { color: colors.text }]}>
+              Add Time Slot
+            </Text>
+            <Text
+              style={[styles.selectedDateText, { color: colors.secondaryText }]}
+            >
               {format(selectedDate, "EEEE, MMMM d, yyyy")}
             </Text>
-            <Text style={styles.timeSelectorLabel}>
+
+            <Text style={[styles.timeSelectorLabel, { color: colors.text }]}>
               Select Start Time (30-minute duration)
             </Text>
 
@@ -293,11 +352,14 @@ export default function AvailabilityScreen() {
                 data={availableTimes}
                 renderItem={({ item }) => {
                   const isSelectedTime = selectedTime === item;
+
+                  // Check if this time is already taken on selected date
                   const isTimeTaken = timeSlots.some(
                     (slot) =>
                       slot.date.toDateString() ===
                         selectedDate.toDateString() && slot.startTime === item,
                   );
+
                   return (
                     <TouchableOpacity
                       style={[
@@ -305,9 +367,7 @@ export default function AvailabilityScreen() {
                         isSelectedTime && { backgroundColor: colors.primary },
                         isTimeTaken && styles.disabledTime,
                       ]}
-                      onPress={() =>
-                        !isTimeTaken && setSelectedTime(item)
-                      }
+                      onPress={() => !isTimeTaken && setSelectedTime(item)}
                       disabled={isTimeTaken}
                     >
                       <Text
@@ -327,9 +387,11 @@ export default function AvailabilityScreen() {
                 contentContainerStyle={styles.timesList}
               />
             </View>
-            <Text style={styles.endTimeText}>
+
+            <Text style={[styles.endTimeText, { color: colors.secondaryText }]}>
               End Time: {calculateEndTime(selectedTime)}
             </Text>
+
             <TouchableOpacity
               style={[styles.saveButton, { backgroundColor: colors.primary }]}
               onPress={handleAddSlot}
@@ -337,12 +399,15 @@ export default function AvailabilityScreen() {
               <Text style={styles.saveButtonText}>Save Time Slot</Text>
             </TouchableOpacity>
           </View>
-        </View>
-      </Modal>
-
+        </>
+      )}
 
       {/* Time Slots List */}
       <View style={styles.slotsContainer}>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>
+          Your Available Time Slots
+        </Text>
+
         {isLoading ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color={colors.primary} />
@@ -382,6 +447,7 @@ export default function AvailabilityScreen() {
                     { color: colors.secondaryText },
                   ]}
                 >
+                  
                   {format(item.date, "EEEE, MMMM d, yyyy")}
                 </Text>
                 {item.slots.map((slot) => (
@@ -403,35 +469,21 @@ export default function AvailabilityScreen() {
 }
 
 const styles = StyleSheet.create({
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    justifyContent: "flex-end",
-  },
-  modalContent: {
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    padding: 20,
-    maxHeight: "80%",
-    backgroundColor: "white", // Added background color
-  },
-  modalHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontFamily: "K2D-SemiBold",
+  headerButton: {
+    marginRight: 15,
+    padding: 8,
   },
   container: {
     flex: 1,
     padding: 16,
   },
-  headerButton: {
-    marginRight: 15,
-    padding: 8,
+  header: {
+    padding: 16,
+    marginBottom: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    position: "relative",
   },
   subtitle: {
     fontFamily: "K2D-Regular, sans-serif",
