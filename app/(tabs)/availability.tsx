@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { Stack } from "expo-router";
 import Colors from "@/constants/Colors";
 import { useAuth } from "@/contexts/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
@@ -56,7 +57,7 @@ export default function AvailabilityScreen() {
       // Ensure dates are properly parsed and sorted
       const formattedData = (data || []).map((slot) => {
         // Create date string with time set to noon to avoid timezone issues
-        const date = new Date(slot.date);  // '2025-04-01' => Date object
+        const date = new Date(slot.date); // '2025-04-01' => Date object
         return {
           ...slot,
           date,
@@ -143,7 +144,6 @@ export default function AvailabilityScreen() {
       date: selectedDate,
       startTime: selectedTime,
       endTime: calculateEndTime(selectedTime),
-
     };
 
     // Check for overlaps
@@ -404,10 +404,6 @@ export default function AvailabilityScreen() {
 
       {/* Time Slots List */}
       <View style={styles.slotsContainer}>
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>
-          Your Available Time Slots
-        </Text>
-
         {isLoading ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color={colors.primary} />
@@ -447,7 +443,6 @@ export default function AvailabilityScreen() {
                     { color: colors.secondaryText },
                   ]}
                 >
-                  
                   {format(item.date, "EEEE, MMMM d, yyyy")}
                 </Text>
                 {item.slots.map((slot) => (
