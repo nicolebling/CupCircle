@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { Stack } from "expo-router";
 import Colors from "@/constants/Colors";
 import { useAuth } from "@/contexts/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
@@ -404,10 +405,7 @@ export default function AvailabilityScreen() {
 
       {/* Time Slots List */}
       <View style={styles.slotsContainer}>
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>
-          Your Available Time Slots
-        </Text>
-
+       
         {isLoading ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color={colors.primary} />
