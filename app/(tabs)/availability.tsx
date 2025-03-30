@@ -56,8 +56,7 @@ export default function AvailabilityScreen() {
       // Ensure dates are properly parsed and sorted
       const formattedData = (data || []).map((slot) => {
         // Create date string with time set to noon to avoid timezone issues
-        const dateStr = `${slot.date}T12:00:00`;
-        const date = new Date(dateStr);
+        const date = new Date(slot.date);  // '2025-04-01' => Date object
         return {
           ...slot,
           date,
@@ -446,6 +445,7 @@ export default function AvailabilityScreen() {
                     { color: colors.secondaryText },
                   ]}
                 >
+                  
                   {format(item.date, "EEEE, MMMM d, yyyy")}
                 </Text>
                 {item.slots.map((slot) => (
