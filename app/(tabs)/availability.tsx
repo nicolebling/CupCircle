@@ -326,44 +326,39 @@ export default function AvailabilityScreen() {
             />
           </View>
 
-          <Modal
-            visible={showAddSlot}
-            transparent={true}
-            animationType="slide"
-            onRequestClose={() => setShowAddSlot(false)}
+          {/* Add Time Slot UI */}
+          <View
+            style={[
+              styles.addSlotContainer,
+              { backgroundColor: colors.card, borderColor: colors.border },
+            ]}
           >
-            <View style={styles.modalOverlay}>
-              <View style={[styles.modalContent, { backgroundColor: colors.card }]}>
-                <View style={styles.modalHeader}>
-                  <Text style={[styles.modalTitle, { color: colors.text }]}>
-                    Add Time Slot
-                  </Text>
-                  <TouchableOpacity onPress={() => setShowAddSlot(false)}>
-                    <Ionicons name="close" size={24} color={colors.text} />
-                  </TouchableOpacity>
-                </View>
+            <Text style={[styles.addSlotTitle, { color: colors.text }]}>
+              Add Time Slot
+            </Text>
+            <Text
+              style={[styles.selectedDateText, { color: colors.secondaryText }]}
+            >
+              {format(selectedDate, "EEEE, MMMM d, yyyy")}
+            </Text>
 
-                <Text style={[styles.selectedDateText, { color: colors.secondaryText }]}>
-                  {format(selectedDate, "EEEE, MMMM d, yyyy")}
-                </Text>
+            <Text style={[styles.timeSelectorLabel, { color: colors.text }]}>
+              Select Start Time (30-minute duration)
+            </Text>
 
-                <Text style={[styles.timeSelectorLabel, { color: colors.text }]}>
-                  Select Start Time (30-minute duration)
-                </Text>
+            <View style={styles.timePickerContainer}>
+              <FlatList
+                horizontal
+                data={availableTimes}
+                renderItem={({ item }) => {
+                  const isSelectedTime = selectedTime === item;
 
-                <View style={styles.timePickerContainer}>
-                  <FlatList
-                    horizontal
-                    data={availableTimes}
-                    renderItem={({ item }) => {
-                      const isSelectedTime = selectedTime === item;
-
-                      // Check if this time is already taken on selected date
-                      const isTimeTaken = timeSlots.some(
-                        (slot) =>
-                          slot.date.toDateString() ===
-                            selectedDate.toDateString() && slot.startTime === item,
-                      );
+                  // Check if this time is already taken on selected date
+                  const isTimeTaken = timeSlots.some(
+                    (slot) =>
+                      slot.date.toDateString() ===
+                        selectedDate.toDateString() && slot.startTime === item,
+                  );
 
                   return (
                     <TouchableOpacity
@@ -469,27 +464,6 @@ export default function AvailabilityScreen() {
 }
 
 const styles = StyleSheet.create({
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'flex-end',
-  },
-  modalContent: {
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    padding: 20,
-    maxHeight: '80%',
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontFamily: 'K2D-SemiBold',
-  },
   headerButton: {
     marginRight: 15,
     padding: 8,
