@@ -276,28 +276,6 @@ export default function ProfileCard({
 
         <View style={styles.content}>
           <View style={styles.headerContainer}>
-            <View style={styles.photoContainer}>
-              {profile.photo_url ? (
-                <Image
-                  source={{ uri: profile.photo_url }}
-                  style={styles.profilePhoto}
-                />
-              ) : (
-                <View
-                  style={[
-                    styles.profilePhoto,
-                    {
-                      backgroundColor: "#1A1A1A",
-                      justifyContent: "center",
-                      alignItems: "center",
-                    },
-                  ]}
-                >
-                  <Ionicons name="person" size={40} color="#ffffff" />
-                </View>
-              )}
-            </View>
-
             <View style={styles.headerInfo}>
               <Text style={[styles.name, { color: colors.text }]}>
                 {profile.name} {profile.age && <Text>({profile.age})</Text>}
