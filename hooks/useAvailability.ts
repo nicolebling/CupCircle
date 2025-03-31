@@ -18,9 +18,9 @@ export function useAvailability() {
       console.log('Original selected date:', date);
       console.log('Original date ISO string:', date.toISOString());
       
-      // Adjust date for timezone
-      // Create date at midnight in local timezone
-      const adjustedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+      // Create date preserving the selected date regardless of timezone
+      const adjustedDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), 12, 0, 0));
+      console.log('Original date:', date);
       console.log('Adjusted date:', adjustedDate);
       console.log('Adjusted date ISO string:', adjustedDate.toISOString());
 
