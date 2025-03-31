@@ -118,7 +118,10 @@ export const availabilityService = {
       console.log('Timezone being used:', timezone);
       
       // Format date as YYYY-MM-DD to avoid timezone issues
-      const formattedDate = availabilityData.date.toISOString().split('T')[0];
+      // Ensure date is set to midnight in local timezone before converting
+      const localDate = new Date(availabilityData.date);
+      localDate.setHours(12, 0, 0, 0); // Set to noon to avoid timezone edge cases
+      const formattedDate = localDate.toISOString().split('T')[0];
       console.log('Formatted date to be saved:', formattedDate);
 
       const { data, error } = await supabase
