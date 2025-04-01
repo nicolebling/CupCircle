@@ -592,7 +592,7 @@ export default function ProfileCard({
                     >
                       <Text style={[styles.occupation, { color: colors.primary }]}>
                         {profile.experience_level}
-                      
+
                         <Ionicons
                           name="cafe"
                           size={14}
@@ -604,7 +604,7 @@ export default function ProfileCard({
                             { color: getCoffeeColor(profile.experience_level) },
                           ]}
                         >
-                          
+
                           {getCoffeeTheme(profile.experience_level)}
                         </Text>
                       </Text>
@@ -1215,7 +1215,7 @@ const styles = StyleSheet.create({
   photoContainer: {
     alignItems: "center",
     marginBottom: 24,
-    position: "relative",
+    position: ""relative",
   },
   profilePhoto: {
     width: 120,
@@ -1457,5 +1457,11 @@ const styles = StyleSheet.create({
       { translateX: -((width - 32) * 0.6 + 16) / 2 },
       { translateY: -((width - 32) * 0.6 + 16) / 2 },
     ],
+    shadowColor: "#FFF",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
+    overflow: "visible",
   },
 });
