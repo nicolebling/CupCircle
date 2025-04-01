@@ -1070,7 +1070,7 @@ const styles = StyleSheet.create({
     resizeMode: "cover",
     borderRadius: ((width - 32) * 0.6) / 2, // Makes the image circular
     alignSelf: 'center', // Center the image
-    
+    marginTop: 16, // Add padding to top
   },
   content: {
     padding: 16,
