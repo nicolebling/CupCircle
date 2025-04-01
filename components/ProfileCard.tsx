@@ -1215,7 +1215,7 @@ const styles = StyleSheet.create({
   photoContainer: {
     alignItems: "center",
     marginBottom: 24,
-    position: ""relative",
+    position: "relative",
   },
   profilePhoto: {
     width: 120,
