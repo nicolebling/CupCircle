@@ -1068,6 +1068,7 @@ const styles = StyleSheet.create({
     width: width - 32, // Full width of card minus margins
     height: width - 32, // Same as width for 1:1 ratio
     resizeMode: "cover",
+    borderRadius: (width - 32) / 2, // Makes the image circular
   },
   content: {
     padding: 16,
