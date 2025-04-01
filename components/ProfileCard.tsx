@@ -1065,8 +1065,6 @@ const styles = StyleSheet.create({
   },
   decorativeCircle: {
     position: 'absolute',
-    top: -4,
-    right: -4,
     width: 40,
     height: 40,
     borderRadius: 20,
@@ -1076,6 +1074,12 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
     elevation: 4,
     zIndex: 1,
+    top: '50%',
+    right: '50%',
+    transform: [
+      { translateX: 20 }, // Half of circle width
+      { translateY: -20 }, // Half of circle height
+    ],
   },
   header: {
     flexDirection: "row",
