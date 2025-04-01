@@ -474,7 +474,6 @@ export default function ProfileCard({
               backgroundColor: colors.card,
               borderColor: colors.border,
               padding: 0,
-              paddingTop: 16,
             },
           ]}
         >
@@ -1052,6 +1051,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     marginBottom: 16,
     margin: 16,
+    paddingTop: 36,
   },
   header: {
     flexDirection: "row",
@@ -1208,7 +1208,7 @@ const styles = StyleSheet.create({
     height: 36,
     borderRadius: 18,
     alignItems: "center",
-    justifyContent"center",
+    justifyContent: "center",
   },
   section: {
     marginBottom: 24,
