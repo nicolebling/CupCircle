@@ -474,18 +474,10 @@ export default function ProfileCard({
               backgroundColor: colors.card,
               borderColor: colors.border,
               padding: 0,
+              paddingTop: 16,
             },
           ]}
         >
-          <View
-            style={[
-              styles.decorativeCircle,
-              {
-                backgroundColor: profile.experience_level ? getCoffeeColor(profile.experience_level) : colors.primary,
-                opacity: 0.8,
-              },
-            ]}
-          />
           {/* Profile Photo */}
           {profile.photo_url ? (
             <Image
@@ -1057,29 +1049,9 @@ const styles = StyleSheet.create({
   userCard: {
     borderRadius: 16,
     borderWidth: 1,
-    overflow: "visible",
+    overflow: "hidden",
     marginBottom: 16,
     margin: 16,
-    paddingTop: 36,
-    position: 'relative',
-  },
-  decorativeCircle: {
-    position: 'absolute',
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 3,
-    elevation: 4,
-    zIndex: 1,
-    top: '50%',
-    right: '50%',
-    transform: [
-      { translateX: 20 }, // Half of circle width
-      { translateY: -20 }, // Half of circle height
-    ],
   },
   header: {
     flexDirection: "row",
@@ -1236,7 +1208,7 @@ const styles = StyleSheet.create({
     height: 36,
     borderRadius: 18,
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent"center",
   },
   section: {
     marginBottom: 24,
