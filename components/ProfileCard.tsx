@@ -288,7 +288,7 @@ export default function ProfileCard({
           <View style={styles.headerContainer}>
             <View style={styles.headerInfo}>
               <Text style={[styles.name, { color: colors.text }]}>
-                {profile.name}{" "}
+                {profile.name}
                 {profile.age && <Text>({profile.age})</Text>}
               </Text>
 
