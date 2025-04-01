@@ -1444,16 +1444,17 @@ const styles = StyleSheet.create({
   },
   decorativeCircle: {
     position: "absolute",
-    width: ((width - 32) * 0.6) + 8, // Slightly larger than the image
-    height: ((width - 32) * 0.6) + 8,
-    borderRadius: (((width - 32) * 0.6) + 8) / 2,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 3,
-    elevation: 4,
+    width: ((width - 32) * 0.6) + 16, // 8px larger on each side
+    height: ((width - 32) * 0.6) + 16,
+    borderRadius: (((width - 32) * 0.6) + 16) / 2,
+    borderWidth: 2,
+    backgroundColor: 'transparent',
     zIndex: 0,
-    top: 12, // Adjust based on image marginTop
-    alignSelf: "center",
+    top: '50%',
+    left: '50%',
+    transform: [
+      { translateX: -(((width - 32) * 0.6) + 16) / 2 },
+      { translateY: -(((width - 32) * 0.6) + 16) / 2 }
+    ],
   },
 });
