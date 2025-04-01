@@ -477,6 +477,15 @@ export default function ProfileCard({
             },
           ]}
         >
+          <View
+            style={[
+              styles.decorativeCircle,
+              {
+                backgroundColor: profile.experience_level ? getCoffeeColor(profile.experience_level) : colors.primary,
+                opacity: 0.8,
+              },
+            ]}
+          />
           {/* Profile Photo */}
           {profile.photo_url ? (
             <Image
@@ -1048,10 +1057,25 @@ const styles = StyleSheet.create({
   userCard: {
     borderRadius: 16,
     borderWidth: 1,
-    overflow: "hidden",
+    overflow: "visible",
     marginBottom: 16,
     margin: 16,
     paddingTop: 36,
+    position: 'relative',
+  },
+  decorativeCircle: {
+    position: 'absolute',
+    top: -4,
+    right: -4,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 3,
+    elevation: 4,
+    zIndex: 1,
   },
   header: {
     flexDirection: "row",
