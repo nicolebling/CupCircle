@@ -1065,10 +1065,11 @@ const styles = StyleSheet.create({
 
   // Matching card styles
   image: {
-    width: width - 32, // Full width of card minus margins
-    height: width - 32, // Same as width for 1:1 ratio
+    width: (width - 32) * 0.6, // 60% of original width
+    height: (width - 32) * 0.6, // Keep 1:1 ratio
     resizeMode: "cover",
-    borderRadius: (width - 32) / 2, // Makes the image circular
+    borderRadius: ((width - 32) * 0.6) / 2, // Makes the image circular
+    alignSelf: 'center', // Center the image
   },
   content: {
     padding: 16,
