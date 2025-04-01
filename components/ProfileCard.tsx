@@ -263,7 +263,17 @@ export default function ProfileCard({
           { backgroundColor: colors.card, borderColor: colors.border },
         ]}
       >
-        <Image source={{ uri: profile.photo }} style={styles.image} />
+        <View style={styles.imageContainer}> {/* Added container */}
+          <Image source={{ uri: profile.photo }} style={styles.image} />
+          {profile.experience_level && (
+            <View
+              style={[
+                styles.decorativeCircle,
+                { backgroundColor: getCoffeeColor(profile.experience_level) },
+              ]}
+            />
+          )}
+        </View>
 
         {profile.matchedCafe && (
           <View
@@ -278,7 +288,8 @@ export default function ProfileCard({
           <View style={styles.headerContainer}>
             <View style={styles.headerInfo}>
               <Text style={[styles.name, { color: colors.text }]}>
-                {profile.name} {profile.age && <Text>({profile.age})</Text>}
+                {profile.name}{" "}
+                {profile.age && <Text>({profile.age})</Text>}
               </Text>
 
               <View style={styles.positionContainer}>
@@ -479,27 +490,38 @@ export default function ProfileCard({
           ]}
         >
           {/* Profile Photo */}
-          {profile.photo_url ? (
-            <Image
-              source={{ uri: profile.photo_url }}
-              style={[styles.image, { marginTop: 0 }]}
-              resizeMode="cover"
-            />
-          ) : (
-            <View
-              style={[
-                styles.image,
-                {
-                  backgroundColor: "#1A1A1A",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  marginTop: 0,
-                },
-              ]}
-            >
-              <Ionicons name="person" size={60} color="#ffffff" />
-            </View>
-          )}
+          <View style={styles.imageContainer}> {/* Added container */}
+            {profile.photo_url ? (
+              <Image
+                source={{ uri: profile.photo_url }}
+                style={[styles.image, { marginTop: 0 }]}
+                resizeMode="cover"
+              />
+            ) : (
+              <View
+                style={[
+                  styles.image,
+                  {
+                    backgroundColor: "#1A1A1A",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    marginTop: 0,
+                  },
+                ]}
+              >
+                <Ionicons name="person" size={60} color="#ffffff" />
+              </View>
+            )}
+            {profile.experience_level && (
+              <View
+                style={[
+                  styles.decorativeCircle,
+                  { backgroundColor: getCoffeeColor(profile.experience_level) },
+                ]}
+              />
+            )}
+          </View>
+
           <View style={{ padding: 16 }}>
             <View style={styles.headerContainer}>
               <View style={styles.headerInfo}>
@@ -1070,8 +1092,11 @@ const styles = StyleSheet.create({
     height: (width - 32) * 0.6, // Keep 1:1 ratio
     resizeMode: "cover",
     borderRadius: ((width - 32) * 0.6) / 2, // Makes the image circular
-    alignSelf: 'center', // Center the image
+    alignSelf: "center", // Center the image
     marginTop: 16, // Add padding to top
+  },
+  imageContainer: {
+    position: 'relative'
   },
   content: {
     padding: 16,
@@ -1416,5 +1441,19 @@ const styles = StyleSheet.create({
   },
   transitionArrow: {
     marginHorizontal: 8,
+  },
+  decorativeCircle: {
+    position: "absolute",
+    width: ((width - 32) * 0.6) + 8, // Slightly larger than the image
+    height: ((width - 32) * 0.6) + 8,
+    borderRadius: (((width - 32) * 0.6) + 8) / 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 3,
+    elevation: 4,
+    zIndex: 0,
+    top: 12, // Adjust based on image marginTop
+    alignSelf: "center",
   },
 });
