@@ -491,7 +491,7 @@ export default function ProfileCard({
           ]}
         >
           {/* Profile Photo */}
-          <View style={styles.imageContainer}>
+          <View style={[styles.imageContainer, { marginTop: 32 }]}>
             {/* Added container */}
             {profile.photo_url ? (
               <Image
@@ -1095,7 +1095,6 @@ const styles = StyleSheet.create({
     resizeMode: "cover",
     borderRadius: ((width - 32) * 0.6) / 2, // Makes the image circular
     alignSelf: "center", // Center the image
-    marginTop: 1000, // Add padding to top
   },
   imageContainer: {
     position: "relative",
