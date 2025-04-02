@@ -34,9 +34,13 @@ export default function AvailabilityScreen() {
   const { user } = useAuth();
   const { isLoading, error, createSlot, getSlots } = useAvailability();
 
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [selectedDate, setSelectedDate] = useState(new Date(new Date().toString()));
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
-  const [showAddSlot, setShowAddSlot] = useState(false); // Added state for toggle
+  const [showAddSlot, setShowAddSlot] = useState(false); // Added state for toggle{/*  */}
+
+  // const [year, month, day] = slot.date.split("-");
+  // const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day), 12);
+  // setSelectedDate(date);
 
   useEffect(() => {
     if (user?.id) {
@@ -58,7 +62,12 @@ export default function AvailabilityScreen() {
       const formattedData = (data || []).map((slot) => {
         // Create date object for sorting and display, set to noon to avoid any timezone issues
         const [year, month, day] = slot.date.split("-");
-        const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day), 12);
+        const date = new Date(
+          parseInt(year),
+          parseInt(month) - 1,
+          parseInt(day),
+          12,
+        );
         return {
           ...slot,
           date,
@@ -205,7 +214,6 @@ export default function AvailabilityScreen() {
     });
   };
 
-  
   const getSlotsForDate = (date: Date) => {
     return timeSlots
       .filter(
