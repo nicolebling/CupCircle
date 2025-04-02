@@ -34,7 +34,7 @@ export default function AvailabilityScreen() {
   const { user } = useAuth();
   const { isLoading, error, createSlot, getSlots } = useAvailability();
 
-  const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
   const [showAddSlot, setShowAddSlot] = useState(false); // Added state for toggle
 
@@ -242,7 +242,7 @@ export default function AvailabilityScreen() {
   }));
 
   const handleDateSelect = (date: Date) => {
-    setSelectedDate(date.toISOString().split('T')[0]);
+    setSelectedDate(date);
   };
 
   return (
