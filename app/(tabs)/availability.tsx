@@ -210,7 +210,11 @@ export default function AvailabilityScreen() {
   const hasTimeSlotsOnDate = (date: Date) => {
     return timeSlots.some((slot) => {
       const slotDate = new Date(slot.date);
-      return slotDate.toDateString() === date.toDateString();
+      return (
+        slotDate.getFullYear() === date.getFullYear() &&
+        slotDate.getMonth() === date.getMonth() &&
+        slotDate.getDate() === date.getDate()
+      );
     });
   };
 

@@ -22,8 +22,8 @@ export function useAvailability() {
       console.log("Original selected date:", date);
       console.log("Original date ISO string:", date);
 
-      // Format date as YYYY-MM-DD
-      const formattedDate = date.toISOString().split("T")[0];
+      // Format date as YYYY-MM-DD using local date
+      const formattedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
       console.log("Original date:", date);
       console.log("Formatted date:", formattedDate);
 
