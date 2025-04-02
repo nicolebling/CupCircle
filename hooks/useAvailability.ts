@@ -8,7 +8,7 @@ export function useAvailability() {
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
 
-  const createSlot = async (date: Date, startTime: string, endTime: string) => {
+  const createSlot = async (date: string, startTime: string, endTime: string) => {
     if (!user?.id) return null;
     setIsLoading(true);
     setError(null);
@@ -16,7 +16,7 @@ export function useAvailability() {
     try {
       const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       console.log("Original selected date:", date);
-      console.log("Original date ISO string:", date.toISOString());
+      console.log("Original date ISO string:", date);
 
       // Keep original date without timezone conversion
       const adjustedDate = new Date(

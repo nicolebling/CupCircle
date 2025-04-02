@@ -14,7 +14,7 @@ import Colors from "@/constants/Colors";
 import { useAuth } from "@/contexts/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
 import AvailabilityCard from "@/components/AvailabilityCard";
-import { format, addDays, isPast, isToday } from "date-fns";
+import { format, addDays, isPast, isToday, parseISO } from "date-fns";
 import { useAvailability } from "../../hooks/useAvailability";
 import { supabase } from "../../lib/supabase";
 
@@ -450,7 +450,7 @@ export default function AvailabilityScreen() {
                     { color: colors.secondaryText },
                   ]}
                 >
-                  {format(new Date(item.date.toDateString()), "EEEE, MMMM d, yyyy")}
+                  {format(item.date, "EEEE, MMMM d, yyyy")}
                 </Text>
                 {item.slots.map((slot) => (
                   <AvailabilityCard

@@ -110,7 +110,7 @@ export const availabilityService = {
   // Create availability slot
   async createAvailability(availabilityData: {
     user_id: string;
-    date: Date;
+    date: string;
     start_time: string;
     end_time: string;
     is_available: boolean;
@@ -125,7 +125,7 @@ export const availabilityService = {
       const localDate = new Date(availabilityData.date);
       localDate.setHours(12, 0, 0, 0); // Set to noon to avoid timezone edge cases
       // No date manipulation, just ensure it's a string in the correct format
-      const formattedDate = localDate.toISOString().split('T')[0];;
+      const formattedDate = availabilityData.date.split('T')[0];
       console.log("Formatted date to be saved:", formattedDate);
 
       const { data, error } = await supabase
@@ -172,7 +172,7 @@ export const availabilityService = {
   async updateAvailability(
     id: string,
     updateData: Partial<{
-      date: Date;
+      date: string;
       start_time: string;
       end_time: string;
       is_available: boolean;
