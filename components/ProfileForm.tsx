@@ -627,7 +627,7 @@ export default function ProfileForm({
           <View style={styles.divider} />
 
           <View style={styles.section}>
-            <View style={styles.inputGroup}>
+            {/* <View style={styles.inputGroup}>
               <Text style={[styles.label, isDark && styles.textDark]}>
                 Favorite Neighborhoods
               </Text>
@@ -636,7 +636,7 @@ export default function ProfileForm({
                 onChange={setNeighborhoods}
                 isDark={isDark}
               />
-            </View>
+            </View> */}
 
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isDark && styles.textDark]}>
@@ -782,7 +782,7 @@ const styles = StyleSheet.create({
   editButton: {
     position: "absolute",
     bottom: 0,
-    right: 0,
+    right: 24,
     backgroundColor: "white",
     borderRadius: 20,
     width: 40,

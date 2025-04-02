@@ -852,7 +852,7 @@ export default function ProfileCard({
 
             {/* Location */}
             <View style={styles.section}>
-              <Text style={[styles.sectionTitle, { color: colors.text }]}>
+              {/* <Text style={[styles.sectionTitle, { color: colors.text }]}>
                 Location Preferences
               </Text>
 
@@ -883,12 +883,12 @@ export default function ProfileCard({
                     ))}
                   </View>
                 </>
-              )}
+              )} */}
 
               {profile.favorite_cafes && profile.favorite_cafes.length > 0 && (
                 <>
                   <Text style={[styles.label, { color: colors.secondaryText }]}>
-                    Favorite Cafes
+                    Cafe Preferences
                   </Text>
                   <View style={styles.tagsContainer}>
                     {profile.favorite_cafes.map((cafe, index) => {

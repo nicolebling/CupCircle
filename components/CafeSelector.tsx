@@ -611,6 +611,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   searchButtonText: {
+    fontFamily: 'K2D-Medium',
     color: "white",
     fontWeight: "bold",
     fontSize: 16,

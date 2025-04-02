@@ -225,13 +225,13 @@ export default function IndustrySelector({
                     style={[
                       styles.tag,
                       {
-                        backgroundColor: colors.primary + "20",
+                        backgroundColor: "transparent",
                         borderColor: colors.primary,
                       },
                     ]}
                     onPress={() => toggleIndustry(industry)}
                   >
-                    <Text style={[styles.tagText, { color: colors.text }]}>
+                    <Text style={[styles.tagText, { color: colors.primary }]}>
                       {industry}
                     </Text>
                     <Ionicons

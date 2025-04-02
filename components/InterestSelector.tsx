@@ -263,13 +263,15 @@ export default function InterestSelector({
                     style={[
                       styles.tag,
                       {
-                        backgroundColor: colors.primary + "20",
+                        backgroundColor: "transparent",
                         borderColor: colors.primary,
+                        
+                
                       },
                     ]}
                     onPress={() => toggleInterest(interest)}
                   >
-                    <Text style={[styles.tagText, { color: colors.text }]}>
+                    <Text style={[styles.tagText, { color: colors.primary }]}>
                        {interest}
                     </Text>
                     <Ionicons
