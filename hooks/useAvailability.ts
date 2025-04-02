@@ -18,16 +18,14 @@ export function useAvailability() {
       console.log("Original selected date:", date);
       console.log("Original date ISO string:", date);
 
-      // Keep original date without timezone conversion
-      const adjustedDate = new Date(
-        Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), 12, 0, 0),
-      );
+      // Format date as YYYY-MM-DD
+      const formattedDate = date.toISOString().split('T')[0];
       console.log("Original date:", date);
-      console.log("Selected date:", date);
+      console.log("Formatted date:", formattedDate);
 
       const result = await availabilityService.createAvailability({
         id: user.id,
-        date: date,
+        date: formattedDate,
         start_time: startTime,
         end_time: endTime,
         is_available: true,

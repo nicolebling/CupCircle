@@ -56,13 +56,9 @@ export default function AvailabilityScreen() {
 
       // Ensure dates are properly parsed and sorted
       const formattedData = (data || []).map((slot) => {
-        // Convert date string (YYYY-MM-DD) to Date object without timezone conversion
+        // Create date object for sorting and display, set to noon to avoid any timezone issues
         const [year, month, day] = slot.date.split("-");
-        const date = new Date(
-          parseInt(year),
-          parseInt(month) - 1,
-          parseInt(day),
-        );
+        const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day), 12);
         return {
           ...slot,
           date,
