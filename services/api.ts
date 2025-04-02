@@ -58,9 +58,10 @@ export const profileService = {
       // Parse employment data if it exists
       if (data && data.employment) {
         try {
-          data.employment = typeof data.employment === 'string' 
-            ? JSON.parse(data.employment) 
-            : data.employment;
+          data.employment =
+            typeof data.employment === "string"
+              ? JSON.parse(data.employment)
+              : data.employment;
         } catch (e) {
           console.error("Error parsing employment data:", e);
           data.employment = [];
@@ -81,9 +82,11 @@ export const profileService = {
       // Convert employment array to JSON string if it exists
       const formattedData = {
         ...profileData,
-        employment: profileData.employment ? JSON.stringify(profileData.employment) : null,
+        employment: profileData.employment
+          ? JSON.stringify(profileData.employment)
+          : null,
       };
-      
+
       const { data, error } = await supabase
         .from("profiles")
         .upsert({
@@ -114,15 +117,16 @@ export const availabilityService = {
   }) {
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     try {
-      console.log('Received date in service:', availabilityData.date);
-      console.log('Timezone being used:', timezone);
-      
+      console.log("Received date in service:", availabilityData.date);
+      console.log("Timezone being used:", timezone);
+
       // Format date as YYYY-MM-DD to avoid timezone issues
       // Ensure date is set to midnight in local timezone before converting
       const localDate = new Date(availabilityData.date);
       localDate.setHours(12, 0, 0, 0); // Set to noon to avoid timezone edge cases
-      const formattedDate = localDate.toISOString().split('T')[0];
-      console.log('Formatted date to be saved:', formattedDate);
+      // No date manipulation, just ensure it's a string in the correct format
+      const formattedDate = availabilityData.date;
+      console.log("Formatted date to be saved:", formattedDate);
 
       const { data, error } = await supabase
         .from("availability")

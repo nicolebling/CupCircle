@@ -15,17 +15,19 @@ export function useAvailability() {
 
     try {
       const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      console.log('Original selected date:', date);
-      console.log('Original date ISO string:', date.toISOString());
-      
+      console.log("Original selected date:", date);
+      console.log("Original date ISO string:", date.toISOString());
+
       // Keep original date without timezone conversion
-      const adjustedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-      console.log('Original date:', date);
-      console.log('Selected date:', adjustedDate);
+      const adjustedDate = new Date(
+        Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), 12, 0, 0),
+      );
+      console.log("Original date:", date);
+      console.log("Selected date:", date);
 
       const result = await availabilityService.createAvailability({
         id: user.id,
-        date: adjustedDate,
+        date: date,
         start_time: startTime,
         end_time: endTime,
         is_available: true,
