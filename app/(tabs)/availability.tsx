@@ -203,9 +203,12 @@ export default function AvailabilityScreen() {
 
   // Function to check if a date has time slots
   const hasTimeSlotsOnDate = (date: Date) => {
-    return timeSlots.some(
-      (slot) => new Date(slot.date).toDateString() === date.toDateString(),
-    );
+    return timeSlots.some((slot) => {
+      // Parse date components to ensure consistent comparison
+      const [year, month, day] = slot.date.split('-');
+      const slotDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+      return slotDate.toDateString() === date.toDateString();
+    });
   };
 
   
