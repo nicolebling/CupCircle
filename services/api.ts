@@ -125,7 +125,7 @@ export const availabilityService = {
       const localDate = new Date(availabilityData.date);
       localDate.setHours(12, 0, 0, 0); // Set to noon to avoid timezone edge cases
       // No date manipulation, just ensure it's a string in the correct format
-      const formattedDate = availabilityData.date;
+      const formattedDate = localDate.toISOString().split('T')[0];;
       console.log("Formatted date to be saved:", formattedDate);
 
       const { data, error } = await supabase
