@@ -8,7 +8,11 @@ export function useAvailability() {
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
 
-  const createSlot = async (date: string, startTime: string, endTime: string) => {
+  const createSlot = async (
+    date: string,
+    startTime: string,
+    endTime: string,
+  ) => {
     if (!user?.id) return null;
     setIsLoading(true);
     setError(null);
@@ -19,7 +23,7 @@ export function useAvailability() {
       console.log("Original date ISO string:", date);
 
       // Format date as YYYY-MM-DD
-      const formattedDate = date.toISOString().split('T')[0];
+      const formattedDate = date.toISOString().split("T")[0];
       console.log("Original date:", date);
       console.log("Formatted date:", formattedDate);
 
