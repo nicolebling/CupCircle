@@ -34,7 +34,9 @@ export default function AvailabilityScreen() {
   const { user } = useAuth();
   const { isLoading, error, createSlot, getSlots } = useAvailability();
 
-  const [selectedDate, setSelectedDate] = useState(new Date(new Date().toString()));
+  const [selectedDate, setSelectedDate] = useState(
+    new Date(new Date().toString()),
+  );
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
   const [showAddSlot, setShowAddSlot] = useState(false); // Added state for toggle{/*  */}
 
@@ -244,14 +246,26 @@ export default function AvailabilityScreen() {
     (a, b) => new Date(a).getTime() - new Date(b).getTime(),
   );
   // Create data for FlatList
-  const flatListData = sortedDates.map((dateString) => ({
-    date: new Date(dateString),
-    slots: groupedTimeSlots[dateString].sort(
-      (a, b) =>
-        new Date(`1970-01-01T${a.startTime}:00`).getTime() -
-        new Date(`1970-01-01T${b.startTime}:00`).getTime(),
-    ),
-  }));
+  // const flatListData = sortedDates.map((dateString) => ({
+  //   date: new Date(dateString),
+  //   slots: groupedTimeSlots[dateString].sort(
+  //     (a, b) =>
+  //       new Date(`1970-01-01T${a.startTime}:00`).getTime() -
+  //       new Date(`1970-01-01T${b.startTime}:00`).getTime(),
+  //   ),
+  // }));
+
+  const flatListData = sortedDates.map((dateString) => {
+    const [year, month, day] = dateString.split("-");
+    return {
+      date: new Date(parseInt(year), parseInt(month) - 1, parseInt(day), 12), // 12 PM
+      slots: groupedTimeSlots[dateString].sort(
+        (a, b) =>
+          new Date(`1970-01-01T${a.startTime}:00`).getTime() -
+          new Date(`1970-01-01T${b.startTime}:00`).getTime(),
+      ),
+    };
+  });
 
   const handleDateSelect = (date: Date) => {
     setSelectedDate(date);
