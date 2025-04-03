@@ -26,7 +26,9 @@ function RootLayoutNav() {
 
     const timeoutId = setTimeout(() => {
       const currentSegment = segments[0];
-      if (user && currentSegment === '(auth)') {
+      if (!user && currentSegment !== '(auth)') {
+        router.replace('/(auth)/login');
+      } else if (user && currentSegment === '(auth)') {
         router.replace('/(tabs)/matching');
       }
     }, 100);

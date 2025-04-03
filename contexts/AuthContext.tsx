@@ -125,9 +125,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setProfile(null);
       setUser(null);
       
-      // Navigate to login
-      router.replace('/(auth)/login');
-      
       // Additional delay before completing
       await new Promise(resolve => setTimeout(resolve, 200));
       setLoading(false);
