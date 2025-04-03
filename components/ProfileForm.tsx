@@ -114,7 +114,7 @@ export default function ProfileForm({
         setOccupation(data.occupation || "");
         setBio(data.bio || "");
         setAge(data.age);
-        setBirthday(data.birthday ? data.birthday.toString() : ""); //Added birthday fetch
+        setBirthday(data.birthday ? data.birthday.toString() : null); //Added birthday fetch
         setExperienceLevel(data.experience_level || "");
         setEducation(data.education || "");
         setCity(data.city || "");
