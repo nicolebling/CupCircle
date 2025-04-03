@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, SafeAreaView, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, SafeAreaView, ScrollView, KeyboardAvoidingView, Platform, Image } from 'react-native';
 import { router } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import Colors from '@/constants/Colors';
