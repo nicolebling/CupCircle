@@ -126,11 +126,7 @@ export default function MatchingScreen() {
       
       // Get users with availability
       console.log("Current user ID:", user?.id);
-      // Format date as YYYY-MM-DD in local time
-      const now = new Date();
-      const today = now.getFullYear() + '-' + 
-                   String(now.getMonth() + 1).padStart(2, '0') + '-' + 
-                   String(now.getDate()).padStart(2, '0');
+      const today = new Date().toISOString().split('T')[0];
       console.log('Fetching availability from date:', today);
       
       const { data: availabilityData, error: availabilityError } = await supabase
