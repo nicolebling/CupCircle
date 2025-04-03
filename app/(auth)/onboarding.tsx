@@ -52,7 +52,7 @@ export default function OnboardingScreen() {
       if (!profileData.name || !profileData.occupation || !profileData.city || 
           !profileData.bio || !profileData.education || !profileData.experience_level || 
           !profileData.industry_categories.length || !profileData.interests.length || 
-          !profileData.favorite_cafes.length) {
+          !profileData.favorite_cafes.length || !profileData.photo_url) {
         alert('Please fill in all required fields before continuing');
         setLoading(false);
         return;
@@ -198,6 +198,32 @@ export default function OnboardingScreen() {
       case 7:
         return (
           <View style={styles.formSection}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Employment History</Text>
+            <EmploymentHistoryEntry
+              employment={profileData.employment[0] || {}}
+              onChange={(updated) => setProfileData({ ...profileData, employment: [updated] })}
+              onDelete={() => setProfileData({ ...profileData, employment: [] })}
+              isDark={false}
+            />
+          </View>
+        );
+
+      case 8:
+        return (
+          <View style={styles.formSection}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Career Transitions</Text>
+            <CareerTransitionEntry
+              transition={profileData.career_transitions[0] || {}}
+              onChange={(updated) => setProfileData({ ...profileData, career_transitions: [updated] })}
+              onDelete={() => setProfileData({ ...profileData, career_transitions: [] })}
+              isDark={false}
+            />
+          </View>
+        );
+
+      case 9:
+        return (
+          <View style={styles.formSection}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>Experience Level</Text>
             <ExperienceLevelSelector
               selected={profileData.experience_level}
@@ -207,7 +233,7 @@ export default function OnboardingScreen() {
           </View>
         );
 
-      case 8:
+      case 10:
         return (
           <View style={styles.formSection}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>Industry Categories</Text>
