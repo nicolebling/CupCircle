@@ -77,7 +77,7 @@ export const profileService = {
   },
 
   // Save profile (create or update)
-  async saveProfile(profileData: Partial<Profile> & { user_id: string }) {
+  async saveProfile(profileData: Partial<Profile> & { id: string }) {
     try {
       // Convert employment array to JSON string if it exists
       const formattedData = {

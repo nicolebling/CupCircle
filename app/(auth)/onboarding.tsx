@@ -129,7 +129,11 @@ export default function OnboardingScreen() {
         setLoading(false);
         return;
       }
-      await updateUser(profileData);
+      const profileDataWithId = {
+    ...profileData,
+    id: user?.id
+  };
+  await updateUser(profileDataWithId);
       router.replace('/(tabs)/matching');
     } catch (error) {
       console.error('Failed to save profile', error);
