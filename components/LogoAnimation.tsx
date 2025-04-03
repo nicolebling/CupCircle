@@ -72,37 +72,38 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     justifyContent: 'center',
-    flex: 1,
-    backgroundColor: '#fff',
   },
   circleContainer: {
     width: 96,
     height: 96,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 20,
   },
   mainCircle: {
     width: 48,
     height: 48,
     borderRadius: 24,
     borderWidth: 2,
-    borderColor: '#007bff', // Primary color
+    borderColor: '#F97415',
     position: 'absolute',
   },
   smallCircle: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#007bff',
+    backgroundColor: '#F97415',
     position: 'absolute',
   },
   title: {
     fontSize: 32,
-      fontFamily: 'K2D-Bold',
-      marginTop: 8,
+    fontFamily: 'K2D-Bold',
+    marginTop: 24,
+    textAlign: 'center',
   },
   subtitle: {
-    color: '#6c757d',
+    fontSize: 16,
+    fontFamily: 'K2D-Regular',
+    marginTop: 8,
+    textAlign: 'center',
   },
 });
