@@ -124,11 +124,13 @@ export default function MatchingScreen() {
     try {
       console.log("Fetching profiles for users with availability");
       
-      // Get users with availability - use correct id field from availability table
+      // Get users with availability
+      console.log("Current user ID:", user?.id);
       const { data: availabilityData, error: availabilityError } = await supabase
         .from('availability')
-        .select('id, avail_id')
-        .neq('id', user?.id);
+        .select('id')
+        .neq('id', user?.id)
+        .gt('date', new Date().toISOString().split('T')[0]); // Only get future dates
       
       if (availabilityError) {
         console.error("Error fetching availability data:", availabilityError);
@@ -137,12 +139,19 @@ export default function MatchingScreen() {
       
       console.log("Retrieved availability data:", availabilityData);
       
+      if (!availabilityData || availabilityData.length === 0) {
+        console.log("No users with availability found");
+        setProfiles([]);
+        setIsLoading(false);
+        return;
+      }
+      
       // Get unique user IDs
-      const userIds = [...new Set(availabilityData?.map(item => item.id))];
+      const userIds = [...new Set(availabilityData.map(item => item.id))];
       console.log("Unique user IDs with availability:", userIds);
       
       if (userIds.length === 0) {
-        console.log("No users with availability found");
+        console.log("No users with availability found after filtering");
         setProfiles([]);
         setIsLoading(false);
         return;
@@ -161,8 +170,15 @@ export default function MatchingScreen() {
       
       console.log("Retrieved profiles data:", profilesData);
       
+      if (!profilesData || profilesData.length === 0) {
+        console.log("No profile data found for available users");
+        setProfiles([]);
+        setIsLoading(false);
+        return;
+      }
+      
       // Map profiles to the format expected by ProfileCard
-      const formattedProfiles = profilesData?.map(profile => {
+      const formattedProfiles = profilesData.map(profile => {
         let interests = [];
         try {
           interests = profile.interests || [];
@@ -170,6 +186,7 @@ export default function MatchingScreen() {
           console.error('Error parsing interests:', e);
         }
         
+        console.log("Processing profile:", profile.id, profile.name);
         const formattedProfile = {
           id: profile.id,
           name: profile.name || 'Anonymous User',
