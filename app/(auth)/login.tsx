@@ -14,6 +14,7 @@ import {
   Image,
 } from "react-native";
 import { Link, router } from "expo-router";
+import LogoAnimation from "@/components/LogoAnimation";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { useAuth } from "@/contexts/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
@@ -149,12 +150,7 @@ export default function LoginScreen() {
           <View style={styles.content}>
             {/* Logo & Branding */}
             <View style={styles.header}>
-              <Text style={[styles.title, { color: theme.colors.text }]}>
-                CupCircle
-              </Text>
-              <Text style={[styles.subtitle, { color: theme.colors.text }]}>
-                Where every cup connects
-              </Text>
+              <LogoAnimation />
             </View>
 
             {/* Form Container */}
