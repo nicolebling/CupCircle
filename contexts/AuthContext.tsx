@@ -113,18 +113,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signOut = async () => {
     try {
+      setLoading(true);
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
 
-      // Update state first
-      setUser(null);
+      // Update state after successful signout
       setSession(null);
       setProfile(null);
-
-      // Wait for next render cycle before navigation
-      await new Promise(resolve => requestAnimationFrame(resolve));
-      router.replace('/(auth)/login');
+      setUser(null);
+      setLoading(false);
     } catch (error) {
+      setLoading(false);
       console.error('Logout failed:', error);
       throw error;
     }
