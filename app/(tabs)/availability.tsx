@@ -233,12 +233,7 @@ export default function AvailabilityScreen() {
     (groups, slot) => {
       const now = new Date();
       const slotDate = new Date(slot.date);
-      
-      // Safely parse time with null checks
-      const timeMatch = slot.start_time?.match(/(\d+):(\d+)\s+(AM|PM)/);
-      if (!timeMatch) return groups; // Skip invalid time formats
-      
-      const [hours, minutes, period] = timeMatch.slice(1);
+      const [hours, minutes, period] = slot.start_time.match(/(\d+):(\d+)\s+(AM|PM)/).slice(1);
       let hour = parseInt(hours);
       if (period === 'PM' && hour !== 12) hour += 12;
       if (period === 'AM' && hour === 12) hour = 0;
