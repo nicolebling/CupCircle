@@ -67,6 +67,7 @@ export default function LoginScreen() {
 
   const { signIn } = useAuth();
   const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme];
   const theme = colorScheme === "dark" ? DarkTheme : DefaultTheme;
 
   // Load custom fonts
