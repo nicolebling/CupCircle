@@ -228,10 +228,28 @@ export default function AvailabilityScreen() {
       .sort((a, b) => a.startTime.localeCompare(b.startTime));
   };
 
-  // Group time slots by date
+  // Group time slots by date and filter out past slots
   const groupedTimeSlots = timeSlots.reduce(
     (groups, slot) => {
-      const dateString = format(new Date(slot.date), "yyyy-MM-dd");
+      const now = new Date();
+      const slotDate = new Date(slot.date);
+      
+      // Parse the time (e.g., "10:00 AM")
+      const [time, period] = slot.start_time.split(' ');
+      const [hours, minutes] = time.split(':');
+      let hour = parseInt(hours);
+      
+      // Convert to 24-hour format
+      if (period === 'PM' && hour !== 12) hour += 12;
+      if (period === 'AM' && hour === 12) hour = 0;
+      
+      // Set the slot's time
+      slotDate.setHours(hour, parseInt(minutes), 0, 0);
+      
+      // Skip if slot is in the past
+      if (slotDate < now) return groups;
+      
+      const dateString = format(slotDate, "yyyy-MM-dd");
       if (!groups[dateString]) {
         groups[dateString] = [];
       }
