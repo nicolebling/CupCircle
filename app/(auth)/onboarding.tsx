@@ -251,9 +251,10 @@ export default function OnboardingScreen() {
           <View style={styles.formSection}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>Interests</Text>
             <InterestSelector
-              selectedInterests={profileData.interests}
-              onInterestsChange={(interests) => setProfileData({ ...profileData, interests })}
+              selected={profileData.interests}
+              onChange={(interests) => setProfileData({ ...profileData, interests })}
               maxInterests={5}
+              isDark={false}
             />
           </View>
         );
