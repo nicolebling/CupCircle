@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, SafeAreaView, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { router } from 'expo-router';
@@ -5,7 +6,11 @@ import { useAuth } from '@/contexts/AuthContext';
 import Colors from '@/constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
 import InterestSelector from '@/components/InterestSelector';
-import IndustrySelector from '@/components/IndustrySelector'; // Import IndustrySelector
+import IndustrySelector from '@/components/IndustrySelector';
+import ExperienceLevelSelector from '@/components/ExperienceLevelSelector';
+import CafeSelector from '@/components/CafeSelector';
+import EmploymentHistoryEntry from '@/components/EmploymentHistoryEntry';
+import CareerTransitionEntry from '@/components/CareerTransitionEntry';
 
 export default function OnboardingScreen() {
   const { user, updateUser } = useAuth();
@@ -14,15 +19,19 @@ export default function OnboardingScreen() {
   const [profileData, setProfileData] = useState({
     name: user?.name || '',
     occupation: '',
+    city: '',
     bio: '',
-    interests: [] as string[],
-    industry_categories: [], // Add industry_categories to profileData
-    photo: 'https://randomuser.me/api/portraits/lego/1.jpg', // Default avatar
+    employment: [],
+    career_transitions: [],
+    experience_level: '',
+    industry_categories: [],
+    interests: [],
+    favorite_cafes: [],
+    photo: 'https://randomuser.me/api/portraits/lego/1.jpg',
   });
-  const colors = Colors.light;
 
   const handleNext = () => {
-    if (step < 3) {
+    if (step < 10) {
       setStep(step + 1);
     } else {
       handleSubmit();
@@ -48,10 +57,147 @@ export default function OnboardingScreen() {
     }
   };
 
-  const handleInputChange = (field, value) => {
-    setProfileData({...profileData, [field]: value});
+  const renderStep = () => {
+    const colors = Colors.light;
+
+    switch(step) {
+      case 1:
+        return (
+          <View style={styles.formSection}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>What's your name?</Text>
+            <TextInput
+              style={[styles.input, { backgroundColor: colors.card, color: colors.text, borderColor: colors.border }]}
+              placeholder="Enter your full name"
+              placeholderTextColor={colors.secondaryText}
+              value={profileData.name}
+              onChangeText={(text) => setProfileData({ ...profileData, name: text })}
+            />
+          </View>
+        );
+
+      case 2:
+        return (
+          <View style={styles.formSection}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>What's your occupation?</Text>
+            <TextInput
+              style={[styles.input, { backgroundColor: colors.card, color: colors.text, borderColor: colors.border }]}
+              placeholder="Enter your job title"
+              placeholderTextColor={colors.secondaryText}
+              value={profileData.occupation}
+              onChangeText={(text) => setProfileData({ ...profileData, occupation: text })}
+            />
+          </View>
+        );
+
+      case 3:
+        return (
+          <View style={styles.formSection}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Where are you located?</Text>
+            <TextInput
+              style={[styles.input, { backgroundColor: colors.card, color: colors.text, borderColor: colors.border }]}
+              placeholder="Enter your city"
+              placeholderTextColor={colors.secondaryText}
+              value={profileData.city}
+              onChangeText={(text) => setProfileData({ ...profileData, city: text })}
+            />
+          </View>
+        );
+
+      case 4:
+        return (
+          <View style={styles.formSection}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Tell us about yourself</Text>
+            <TextInput
+              style={[styles.textArea, { backgroundColor: colors.card, color: colors.text, borderColor: colors.border }]}
+              placeholder="Write a short bio..."
+              placeholderTextColor={colors.secondaryText}
+              multiline
+              numberOfLines={5}
+              textAlignVertical="top"
+              value={profileData.bio}
+              onChangeText={(text) => setProfileData({ ...profileData, bio: text })}
+            />
+          </View>
+        );
+
+      case 5:
+        return (
+          <View style={styles.formSection}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Employment History</Text>
+            <EmploymentHistoryEntry
+              employment={profileData.employment[0] || {}}
+              onChange={(updated) => setProfileData({ ...profileData, employment: [updated] })}
+              onDelete={() => setProfileData({ ...profileData, employment: [] })}
+              isDark={false}
+            />
+          </View>
+        );
+
+      case 6:
+        return (
+          <View style={styles.formSection}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Career Transitions</Text>
+            <CareerTransitionEntry
+              transition={profileData.career_transitions[0] || {}}
+              onChange={(updated) => setProfileData({ ...profileData, career_transitions: [updated] })}
+              onDelete={() => setProfileData({ ...profileData, career_transitions: [] })}
+              isDark={false}
+            />
+          </View>
+        );
+
+      case 7:
+        return (
+          <View style={styles.formSection}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Experience Level</Text>
+            <ExperienceLevelSelector
+              selected={profileData.experience_level}
+              onChange={(level) => setProfileData({ ...profileData, experience_level: level })}
+              isDark={false}
+            />
+          </View>
+        );
+
+      case 8:
+        return (
+          <View style={styles.formSection}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Industry Categories</Text>
+            <IndustrySelector
+              selected={profileData.industry_categories}
+              onChange={(industries) => setProfileData({ ...profileData, industry_categories: industries })}
+              maxSelections={3}
+              isDark={false}
+            />
+          </View>
+        );
+
+      case 9:
+        return (
+          <View style={styles.formSection}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Interests</Text>
+            <InterestSelector
+              selectedInterests={profileData.interests}
+              onInterestsChange={(interests) => setProfileData({ ...profileData, interests })}
+              maxInterests={5}
+            />
+          </View>
+        );
+
+      case 10:
+        return (
+          <View style={styles.formSection}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Favorite Cafes</Text>
+            <CafeSelector
+              selected={profileData.favorite_cafes}
+              onChange={(cafes) => setProfileData({ ...profileData, favorite_cafes: cafes })}
+              isDark={false}
+            />
+          </View>
+        );
+    }
   };
 
+  const colors = Colors.light;
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
@@ -63,78 +209,14 @@ export default function OnboardingScreen() {
           <View style={styles.header}>
             <Text style={[styles.title, { color: colors.text }]}>Complete Your Profile</Text>
             <Text style={[styles.subtitle, { color: colors.secondaryText }]}>
-              Step {step} of 3
+              Step {step} of 10
             </Text>
+            <View style={styles.progressBar}>
+              <View style={[styles.progress, { width: `${(step / 10) * 100}%`, backgroundColor: colors.primary }]} />
+            </View>
           </View>
 
-          {step === 1 && (
-            <View style={styles.formSection}>
-              <Text style={[styles.sectionTitle, { color: colors.text }]}>Basic Information</Text>
-
-              <Text style={[styles.label, { color: colors.text }]}>Full Name</Text>
-              <TextInput
-                style={[styles.input, { backgroundColor: colors.card, color: colors.text, borderColor: colors.border }]}
-                placeholder="Enter your full name"
-                placeholderTextColor={colors.secondaryText}
-                value={profileData.name}
-                onChangeText={(text) => setProfileData({ ...profileData, name: text })}
-              />
-
-              <Text style={[styles.label, { color: colors.text }]}>Occupation</Text>
-              <TextInput
-                style={[styles.input, { backgroundColor: colors.card, color: colors.text, borderColor: colors.border }]}
-                placeholder="Enter your job title"
-                placeholderTextColor={colors.secondaryText}
-                value={profileData.occupation}
-                onChangeText={(text) => setProfileData({ ...profileData, occupation: text })}
-              />
-            </View>
-          )}
-
-          {step === 2 && (
-            <View style={styles.formSection}>
-              <Text style={[styles.sectionTitle, { color: colors.text }]}>About You</Text>
-
-              <Text style={[styles.label, { color: colors.text }]}>Bio</Text>
-              <TextInput
-                style={[styles.textArea, { backgroundColor: colors.card, color: colors.text, borderColor: colors.border }]}
-                placeholder="Tell others about yourself, your experience, and what you're looking for in coffee chats..."
-                placeholderTextColor={colors.secondaryText}
-                multiline
-                numberOfLines={5}
-                textAlignVertical="top"
-                value={profileData.bio}
-                onChangeText={(text) => setProfileData({ ...profileData, bio: text })}
-              />
-            </View>
-          )}
-
-          {step === 3 && (
-            <View style={styles.formSection}>
-              <Text style={[styles.sectionTitle, { color: colors.text }]}>Professional Interests</Text>
-              <Text style={[styles.description, { color: colors.secondaryText }]}>
-                Add interests that will help connect you with like-minded professionals
-              </Text>
-
-              <InterestSelector
-                selectedInterests={profileData.interests}
-                onInterestsChange={(interests) => setProfileData({...profileData, interests})}
-                maxInterests={5}
-              />
-              <Text style={[styles.helperText, { color: colors.secondaryText }]}>
-                Select up to 5 interests that will help connect you with like-minded professionals
-              </Text>
-              <View style={styles.inputGroup}> {/* Placeholder for IndustrySelector */}
-                <Text style={[styles.label, { color: colors.text }]}>Industries</Text>
-                <IndustrySelector
-                  selected={profileData.industry_categories || []}
-                  onChange={(industries) => handleInputChange('industry_categories', industries)}
-                  maxSelections={3}
-                  isDark={false} // Assuming light theme by default.  Needs proper theme integration.
-                />
-              </View>
-            </View>
-          )}
+          {renderStep()}
 
           <View style={styles.navigationContainer}>
             {step > 1 && (
@@ -149,18 +231,17 @@ export default function OnboardingScreen() {
             <TouchableOpacity 
               style={[
                 styles.nextButton, 
-                { backgroundColor: colors.primary, flex: step === 1 ? 2 : 1 }, 
+                { backgroundColor: colors.primary, flex: step === 1 ? 2 : 1 },
                 loading && { opacity: 0.7 }
               ]}
               onPress={handleNext}
               disabled={loading}
             >
               <Text style={styles.nextButtonText}>
-                {step === 3 ? 'Finish' : 'Next'}
+                {step === 10 ? 'Finish' : 'Next'}
               </Text>
               {loading && <Ionicons name="sync" size={18} color="white" style={styles.loadingIcon} />}
             </TouchableOpacity>
-
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -187,31 +268,25 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 16,
     fontFamily: 'K2D-Medium',
+    marginBottom: 8,
+  },
+  progressBar: {
+    height: 4,
+    backgroundColor: '#E0E0E0',
+    borderRadius: 2,
+    overflow: 'hidden',
+  },
+  progress: {
+    height: '100%',
+    borderRadius: 2,
   },
   formSection: {
     marginBottom: 28,
   },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: 24,
     fontFamily: 'K2D-SemiBold',
     marginBottom: 16,
-  },
-  description: {
-    fontSize: 14,
-    fontFamily: 'K2D-Regular',
-    marginBottom: 16,
-  },
-  helperText: {
-    fontFamily: 'K2D-Regular',
-    fontSize: 12,
-    marginTop: 8,
-    marginBottom: 16,
-    fontStyle: 'italic',
-  },
-  label: {
-    fontSize: 16,
-    fontFamily: 'K2D-Medium',
-    marginBottom: 8,
   },
   input: {
     height: 50,
@@ -232,46 +307,6 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     fontSize: 16,
     fontFamily: 'K2D-Regular',
-  },
-  interestInputContainer: {
-    flexDirection: 'row',
-    marginBottom: 16,
-  },
-  interestInput: {
-    flex: 1,
-    height: 50,
-    borderRadius: 8,
-    borderWidth: 1,
-    paddingHorizontal: 16,
-    fontSize: 16,
-    fontFamily: 'K2D-Regular',
-    marginRight: 8,
-  },
-  addButton: {
-    width: 50,
-    height: 50,
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  interestTags: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  tag: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderRadius: 20,
-    borderWidth: 1,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    marginRight: 8,
-    marginBottom: 8,
-  },
-  tagText: {
-    fontSize: 14,
-    fontFamily: 'K2D-Regular',
-    marginRight: 4,
   },
   navigationContainer: {
     flexDirection: 'row',
@@ -308,7 +343,4 @@ const styles = StyleSheet.create({
   loadingIcon: {
     marginLeft: 8,
   },
-  inputGroup: {
-    marginBottom: 16,
-  }
 });
