@@ -22,13 +22,17 @@ function RootLayoutNav() {
   const colors = Colors[colorScheme];
 
   useEffect(() => {
-    if (!loading) {
-      if (!user && segments[0] !== '(auth)') {
-        router.replace('/(auth)/login');
-      } else if (user && segments[0] === '(auth)') {
-        router.replace('/(tabs)/matching');
+    const navigate = async () => {
+      if (!loading) {
+        const currentSegment = segments[0];
+        if (!user && currentSegment !== '(auth)') {
+          await router.replace('/(auth)/login');
+        } else if (user && currentSegment === '(auth)') {
+          await router.replace('/(tabs)/matching');
+        }
       }
-    }
+    };
+    navigate();
   }, [user, loading, segments]);
 
   return (
