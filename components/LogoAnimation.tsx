@@ -62,8 +62,8 @@ export default function LogoAnimation() {
       <Animated.View style={[styles.smallCircle, circle1Style]} />
       <Animated.View style={[styles.smallCircle, circle2Style]} />
     </View>
-    <Text style={[styles.title, { color: colors.primary }]}>CupCircle</Text>
-    <Text style={[styles.subtitle, { color: colors.primary }]}>Where every cup connects</Text>
+    <Text style={[styles.title, { color: colors.text }]}>CupCircle</Text>
+    <Text style={[styles.subtitle, { color: colors.secondaryText }]}>Where every cup connects</Text>
   </View>
 )
 };
