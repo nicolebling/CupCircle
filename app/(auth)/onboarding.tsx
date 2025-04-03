@@ -21,6 +21,7 @@ export default function OnboardingScreen() {
     occupation: '',
     city: '',
     bio: '',
+    photo_url: user?.photo_url || 'https://randomuser.me/api/portraits/lego/1.jpg',
     education: '',
     employment: [],
     career_transitions: [],
@@ -130,6 +131,31 @@ export default function OnboardingScreen() {
         );
 
       case 5:
+        return (
+          <View style={styles.formSection}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Profile Photo</Text>
+            <View style={styles.photoContainer}>
+              <Image 
+                source={{ uri: profileData.photo_url }} 
+                style={styles.profilePhoto}
+              />
+              <TouchableOpacity 
+                style={[styles.photoButton, { backgroundColor: colors.primary }]}
+                onPress={() => {
+                  // For now, we'll just use a placeholder image
+                  setProfileData({ 
+                    ...profileData, 
+                    photo_url: `https://randomuser.me/api/portraits/lego/${Math.floor(Math.random() * 8) + 1}.jpg`
+                  });
+                }}
+              >
+                <Text style={styles.photoButtonText}>Change Photo</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        );
+
+      case 6:
         return (
           <View style={styles.formSection}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>Education</Text>
@@ -365,5 +391,25 @@ const styles = StyleSheet.create({
   },
   loadingIcon: {
     marginLeft: 8,
+  },
+  photoContainer: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  profilePhoto: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    marginBottom: 16,
+  },
+  photoButton: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 20,
+  },
+  photoButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontFamily: 'K2D-Medium',
   },
 });
