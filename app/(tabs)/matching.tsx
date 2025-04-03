@@ -73,16 +73,24 @@ export default function MatchingScreen() {
       if (!user) return;
       
       try {
+        console.log("Checking availability for user:", user.id);
         const { data, error } = await supabase
           .from('availability')
           .select('*')
           .eq('id', user.id);
         
-        if (error) throw error;
+        if (error) {
+          console.error("Error fetching user availability:", error);
+          throw error;
+        }
+        
+        console.log("User availability data:", data);
         
         // Filter out past availability
         const now = new Date();
         const futureAvailability = data?.filter(slot => {
+          if (!slot.start_time) return false;
+          
           const slotDate = new Date(slot.date);
           const [time, period] = slot.start_time.split(' ');
           const [hours, minutes] = time.split(':');
@@ -96,14 +104,12 @@ export default function MatchingScreen() {
           return slotDate > now;
         });
         
-        setHasAvailability(futureAvailability && futureAvailability.length > 0);
+        const hasValidAvailability = futureAvailability && futureAvailability.length > 0;
+        console.log("User has valid availability:", hasValidAvailability);
+        setHasAvailability(hasValidAvailability);
         
-        // If user has availability, fetch profiles with availability
-        if (futureAvailability && futureAvailability.length > 0) {
-          fetchProfiles();
-        } else {
-          setIsLoading(false);
-        }
+        // Always fetch profiles - we'll show appropriate UI based on hasAvailability state
+        fetchProfiles();
       } catch (error) {
         console.error('Error checking availability:', error);
         setIsLoading(false);
@@ -116,19 +122,27 @@ export default function MatchingScreen() {
   const fetchProfiles = async () => {
     setIsLoading(true);
     try {
-      // Get users with availability
+      console.log("Fetching profiles for users with availability");
+      
+      // Get users with availability - use correct id field from availability table
       const { data: availabilityData, error: availabilityError } = await supabase
         .from('availability')
-        .select('id')
-        .neq('id', user?.id)
-        .not('is_available', 'eq', false);
+        .select('id, avail_id')
+        .neq('id', user?.id);
       
-      if (availabilityError) throw availabilityError;
+      if (availabilityError) {
+        console.error("Error fetching availability data:", availabilityError);
+        throw availabilityError;
+      }
+      
+      console.log("Retrieved availability data:", availabilityData);
       
       // Get unique user IDs
       const userIds = [...new Set(availabilityData?.map(item => item.id))];
+      console.log("Unique user IDs with availability:", userIds);
       
       if (userIds.length === 0) {
+        console.log("No users with availability found");
         setProfiles([]);
         setIsLoading(false);
         return;
@@ -140,7 +154,12 @@ export default function MatchingScreen() {
         .select('*')
         .in('id', userIds);
       
-      if (profilesError) throw profilesError;
+      if (profilesError) {
+        console.error("Error fetching profile data:", profilesError);
+        throw profilesError;
+      }
+      
+      console.log("Retrieved profiles data:", profilesData);
       
       // Map profiles to the format expected by ProfileCard
       const formattedProfiles = profilesData?.map(profile => {
@@ -151,7 +170,7 @@ export default function MatchingScreen() {
           console.error('Error parsing interests:', e);
         }
         
-        return {
+        const formattedProfile = {
           id: profile.id,
           name: profile.name || 'Anonymous User',
           photo: profile.photo_url || 'https://via.placeholder.com/150',
@@ -167,8 +186,11 @@ export default function MatchingScreen() {
           matchedCafe: checkCafeMatch(profile.favorite_cafes),
           employment: profile.employment
         };
+        
+        return formattedProfile;
       }) || [];
       
+      console.log("Formatted profiles:", formattedProfiles.length);
       setProfiles(formattedProfiles);
     } catch (error) {
       console.error('Error fetching profiles:', error);
