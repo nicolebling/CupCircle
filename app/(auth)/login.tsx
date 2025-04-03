@@ -26,7 +26,9 @@ import {
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import { supabase } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase';
+import Colors from '@/constants/Colors';
+
 
 
 // Tells Supabase Auth to continuously refresh the session automatically if
@@ -212,7 +214,7 @@ export default function LoginScreen() {
               <TouchableOpacity
                 style={[
                   styles.button,
-                  { backgroundColor: theme.colors.primary },
+                  { backgroundColor: colors.primary },
                 ]}
                 onPress={() => signInWithEmail()}
                 disabled={loading}
