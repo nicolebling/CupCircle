@@ -298,8 +298,8 @@ export default function ProfileCard({
                   {profile.occupation}
                 </Text>
                 {profile.experience_level && 
-                 ((profile.employment && profile.employment.length > 0) || 
-                  (profile.career_transitions && profile.career_transitions.length > 0)) && (
+                 ((profile.employment?.length > 0) || 
+                  (profile.career_transitions?.length > 0)) && (
                   <Text
                     style={[styles.experience, { color: colors.secondaryText }]}
                   >
