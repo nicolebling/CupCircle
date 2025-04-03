@@ -126,11 +126,15 @@ export default function MatchingScreen() {
       
       // Get users with availability
       console.log("Current user ID:", user?.id);
+      const today = new Date().toISOString().split('T')[0];
+      console.log('Fetching availability from date:', today);
+      
       const { data: availabilityData, error: availabilityError } = await supabase
         .from('availability')
-        .select('id')
+        .select('id, date, start_time, end_time')
         .neq('id', user?.id)
-        .gt('date', new Date().toISOString().split('T')[0]); // Only get future dates
+        .gte('date', today)
+        .order('date', { ascending: true });
       
       if (availabilityError) {
         console.error("Error fetching availability data:", availabilityError);
@@ -138,6 +142,26 @@ export default function MatchingScreen() {
       }
       
       console.log("Retrieved availability data:", availabilityData);
+      
+      // Filter out expired time slots for today
+      const now = new Date();
+      const currentTime = now.toLocaleTimeString('en-US', { hour12: true });
+      
+      const validAvailability = availabilityData?.filter(slot => {
+        if (!slot) return false;
+        
+        // For future dates, keep all slots
+        if (slot.date > today) return true;
+        
+        // For today, only keep future time slots
+        if (slot.date === today) {
+          return slot.start_time > currentTime;
+        }
+        
+        return false;
+      });
+      
+      console.log("Filtered availability data:", validAvailability);
       
       if (!availabilityData || availabilityData.length === 0) {
         console.log("No users with availability found");
