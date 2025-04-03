@@ -407,15 +407,27 @@ export default function AvailabilityScreen() {
                         selectedDate.toDateString() && slot.startTime === item,
                   );
 
+                  // Check if time slot is in the past
+                  const now = new Date();
+                  const [time, period] = item.split(' ');
+                  const [hours, minutes] = time.split(':');
+                  let hour = parseInt(hours);
+                  if (period === 'PM' && hour !== 12) hour += 12;
+                  if (period === 'AM' && hour === 12) hour = 0;
+                  
+                  const slotTime = new Date(selectedDate);
+                  slotTime.setHours(hour, parseInt(minutes), 0, 0);
+                  const isPastTime = slotTime < now;
+
                   return (
                     <TouchableOpacity
                       style={[
                         styles.timeButton,
                         isSelectedTime && { backgroundColor: colors.primary },
-                        isTimeTaken && styles.disabledTime,
+                        (isTimeTaken || isPastTime) && styles.disabledTime,
                       ]}
-                      onPress={() => !isTimeTaken && setSelectedTime(item)}
-                      disabled={isTimeTaken}
+                      onPress={() => !isTimeTaken && !isPastTime && setSelectedTime(item)}
+                      disabled={isTimeTaken || isPastTime}
                     >
                       <Text
                         style={[
