@@ -29,7 +29,6 @@ export default function OnboardingScreen() {
     industry_categories: [],
     interests: [],
     favorite_cafes: [],
-    photo: 'https://randomuser.me/api/portraits/lego/1.jpg',
   });
 
   const handleNext = () => {
@@ -288,7 +287,7 @@ export default function OnboardingScreen() {
               Step {step} of 12
             </Text>
             <View style={styles.progressBar}>
-              <View style={[styles.progress, { width: `${(step / 10) * 100}%`, backgroundColor: colors.primary }]} />
+              <View style={[styles.progress, { width: `${(step / 12) * 100}%`, backgroundColor: colors.primary }]} />
             </View>
           </View>
 
