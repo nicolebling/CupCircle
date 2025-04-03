@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -72,7 +71,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       if (error) throw error;
-      
+
       if (data.user) {
         setUser(data.user);
         setSession(data.session);
@@ -114,18 +113,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signOut = async () => {
     try {
-      setLoading(true);
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
 
+      // Update state first
       setUser(null);
       setSession(null);
       setProfile(null);
-      setLoading(false);
 
+      // Wait for next render cycle before navigation
+      await new Promise(resolve => requestAnimationFrame(resolve));
       router.replace('/(auth)/login');
     } catch (error) {
-      setLoading(false);
       console.error('Logout failed:', error);
       throw error;
     }
