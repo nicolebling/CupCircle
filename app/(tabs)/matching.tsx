@@ -1,122 +1,58 @@
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, Modal, ScrollView, ActivityIndicator } from 'react-native';
 import Colors from '@/constants/Colors';
 import ProfileCard from '@/components/ProfileCard';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
+import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/contexts/AuthContext';
+import { useColorScheme } from '@/hooks/useColorScheme';
 
 // Define the profile type for better type checking
 interface Profile {
   id: string;
   name: string;
+  photo_url?: string;
+  photo?: string;
+  birthday?: string;
   age?: number;
-  photo: string;
   occupation: string;
-  location?: string;
-  experience: string;
+  experience_level?: string;
+  industry_categories?: string[];
+  skills?: string[];
+  experience?: string;
+  education?: string;
   bio: string;
-  interests: string[];
-  favoriteCafes?: string[];
+  city?: string;
+  location?: string;
   neighborhoods?: string[];
+  favorite_cafes?: string[];
+  interests: string[];
   matchedCafe?: boolean;
+  employment?: string[];
+}
+
+interface TimeSlot {
+  avail_id: number;
+  id: string;
+  date: string;
+  start_time: string;
+  end_time: string;
+  is_available: boolean;
 }
 
 export default function MatchingScreen() {
-  const colors = Colors.light;
+  const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme];
+  const { user } = useAuth();
   
-  // Mock profiles data
-  const [profiles] = useState<Profile[]>([
-    {
-      id: '1',
-      name: 'Alex Thompson',
-      age: 28,
-      photo: 'https://randomuser.me/api/portraits/men/32.jpg',
-      occupation: 'Software Engineer',
-      location: 'Downtown',
-      experience: '5 years at Google, 2 years at StartupXYZ',
-      bio: 'Passionate about building scalable web applications and mentoring junior developers. Looking to expand my network in the tech community.',
-      interests: ['React', 'Node.js', 'Cloud Architecture', 'Mentoring'],
-      favoriteCafes: ['Coffee House', 'Bean There', 'Code & Coffee', 'Caffeine Lab'],
-      neighborhoods: ['Downtown', 'Tech District', 'Innovation Park'],
-      matchedCafe: true,
-    },
-    {
-      id: '2',
-      name: 'Sophia Wang',
-      age: 31,
-      photo: 'https://randomuser.me/api/portraits/women/44.jpg',
-      occupation: 'UX/UI Designer',
-      location: 'Arts District',
-      experience: '4 years at Design Studio, 3 years freelancing',
-      bio: 'Creative designer with a strong focus on user-centered design. I enjoy collaborating with developers and product teams to create intuitive experiences.',
-      interests: ['User Research', 'Wireframing', 'Figma', 'Design Systems'],
-      favoriteCafes: ['The Roastery', 'Morning Brew', 'Creative Grounds', 'Sketch & Sip'],
-      neighborhoods: ['Arts District', 'Midtown', 'Design Quarter', 'Creative Hub'],
-      matchedCafe: false,
-    },
-    {
-      id: '3',
-      name: 'Marcus Johnson',
-      age: 35,
-      photo: 'https://randomuser.me/api/portraits/men/67.jpg',
-      occupation: 'Product Manager',
-      location: 'Financial District',
-      experience: '7 years in product management across fintech and e-commerce',
-      bio: 'Strategic product manager with experience taking products from concept to market. Looking to connect with engineers and designers.',
-      interests: ['Agile', 'Product Strategy', 'Market Research', 'FinTech'],
-      favoriteCafes: ['Coffee House', 'Finance Cafe', 'Wall Street Brews', 'Trader Joe\'s Coffee'],
-      neighborhoods: ['Financial District', 'Downtown', 'Business Center'],
-      matchedCafe: true,
-    },
-    {
-      id: '4',
-      name: 'Jasmine Rodriguez',
-      age: 29,
-      photo: 'https://randomuser.me/api/portraits/women/29.jpg',
-      occupation: 'Marketing Specialist',
-      location: 'Uptown',
-      experience: '6 years in digital marketing, specialized in social media campaigns',
-      bio: 'Creative marketer passionate about telling authentic brand stories. Looking to connect with other marketing professionals and potential collaborators.',
-      interests: ['Social Media', 'Content Strategy', 'Brand Development', 'Analytics'],
-      favoriteCafes: ['Brew & View', 'Social Cup', 'Marketing Mocha', 'Hashtag Coffee'],
-      neighborhoods: ['Uptown', 'Media District', 'North End'],
-      matchedCafe: true,
-    },
-    {
-      id: '5',
-      name: 'David Chen',
-      age: 33,
-      photo: 'https://randomuser.me/api/portraits/men/94.jpg',
-      occupation: 'Data Scientist',
-      location: 'Tech District',
-      experience: '8 years in data science, previously at Amazon and DataTech',
-      bio: 'Analytical thinker with a passion for turning data into actionable insights. Looking to network with other data professionals and domain experts.',
-      interests: ['Machine Learning', 'Data Visualization', 'Python', 'Big Data'],
-      favoriteCafes: ['Byte Brew', 'Data Drip', 'Algorithm Cafe', 'Python Press'],
-      neighborhoods: ['Tech District', 'University Area', 'Research Park'],
-      matchedCafe: false,
-    },
-    {
-      id: '6',
-      name: 'Olivia Williams',
-      age: 27,
-      photo: 'https://randomuser.me/api/portraits/women/63.jpg',
-      occupation: 'Startup Founder',
-      location: 'Innovation District',
-      experience: '3 years running HealthTech startup, previously product manager',
-      bio: 'Passionate entrepreneur building solutions in the health and wellness space. Looking to connect with potential advisors, investors, and team members.',
-      interests: ['HealthTech', 'Entrepreneurship', 'Venture Capital', 'Product Development'],
-      favoriteCafes: ['Founder\'s Brew', 'Pitch Perfect Coffee', 'Startup Grind', 'Innovation Drip'],
-      neighborhoods: ['Innovation District', 'Accelerator Square', 'Venture Valley'],
-      matchedCafe: true,
-    },
-  ]);
-  
+  const [profiles, setProfiles] = useState<Profile[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFilterModalVisible, setFilterModalVisible] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [matchAnimation, setMatchAnimation] = useState(false);
+  const [hasAvailability, setHasAvailability] = useState(false);
   
   // Animation values
   const cardOffset = useSharedValue(0);
@@ -130,21 +66,142 @@ export default function MatchingScreen() {
       ]
     };
   });
+
+  useEffect(() => {
+    // Check if current user has any availability slots
+    const checkUserAvailability = async () => {
+      if (!user) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('availability')
+          .select('*')
+          .eq('id', user.id);
+        
+        if (error) throw error;
+        
+        // Filter out past availability
+        const now = new Date();
+        const futureAvailability = data?.filter(slot => {
+          const slotDate = new Date(slot.date);
+          const [time, period] = slot.start_time.split(' ');
+          const [hours, minutes] = time.split(':');
+          let hour = parseInt(hours);
+          
+          // Convert to 24-hour format
+          if (period === 'PM' && hour !== 12) hour += 12;
+          if (period === 'AM' && hour === 12) hour = 0;
+          
+          slotDate.setHours(hour, parseInt(minutes), 0, 0);
+          return slotDate > now;
+        });
+        
+        setHasAvailability(futureAvailability && futureAvailability.length > 0);
+        
+        // If user has availability, fetch profiles with availability
+        if (futureAvailability && futureAvailability.length > 0) {
+          fetchProfiles();
+        } else {
+          setIsLoading(false);
+        }
+      } catch (error) {
+        console.error('Error checking availability:', error);
+        setIsLoading(false);
+      }
+    };
+    
+    checkUserAvailability();
+  }, [user]);
+  
+  const fetchProfiles = async () => {
+    setIsLoading(true);
+    try {
+      // Get users with availability
+      const { data: availabilityData, error: availabilityError } = await supabase
+        .from('availability')
+        .select('id')
+        .neq('id', user?.id)
+        .not('is_available', 'eq', false);
+      
+      if (availabilityError) throw availabilityError;
+      
+      // Get unique user IDs
+      const userIds = [...new Set(availabilityData?.map(item => item.id))];
+      
+      if (userIds.length === 0) {
+        setProfiles([]);
+        setIsLoading(false);
+        return;
+      }
+      
+      // Fetch profiles for these users
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('profiles')
+        .select('*')
+        .in('id', userIds);
+      
+      if (profilesError) throw profilesError;
+      
+      // Map profiles to the format expected by ProfileCard
+      const formattedProfiles = profilesData?.map(profile => {
+        let interests = [];
+        try {
+          interests = profile.interests || [];
+        } catch (e) {
+          console.error('Error parsing interests:', e);
+        }
+        
+        return {
+          id: profile.id,
+          name: profile.name || 'Anonymous User',
+          photo: profile.photo_url || 'https://via.placeholder.com/150',
+          occupation: profile.occupation || 'Professional',
+          bio: profile.bio || 'No bio available',
+          experience_level: profile.experience_level,
+          city: profile.city,
+          industry_categories: profile.industry_categories,
+          interests: interests,
+          favorite_cafes: profile.favorite_cafes,
+          neighborhoods: profile.neighborhoods,
+          // Check if there's a cafe match (simplified version)
+          matchedCafe: checkCafeMatch(profile.favorite_cafes),
+          employment: profile.employment
+        };
+      }) || [];
+      
+      setProfiles(formattedProfiles);
+    } catch (error) {
+      console.error('Error fetching profiles:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  // Simplified function to check if there's a cafe match
+  // In a real implementation, you would compare with the current user's favorite cafes
+  const checkCafeMatch = (cafes: string[] = []) => {
+    // Placeholder logic - in real app, compare with current user's cafes
+    return cafes && cafes.length > 0;
+  };
   
   const handleLike = () => {
     // Animate card off-screen to the right
     cardOffset.value = withSpring(500);
     cardRotate.value = withSpring(20);
     
-    // Here you would typically send a like request to your backend
-    console.log(`Liked ${profiles[currentIndex].name}`);
-    
-    // Show match animation randomly (simulate mutual match)
-    if (Math.random() > 0.7) {
-      setTimeout(() => {
-        setMatchAnimation(true);
-        setTimeout(() => setMatchAnimation(false), 3000);
-      }, 500);
+    if (profiles.length > 0 && currentIndex < profiles.length) {
+      console.log(`Liked ${profiles[currentIndex].name}`);
+      
+      // Here you would typically send a like request to your backend
+      // For example: createMatch(profiles[currentIndex].id)
+      
+      // Show match animation randomly (simulate mutual match)
+      if (Math.random() > 0.7) {
+        setTimeout(() => {
+          setMatchAnimation(true);
+          setTimeout(() => setMatchAnimation(false), 3000);
+        }, 500);
+      }
     }
     
     // Small delay before moving to next profile
@@ -163,7 +220,9 @@ export default function MatchingScreen() {
     cardOffset.value = withSpring(-500);
     cardRotate.value = withSpring(-20);
     
-    console.log(`Skipped ${profiles[currentIndex].name}`);
+    if (profiles.length > 0 && currentIndex < profiles.length) {
+      console.log(`Skipped ${profiles[currentIndex].name}`);
+    }
     
     // Small delay before moving to next profile
     setTimeout(() => {
@@ -190,11 +249,27 @@ export default function MatchingScreen() {
     setIsLoading(true);
     setFilterModalVisible(false);
     
-    // Simulate API call for new profiles based on filters
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 1500);
+    // Re-fetch profiles with filters
+    fetchProfiles();
   };
+  
+  const renderNoAvailabilityMessage = () => (
+    <View style={[styles.emptyCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+      <Ionicons name="calendar-outline" size={48} color={colors.primary} />
+      <Text style={[styles.emptyCardTitle, { color: colors.text }]}>
+        Set Your Availability
+      </Text>
+      <Text style={[styles.emptyCardText, { color: colors.secondaryText }]}>
+        You need to add some available time slots before you can match with others.
+      </Text>
+      <TouchableOpacity 
+        style={[styles.emptyCardButton, { backgroundColor: colors.primary }]}
+        onPress={() => {/* Navigate to availability tab */}}
+      >
+        <Text style={styles.emptyCardButtonText}>Go to Availability</Text>
+      </TouchableOpacity>
+    </View>
+  );
   
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
@@ -213,56 +288,79 @@ export default function MatchingScreen() {
               <ActivityIndicator size="large" color={colors.primary} />
               <Text style={[styles.loadingText, { color: colors.text }]}>Finding perfect matches...</Text>
             </View>
+          ) : !hasAvailability ? (
+            renderNoAvailabilityMessage()
+          ) : profiles.length === 0 ? (
+            <View style={[styles.noMoreCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+              <Ionicons name="people" size={48} color={colors.primary} />
+              <Text style={[styles.noMoreText, { color: colors.text }]}>
+                No matches available
+              </Text>
+              <Text style={[styles.checkBackText, { color: colors.secondaryText }]}>
+                We couldn't find any profiles matching your criteria. Try adjusting your filters or check back later!
+              </Text>
+              <TouchableOpacity 
+                style={[styles.refreshButton, { backgroundColor: colors.primary }]}
+                onPress={openFilterModal}
+              >
+                <Text style={styles.refreshButtonText}>Adjust Filters</Text>
+              </TouchableOpacity>
+            </View>
           ) : currentIndex < profiles.length ? (
             <>
               <Animated.View style={[styles.animatedCardContainer, cardAnimatedStyle]}>
                 <ProfileCard
+                  userId={profiles[currentIndex].id}
                   profile={profiles[currentIndex]}
+                  isNewUser={false}
                   onLike={handleLike}
                   onSkip={handleSkip}
                 />
               </Animated.View>
               
               <View style={styles.navigationControls}>
+                <TouchableOpacity 
+                  onPress={handlePrevious} 
+                  style={[
+                    styles.navButton, 
+                    { backgroundColor: colors.card, opacity: currentIndex > 0 ? 1 : 0.5 }
+                  ]}
+                  disabled={currentIndex === 0}
+                >
+                  <Ionicons name="arrow-back" size={20} color={colors.primary} />
+                  <Text style={[styles.navButtonText, { color: colors.primary }]}>Previous</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  onPress={() => {}} 
+                  style={[styles.navButton, { backgroundColor: colors.card }]}
+                >
+                  <Ionicons name="person" size={20} color={colors.primary} />
+                  <Text style={[styles.navButtonText, { color: colors.primary }]}>View Details</Text>
+                </TouchableOpacity>
+              </View>
+            </>
+          ) : (
+            <View style={[styles.noMoreCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+              <Ionicons name="cafe" size={48} color={colors.primary} />
+              <Text style={[styles.noMoreText, { color: colors.text }]}>
+                No more profiles to show
+              </Text>
+              <Text style={[styles.checkBackText, { color: colors.secondaryText }]}>
+                You've seen all available profiles! Check back later for more connections.
+              </Text>
               <TouchableOpacity 
-                onPress={handlePrevious} 
-                style={[
-                  styles.navButton, 
-                  { backgroundColor: colors.card, opacity: currentIndex > 0 ? 1 : 0.5 }
-                ]}
-                disabled={currentIndex === 0}
+                style={[styles.refreshButton, { backgroundColor: colors.primary }]}
+                onPress={() => {
+                  setCurrentIndex(0);
+                  fetchProfiles();
+                }}
               >
-                <Ionicons name="arrow-back" size={20} color={colors.primary} />
-                <Text style={[styles.navButtonText, { color: colors.primary }]}>Previous</Text>
-              </TouchableOpacity>
-              
-              <TouchableOpacity 
-                onPress={() => {}} 
-                style={[styles.navButton, { backgroundColor: colors.card }]}
-              >
-                <Ionicons name="person" size={20} color={colors.primary} />
-                <Text style={[styles.navButtonText, { color: colors.primary }]}>View Details</Text>
+                <Text style={styles.refreshButtonText}>Refresh</Text>
               </TouchableOpacity>
             </View>
-          </>
-        ) : (
-          <View style={[styles.noMoreCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-            <Ionicons name="cafe" size={48} color={colors.primary} />
-            <Text style={[styles.noMoreText, { color: colors.text }]}>
-              No more profiles to show
-            </Text>
-            <Text style={[styles.checkBackText, { color: colors.secondaryText }]}>
-              Adjust your filters or check back later for more connections!
-            </Text>
-            <TouchableOpacity 
-              style={[styles.refreshButton, { backgroundColor: colors.primary }]}
-              onPress={openFilterModal}
-            >
-              <Text style={styles.refreshButtonText}>Adjust Filters</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-      </View>
+          )}
+        </View>
       </ScrollView>
       
       {/* Filter Modal */}
@@ -447,6 +545,38 @@ const styles = StyleSheet.create({
     fontFamily: 'K2D-Medium',
     fontSize: 14,
     marginLeft: 8,
+  },
+  emptyCard: {
+    width: '90%',
+    height: 300,
+    borderRadius: 16,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20,
+  },
+  emptyCardTitle: {
+    fontFamily: 'K2D-SemiBold',
+    fontSize: 20,
+    textAlign: 'center',
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  emptyCardText: {
+    fontFamily: 'K2D-Regular',
+    fontSize: 16,
+    textAlign: 'center',
+    marginBottom: 24,
+  },
+  emptyCardButton: {
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 25,
+  },
+  emptyCardButtonText: {
+    color: 'white',
+    fontFamily: 'K2D-Medium',
+    fontSize: 16,
   },
   noMoreCard: {
     width: '90%',
