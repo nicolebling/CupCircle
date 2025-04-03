@@ -1,10 +1,13 @@
 
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, SafeAreaView, ScrollView, KeyboardAvoidingView, Platform, Image } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, SafeAreaView, ScrollView, KeyboardAvoidingView, Platform, Image, Alert } from 'react-native';
 import { router } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import Colors from '@/constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
+import { decode } from 'base64-arraybuffer';
+import { supabase } from '@/lib/supabase';
 import InterestSelector from '@/components/InterestSelector';
 import IndustrySelector from '@/components/IndustrySelector';
 import ExperienceLevelSelector from '@/components/ExperienceLevelSelector';
@@ -36,6 +39,76 @@ export default function OnboardingScreen() {
       setStep(step + 1);
     } else {
       handleSubmit();
+    }
+  };
+
+  const requestPermission = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert(
+        "Permission Required",
+        "Please enable media library access in settings.",
+      );
+      return false;
+    }
+    return true;
+  };
+
+  const pickImage = async () => {
+    const hasPermission = await requestPermission();
+    if (!hasPermission) return;
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+      base64: true,
+    });
+
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      uploadImage(result.assets[0].uri);
+    }
+  };
+
+  const uploadImage = async (uri: string) => {
+    try {
+      setLoading(true);
+      
+      const response = await fetch(uri);
+      const blob = await response.blob();
+      
+      const reader = new FileReader();
+      const base64Promise = new Promise((resolve) => {
+        reader.onload = () => {
+          const base64 = reader.result?.toString().split(",")[1];
+          resolve(base64);
+        };
+      });
+      reader.readAsDataURL(blob);
+      const base64Data = await base64Promise;
+
+      const filePath = `${user?.id}/${Date.now()}.png`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("photos")
+        .upload(filePath, decode(base64Data as string), {
+          contentType: "image/png",
+        });
+
+      if (uploadError) throw uploadError;
+
+      const { data } = supabase.storage.from("photos").getPublicUrl(filePath);
+      
+      setProfileData({
+        ...profileData,
+        photo_url: data.publicUrl
+      });
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      Alert.alert("Error", "Failed to upload image. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -140,13 +213,7 @@ export default function OnboardingScreen() {
               />
               <TouchableOpacity 
                 style={[styles.photoButton, { backgroundColor: colors.primary }]}
-                onPress={() => {
-                  // For now, we'll just use a placeholder image
-                  setProfileData({ 
-                    ...profileData, 
-                    photo_url: `https://randomuser.me/api/portraits/lego/${Math.floor(Math.random() * 8) + 1}.jpg`
-                  });
-                }}
+                onPress={pickImage}
               >
                 <Text style={styles.photoButtonText}>Change Photo</Text>
               </TouchableOpacity>
