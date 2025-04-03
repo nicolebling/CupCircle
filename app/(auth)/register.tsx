@@ -298,18 +298,16 @@ export default function SignUpScreen() {
               <Text style={[styles.footerText, { color: theme.colors.text }]}>
                 Already have an account?
               </Text>
-              <Link href="/(auth)/login" asChild>
-                <TouchableOpacity>
-                  <Text
-                    style={[
-                      styles.registerLink,
-                      { color: colors.primary },
-                    ]}
-                  >
-                    Log In
-                  </Text>
-                </TouchableOpacity>
-              </Link>
+              <TouchableOpacity onPress={() => router.replace('/(auth)/login')}>
+                <Text
+                  style={[
+                    styles.registerLink,
+                    { color: colors.primary },
+                  ]}
+                >
+                  Log In
+                </Text>
+              </TouchableOpacity>
             </View>
           </View>
         </KeyboardAvoidingView>

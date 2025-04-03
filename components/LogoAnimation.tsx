@@ -31,6 +31,13 @@ export default function LogoAnimation() {
 
     rotate1.start();
     rotate2.start();
+
+    return () => {
+      rotate1.stop();
+      rotate2.stop();
+      rotateAnim1.setValue(0);
+      rotateAnim2.setValue(0);
+    };
   }, [rotateAnim1, rotateAnim2]);
 
   const circle1Style = {
