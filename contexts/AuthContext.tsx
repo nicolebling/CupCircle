@@ -117,18 +117,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setLoading(true);
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
-      
-      // Batch state updates together before navigation
-      const updateStates = () => {
-        setUser(null);
-        setSession(null);
-        setProfile(null);
-        setLoading(false);
-      };
-      
-      updateStates();
-      // Navigate after state updates are complete
-      setTimeout(() => router.replace('/(auth)/login'), 0);
+
+      setUser(null);
+      setSession(null);
+      setProfile(null);
+      setLoading(false);
+
+      router.replace('/(auth)/login');
     } catch (error) {
       setLoading(false);
       console.error('Logout failed:', error);
