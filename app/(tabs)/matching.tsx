@@ -142,65 +142,51 @@ export default function MatchingScreen() {
       const today = new Date().toISOString().split("T")[0];
       console.log("Fetching availability from date:", today);
 
-      // Get all availability data for other users with future dates
       const { data: availabilityData, error: availabilityError } =
         await supabase
           .from("availability")
-          .select("*")
-          .neq("id", user?.id)
-          .gte("date", today)  // Only get today and future dates
+          .select("*") // ✅ also changed 'id' to 'user_id'
+          .neq("id", user?.id) // ✅ FIXED
           .order("date", { ascending: true });
+
+     
 
       if (availabilityError) {
         console.error("Error fetching availability data:", availabilityError);
         throw availabilityError;
       }
 
-      console.log("Retrieved availability data:", availabilityData?.length, "records");
-      console.log("Sample availability:", availabilityData?.[0]);
+      console.log("Retrieved availability data:", availabilityData);
 
       // Filter out expired time slots for today
       const now = new Date();
-      const currentHour = now.getHours();
-      const currentMinute = now.getMinutes();
-      
+      const currentTime = now.toLocaleTimeString("en-US", { hour12: true });
+
       const validAvailability = availabilityData?.filter((slot) => {
         if (!slot) return false;
 
         // For future dates, keep all slots
         if (slot.date > today) return true;
 
-        // For today, convert the time to 24-hour format to compare properly
+        // For today, only keep future time slots
         if (slot.date === today) {
-          const [time, period] = (slot.start_time || "").split(" ");
-          if (!time) return false;
-          
-          const [hourStr, minuteStr] = time.split(":");
-          let hour = parseInt(hourStr);
-          const minute = parseInt(minuteStr);
-          
-          // Convert to 24-hour format
-          if (period === "PM" && hour !== 12) hour += 12;
-          if (period === "AM" && hour === 12) hour = 0;
-          
-          // Compare with current time
-          return (hour > currentHour) || (hour === currentHour && minute > currentMinute);
+          return slot.start_time > currentTime;
         }
 
         return false;
       });
 
-      console.log("Filtered availability data:", validAvailability?.length, "valid slots");
+      console.log("Filtered availability data:", validAvailability);
 
-      if (!validAvailability || validAvailability.length === 0) {
-        console.log("No users with valid availability found");
+      if (!availabilityData || availabilityData.length === 0) {
+        console.log("No users with availability found");
         setProfiles([]);
         setIsLoading(false);
         return;
       }
 
-      // Get unique user IDs from valid availability
-      const userIds = [...new Set(validAvailability.map((item) => item.id))];
+      // Get unique user IDs
+      const userIds = [...new Set(availabilityData.map((item) => item.id))];
       console.log("Unique user IDs with availability:", userIds);
 
       if (userIds.length === 0) {
@@ -231,24 +217,16 @@ export default function MatchingScreen() {
       }
 
       // Map profiles to the format expected by ProfileCard
-      const formattedProfiles = profilesData?.map((profile) => {
-          // Add debug information
-          console.log("Processing profile:", profile.id, profile.name);
-          
-          // Parse interests safely
+      const formattedProfiles =
+        profilesData.map((profile) => {
           let interests = [];
           try {
-            if (profile.interests) {
-              interests = Array.isArray(profile.interests) 
-                ? profile.interests 
-                : JSON.parse(profile.interests);
-            }
+            interests = profile.interests || [];
           } catch (e) {
             console.error("Error parsing interests:", e);
-            interests = [];
           }
-          
-          // Create formatted profile with all needed fields
+
+          console.log("Processing profile:", profile.id, profile.name);
           const formattedProfile = {
             id: profile.id,
             name: profile.name || "Anonymous User",
@@ -257,31 +235,22 @@ export default function MatchingScreen() {
             bio: profile.bio || "No bio available",
             experience_level: profile.experience_level,
             city: profile.city,
-            industry_categories: profile.industry_categories || [],
+            industry_categories: profile.industry_categories,
             interests: interests,
-            favorite_cafes: profile.favorite_cafes || [],
-            neighborhoods: profile.neighborhoods || [],
+            favorite_cafes: profile.favorite_cafes,
+            neighborhoods: profile.neighborhoods,
             // Check if there's a cafe match (simplified version)
             matchedCafe: checkCafeMatch(profile.favorite_cafes),
-            employment: profile.employment || [],
+            employment: profile.employment,
           };
 
           return formattedProfile;
         }) || [];
 
       console.log("Formatted profiles:", formattedProfiles.length);
-      
-      if (formattedProfiles.length === 0) {
-        console.log("No profiles formatted - check data structure");
-      } else {
-        console.log("First profile example:", formattedProfiles[0]);
-      }
-      
       setProfiles(formattedProfiles);
     } catch (error) {
       console.error("Error fetching profiles:", error);
-      // Set empty profiles to avoid showing stale data
-      setProfiles([]);
     } finally {
       setIsLoading(false);
     }
