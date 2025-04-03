@@ -90,7 +90,7 @@ export const profileService = {
       const { data, error } = await supabase
         .from("profiles")
         .upsert({
-          id: profileData.user_id,
+          
           ...formattedData,
           updated_at: new Date().toISOString(),
         })

@@ -168,7 +168,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { error } = await supabase
         .from('profiles')
         .update(userData)
-        .eq('user_id', user.id);
+        .eq('id', user.id);
 
       if (error) throw error;
 
