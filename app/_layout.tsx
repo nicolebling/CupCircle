@@ -29,7 +29,7 @@ function RootLayoutNav() {
       const currentSegment = segments[0];
       if (!user && currentSegment !== '(auth)') {
         router.replace('/(auth)/login');
-      } else if (user && currentSegment === '(auth)') {
+      } else if (user && currentSegment === '(auth)' && segments[1] !== 'onboarding') {
         router.replace('/(tabs)/matching');
       }
     }, 100);

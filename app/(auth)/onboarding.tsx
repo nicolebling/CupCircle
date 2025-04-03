@@ -47,8 +47,13 @@ export default function OnboardingScreen() {
   const handleSubmit = async () => {
     setLoading(true);
     try {
+      if (!profileData.name || !profileData.occupation || !profileData.city) {
+        alert('Please fill in all required fields before continuing');
+        setLoading(false);
+        return;
+      }
       await updateUser(profileData);
-      router.replace('/(tabs)');
+      router.replace('/(tabs)/matching');
     } catch (error) {
       console.error('Failed to save profile', error);
       alert('Failed to save profile information. Please try again.');
