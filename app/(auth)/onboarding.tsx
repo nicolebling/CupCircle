@@ -21,6 +21,7 @@ export default function OnboardingScreen() {
     occupation: '',
     city: '',
     bio: '',
+    education: '',
     employment: [],
     career_transitions: [],
     experience_level: '',
@@ -47,7 +48,10 @@ export default function OnboardingScreen() {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      if (!profileData.name || !profileData.occupation || !profileData.city) {
+      if (!profileData.name || !profileData.occupation || !profileData.city || 
+          !profileData.bio || !profileData.education || !profileData.experience_level || 
+          !profileData.industry_categories.length || !profileData.interests.length || 
+          !profileData.favorite_cafes.length) {
         alert('Please fill in all required fields before continuing');
         setLoading(false);
         return;
@@ -126,6 +130,20 @@ export default function OnboardingScreen() {
         );
 
       case 5:
+        return (
+          <View style={styles.formSection}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Education</Text>
+            <TextInput
+              style={[styles.input, { backgroundColor: colors.card, color: colors.text, borderColor: colors.border }]}
+              placeholder="Enter your educational background"
+              placeholderTextColor={colors.secondaryText}
+              value={profileData.education}
+              onChangeText={(text) => setProfileData({ ...profileData, education: text })}
+            />
+          </View>
+        );
+
+      case 6:
         return (
           <View style={styles.formSection}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>Employment History</Text>

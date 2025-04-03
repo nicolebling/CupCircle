@@ -265,8 +265,8 @@ export default function InterestSelector({
                       {
                         backgroundColor: "transparent",
                         borderColor: colors.primary,
-                        
-                
+
+
                       },
                     ]}
                     onPress={() => toggleInterest(interest)}
