@@ -255,7 +255,7 @@ export default function LoginScreen() {
                   <Text
                     style={[
                       styles.registerLink,
-                      { color: theme.colors.primary },
+                      { color: colors.primary },
                     ]}
                   >
                     Register
