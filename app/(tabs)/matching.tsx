@@ -145,11 +145,9 @@ export default function MatchingScreen() {
       const { data: availabilityData, error: availabilityError } =
         await supabase
           .from("availability")
-          .select("*") // ✅ also changed 'id' to 'user_id'
-          .neq("id", user?.id) // ✅ FIXED
+          .select("*")
+          .neq("id", user?.id) 
           .order("date", { ascending: true });
-
-     
 
       if (availabilityError) {
         console.error("Error fetching availability data:", availabilityError);
