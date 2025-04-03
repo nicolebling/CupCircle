@@ -114,6 +114,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signOut = async () => {
     try {
       setLoading(true);
+      // Small delay to allow loading state to be visible
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
 
@@ -121,6 +124,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setSession(null);
       setProfile(null);
       setUser(null);
+      
+      // Small delay before completing the transition
+      await new Promise(resolve => setTimeout(resolve, 200));
       setLoading(false);
     } catch (error) {
       setLoading(false);
