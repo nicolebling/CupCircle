@@ -28,6 +28,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { supabase } from '@/lib/supabase'
 
+
 // Prevent splash screen from hiding until assets are loaded
 SplashScreen.preventAutoHideAsync();
 
@@ -45,6 +46,7 @@ export default function SignUpScreen() {
 
   const { signUp } = useAuth();
   const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme];
   const theme = colorScheme === "dark" ? DarkTheme : DefaultTheme;
 
   // Load custom fonts
@@ -301,7 +303,7 @@ export default function SignUpScreen() {
                   <Text
                     style={[
                       styles.registerLink,
-                      { color: theme.colors.primary },
+                      { color: colors.primary },
                     ]}
                   >
                     Log In
