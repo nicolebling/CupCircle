@@ -12,34 +12,29 @@ export default function LogoAnimation() {
   const circle2Animation = React.useRef(new Animated.Value(0)).current;
 
   React.useEffect(() => {
-    const animate = () => {
-      Animated.parallel([
-        Animated.loop(
-          Animated.timing(circle1Animation, {
-            toValue: 1,
-            duration: 10000,
-            easing: Easing.linear,
-            useNativeDriver: true
-          })
-        ),
-        Animated.loop(
-          Animated.timing(circle2Animation, {
-            toValue: 1,
-            duration: 10000,
-            easing: Easing.linear,
-            useNativeDriver: true
-          })
-        )
-      ]).start();
-    };
+    Animated.loop(
+      Animated.timing(circle1Animation, {
+        toValue: 1,
+        duration: 10000,
+        easing: Easing.linear,
+        useNativeDriver: true
+      })
+    ).start();
 
-    animate();
+    Animated.loop(
+      Animated.timing(circle2Animation, {
+        toValue: 1,
+        duration: 10000,
+        easing: Easing.linear,
+        useNativeDriver: true
+      })
+    ).start();
   }, []);
 
   const circle1Style = {
     transform: [
       {
-        translateY: -20
+        translateY: -16
       },
       {
         rotate: circle1Animation.interpolate({
@@ -53,7 +48,7 @@ export default function LogoAnimation() {
   const circle2Style = {
     transform: [
       {
-        translateY: -20
+        translateY: -16
       },
       {
         rotate: circle2Animation.interpolate({
@@ -79,8 +74,6 @@ export default function LogoAnimation() {
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    justifyContent: 'center',
-    marginVertical: 32,
   },
   logoContainer: {
     width: 48,
@@ -103,11 +96,10 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontFamily: 'K2D-Bold',
-    marginTop: 8,
   },
   subtitle: {
     fontSize: 16,
     fontFamily: 'K2D-Regular',
-    marginTop: 4,
+    marginTop: 5,
   },
 });
