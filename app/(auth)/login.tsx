@@ -117,13 +117,13 @@ export default function LoginScreen() {
 
         if (!profileData) {
           Alert.alert('Welcome back!', 'Please complete your profile to continue.');
-          router.replace('/(auth)/profile-setup');
+          router.replace('/(auth)/onboarding');
         } else {
           router.replace('/(tabs)/matching');
         }
       } catch (checkError) {
         console.error("Error in profile check:", checkError);
-        router.replace('/(auth)/profile-setup');
+        router.replace('/(auth)/onboarding');
       }
     }
     setLoading(false);
