@@ -22,18 +22,23 @@ function RootLayoutNav() {
   const colors = Colors[colorScheme];
 
   useEffect(() => {
-    const handleNavigation = async () => {
-      if (!loading) {
-        const currentSegment = segments[0];
-        if (!user && currentSegment !== '(auth)') {
-          await router.replace('/(auth)/login');
-        } else if (user && currentSegment === '(auth)') {
-          await router.replace('/(tabs)/matching');
-        }
+    if (loading) return;
+
+    const timeoutId = setTimeout(() => {
+      const currentSegment = segments[0];
+      if (!user && currentSegment !== '(auth)') {
+        router.replace('/(auth)/login');
+      } else if (user && currentSegment === '(auth)') {
+        router.replace('/(tabs)/matching');
       }
-    };
-    handleNavigation();
+    }, 100);
+
+    return () => clearTimeout(timeoutId);
   }, [user, loading, segments]);
+
+  if (loading) {
+    return null; // Or a loading spinner component
+  }
 
   return (
     <Stack 
