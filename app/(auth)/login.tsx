@@ -27,6 +27,7 @@ import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { supabase } from '@/lib/supabase'
+import Colors from '@/constants/Colors';
 
 
 // Tells Supabase Auth to continuously refresh the session automatically if
