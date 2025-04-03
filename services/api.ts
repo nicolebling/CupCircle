@@ -149,15 +149,31 @@ export const availabilityService = {
   // Get user's availability slots
   async getUserAvailability(userId: string) {
     try {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const todayStr = today.toISOString().split('T')[0];
+
       const { data, error } = await supabase
         .from("availability")
         .select("*")
-        .eq("user_id", userId) // Corrected the column name here.  It was likely "id" before and should be "user_id" to match the createAvailability function.
+        .eq("user_id", userId)
+        .gte('date', todayStr) // Only get dates from today onwards
         .order("date", { ascending: true })
         .order("start_time", { ascending: true });
 
       if (error) throw error;
-      return data || [];
+      
+      // Further filter out today's past time slots
+      const now = new Date();
+      const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')} ${now.getHours() >= 12 ? 'PM' : 'AM'}`;
+      
+      return (data || []).filter(slot => {
+        if (slot.date > todayStr) return true;
+        if (slot.date === todayStr) {
+          return slot.start_time > currentTime;
+        }
+        return false;
+      });
     } catch (error) {
       console.error("Failed to get availability:", error);
       throw error;
