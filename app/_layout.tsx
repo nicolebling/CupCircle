@@ -37,11 +37,7 @@ function RootLayoutNav() {
   }, [user, loading, segments]);
 
   if (loading) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.background }}>
-        <ActivityIndicator size="large" color={colors.primary} />
-      </View>
-    );
+    return null; // Or a loading spinner component
   }
 
   return (
