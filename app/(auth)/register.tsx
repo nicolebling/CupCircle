@@ -12,6 +12,8 @@ import {
   Image,
 } from "react-native";
 import { Link, router } from "expo-router";
+import LogoAnimation from "@/components/LogoAnimation";
+import Colors from '@/constants/Colors';
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { useAuth } from "@/contexts/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
@@ -186,12 +188,7 @@ export default function SignUpScreen() {
           <View style={styles.content}>
             {/* Logo & Branding */}
             <View style={styles.header}>
-              <Text style={[styles.title, { color: theme.colors.text }]}>
-                CupCircle
-              </Text>
-              <Text style={[styles.subtitle, { color: theme.colors.text }]}>
-                Where every cup connects
-              </Text>
+              <LogoAnimation />
             </View>
 
             {/* Form Container */}
@@ -281,7 +278,7 @@ export default function SignUpScreen() {
               <TouchableOpacity
                 style={[
                   styles.button,
-                  { backgroundColor: theme.colors.primary },
+                  { backgroundColor: colors.primary },
                 ]}
                 onPress={signUpWithEmail}
                 disabled={loading}
