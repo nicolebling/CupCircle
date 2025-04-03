@@ -147,8 +147,7 @@ export default function MatchingScreen() {
       
       console.log("Retrieved availability data:", availabilityData);
       
-      // Filter out expired time slots for today
-      const now = new Date();
+      // Use the existing now variable for current time
       const currentTime = now.toLocaleTimeString('en-US', { hour12: true });
       
       const validAvailability = availabilityData?.filter(slot => {
