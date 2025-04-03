@@ -33,7 +33,7 @@ export default function OnboardingScreen() {
   });
 
   const handleNext = () => {
-    if (step < 10) {
+    if (step < 12) {
       setStep(step + 1);
     } else {
       handleSubmit();
@@ -246,7 +246,7 @@ export default function OnboardingScreen() {
           </View>
         );
 
-      case 9:
+      case 11:
         return (
           <View style={styles.formSection}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>Interests</Text>
@@ -259,7 +259,7 @@ export default function OnboardingScreen() {
           </View>
         );
 
-      case 10:
+      case 12:
         return (
           <View style={styles.formSection}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>Favorite Cafes</Text>
@@ -285,7 +285,7 @@ export default function OnboardingScreen() {
           <View style={styles.header}>
             <Text style={[styles.title, { color: colors.text }]}>Complete Your Profile</Text>
             <Text style={[styles.subtitle, { color: colors.secondaryText }]}>
-              Step {step} of 10
+              Step {step} of 12
             </Text>
             <View style={styles.progressBar}>
               <View style={[styles.progress, { width: `${(step / 10) * 100}%`, backgroundColor: colors.primary }]} />
