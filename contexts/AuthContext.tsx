@@ -114,9 +114,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signOut = async () => {
     try {
       setLoading(true);
-      // Add small delay for visual feedback
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
+     
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
 
@@ -125,9 +123,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setProfile(null);
       setUser(null);
       
-      // Additional delay before completing
-      await new Promise(resolve => setTimeout(resolve, 200));
       setLoading(false);
+      // Navigate to login
+      router.replace('/(auth)/login');
     } catch (error) {
       setLoading(false);
       console.error('Logout failed:', error);
