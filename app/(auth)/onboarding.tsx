@@ -24,7 +24,7 @@ export default function OnboardingScreen() {
     occupation: '',
     city: '',
     bio: '',
-    photo_url: user?.photo_url || 'https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png',
+    photo_url: user?.photo_url || '',
     education: '',
     employment: [],
     career_transitions: [],
