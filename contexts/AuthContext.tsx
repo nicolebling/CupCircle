@@ -138,9 +138,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const fetchProfile = async (): Promise<Profile | null> => {
+  const fetchProfile = async (forceRefresh = false): Promise<Profile | null> => {
     try {
       if (!user?.id) return null;
+      
+      // Return cached profile if available and not forcing refresh
+      if (!forceRefresh && profile) {
+        return profile;
+      }
 
       const { data, error } = await supabase
         .from('profiles')

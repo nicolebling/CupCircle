@@ -20,10 +20,15 @@ export default function ProfileScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
 
   useEffect(() => {
-    if (user) {
+    if (user && profile) {
+      // Use cached profile immediately
+      setProfileData(profile);
+      // Refresh in background
+      fetchProfile(true);
+    } else if (user) {
       fetchProfile();
     }
-  }, [user]);
+  }, [user, profile]);
 
   const fetchProfile = async () => {
     try {
