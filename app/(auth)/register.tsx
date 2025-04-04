@@ -332,6 +332,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     justifyContent: "space-between",
+    
   },
   header: {
     alignItems: "center",
@@ -405,6 +406,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginTop: 10,
+     marginBottom: 10,
   },
   buttonText: {
     color: "white",
