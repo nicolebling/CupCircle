@@ -211,10 +211,25 @@ export default function OnboardingScreen() {
           <View style={styles.formSection}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>Profile Photo</Text>
             <View style={styles.photoContainer}>
-              <Image 
-                source={{ uri: profileData.photo_url }} 
-                style={styles.profilePhoto}
-              />
+              {profileData.photo_url ? (
+                <Image 
+                  source={{ uri: profileData.photo_url }} 
+                  style={styles.profilePhoto}
+                />
+              ) : (
+                <View
+                  style={[
+                    styles.profilePhoto,
+                    {
+                      backgroundColor: "#ffffff",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    },
+                  ]}
+                >
+                  <Ionicons name="person" size={60} color="#1A1A1A" />
+                </View>
+              )}
               <TouchableOpacity 
                 style={[styles.photoButton, { backgroundColor: colors.primary }]}
                 onPress={pickImage}
