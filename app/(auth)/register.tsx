@@ -73,7 +73,7 @@ export default function SignUpScreen() {
         } else if (error.message.includes("valid email")) {
           setError("Please enter a valid email address");
         } else {
-          setError("Unable to create account. Please try again.");
+          setError("Please enter a valid email address.");
         }
       } else {
         console.log("Signup successful:", data)
@@ -285,6 +285,8 @@ export default function SignUpScreen() {
                 </TouchableOpacity>
               </View>
 
+              
+
               {/* Sign Up Button */}
               <TouchableOpacity
                 style={[
@@ -298,12 +300,15 @@ export default function SignUpScreen() {
                   {loading ? "Signing up..." : "Sign Up"}
                 </Text>
               </TouchableOpacity>
+
+              {/* Error Message */}
+              {error ? (
+                <Text style={styles.errorMessage}>{error}</Text>
+              ) : null}
+              
             </View>
 
-            {/* Error Message */}
-            {error ? (
-              <Text style={styles.errorMessage}>{error}</Text>
-            ) : null}
+           
 
             {/* Already Have an Account? */}
             <View style={styles.footer}>
