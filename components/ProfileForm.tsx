@@ -429,18 +429,19 @@ export default function ProfileForm({
                   resizeMode="cover"
                 />
               ) : (
-                <View
-                  style={[
-                    styles.image,
-                    {
-                      backgroundColor: "#1A1A1A",
-                      justifyContent: "center",
-                      alignItems: "center",
-                    },
-                  ]}
-                >
-                  <Ionicons name="person" size={60} color="#ffffff" />
-                </View>
+      <View
+        style={[
+          styles.image,
+          {
+            backgroundColor: "#ededed",
+            justifyContent: "center",
+            alignItems: "center",
+            marginTop: 0,
+          },
+        ]}
+      >
+        <Ionicons name="person" size={60} color="#fff" />
+      </View>
               )}
               <View style={styles.editButton}>
                 <Ionicons name="camera" size={20} color="#666" />
@@ -464,7 +465,7 @@ export default function ProfileForm({
 
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isDark && styles.textDark]}>
-                Occupation
+                Headline
               </Text>
               <TextInput
                 style={[styles.input, isDark && styles.inputDark]}
@@ -670,6 +671,7 @@ export default function ProfileForm({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    color: "#fff",
   },
   loadingContainer: {
     flex: 1,

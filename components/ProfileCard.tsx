@@ -506,14 +506,14 @@ export default function ProfileCard({
                 style={[
                   styles.image,
                   {
-                    backgroundColor: "#ffffff",
+                    backgroundColor: "#ededed",
                     justifyContent: "center",
                     alignItems: "center",
                     marginTop: 0,
                   },
                 ]}
               >
-                <Ionicons name="person" size={60} color="#1A1A1A" />
+                <Ionicons name="person" size={60} color="#fff" />
               </View>
             )}
             {profile.experience_level && (

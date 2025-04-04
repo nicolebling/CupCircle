@@ -221,13 +221,13 @@ export default function OnboardingScreen() {
                   style={[
                     styles.profilePhoto,
                     {
-                      backgroundColor: "#ffffff",
+                      backgroundColor: "#ededed",
                       justifyContent: "center",
                       alignItems: "center",
                     },
                   ]}
                 >
-                  <Ionicons name="person" size={60} color="#1A1A1A" />
+                  <Ionicons name="person" size={60} color="#fff" />
                 </View>
               )}
               <TouchableOpacity 
@@ -262,19 +262,6 @@ export default function OnboardingScreen() {
               employment={profileData.employment[0] || {}}
               onChange={(updated) => setProfileData({ ...profileData, employment: [updated] })}
               onDelete={() => setProfileData({ ...profileData, employment: [] })}
-              isDark={false}
-            />
-          </View>
-        );
-
-      case 6:
-        return (
-          <View style={styles.formSection}>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>Career Transitions</Text>
-            <CareerTransitionEntry
-              transition={profileData.career_transitions[0] || {}}
-              onChange={(updated) => setProfileData({ ...profileData, career_transitions: [updated] })}
-              onDelete={() => setProfileData({ ...profileData, career_transitions: [] })}
               isDark={false}
             />
           </View>
