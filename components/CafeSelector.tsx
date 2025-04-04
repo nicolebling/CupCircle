@@ -222,7 +222,7 @@ export default function CafeSelector({
           >
             {selected.length
               ? `${selected.length} cafe${selected.length === 1 ? "" : "s"} selected`
-              : "Select favorite cafes"}
+              : "Select top 3 cafes"}
           </Text>
           <Ionicons name="chevron-down" size={20} color={colors.secondaryText} />
         </TouchableOpacity>

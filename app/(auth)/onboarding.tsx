@@ -191,7 +191,19 @@ export default function OnboardingScreen() {
           </View>
         );
 
-      case 4:
+        case 4:
+        return (
+          <View style={styles.formSection}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Experience Level</Text>
+            <ExperienceLevelSelector
+              selected={profileData.experience_level}
+              onChange={(level) => setProfileData({ ...profileData, experience_level: level })}
+              isDark={false}
+            />
+          </View>
+        );
+
+      case 5:
         return (
           <View style={styles.formSection}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>Tell us about yourself</Text>
@@ -208,7 +220,7 @@ export default function OnboardingScreen() {
           </View>
         );
 
-      case 5:
+      case 6:
         return (
           <View style={styles.formSection}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>Profile Photo</Text>
@@ -244,7 +256,7 @@ export default function OnboardingScreen() {
           </View>
         );
 
-      case 6:
+      case 7:
         return (
           <View style={styles.formSection}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>Education</Text>
@@ -259,7 +271,7 @@ export default function OnboardingScreen() {
         );
 
 
-      case 7:
+      case 8:
         return (
           <View style={styles.formSection}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>Industry Categories</Text>
@@ -272,10 +284,11 @@ export default function OnboardingScreen() {
           </View>
         );
 
-        case 8:
+        case 9:
           return (
             <View style={styles.formSection}>
               <Text style={[styles.sectionTitle, { color: colors.text }]}>Employment</Text>
+              <Text style={[styles.sectionSubtitle, { color: colors.secondaryText }]}>Employment history is optional, but we recommend listing at least one.</Text>
               <EmploymentHistoryEntry
                 employment={profileData.employment[0] || {}}
                 onChange={(updated) => setProfileData({ ...profileData, employment: [updated] })}
@@ -285,18 +298,7 @@ export default function OnboardingScreen() {
             </View>
           );
 
-        case 9:
-        return (
-          <View style={styles.formSection}>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>Experience Level</Text>
-             <Text style={[styles.sectionSubtitle, { color: colors.secondaryText }]}>Employment history is optional, but we recommend listing at least one.</Text>
-            <ExperienceLevelSelector
-              selected={profileData.experience_level}
-              onChange={(level) => setProfileData({ ...profileData, experience_level: level })}
-              isDark={false}
-            />
-          </View>
-        );
+       
 
         case 10:
           return (

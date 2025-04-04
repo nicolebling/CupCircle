@@ -45,7 +45,7 @@ export function useAvailability() {
     }
   };
 
-  const getSlots = async () => {
+  const getSlots = async () => {r
     if (!user?.id) return [];
     setIsLoading(true);
     setError(null);
