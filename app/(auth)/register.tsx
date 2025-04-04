@@ -65,8 +65,7 @@ export default function SignUpScreen() {
 
       if (error) {
         console.error("Signup error:", error.message)
-        setToastMessage(error.message);
-        setToastVisible(true);
+        setError(error.message);
       } else {
         console.log("Signup successful:", data)
         console.log("User created:", data.user)
@@ -188,6 +187,9 @@ export default function SignUpScreen() {
           style={styles.keyboardAvoidingView}
         >
           <View style={styles.content}>
+            {error ? (
+              <Text style={styles.errorMessage}>{error}</Text>
+            ) : null}
             {/* Logo & Branding */}
             <View style={styles.header}>
               <LogoAnimation />
@@ -312,12 +314,6 @@ export default function SignUpScreen() {
           </View>
         </KeyboardAvoidingView>
         <StatusBar style="auto" />
-      <Toast 
-          visible={toastVisible} 
-          message={toastMessage} 
-          type="error" 
-          onDismiss={() => setToastVisible(false)} 
-        />
       </SafeAreaView>
     </ThemeProvider>
   );
