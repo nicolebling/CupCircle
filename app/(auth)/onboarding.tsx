@@ -165,6 +165,7 @@ export default function OnboardingScreen() {
         return (
           <View style={styles.formSection}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>What's your occupation?</Text>
+            <Text style={[styles.sectionSubtitle, { color: colors.secondaryText }]}>This could be your job title, passion, or just something that describes you best.</Text>
             <TextInput
               style={[styles.input, { backgroundColor: colors.card, color: colors.text, borderColor: colors.border }]}
               placeholder="Enter your job title"
@@ -434,6 +435,11 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 24,
     fontFamily: 'K2D-SemiBold',
+    marginBottom: 8,
+  },
+  sectionSubtitle: {
+    fontSize: 14,
+    fontFamily: 'K2D-Regular',
     marginBottom: 16,
   },
   input: {
