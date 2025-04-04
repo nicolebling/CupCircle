@@ -187,9 +187,7 @@ export default function SignUpScreen() {
           style={styles.keyboardAvoidingView}
         >
           <View style={styles.content}>
-            {error ? (
-              <Text style={styles.errorMessage}>{error}</Text>
-            ) : null}
+            
             {/* Logo & Branding */}
             <View style={styles.header}>
               <LogoAnimation />
@@ -293,7 +291,10 @@ export default function SignUpScreen() {
               </TouchableOpacity>
             </View>
 
-            
+            {/* Error Message */}
+            {error ? (
+              <Text style={styles.errorMessage}>{error}</Text>
+            ) : null}
 
             {/* Already Have an Account? */}
             <View style={styles.footer}>
@@ -433,5 +434,12 @@ const styles = StyleSheet.create({
   registerLink: {
     fontSize: 14,
     fontFamily: "K2D-SemiBold",
+  },
+  errorMessage: {
+    color: '#f44336',
+    textAlign: 'center',
+    marginTop: 10,
+    fontSize: 14,
+    fontFamily: "K2D-Regular",
   },
 });
