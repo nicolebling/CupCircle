@@ -96,8 +96,15 @@ export default function LoginScreen() {
 
     if (error) {
       console.error("Login error:", error.message);
-      setError(error.message);
-      setToastMessage(error.message);
+      // Convert technical error messages to user-friendly ones
+      if (error.message.includes("Invalid login")) {
+        setError("Incorrect email or password");
+      } else if (error.message.includes("Email not confirmed")) {
+        setError("Please verify your email address");
+      } else {
+        setError("Unable to log in. Please try again.");
+      }
+      setToastMessage(error); // Keep toast consistent with error message
       setToastVisible(true);
     } else {
       console.log("Login successful:", data);

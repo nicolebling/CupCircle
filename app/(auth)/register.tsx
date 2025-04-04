@@ -65,7 +65,16 @@ export default function SignUpScreen() {
 
       if (error) {
         console.error("Signup error:", error.message)
-        setError(error.message);
+        // Convert technical error messages to user-friendly ones
+        if (error.message.includes("User already registered")) {
+          setError("An account with this email already exists");
+        } else if (error.message.includes("Password should be")) {
+          setError("Password must be at least 6 characters long");
+        } else if (error.message.includes("valid email")) {
+          setError("Please enter a valid email address");
+        } else {
+          setError("Unable to create account. Please try again.");
+        }
       } else {
         console.log("Signup successful:", data)
         console.log("User created:", data.user)
