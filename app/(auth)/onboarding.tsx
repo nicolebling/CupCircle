@@ -236,7 +236,9 @@ export default function OnboardingScreen() {
                 style={[styles.photoButton, { backgroundColor: colors.primary }]}
                 onPress={pickImage}
               >
-                <Text style={styles.photoButtonText}>Change Photo</Text>
+                <Text style={styles.photoButtonText}>
+                  {profileData.photo_url ? 'Change Photo' : 'Add Photo'}
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
