@@ -109,7 +109,7 @@ type ProfileCardProps = {
 
 const EMPTY_PROFILE: UserProfileData = {
   name: "",
-  photo: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIxMDAiIGN5PSIxMDAiIHI9Ijk4IiBmaWxsPSIjZjJmMmYyIiBzdHJva2U9IiNlMGUwZTAiIHN0cm9rZS13aWR0aD0iMiIvPjxwYXRoIGQ9Ik05MCw5MEgxMTBNMTAwLDgwVjEyMCIgc3Ryb2tlPSIjOTA5MDkwIiBzdHJva2Utd2lkdGg9IjgiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvc3ZnPg==",
+  photo: "https://via.placeholder.com/150",
   birthday: "",
   occupation: "",
   experienceLevel: "",
