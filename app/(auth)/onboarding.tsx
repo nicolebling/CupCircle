@@ -164,7 +164,7 @@ export default function OnboardingScreen() {
       case 2:
         return (
           <View style={styles.formSection}>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>What's your occupation?</Text>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>A headline for your profile</Text>
             <Text style={[styles.sectionSubtitle, { color: colors.secondaryText }]}>This could be your job title, passion, or just something that describes you best.</Text>
             <TextInput
               style={[styles.input, { backgroundColor: colors.card, color: colors.text, borderColor: colors.border }]}
@@ -180,9 +180,10 @@ export default function OnboardingScreen() {
         return (
           <View style={styles.formSection}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>Where are you located?</Text>
+            <Text style={[styles.sectionSubtitle, { color: colors.secondaryText }]}>Currently, we're based only in NYC.</Text>
             <TextInput
               style={[styles.input, { backgroundColor: colors.card, color: colors.text, borderColor: colors.border }]}
-              placeholder="Enter your city"
+              placeholder="New York City"
               placeholderTextColor={colors.secondaryText}
               value={profileData.city}
               onChangeText={(text) => setProfileData({ ...profileData, city: text })}
@@ -255,58 +256,8 @@ export default function OnboardingScreen() {
           </View>
         );
 
-      case 6:
-        return (
-          <View style={styles.formSection}>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>Employment History</Text>
-            <EmploymentHistoryEntry
-              employment={profileData.employment[0] || {}}
-              onChange={(updated) => setProfileData({ ...profileData, employment: [updated] })}
-              onDelete={() => setProfileData({ ...profileData, employment: [] })}
-              isDark={false}
-            />
-          </View>
-        );
 
       case 7:
-        return (
-          <View style={styles.formSection}>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>Employment History</Text>
-            <EmploymentHistoryEntry
-              employment={profileData.employment[0] || {}}
-              onChange={(updated) => setProfileData({ ...profileData, employment: [updated] })}
-              onDelete={() => setProfileData({ ...profileData, employment: [] })}
-              isDark={false}
-            />
-          </View>
-        );
-
-      case 8:
-        return (
-          <View style={styles.formSection}>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>Career Transitions</Text>
-            <CareerTransitionEntry
-              transition={profileData.career_transitions[0] || {}}
-              onChange={(updated) => setProfileData({ ...profileData, career_transitions: [updated] })}
-              onDelete={() => setProfileData({ ...profileData, career_transitions: [] })}
-              isDark={false}
-            />
-          </View>
-        );
-
-      case 9:
-        return (
-          <View style={styles.formSection}>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>Experience Level</Text>
-            <ExperienceLevelSelector
-              selected={profileData.experience_level}
-              onChange={(level) => setProfileData({ ...profileData, experience_level: level })}
-              isDark={false}
-            />
-          </View>
-        );
-
-      case 10:
         return (
           <View style={styles.formSection}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>Industry Categories</Text>
@@ -318,6 +269,46 @@ export default function OnboardingScreen() {
             />
           </View>
         );
+
+        case 8:
+          return (
+            <View style={styles.formSection}>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>Employment</Text>
+              <EmploymentHistoryEntry
+                employment={profileData.employment[0] || {}}
+                onChange={(updated) => setProfileData({ ...profileData, employment: [updated] })}
+                onDelete={() => setProfileData({ ...profileData, employment: [] })}
+                isDark={false}
+              />
+            </View>
+          );
+
+        case 9:
+        return (
+          <View style={styles.formSection}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Experience Level</Text>
+             <Text style={[styles.sectionSubtitle, { color: colors.secondaryText }]}>Employment history is optional, but we recommend listing at least one.</Text>
+            <ExperienceLevelSelector
+              selected={profileData.experience_level}
+              onChange={(level) => setProfileData({ ...profileData, experience_level: level })}
+              isDark={false}
+            />
+          </View>
+        );
+
+        case 10:
+          return (
+            <View style={styles.formSection}>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>Career Transitions</Text>
+              <Text style={[styles.sectionSubtitle, { color: colors.secondaryText }]}>If you've made a career shift, feel free to include it—it’s optional, but can add useful context.</Text>
+              <CareerTransitionEntry
+                transition={profileData.career_transitions[0] || {}}
+                onChange={(updated) => setProfileData({ ...profileData, career_transitions: [updated] })}
+                onDelete={() => setProfileData({ ...profileData, career_transitions: [] })}
+                isDark={false}
+              />
+            </View>
+          );
 
       case 11:
         return (
@@ -335,7 +326,8 @@ export default function OnboardingScreen() {
       case 12:
         return (
           <View style={styles.formSection}>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>Favorite Cafes</Text>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Top 3 Cafes</Text>
+             <Text style={[styles.sectionSubtitle, { color: colors.secondaryText }]}>Share your top cafes for coffee chats.</Text>
             <CafeSelector
               selected={profileData.favorite_cafes}
               onChange={(cafes) => setProfileData({ ...profileData, favorite_cafes: cafes })}
