@@ -24,7 +24,7 @@ export default function OnboardingScreen() {
     occupation: '',
     city: '',
     bio: '',
-    photo_url: user?.photo_url || 'https://randomuser.me/api/portraits/lego/1.jpg',
+    photo_url: user?.photo_url || 'https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png',
     education: '',
     employment: [],
     career_transitions: [],
