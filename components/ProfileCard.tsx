@@ -366,10 +366,80 @@ export default function ProfileCard({
 
           <View style={styles.divider} />
 
+          {/* Industries */}
+          {profile.industry_categories && profile.industry_categories.length > 0 && (
+            <>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>Industries</Text>
+              <View style={styles.interestsContainer}>
+                {profile.industry_categories.map((industry, index) => (
+                  <View
+                    key={index}
+                    style={[
+                      styles.interestTag,
+                      {
+                        backgroundColor: "transparent",
+                        borderWidth: 1,
+                        borderColor: colors.primary,
+                      },
+                    ]}
+                  >
+                    <Text style={[styles.interestText, { color: colors.primary }]}>
+                      {industry}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            </>
+          )}
+
+          {/* Employment */}
+          {profile.employment && profile.employment.length > 0 && (
+            <>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>Experience</Text>
+              {profile.employment.map((jobString, index) => {
+                const job = typeof jobString === 'string' ? JSON.parse(jobString) : jobString;
+                return (
+                  <View key={index} style={styles.employmentCard}>
+                    <Text style={[styles.position, { color: colors.text }]}>{job.position}</Text>
+                    <Text style={[styles.companyName, { color: colors.secondaryText }]}>{job.company}</Text>
+                    <Text style={[styles.dateRange, { color: colors.secondaryText }]}>
+                      {job.fromDate} - {job.toDate}
+                    </Text>
+                  </View>
+                );
+              })}
+            </>
+          )}
+
+          {/* Career Transitions */}
+          {profile.career_transitions && profile.career_transitions.length > 0 && (
+            <>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>Career Transitions</Text>
+              {profile.career_transitions.map((transitionString, index) => {
+                const transition = typeof transitionString === 'string' ? JSON.parse(transitionString) : transitionString;
+                return (
+                  <View key={index} style={styles.transitionCard}>
+                    <View style={styles.transitionText}>
+                      <Text style={[styles.position, { color: colors.text }]}>{transition.position1}</Text>
+                      <Ionicons name="arrow-forward" size={20} color={colors.primary} style={styles.transitionArrow} />
+                      <Text style={[styles.position, { color: colors.text }]}>{transition.position2}</Text>
+                    </View>
+                  </View>
+                );
+              })}
+            </>
+          )}
+
+          {/* Education */}
+          {profile.education && (
+            <>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>Education</Text>
+              <Text style={[styles.sectionText, { color: colors.text }]}>{profile.education}</Text>
+            </>
+          )}
+
           {/* Interests */}
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>
-            Interests
-          </Text>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Interests</Text>
           <View style={styles.interestsContainer}>
             {profile.interests &&
               profile.interests.slice(0, 5).map((interest, index) => (
@@ -384,9 +454,7 @@ export default function ProfileCard({
                     },
                   ]}
                 >
-                  <Text
-                    style={[styles.interestText, { color: colors.primary }]}
-                  >
+                  <Text style={[styles.interestText, { color: colors.primary }]}>
                     {interest}
                   </Text>
                 </View>
