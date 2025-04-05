@@ -257,33 +257,24 @@ export default function ProfileCard({
   // For matching view
   if (!isUserProfile && !isEditMode && !isOnboarding) {
     return (
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
-        <View
-          style={[
-            styles.userCard,
-            {
-              backgroundColor: colors.card,
-              borderColor: colors.border,
-              padding: 0,
-              paddingTop: 16,
-            },
-          ]}
-        >
-          <View style={[styles.imageContainer, { marginTop: 32 }]}>
-            <Image
-              source={{ uri: profile.photo }}
-              style={[styles.image, { marginTop: 0 }]}
-              resizeMode="cover"
+      <View
+        style={[
+          styles.card,
+          { backgroundColor: colors.card, borderColor: colors.border },
+        ]}
+      >
+        <View style={styles.imageContainer}>
+          {/* Added container */}
+          <Image source={{ uri: profile.photo }} style={styles.image} />
+          {profile.experience_level && (
+            <View
+              style={[
+                styles.decorativeCircle,
+                { backgroundColor: getCoffeeColor(profile.experience_level) },
+              ]}
             />
-            {profile.experience_level && (
-              <View
-                style={[
-                  styles.decorativeCircle,
-                  { borderColor: getCoffeeColor(profile.experience_level) },
-                ]}
-              />
-            )}
-          </View>
+          )}
+        </View>
 
         {profile.matchedCafe && (
           <View
