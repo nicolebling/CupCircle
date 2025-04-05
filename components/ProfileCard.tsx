@@ -295,28 +295,28 @@ export default function ProfileCard({
           )}
 
           <View style={{ padding: 16 }}>
-            <View style={styles.headerContainer}>
-              <View style={styles.headerInfo}>
-                <Text
-                  style={[
-                    styles.name,
-                    { color: colors.text, textAlign: "center" },
-                  ]}
-                >
-                  {profile.name}
-                  {profile.age && <Text>({profile.age})</Text>}
-                </Text>
+          <View style={styles.headerContainer}>
+            <View style={styles.headerInfo}>
+              <Text
+                style={[
+                  styles.name,
+                  { color: colors.text, textAlign: "center" },
+                ]}
+              >
+                {profile.name}
+                {profile.age && <Text>({profile.age})</Text>}
+              </Text>
 
-                <View
-                  style={[
-                    styles.positionContainer,
-                    { justifyContent: "center" },
-                  ]}
-                >
-                  <Text style={[styles.position, { color: colors.text }]}>
-                    {profile.occupation}
-                  </Text>
-                  {profile.experience_level && ( 
+              <View
+                style={[
+                  styles.positionContainer,
+                  { justifyContent: "center" },
+                ]}
+              >
+                <Text style={[styles.position, { color: colors.text }]}>
+                  {profile.occupation}
+                </Text>
+                {profile.experience_level && 
                  ((profile.employment?.length > 0) || 
                   (profile.career_transitions?.length > 0)) && (
                   <Text
