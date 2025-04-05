@@ -141,18 +141,22 @@ export default function MatchingScreen() {
       console.log("Current user ID:", user?.id);
       const today = new Date().toISOString().split("T")[0];
       console.log("Fetching availability from date:", today);
+      
 
       const { data: availabilityData, error: availabilityError } =
         await supabase
           .from("availability")
           .select("*")
-          .neq("user_id", user?.id) 
+          .neq("id", user?.id) 
           .order("date", { ascending: true });
 
+      
       if (availabilityError) {
         console.error("Error fetching availability data:", availabilityError);
+        
         throw availabilityError;
       }
+    
 
       console.log("Retrieved availability data:", availabilityData);
 
