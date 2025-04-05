@@ -399,12 +399,22 @@ export default function ProfileCard({
               {profile.employment.map((jobString, index) => {
                 const job = typeof jobString === 'string' ? JSON.parse(jobString) : jobString;
                 return (
-                  <View key={index} style={styles.employmentCard}>
-                    <Text style={[styles.position, { color: colors.text }]}>{job.position}</Text>
-                    <Text style={[styles.companyName, { color: colors.secondaryText }]}>{job.company}</Text>
-                    <Text style={[styles.dateRange, { color: colors.secondaryText }]}>
-                      {job.fromDate} - {job.toDate}
-                    </Text>
+                  <View key={index} style={styles.employmentContainer}>
+                    <View style={styles.timelineDot} />
+                    <View style={styles.employmentCard}>
+                      <Text style={[styles.position, { color: colors.text, fontSize: 16, marginBottom: 4 }]}>
+                        {job.position}
+                      </Text>
+                      <Text style={[styles.companyName, { color: colors.text, fontSize: 14 }]}>
+                        {job.company}
+                      </Text>
+                      <Text style={[styles.dateRange, { color: colors.secondaryText, fontSize: 14, marginTop: 4 }]}>
+                        {job.fromDate} - {job.toDate}
+                      </Text>
+                    </View>
+                    {index < profile.employment.length - 1 && (
+                      <View style={[styles.timelineLine, { backgroundColor: colors.border }]} />
+                    )}
                   </View>
                 );
               })}
