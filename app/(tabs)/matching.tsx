@@ -55,6 +55,8 @@ interface TimeSlot {
 }
 
 export default function MatchingScreen() {
+  // Expose the openFilterModal function to the header
+  global.matchingScreen = { openFilterModal: null };
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const { user } = useAuth();
@@ -323,6 +325,8 @@ export default function MatchingScreen() {
   const openFilterModal = () => {
     setFilterModalVisible(true);
   };
+  // Make the function available to the header
+  global.matchingScreen.openFilterModal = openFilterModal;
 
   const applyFilters = () => {
     setIsLoading(true);
@@ -362,16 +366,7 @@ export default function MatchingScreen() {
     <SafeAreaView
       style={[styles.container, { backgroundColor: colors.background }]}
     >
-      <View style={styles.header}>
-        <View style={styles.headerContent}>
-          <TouchableOpacity
-            onPress={openFilterModal}
-            style={styles.filterButton}
-          >
-            <Ionicons name="options" size={24} color={colors.primary} />
-          </TouchableOpacity>
-        </View>
-      </View>
+      
 
       <ScrollView
         style={{ flex: 1 }}

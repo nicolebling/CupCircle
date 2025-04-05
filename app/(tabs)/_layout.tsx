@@ -36,6 +36,19 @@ export default function TabLayout() {
         name="matching"
         options={{
           title: 'Explore Your Circle',
+          headerRight: () => (
+            <TouchableOpacity 
+              onPress={() => {
+                const matchingScreen = global.matchingScreen;
+                if (matchingScreen?.openFilterModal) {
+                  matchingScreen.openFilterModal();
+                }
+              }}
+              style={{ marginRight: 16 }}
+            >
+              <Ionicons name="options" size={24} color={Colors.light.primary} />
+            </TouchableOpacity>
+          ),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="people" size={size} color={color} />
           ),
