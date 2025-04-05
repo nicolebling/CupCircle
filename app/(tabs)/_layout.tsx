@@ -2,6 +2,7 @@ import React from 'react';
 import { Tabs } from 'expo-router';
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
+import { TouchableOpacity } from "react-native";
 
 export default function TabLayout() {
   const colors = Colors.light;
