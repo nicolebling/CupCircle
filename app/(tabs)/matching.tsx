@@ -147,9 +147,8 @@ export default function MatchingScreen() {
         await supabase
           .from("availability")
           .select("*")
-          .neq("user_id", user?.id)
-          .gte('date', today)
-          .order("date", { ascending: true });
+          // .neq("id", user?.id)
+          // .order("date", { ascending: true });
 
       
       if (availabilityError) {
