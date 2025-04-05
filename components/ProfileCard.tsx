@@ -819,7 +819,7 @@ export default function ProfileCard({
                   </>
                 )}
 
-              {/* Interests */}
+            {/* Interests */}
               {profile.interests && profile.interests.length > 0 && (
                 <View style={styles.section}>
                   <Text style={[styles.label, { color: colors.secondaryText }]}>
