@@ -444,6 +444,73 @@ export default function MatchingScreen() {
                   onLike={handleLike}
                   onSkip={handleSkip}
                 />
+                
+                {/* Cafe details and availability */}
+                {profiles[currentIndex].favorite_cafes && profiles[currentIndex].favorite_cafes.length > 0 && (
+                  <View style={[styles.detailsCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+                    <Text style={[styles.detailsTitle, { color: colors.text }]}>
+                      Favorite Cafes
+                    </Text>
+                    <View style={styles.cafeList}>
+                      {profiles[currentIndex].favorite_cafes.map((cafe, index) => {
+                        const [cafeName, cafeAddress] = cafe ? cafe.split('|||') : ['', ''];
+                        return (
+                          <TouchableOpacity 
+                            key={index}
+                            style={[styles.cafeItem, { backgroundColor: colors.card }]}
+                          >
+                            <View style={styles.cafeDetails}>
+                              <Text style={[styles.cafeName, { color: colors.text }]}>
+                                <Ionicons name="cafe" size={16} color={colors.primary} style={{marginRight: 5}} /> 
+                                {cafeName}
+                              </Text>
+                              <Text style={[styles.cafeAddress, { color: colors.secondaryText }]}>
+                                {cafeAddress}
+                              </Text>
+                            </View>
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </View>
+                  </View>
+                )}
+                
+                {profiles[currentIndex].availabilitySlots && profiles[currentIndex].availabilitySlots.length > 0 && (
+                  <View style={[styles.detailsCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+                    <Text style={[styles.detailsTitle, { color: colors.text }]}>
+                      Available Times
+                    </Text>
+                    <View style={styles.availabilityList}>
+                      {profiles[currentIndex].availabilitySlots.map((slot, index) => {
+                        // Format the date
+                        const date = new Date(slot.date);
+                        const formattedDate = date.toLocaleDateString('en-US', {
+                          weekday: 'short',
+                          month: 'short', 
+                          day: 'numeric'
+                        });
+                        
+                        return (
+                          <TouchableOpacity 
+                            key={index}
+                            style={[styles.timeSlotItem, { backgroundColor: colors.card }]}
+                          >
+                            <View style={styles.timeSlotDetails}>
+                              <Text style={[styles.timeSlotDate, { color: colors.text }]}>
+                                <Ionicons name="calendar" size={16} color={colors.primary} style={{marginRight: 5}} /> 
+                                {formattedDate}
+                              </Text>
+                              <Text style={[styles.timeSlotTime, { color: colors.secondaryText }]}>
+                                <Ionicons name="time" size={16} color={colors.secondaryText} style={{marginRight: 5}} /> 
+                                {slot.start_time} - {slot.end_time}
+                              </Text>
+                            </View>
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </View>
+                  </View>
+                )}
               </Animated.View>
 
               <View style={styles.navigationControls}>
@@ -961,5 +1028,68 @@ const styles = StyleSheet.create({
     color: "#666",
     fontFamily: "K2D-Medium",
     fontSize: 16,
+  },
+  detailsCard: {
+    width: "90%",
+    borderRadius: 16,
+    borderWidth: 1,
+    padding: 16,
+    marginTop: 16,
+    alignSelf: "center",
+  },
+  detailsTitle: {
+    fontFamily: "K2D-SemiBold",
+    fontSize: 18,
+    marginBottom: 12,
+  },
+  cafeList: {
+    marginBottom: 8,
+  },
+  cafeItem: {
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  cafeDetails: {
+    flex: 1,
+  },
+  cafeName: {
+    fontFamily: "K2D-Medium",
+    fontSize: 16,
+    marginBottom: 4,
+  },
+  cafeAddress: {
+    fontFamily: "K2D-Regular",
+    fontSize: 12,
+  },
+  availabilityList: {
+    marginBottom: 8,
+  },
+  timeSlotItem: {
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  timeSlotDetails: {
+    flex: 1,
+  },
+  timeSlotDate: {
+    fontFamily: "K2D-Medium",
+    fontSize: 16,
+    marginBottom: 4,
+  },
+  timeSlotTime: {
+    fontFamily: "K2D-Regular",
+    fontSize: 14,
   },
 });
