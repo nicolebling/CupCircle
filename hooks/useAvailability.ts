@@ -4,6 +4,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { Availability } from "../models/Availability";
 import { cacheService } from "../services/cacheService";
 import NetInfo from "@react-native-community/netinfo";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export function useAvailability() {
   const [isLoading, setIsLoading] = useState(false);
