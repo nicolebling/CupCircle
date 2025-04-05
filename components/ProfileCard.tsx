@@ -257,44 +257,63 @@ export default function ProfileCard({
   // For matching view
   if (!isUserProfile && !isEditMode && !isOnboarding) {
     return (
-      <View
-        style={[
-          styles.card,
-          { backgroundColor: colors.card, borderColor: colors.border },
-        ]}
-      >
-        <View style={styles.imageContainer}>
-          {/* Added container */}
-          <Image source={{ uri: profile.photo }} style={styles.image} />
-          {profile.experience_level && (
-            <View
-              style={[
-                styles.decorativeCircle,
-                { backgroundColor: getCoffeeColor(profile.experience_level) },
-              ]}
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
+        <View
+          style={[
+            styles.userCard,
+            {
+              backgroundColor: colors.card,
+              borderColor: colors.border,
+              padding: 0,
+              paddingTop: 16,
+            },
+          ]}
+        >
+          <View style={[styles.imageContainer, { marginTop: 32 }]}>
+            <Image
+              source={{ uri: profile.photo }}
+              style={[styles.image, { marginTop: 0 }]}
+              resizeMode="cover"
             />
-          )}
-        </View>
-
-        {profile.matchedCafe && (
-          <View
-            style={[styles.matchBadge, { backgroundColor: colors.primary }]}
-          >
-            <Ionicons name="cafe" size={14} color="white" />
-            <Text style={styles.matchBadgeText}>Café Match</Text>
+            {profile.experience_level && (
+              <View
+                style={[
+                  styles.decorativeCircle,
+                  { borderColor: getCoffeeColor(profile.experience_level) },
+                ]}
+              />
+            )}
           </View>
-        )}
 
-        <View style={styles.content}>
+          {profile.matchedCafe && (
+            <View
+              style={[styles.matchBadge, { backgroundColor: colors.primary }]}
+            >
+              <Ionicons name="cafe" size={14} color="white" />
+              <Text style={styles.matchBadgeText}>Café Match</Text>
+            </View>
+          )}
+
+          <View style={{ padding: 16 }}>
           <View style={styles.headerContainer}>
             <View style={styles.headerInfo}>
-              <Text style={[styles.name, { color: colors.text }]}>
+              <Text
+                style={[
+                  styles.name,
+                  { color: colors.text, textAlign: "center" },
+                ]}
+              >
                 {profile.name}
                 {profile.age && <Text>({profile.age})</Text>}
               </Text>
 
-              <View style={styles.positionContainer}>
-                <Text style={[styles.position, { color: colors.primary }]}>
+              <View
+                style={[
+                  styles.positionContainer,
+                  { justifyContent: "center" },
+                ]}
+              >
+                <Text style={[styles.position, { color: colors.text }]}>
                   {profile.occupation}
                 </Text>
                 {profile.experience_level && 
