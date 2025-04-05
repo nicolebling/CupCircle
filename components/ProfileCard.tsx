@@ -297,21 +297,24 @@ export default function ProfileCard({
                 <Text style={[styles.position, { color: colors.primary }]}>
                   {profile.occupation}
                 </Text>
-                {profile.experience_level && 
-                 ((profile.employment?.length > 0) || 
-                  (profile.career_transitions?.length > 0)) && (
-                  <Text
-                    style={[styles.experience, { color: colors.secondaryText }]}
-                  >
-                    {profile.experience_level}
-                    <Ionicons
-                      name="cafe"
-                      size={12}
-                      color={getCoffeeColor(profile.experience_level)}
-                      style={{ marginLeft: 4 }}
-                    />
-                  </Text>
-                )}
+                {profile.experience_level &&
+                  ((profile.employment?.length > 0) ||
+                    (profile.career_transitions?.length > 0)) && (
+                    <Text
+                      style={[
+                        styles.experience,
+                        { color: colors.secondaryText },
+                      ]}
+                    >
+                      {profile.experience_level}
+                      <Ionicons
+                        name="cafe"
+                        size={12}
+                        color={getCoffeeColor(profile.experience_level)}
+                        style={{ marginLeft: 4 }}
+                      />
+                    </Text>
+                  )}
               </View>
 
               {profile.city && (
@@ -1097,10 +1100,12 @@ const styles = StyleSheet.create({
     resizeMode: "cover",
     borderRadius: ((width - 32) * 0.6) / 2, // Makes the image circular
     alignSelf: "center", // Center the image
+    zIndex: 2,
   },
   imageContainer: {
     position: "relative",
-    marginTop: 40
+    marginTop: 40,
+    alignItems: "center",
   },
   content: {
     padding: 16,
@@ -1453,13 +1458,8 @@ const styles = StyleSheet.create({
     borderRadius: ((width - 32) * 0.6 + 16) / 2,
     borderWidth: 4,
     backgroundColor: "transparent",
-    zIndex: 0,
-    top: "50%",
-    left: "50%",
-    transform: [
-      { translateX: -((width - 32) * 0.6 + 16) / 2 },
-      { translateY: -((width - 32) * 0.6 + 16) / 2 },
-    ],
+    top: -8,
+    zIndex: 1,
     shadowColor: "#FFF",
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.3,
