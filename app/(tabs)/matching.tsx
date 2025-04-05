@@ -43,6 +43,7 @@ interface Profile {
   interests: string[];
   matchedCafe?: boolean;
   employment?: string[];
+  availabilitySlots: TimeSlot[];
 }
 
 interface TimeSlot {
@@ -143,7 +144,7 @@ export default function MatchingScreen() {
       console.log("Current user ID:", user?.id);
       const today = new Date().toISOString().split("T")[0];
       console.log("Fetching availability from date:", today);
-      
+
 
       const { data: availabilityData, error: availabilityError } =
         await supabase
@@ -151,13 +152,13 @@ export default function MatchingScreen() {
           .select("*")
           .neq("id", user?.id)
           .order("date", { ascending: true });
-      
+
       if (availabilityError) {
         console.error("Error fetching availability data:", availabilityError);
-        
+
         throw availabilityError;
       }
-    
+
       console.log("Retrieved availability data:", availabilityData);
 
       // Filter out expired time slots for today
@@ -218,6 +219,28 @@ export default function MatchingScreen() {
         return;
       }
 
+      // Get availability data for each user
+      const userAvailabilityMap = {};
+      for (const userId of userIds) {
+        const { data: userAvail, error: availError } = await supabase
+          .from("availability")
+          .select("*")
+          .eq("id", userId)
+          .order("date", { ascending: true });
+
+        if (!availError && userAvail) {
+          // Filter out past availability
+          const now = new Date();
+          const futureAvailability = userAvail.filter((slot) => {
+            if (!slot.date) return false;
+            const slotDate = new Date(slot.date);
+            return slotDate > now;
+          });
+
+          userAvailabilityMap[userId] = futureAvailability;
+        }
+      }
+
       // Map profiles to the format expected by ProfileCard
       const formattedProfiles =
         profilesData.map((profile) => {
@@ -244,6 +267,8 @@ export default function MatchingScreen() {
             // Check if there's a cafe match (simplified version)
             matchedCafe: checkCafeMatch(profile.favorite_cafes),
             employment: profile.employment,
+            // Add the user's availability slots
+            availabilitySlots: userAvailabilityMap[profile.id] || []
           };
 
           return formattedProfile;
