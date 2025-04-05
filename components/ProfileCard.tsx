@@ -263,6 +263,7 @@ export default function ProfileCard({
           { backgroundColor: colors.card, borderColor: colors.border },
         ]}
       >
+        {/* Profile Photo */}
         <View style={styles.imageContainer}>
           {/* Added container */}
           {profile.photo ? (
@@ -286,12 +287,13 @@ export default function ProfileCard({
             <View
               style={[
                 styles.decorativeCircle,
-                { backgroundColor: getCoffeeColor(profile.experience_level) },
+                { borderColor: getCoffeeColor(profile.experience_level) },
               ]}
             />
           )}
         </View>
 
+        {/* Match badge - Edit for later */}
         {profile.matchedCafe && (
           <View
             style={[styles.matchBadge, { backgroundColor: colors.primary }]}
@@ -301,21 +303,25 @@ export default function ProfileCard({
           </View>
         )}
 
+        
         <View style={styles.content}>
           <View style={styles.headerContainer}>
             <View style={styles.headerInfo}>
+
+              {/* Name */}
               <Text style={[styles.name, { color: colors.text }]}>
                 {profile.name}
-                {profile.age && <Text>({profile.age})</Text>}
+                {/* {profile.age && <Text>({profile.age})</Text>} */}
               </Text>
 
+              {/* Occupation / Headline */}
               <View style={styles.positionContainer}>
                 <Text style={[styles.position, { color: colors.primary }]}>
                   {profile.occupation}
                 </Text>
                 {profile.experience_level &&
-                  ((profile.employment?.length > 0) ||
-                    (profile.career_transitions?.length > 0)) && (
+                  (profile.employment?.length > 0 ||
+                    profile.career_transitions?.length > 0) && (
                     <Text
                       style={[
                         styles.experience,
@@ -332,7 +338,8 @@ export default function ProfileCard({
                     </Text>
                   )}
               </View>
-
+              
+               {/* Location */}
               {profile.city && (
                 <View style={styles.locationContainer}>
                   <Ionicons
@@ -350,6 +357,7 @@ export default function ProfileCard({
             </View>
           </View>
 
+          {/* Bio */}
           <View style={styles.bioContainer}>
             <Text style={[styles.bioText, { color: colors.text }]}>
               {profile.bio}
@@ -358,6 +366,7 @@ export default function ProfileCard({
 
           <View style={styles.divider} />
 
+          {/* Interests */}
           <Text style={[styles.sectionTitle, { color: colors.text }]}>
             Interests
           </Text>
@@ -368,7 +377,11 @@ export default function ProfileCard({
                   key={index}
                   style={[
                     styles.interestTag,
-                    { backgroundColor: colors.primary + "20" },
+                    {
+                      backgroundColor: "transparent",
+                      borderWidth: 1,
+                      borderColor: colors.primary,
+                    },
                   ]}
                 >
                   <Text
@@ -380,6 +393,7 @@ export default function ProfileCard({
               ))}
           </View>
 
+          {/* Favorite Cafes */}
           {profile.favoriteCafes && profile.favoriteCafes.length > 0 && (
             <>
               <Text style={[styles.sectionTitle, { color: colors.text }]}>
@@ -391,7 +405,11 @@ export default function ProfileCard({
                     key={index}
                     style={[
                       styles.interestTag,
-                      { backgroundColor: colors.primary + "15" },
+                      {
+                        backgroundColor: "transparent",
+                        borderWidth: 1,
+                        borderColor: colors.primary,
+                      },
                     ]}
                   >
                     <Text
@@ -410,6 +428,7 @@ export default function ProfileCard({
             </>
           )}
 
+          {/* Neighborhoods */}
           {profile.neighborhoods && profile.neighborhoods.length > 0 && (
             <>
               <Text style={[styles.sectionTitle, { color: colors.text }]}>
@@ -423,7 +442,11 @@ export default function ProfileCard({
                       key={index}
                       style={[
                         styles.interestTag,
-                        { backgroundColor: colors.primary + "15" },
+                        {
+                          backgroundColor: "transparent",
+                          borderWidth: 1,
+                          borderColor: colors.primary,
+                        },
                       ]}
                     >
                       <Text
@@ -442,6 +465,7 @@ export default function ProfileCard({
             </>
           )}
 
+          {/* Experience */}
           {profile.experience && (
             <>
               <Text style={[styles.sectionTitle, { color: colors.text }]}>
