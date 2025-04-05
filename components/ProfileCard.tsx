@@ -265,7 +265,22 @@ export default function ProfileCard({
       >
         <View style={styles.imageContainer}>
           {/* Added container */}
-          <Image source={{ uri: profile.photo }} style={styles.image} />
+          {profile.photo ? (
+            <Image source={{ uri: profile.photo }} style={styles.image} />
+          ) : (
+            <View
+              style={[
+                styles.image,
+                {
+                  backgroundColor: "#ededed",
+                  justifyContent: "center",
+                  alignItems: "center",
+                },
+              ]}
+            >
+              <Ionicons name="person" size={60} color="#fff" />
+            </View>
+          )}
           {profile.experience_level && (
             <View
               style={[
