@@ -507,7 +507,7 @@ export default function ProfileCard({
           )}
 
           {/* Neighborhoods */}
-          {profile.neighborhoods && profile.neighborhoods.length > 0 && (
+          {/* {profile.neighborhoods && profile.neighborhoods.length > 0 && (
             <>
               <Text style={[styles.sectionTitle, { color: colors.text }]}>
                 Neighborhoods
@@ -541,7 +541,7 @@ export default function ProfileCard({
                   ))}
               </View>
             </>
-          )}
+          )} */}
 
           {/* Experience */}
           {profile.experience && (
