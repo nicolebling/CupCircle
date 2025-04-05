@@ -18,6 +18,8 @@ type AvailabilityCardProps = {
   onDelete: () => void;
 };
 
+
+
 export default function AvailabilityCard({ timeSlot, onDelete }: AvailabilityCardProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];

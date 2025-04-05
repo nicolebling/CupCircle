@@ -343,16 +343,6 @@ export default function ProfileCard({
           <View style={styles.divider} />
 
           <Text style={[styles.sectionTitle, { color: colors.text }]}>
-            About
-          </Text>
-          <Text
-            style={[styles.sectionText, { color: colors.secondaryText }]}
-            numberOfLines={3}
-          >
-            {profile.bio}
-          </Text>
-
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>
             Interests
           </Text>
           <View style={styles.interestsContainer}>
