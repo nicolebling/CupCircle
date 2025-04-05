@@ -147,9 +147,8 @@ export default function MatchingScreen() {
         await supabase
           .from("availability")
           .select("*")
-          // .neq("id", user?.id)
-          // .order("date", { ascending: true });
-
+          .neq("id", user?.id)
+          .order("date", { ascending: true });
       
       if (availabilityError) {
         console.error("Error fetching availability data:", availabilityError);
@@ -157,7 +156,6 @@ export default function MatchingScreen() {
         throw availabilityError;
       }
     
-
       console.log("Retrieved availability data:", availabilityData);
 
       // Filter out expired time slots for today
