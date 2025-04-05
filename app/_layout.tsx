@@ -7,6 +7,7 @@ import { useEffect } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import 'react-native-reanimated';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
+import { NetworkProvider } from '@/contexts/NetworkContext';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { Text, TextInput } from 'react-native';
 import Colors from '@/constants/Colors';
