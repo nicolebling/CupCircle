@@ -142,12 +142,19 @@ export default function MatchingScreen() {
       const today = new Date().toISOString().split("T")[0];
       console.log("Fetching availability from date:", today);
 
+      // Get current date and time
+      const now = new Date();
+      const today = now.toISOString().split('T')[0];
+      const currentTime = now.toLocaleTimeString('en-US', { hour12: true });
+
       const { data: availabilityData, error: availabilityError } =
         await supabase
           .from("availability")
           .select("*")
-          .neq("id", user?.id) 
-          .order("date", { ascending: true });
+          .neq("id", user?.id)
+          .gte('date', today) // Only get availability from today onwards
+          .order("date", { ascending: true })
+          .order("start_time", { ascending: true });
 
       if (availabilityError) {
         console.error("Error fetching availability data:", availabilityError);
@@ -156,10 +163,7 @@ export default function MatchingScreen() {
 
       console.log("Retrieved availability data:", availabilityData);
 
-      // Filter out expired time slots for today
-      const now = new Date();
-      const currentTime = now.toLocaleTimeString("en-US", { hour12: true });
-
+      // Filter out expired time slots
       const validAvailability = availabilityData?.filter((slot) => {
         if (!slot) return false;
 
@@ -168,7 +172,17 @@ export default function MatchingScreen() {
 
         // For today, only keep future time slots
         if (slot.date === today) {
-          return slot.start_time > currentTime;
+          // Parse time properly for comparison
+          const [time, period] = slot.start_time.split(' ');
+          const [hours, minutes] = time.split(':');
+          let hour = parseInt(hours);
+          if (period === 'PM' && hour !== 12) hour += 12;
+          if (period === 'AM' && hour === 12) hour = 0;
+          
+          const slotTime = new Date(now);
+          slotTime.setHours(hour, parseInt(minutes), 0, 0);
+          
+          return slotTime > now;
         }
 
         return false;
