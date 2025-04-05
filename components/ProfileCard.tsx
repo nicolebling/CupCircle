@@ -275,6 +275,7 @@ export default function ProfileCard({
                   backgroundColor: "#ededed",
                   justifyContent: "center",
                   alignItems: "center",
+                  zIndex: 2,
                 },
               ]}
             >
