@@ -439,6 +439,7 @@ export default function MatchingScreen() {
                   onPress={handlePrevious}
                   style={[
                     styles.floatingButton,
+                    styles.leftButton,
                     { opacity: currentIndex > 0 ? 1 : 0.5 },
                   ]}
                   disabled={currentIndex === 0}
@@ -448,7 +449,7 @@ export default function MatchingScreen() {
 
                 <TouchableOpacity
                   onPress={handleLike}
-                  style={styles.floatingButton}
+                  style={[styles.floatingButton, styles.rightButton]}
                 >
                   <Ionicons name="arrow-forward" size={24} color={colors.primary} />
                 </TouchableOpacity>
@@ -801,7 +802,7 @@ export default function MatchingScreen() {
 
 const styles = StyleSheet.create({
   navigationFloating: {
-    position: 'absolute',
+    position: 'fixed',
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
@@ -809,6 +810,7 @@ const styles = StyleSheet.create({
     zIndex: 1000,
     top: '50%',
     transform: [{ translateY: -25 }],
+    pointerEvents: 'box-none',
   },
   floatingButton: {
     width: 50,
@@ -822,6 +824,13 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
+    position: 'absolute',
+  },
+  leftButton: {
+    left: 20,
+  },
+  rightButton: {
+    right: 20,
   },
   container: {
     flex: 1,
