@@ -624,7 +624,7 @@ export default function ProfileCard({
         {onLike && onSkip && (
           <View style={styles.buttonsContainer}>
               <TouchableOpacity
-                onPress={onSkip}
+                onPress={handlePrevious}
                 style={[
                   styles.actionButton,
                   styles.likeButton,
