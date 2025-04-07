@@ -150,8 +150,8 @@ export default function ProfileCard({
   }, [userId, isNewUser]);
   
   const handlePrevious = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1);
+    if (onPrevious) {
+      onPrevious();
     }
   };
 
