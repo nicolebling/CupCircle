@@ -149,11 +149,7 @@ export default function ProfileCard({
     }
   }, [userId, isNewUser]);
   
-  const handlePrevious = () => {
-    if (onPrevious) {
-      onPrevious();
-    }
-  };
+  
 
   const fetchProfile = async () => {
     try {

@@ -434,6 +434,26 @@ export default function MatchingScreen() {
             </View>
           ) : currentIndex < profiles.length ? (
             <>
+              <View style={styles.navigationFloating}>
+                <TouchableOpacity
+                  onPress={handlePrevious}
+                  style={[
+                    styles.floatingButton,
+                    { opacity: currentIndex > 0 ? 1 : 0.5 },
+                  ]}
+                  disabled={currentIndex === 0}
+                >
+                  <Ionicons name="arrow-back" size={24} color={colors.primary} />
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={handleLike}
+                  style={styles.floatingButton}
+                >
+                  <Ionicons name="arrow-forward" size={24} color={colors.primary} />
+                </TouchableOpacity>
+              </View>
+
               <Animated.View
                 style={[styles.animatedCardContainer, cardAnimatedStyle]}
               >
@@ -441,10 +461,6 @@ export default function MatchingScreen() {
                   userId={profiles[currentIndex].id}
                   profile={profiles[currentIndex]}
                   isNewUser={false}
-                  onLike={handleLike}
-                  onSkip={handleSkip}
-                  onPrevious={handlePrevious}
-                  currentIndex={currentIndex}
                 />
                 
                 {/* Cafe details and availability */}
@@ -784,6 +800,29 @@ export default function MatchingScreen() {
 }
 
 const styles = StyleSheet.create({
+  navigationFloating: {
+    position: 'absolute',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    paddingHorizontal: 20,
+    zIndex: 1000,
+    top: '50%',
+    transform: [{ translateY: -25 }],
+  },
+  floatingButton: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: '#FFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
   container: {
     flex: 1,
     padding: 16,
