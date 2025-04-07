@@ -106,6 +106,7 @@ type ProfileCardProps = {
   onLike?: () => void;
   onSkip?: () => void;
   onPrevious?: () => void;
+  currentIndex?: number;
 };
 
 const EMPTY_PROFILE: UserProfileData = {

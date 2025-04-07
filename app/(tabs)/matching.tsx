@@ -444,6 +444,7 @@ export default function MatchingScreen() {
                   onLike={handleLike}
                   onSkip={handleSkip}
                   onPrevious={handlePrevious}
+                  currentIndex={currentIndex}
                 />
                 
                 {/* Cafe details and availability */}
