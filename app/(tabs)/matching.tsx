@@ -443,6 +443,7 @@ export default function MatchingScreen() {
                   isNewUser={false}
                   onLike={handleLike}
                   onSkip={handleSkip}
+                  onPrevious={handlePrevious}
                 />
                 
                 {/* Cafe details and availability */}

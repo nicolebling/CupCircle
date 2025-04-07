@@ -105,6 +105,7 @@ type ProfileCardProps = {
   onCancel?: () => void;
   onLike?: () => void;
   onSkip?: () => void;
+  onPrevious?: () => void;
 };
 
 const EMPTY_PROFILE: UserProfileData = {
@@ -624,7 +625,7 @@ export default function ProfileCard({
         {onLike && onSkip && (
           <View style={styles.buttonsContainer}>
               <TouchableOpacity
-                onPress={handlePrevious}
+                onPress={onPrevious}
                 style={[
                   styles.actionButton,
                   styles.likeButton,
