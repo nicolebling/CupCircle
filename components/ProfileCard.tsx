@@ -136,6 +136,7 @@ export default function ProfileCard({
 }: ProfileCardProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [profileData, setProfileData] = useState(null);
@@ -145,6 +146,12 @@ export default function ProfileCard({
       fetchProfile();
     }
   }, [userId, isNewUser]);
+  
+  const handlePrevious = () => {
+    if (currentIndex > 0) {
+      setCurrentIndex(currentIndex - 1);
+    }
+  };
 
   const fetchProfile = async () => {
     try {
@@ -303,11 +310,9 @@ export default function ProfileCard({
           </View>
         )}
 
-        
         <View style={styles.content}>
           <View style={styles.headerContainer}>
             <View style={styles.headerInfo}>
-
               {/* Name */}
               <Text style={[styles.name, { color: colors.text }]}>
                 {profile.name}
@@ -338,8 +343,8 @@ export default function ProfileCard({
                     </Text>
                   )}
               </View>
-              
-               {/* Location */}
+
+              {/* Location */}
               {profile.city && (
                 <View style={styles.locationContainer}>
                   <Ionicons
@@ -367,53 +372,87 @@ export default function ProfileCard({
           <View style={styles.divider} />
 
           {/* Industries */}
-          {profile.industry_categories && profile.industry_categories.length > 0 && (
-            <>
-              <Text style={[styles.sectionTitle, { color: colors.text }]}>Industries</Text>
-              <View style={styles.interestsContainer}>
-                {profile.industry_categories.map((industry, index) => (
-                  <View
-                    key={index}
-                    style={[
-                      styles.interestTag,
-                      {
-                        backgroundColor: "transparent",
-                        borderWidth: 1,
-                        borderColor: colors.primary,
-                      },
-                    ]}
-                  >
-                    <Text style={[styles.interestText, { color: colors.primary }]}>
-                      {industry}
-                    </Text>
-                  </View>
-                ))}
-              </View>
-            </>
-          )}
+          {profile.industry_categories &&
+            profile.industry_categories.length > 0 && (
+              <>
+                <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                  Industries
+                </Text>
+                <View style={styles.interestsContainer}>
+                  {profile.industry_categories.map((industry, index) => (
+                    <View
+                      key={index}
+                      style={[
+                        styles.interestTag,
+                        {
+                          backgroundColor: "transparent",
+                          borderWidth: 1,
+                          borderColor: colors.primary,
+                        },
+                      ]}
+                    >
+                      <Text
+                        style={[styles.interestText, { color: colors.primary }]}
+                      >
+                        {industry}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              </>
+            )}
 
           {/* Employment */}
           {profile.employment && profile.employment.length > 0 && (
             <>
-              <Text style={[styles.sectionTitle, { color: colors.text }]}>Experience</Text>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                Experience
+              </Text>
               {profile.employment.map((jobString, index) => {
-                const job = typeof jobString === 'string' ? JSON.parse(jobString) : jobString;
+                const job =
+                  typeof jobString === "string"
+                    ? JSON.parse(jobString)
+                    : jobString;
                 return (
                   <View key={index} style={styles.employmentContainer}>
                     <View style={styles.timelineDot} />
                     <View style={styles.employmentCard}>
-                      <Text style={[styles.position, { color: colors.text, fontSize: 16, marginBottom: 4 }]}>
+                      <Text
+                        style={[
+                          styles.position,
+                          { color: colors.text, fontSize: 16, marginBottom: 4 },
+                        ]}
+                      >
                         {job.position}
                       </Text>
-                      <Text style={[styles.companyName, { color: colors.text, fontSize: 14 }]}>
+                      <Text
+                        style={[
+                          styles.companyName,
+                          { color: colors.text, fontSize: 14 },
+                        ]}
+                      >
                         {job.company}
                       </Text>
-                      <Text style={[styles.dateRange, { color: colors.secondaryText, fontSize: 14, marginTop: 4 }]}>
+                      <Text
+                        style={[
+                          styles.dateRange,
+                          {
+                            color: colors.secondaryText,
+                            fontSize: 14,
+                            marginTop: 4,
+                          },
+                        ]}
+                      >
                         {job.fromDate} - {job.toDate}
                       </Text>
                     </View>
                     {index < profile.employment.length - 1 && (
-                      <View style={[styles.timelineLine, { backgroundColor: colors.border }]} />
+                      <View
+                        style={[
+                          styles.timelineLine,
+                          { backgroundColor: colors.border },
+                        ]}
+                      />
                     )}
                   </View>
                 );
@@ -422,34 +461,55 @@ export default function ProfileCard({
           )}
 
           {/* Career Transitions */}
-          {profile.career_transitions && profile.career_transitions.length > 0 && (
-            <>
-              <Text style={[styles.sectionTitle, { color: colors.text }]}>Career Transitions</Text>
-              {profile.career_transitions.map((transitionString, index) => {
-                const transition = typeof transitionString === 'string' ? JSON.parse(transitionString) : transitionString;
-                return (
-                  <View key={index} style={styles.transitionCard}>
-                    <View style={styles.transitionText}>
-                      <Text style={[styles.position, { color: colors.text }]}>{transition.position1}</Text>
-                      <Ionicons name="arrow-forward" size={20} color={colors.primary} style={styles.transitionArrow} />
-                      <Text style={[styles.position, { color: colors.text }]}>{transition.position2}</Text>
+          {profile.career_transitions &&
+            profile.career_transitions.length > 0 && (
+              <>
+                <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                  Career Transitions
+                </Text>
+                {profile.career_transitions.map((transitionString, index) => {
+                  const transition =
+                    typeof transitionString === "string"
+                      ? JSON.parse(transitionString)
+                      : transitionString;
+                  return (
+                    <View key={index} style={styles.transitionCard}>
+                      <View style={styles.transitionText}>
+                        <Text style={[styles.position, { color: colors.text }]}>
+                          {transition.position1}
+                        </Text>
+                        <Ionicons
+                          name="arrow-forward"
+                          size={20}
+                          color={colors.primary}
+                          style={styles.transitionArrow}
+                        />
+                        <Text style={[styles.position, { color: colors.text }]}>
+                          {transition.position2}
+                        </Text>
+                      </View>
                     </View>
-                  </View>
-                );
-              })}
-            </>
-          )}
+                  );
+                })}
+              </>
+            )}
 
           {/* Education */}
           {profile.education && (
             <>
-              <Text style={[styles.sectionTitle, { color: colors.text }]}>Education</Text>
-              <Text style={[styles.sectionText, { color: colors.text }]}>{profile.education}</Text>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                Education
+              </Text>
+              <Text style={[styles.sectionText, { color: colors.text }]}>
+                {profile.education}
+              </Text>
             </>
           )}
 
           {/* Interests */}
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>Interests</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>
+            Interests
+          </Text>
           <View style={styles.interestsContainer}>
             {profile.interests &&
               profile.interests.slice(0, 5).map((interest, index) => (
@@ -464,7 +524,9 @@ export default function ProfileCard({
                     },
                   ]}
                 >
-                  <Text style={[styles.interestText, { color: colors.primary }]}>
+                  <Text
+                    style={[styles.interestText, { color: colors.primary }]}
+                  >
                     {interest}
                   </Text>
                 </View>
@@ -561,15 +623,16 @@ export default function ProfileCard({
 
         {onLike && onSkip && (
           <View style={styles.buttonsContainer}>
-            <TouchableOpacity
-              onPress={onSkip}
-              style={[
-                styles.actionButton,
-                styles.skipButton,
-                { backgroundColor: "#FEE2E2" },
-              ]}
-            >
-              <Ionicons name="close" size={24} color="#EF4444" />
+              <TouchableOpacity
+                onPress={onSkip}
+                style={[
+                  styles.actionButton,
+                  styles.likeButton,
+                  { backgroundColor: "#FFF" },
+                ]}
+                disabled={currentIndex === 0}
+              >
+              <Ionicons name="arrow-back" size={24} color="#64748B" />
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -577,10 +640,10 @@ export default function ProfileCard({
               style={[
                 styles.actionButton,
                 styles.likeButton,
-                { backgroundColor: "#DCFCE7" },
+                { backgroundColor: "#FFF" },
               ]}
             >
-              <Ionicons name="checkmark" size={24} color="#22C55E" />
+              <Ionicons name="arrow-forward" size={24} color="#64748B" />
             </TouchableOpacity>
           </View>
         )}
@@ -1306,6 +1369,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     padding: 16,
     justifyContent: "center",
+    color: "#FFF",
   },
   actionButton: {
     width: 60,
