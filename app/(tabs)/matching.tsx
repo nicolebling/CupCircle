@@ -145,7 +145,6 @@ export default function MatchingScreen() {
       const today = new Date().toISOString().split("T")[0];
       console.log("Fetching availability from date:", today);
 
-
       const { data: availabilityData, error: availabilityError } =
         await supabase
           .from("availability")
@@ -222,16 +221,17 @@ export default function MatchingScreen() {
       // Get availability data for each user
       const userAvailabilityMap = {};
       const usersWithUpcomingAvailability = [];
-      
+
       // Calculate date for 7 days from now
-      const now = new Date();
       const sevenDaysLater = new Date();
       sevenDaysLater.setDate(now.getDate() + 7);
-      const sevenDaysLaterStr = sevenDaysLater.toISOString().split('T')[0];
-      const todayStr = now.toISOString().split('T')[0];
-      
-      console.log(`Filtering availability between ${todayStr} and ${sevenDaysLaterStr}`);
-      
+      const sevenDaysLaterStr = sevenDaysLater.toISOString().split("T")[0];
+      const todayStr = now.toISOString().split("T")[0];
+
+      console.log(
+        `Filtering availability between ${todayStr} and ${sevenDaysLaterStr}`,
+      );
+
       for (const userId of userIds) {
         const { data: userAvail, error: availError } = await supabase
           .from("availability")
@@ -245,28 +245,32 @@ export default function MatchingScreen() {
           // Filter for valid time slots (future times)
           const validAvailability = userAvail.filter((slot) => {
             if (!slot.date) return false;
-            
+
             // For slots today, check if time is in the future
             if (slot.date === todayStr) {
-              const currentTime = now.toLocaleTimeString('en-US', { hour12: true });
+              const currentTime = now.toLocaleTimeString("en-US", {
+                hour12: true,
+              });
               return slot.start_time > currentTime;
             }
-            
+
             // All other days in the next 7 days are valid
             return true;
           });
-          
+
           if (validAvailability.length > 0) {
             userAvailabilityMap[userId] = validAvailability;
             usersWithUpcomingAvailability.push(userId);
           }
         }
       }
-      
+
       // Filter user IDs to only those with upcoming availability
       userIds = usersWithUpcomingAvailability;
-      console.log(`Found ${userIds.length} users with availability in the next 7 days`);
-      
+      console.log(
+        `Found ${userIds.length} users with availability in the next 7 days`,
+      );
+
       if (userIds.length === 0) {
         console.log("No users with upcoming availability found");
         setProfiles([]);
@@ -301,7 +305,7 @@ export default function MatchingScreen() {
             matchedCafe: checkCafeMatch(profile.favorite_cafes),
             employment: profile.employment,
             // Add the user's availability slots
-            availabilitySlots: userAvailabilityMap[profile.id] || []
+            availabilitySlots: userAvailabilityMap[profile.id] || [],
           };
 
           return formattedProfile;
@@ -452,7 +456,7 @@ export default function MatchingScreen() {
               <Text
                 style={[styles.checkBackText, { color: colors.secondaryText }]}
               >
-                We couldn't find any users with availability in the next 7 days. 
+                We couldn't find any users with availability in the next 7 days.
                 Check back later as more users add their availability!
               </Text>
               <TouchableOpacity
@@ -477,14 +481,22 @@ export default function MatchingScreen() {
                   ]}
                   disabled={currentIndex === 0}
                 >
-                  <Ionicons name="arrow-back" size={24} color={colors.primary} />
+                  <Ionicons
+                    name="arrow-back"
+                    size={24}
+                    color={colors.primary}
+                  />
                 </TouchableOpacity>
 
                 <TouchableOpacity
                   onPress={handleLike}
                   style={[styles.floatingButton, styles.rightButton]}
                 >
-                  <Ionicons name="arrow-forward" size={24} color={colors.primary} />
+                  <Ionicons
+                    name="arrow-forward"
+                    size={24}
+                    color={colors.primary}
+                  />
                 </TouchableOpacity>
               </View>
 
@@ -496,73 +508,145 @@ export default function MatchingScreen() {
                   profile={profiles[currentIndex]}
                   isNewUser={false}
                 />
-                
+
                 {/* Cafe details and availability */}
-                {profiles[currentIndex].favorite_cafes && profiles[currentIndex].favorite_cafes.length > 0 && (
-                  <View style={[styles.detailsCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-                    <Text style={[styles.detailsTitle, { color: colors.text }]}>
-                      Favorite Cafes
-                    </Text>
-                    <View style={styles.cafeList}>
-                      {profiles[currentIndex].favorite_cafes.map((cafe, index) => {
-                        const [cafeName, cafeAddress] = cafe ? cafe.split('|||') : ['', ''];
-                        return (
-                          <TouchableOpacity 
-                            key={index}
-                            style={[styles.cafeItem, { backgroundColor: colors.card }]}
-                          >
-                            <View style={styles.cafeDetails}>
-                              <Text style={[styles.cafeName, { color: colors.text }]}>
-                                <Ionicons name="cafe" size={16} color={colors.primary} style={{marginRight: 5}} /> 
-                                {cafeName}
-                              </Text>
-                              <Text style={[styles.cafeAddress, { color: colors.secondaryText }]}>
-                                {cafeAddress}
-                              </Text>
-                            </View>
-                          </TouchableOpacity>
-                        );
-                      })}
+                {profiles[currentIndex].favorite_cafes &&
+                  profiles[currentIndex].favorite_cafes.length > 0 && (
+                    <View
+                      style={[
+                        styles.detailsCard,
+                        {
+                          backgroundColor: colors.card,
+                          borderColor: colors.border,
+                        },
+                      ]}
+                    >
+                      <Text
+                        style={[styles.detailsTitle, { color: colors.text }]}
+                      >
+                        Favorite Cafes
+                      </Text>
+                      <View style={styles.cafeList}>
+                        {profiles[currentIndex].favorite_cafes.map(
+                          (cafe, index) => {
+                            const [cafeName, cafeAddress] = cafe
+                              ? cafe.split("|||")
+                              : ["", ""];
+                            return (
+                              <TouchableOpacity
+                                key={index}
+                                style={[
+                                  styles.cafeItem,
+                                  { backgroundColor: colors.card },
+                                ]}
+                              >
+                                <View style={styles.cafeDetails}>
+                                  <Text
+                                    style={[
+                                      styles.cafeName,
+                                      { color: colors.text },
+                                    ]}
+                                  >
+                                    <Ionicons
+                                      name="cafe"
+                                      size={16}
+                                      color={colors.primary}
+                                      style={{ marginRight: 5 }}
+                                    />
+                                    {cafeName}
+                                  </Text>
+                                  <Text
+                                    style={[
+                                      styles.cafeAddress,
+                                      { color: colors.secondaryText },
+                                    ]}
+                                  >
+                                    {cafeAddress}
+                                  </Text>
+                                </View>
+                              </TouchableOpacity>
+                            );
+                          },
+                        )}
+                      </View>
                     </View>
-                  </View>
-                )}
-                
-                {profiles[currentIndex].availabilitySlots && profiles[currentIndex].availabilitySlots.length > 0 && (
-                  <View style={[styles.detailsCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-                    <Text style={[styles.detailsTitle, { color: colors.text }]}>
-                      Available Times
-                    </Text>
-                    <View style={styles.availabilityList}>
-                      {profiles[currentIndex].availabilitySlots.map((slot, index) => {
-                        // Format the date
-                        const date = new Date(slot.date);
-                        const formattedDate = date.toLocaleDateString('en-US', {
-                          weekday: 'short',
-                          month: 'short', 
-                          day: 'numeric'
-                        });
-                        
-                        return (
-                          <TouchableOpacity 
-                            key={index}
-                            style={[styles.timeSlotItem, { backgroundColor: colors.card }]}
-                          >
-                            <View style={styles.timeSlotDetails}>
-                              <Text style={[styles.timeSlotDate, { color: colors.text }]}>
-                                <Ionicons name="calendar" size={16} color={colors.primary} style={{marginRight: 5}} /> 
-                                {formattedDate}
-                              </Text>
-                              <Text style={[styles.timeSlotTime, { color: colors.secondaryText }]}>
-                                <Ionicons name="time" size={16} color={colors.secondaryText} style={{marginRight: 5}} /> 
-                                {slot.start_time} - {slot.end_time}
-                              </Text>
-                            </View>
-                          </TouchableOpacity>
-                        );
-                      })}
+                  )}
+
+                {profiles[currentIndex].availabilitySlots &&
+                  profiles[currentIndex].availabilitySlots.length > 0 && (
+                    <View
+                      style={[
+                        styles.detailsCard,
+                        {
+                          backgroundColor: colors.card,
+                          borderColor: colors.border,
+                        },
+                      ]}
+                    >
+                      <Text
+                        style={[styles.detailsTitle, { color: colors.text }]}
+                      >
+                        Available Times
+                      </Text>
+                      <View style={styles.availabilityList}>
+                        {profiles[currentIndex].availabilitySlots.map(
+                          (slot, index) => {
+                            // Format the date
+                            const date = new Date(slot.date);
+                            const formattedDate = date.toLocaleDateString(
+                              "en-US",
+                              {
+                                weekday: "short",
+                                month: "short",
+                                day: "numeric",
+                              },
+                            );
+
+                            return (
+                              <TouchableOpacity
+                                key={index}
+                                style={[
+                                  styles.timeSlotItem,
+                                  { backgroundColor: colors.card },
+                                ]}
+                              >
+                                <View style={styles.timeSlotDetails}>
+                                  <Text
+                                    style={[
+                                      styles.timeSlotDate,
+                                      { color: colors.text },
+                                    ]}
+                                  >
+                                    <Ionicons
+                                      name="calendar"
+                                      size={16}
+                                      color={colors.primary}
+                                      style={{ marginRight: 5 }}
+                                    />
+                                    {formattedDate}
+                                  </Text>
+                                  <Text
+                                    style={[
+                                      styles.timeSlotTime,
+                                      { color: colors.secondaryText },
+                                    ]}
+                                  >
+                                    <Ionicons
+                                      name="time"
+                                      size={16}
+                                      color={colors.secondaryText}
+                                      style={{ marginRight: 5 }}
+                                    />
+                                    {slot.start_time} - {slot.end_time}
+                                  </Text>
+                                </View>
+                              </TouchableOpacity>
+                            );
+                          },
+                        )}
+                      </View>
                     </View>
-                  </View>
-                )}
+                  )}
               </Animated.View>
 
               <View style={styles.navigationControls}>
@@ -835,29 +919,29 @@ export default function MatchingScreen() {
 
 const styles = StyleSheet.create({
   navigationFloating: {
-    position: 'fixed',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
+    position: "fixed",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
     paddingHorizontal: 20,
     zIndex: 1000,
-    top: '50%',
+    top: "50%",
     transform: [{ translateY: -25 }],
-    pointerEvents: 'box-none',
+    pointerEvents: "box-none",
   },
   floatingButton: {
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: '#FFF',
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
+    backgroundColor: "#FFF",
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
-    position: 'absolute',
+    position: "absolute",
   },
   leftButton: {
     left: 20,
