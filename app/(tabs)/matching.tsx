@@ -188,7 +188,7 @@ export default function MatchingScreen() {
       }
 
       // Get unique user IDs
-      const userIds = [...new Set(availabilityData.map((item) => item.id))];
+      let userIds = [...new Set(availabilityData.map((item) => item.id))];
       console.log("Unique user IDs with availability:", userIds);
 
       if (userIds.length === 0) {
