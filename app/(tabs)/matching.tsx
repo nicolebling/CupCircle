@@ -199,7 +199,7 @@ export default function MatchingScreen() {
         return;
       }
 
-      // Fetch profiles for these users
+      // Fetch profiles for users with availability in next 7 days
       const { data: profilesData, error: profilesError } = await supabase
         .from("profiles")
         .select("*")
@@ -221,24 +221,57 @@ export default function MatchingScreen() {
 
       // Get availability data for each user
       const userAvailabilityMap = {};
+      const usersWithUpcomingAvailability = [];
+      
+      // Calculate date for 7 days from now
+      const now = new Date();
+      const sevenDaysLater = new Date();
+      sevenDaysLater.setDate(now.getDate() + 7);
+      const sevenDaysLaterStr = sevenDaysLater.toISOString().split('T')[0];
+      const todayStr = now.toISOString().split('T')[0];
+      
+      console.log(`Filtering availability between ${todayStr} and ${sevenDaysLaterStr}`);
+      
       for (const userId of userIds) {
         const { data: userAvail, error: availError } = await supabase
           .from("availability")
           .select("*")
           .eq("id", userId)
+          .gte("date", todayStr)
+          .lte("date", sevenDaysLaterStr)
           .order("date", { ascending: true });
 
-        if (!availError && userAvail) {
-          // Filter out past availability
-          const now = new Date();
-          const futureAvailability = userAvail.filter((slot) => {
+        if (!availError && userAvail && userAvail.length > 0) {
+          // Filter for valid time slots (future times)
+          const validAvailability = userAvail.filter((slot) => {
             if (!slot.date) return false;
-            const slotDate = new Date(slot.date);
-            return slotDate > now;
+            
+            // For slots today, check if time is in the future
+            if (slot.date === todayStr) {
+              const currentTime = now.toLocaleTimeString('en-US', { hour12: true });
+              return slot.start_time > currentTime;
+            }
+            
+            // All other days in the next 7 days are valid
+            return true;
           });
-
-          userAvailabilityMap[userId] = futureAvailability;
+          
+          if (validAvailability.length > 0) {
+            userAvailabilityMap[userId] = validAvailability;
+            usersWithUpcomingAvailability.push(userId);
+          }
         }
+      }
+      
+      // Filter user IDs to only those with upcoming availability
+      userIds = usersWithUpcomingAvailability;
+      console.log(`Found ${userIds.length} users with availability in the next 7 days`);
+      
+      if (userIds.length === 0) {
+        console.log("No users with upcoming availability found");
+        setProfiles([]);
+        setIsLoading(false);
+        return;
       }
 
       // Map profiles to the format expected by ProfileCard
@@ -419,8 +452,8 @@ export default function MatchingScreen() {
               <Text
                 style={[styles.checkBackText, { color: colors.secondaryText }]}
               >
-                We couldn't find any profiles matching your criteria. Try
-                adjusting your filters or check back later!
+                We couldn't find any users with availability in the next 7 days. 
+                Check back later as more users add their availability!
               </Text>
               <TouchableOpacity
                 style={[
