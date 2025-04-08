@@ -8,6 +8,7 @@ import {
   Modal,
   ScrollView,
   ActivityIndicator,
+  TextInput,
 } from "react-native";
 import Colors from "@/constants/Colors";
 import ProfileCard from "@/components/ProfileCard";
@@ -60,6 +61,7 @@ export default function MatchingScreen() {
   global.matchingScreen = { openFilterModal: null };
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
+  const isDark = colorScheme === "dark";
   const { user } = useAuth();
 
   const [profiles, setProfiles] = useState<Profile[]>([]);
@@ -280,7 +282,7 @@ export default function MatchingScreen() {
 
       // Map profiles to the format expected by ProfileCard
       const formattedProfiles = profilesData
-        .filter(profile => userAvailabilityMap[profile.id]?.length > 0)
+        .filter((profile) => userAvailabilityMap[profile.id]?.length > 0)
         .map((profile) => {
           let interests = [];
           try {
@@ -491,7 +493,17 @@ export default function MatchingScreen() {
 
                 <TouchableOpacity
                   onPress={handleLike}
-                  style={[styles.floatingButton, styles.rightButton]}
+                  style={[
+                    styles.floatingButton,
+                    styles.rightButton,
+                    {
+                      opacity:
+                        currentIndex > 0 && currentIndex == profiles.length - 1
+                          ? 0.5
+                          : 1,
+                    },
+                  ]}
+                  disabled={currentIndex == profiles.length - 1}
                 >
                   <Ionicons
                     name="arrow-forward"
@@ -646,6 +658,30 @@ export default function MatchingScreen() {
                           },
                         )}
                       </View>
+                    </View>
+                  )}
+                {profiles[currentIndex].availabilitySlots &&
+                  profiles[currentIndex].availabilitySlots.length > 0 && (
+                    <View
+                      style={[
+                        styles.detailsCard,
+                        {
+                          backgroundColor: colors.card,
+                          borderColor: colors.border,
+                        },
+                      ]}
+                    >
+                      <Text
+                        style={[styles.detailsTitle, { color: colors.text }]}
+                      >
+                        Send A Message
+                      </Text>
+                      <TextInput
+                        style={[styles.textArea, isDark && styles.inputDark]}
+                        placeholder="Send a message..."
+                        multiline
+                        numberOfLines={2}
+                      />
                     </View>
                   )}
               </Animated.View>
@@ -887,7 +923,7 @@ export default function MatchingScreen() {
       </Modal>
 
       {/* Match Animation Modal */}
-      <Modal visible={matchAnimation} transparent={true} animationType="fade">
+      {/* <Modal visible={matchAnimation} transparent={true} animationType="fade">
         <View style={styles.matchModalOverlay}>
           <View style={styles.matchModalContent}>
             <Ionicons name="checkmark-circle" size={80} color="#4CAF50" />
@@ -913,7 +949,7 @@ export default function MatchingScreen() {
             </TouchableOpacity>
           </View>
         </View>
-      </Modal>
+      </Modal> */}
     </SafeAreaView>
   );
 }
@@ -1259,5 +1295,43 @@ const styles = StyleSheet.create({
   timeSlotTime: {
     fontFamily: "K2D-Regular",
     fontSize: 14,
+  },
+  label: {
+    fontSize: 14,
+    marginBottom: 8,
+    color: "#555",
+    fontFamily: "K2D-Regular",
+  },
+  input: {
+    backgroundColor: "#f8f8f8",
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    color: "#333",
+    marginBottom: 5,
+    fontFamily: "K2D-Regular",
+  },
+  inputDark: {
+    backgroundColor: "#333",
+    borderColor: "#555",
+    color: "#fff",
+    marginBottom: 5,
+  },
+  textArea: {
+    fontFamily: "K2D-Regular",
+    backgroundColor: "#f8f8f8",
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    color: "#333",
+    height: 100,
+    textAlignVertical: "top",
+  },
+  textDark: {
+    color: "#fff",
   },
 });
