@@ -279,8 +279,9 @@ export default function MatchingScreen() {
       }
 
       // Map profiles to the format expected by ProfileCard
-      const formattedProfiles =
-        profilesData.map((profile) => {
+      const formattedProfiles = profilesData
+        .filter(profile => userAvailabilityMap[profile.id]?.length > 0)
+        .map((profile) => {
           let interests = [];
           try {
             interests = profile.interests || [];
@@ -309,7 +310,7 @@ export default function MatchingScreen() {
           };
 
           return formattedProfile;
-        }) || [];
+        });
 
       console.log("Formatted profiles:", formattedProfiles.length);
       setProfiles(formattedProfiles);
