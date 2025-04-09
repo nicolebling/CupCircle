@@ -18,6 +18,7 @@ import Animated, {
   useAnimatedStyle,
   withSpring,
 } from "react-native-reanimated";
+import { format } from "date-fns";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import { useColorScheme } from "@/hooks/useColorScheme";
@@ -570,7 +571,7 @@ export default function MatchingScreen() {
                                     <Ionicons
                                       name="cafe"
                                       size={16}
-                                      color={colors.primary}
+                                      color={selectedCafe === cafe ? 'white' : colors.primary}
                                       style={{ marginRight: 5 }}
                                     />
                                     {cafeName}
@@ -613,14 +614,7 @@ export default function MatchingScreen() {
                           (slot, index) => {
                             // Format the date
                             const date = new Date(slot.date);
-                            const formattedDate = date.toLocaleDateString(
-                              "en-US",
-                              {
-                                weekday: "short",
-                                month: "short",
-                                day: "numeric",
-                              },
-                            );
+                            const formattedDate = format(date, "EEE, MMM d, yyyy");
 
                             return (
                               <TouchableOpacity
@@ -641,7 +635,7 @@ export default function MatchingScreen() {
                                     <Ionicons
                                       name="calendar"
                                       size={16}
-                                      color={colors.primary}
+                                      color={selectedTimeSlot === slot ? 'white' : colors.primary}
                                       style={{ marginRight: 5 }}
                                     />
                                     {formattedDate}
@@ -655,7 +649,7 @@ export default function MatchingScreen() {
                                     <Ionicons
                                       name="time"
                                       size={16}
-                                      color={colors.secondaryText}
+                                      color={selectedTimeSlot === slot ? 'rgba(255,255,255,0.8)' : colors.secondaryText}
                                       style={{ marginRight: 5 }}
                                     />
                                     {slot.start_time} - {slot.end_time}
