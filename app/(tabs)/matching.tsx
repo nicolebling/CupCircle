@@ -658,7 +658,7 @@ export default function MatchingScreen() {
                                       color={selectedTimeSlot === slot ? 'rgba(255,255,255,0.8)' : colors.secondaryText}
                                       style={{ marginRight: 5 }}
                                     />
-                                    {slot.start_time} - {slot.end_time}
+                                    {slot.start_time.split('.')[0]} - {slot.end_time.split('.')[0]}
                                   </Text>
                                 </View>
                               </TouchableOpacity>

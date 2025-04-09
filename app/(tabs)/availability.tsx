@@ -119,10 +119,10 @@ export default function AvailabilityScreen() {
   // Available time slots (30-minute increments from 9:30 AM to 4:00 PM)
   const availableTimes = [
     "9:30 AM",
-    "10:00 AM",
+    "10:00 AM", 
     "10:30 AM",
     "11:00 AM",
-    "11:30 AM",
+    "11:30 AM", 
     "12:00 PM",
     "12:30 PM",
     "1:00 PM",

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -23,25 +22,28 @@ type AvailabilityCardProps = {
 export default function AvailabilityCard({ timeSlot, onDelete }: AvailabilityCardProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
-  
+
   // Get timezone from props or fallback to system timezone
   const timeZone = timeSlot.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
   const timeZoneAbbr = timeZone.split('/')[1] || timeZone;
-  
+
+  const formattedStartTime = timeSlot.startTime.split('.')[0];
+  const formattedEndTime = timeSlot.endTime.split('.')[0];
+
   return (
     <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
       <View style={styles.timeSlotInfo}>
         <Ionicons name="time-outline" size={24} color={colors.primary} style={styles.icon} />
         <View style={styles.textContainer}>
           <Text style={[styles.timeRange, { color: colors.text }]}>
-            {timeSlot.startTime} - {timeSlot.endTime}
+            {formattedStartTime} - {formattedEndTime}
           </Text>
           <Text style={[styles.timeZone, { color: colors.secondaryText }]}>
             {timeZoneAbbr} time zone
           </Text>
         </View>
       </View>
-      
+
       <TouchableOpacity
         style={styles.deleteButton}
         onPress={onDelete}
