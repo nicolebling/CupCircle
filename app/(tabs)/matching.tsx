@@ -109,6 +109,7 @@ export default function MatchingScreen() {
 
         // Filter out past availability
         const now = new Date();
+       
         const futureAvailability = data?.filter((slot) => {
           if (!slot.start_time) return false;
 
@@ -612,9 +613,14 @@ export default function MatchingScreen() {
                       <View style={styles.availabilityList}>
                         {profiles[currentIndex].availabilitySlots.map(
                           (slot, index) => {
+                            
+                            
+                            // Split and use the year, month, and day directly in the local time zone
+                            const [year, month, day] = slot.date.split('-').map(Number);
+
                             // Format the date
-                            const date = new Date(slot.date);
-                            const formattedDate = format(date, "EEE, MMM d, yyyy");
+                            const date = new Date(year, month - 1, day); // Note: month is 0-indexed
+                            const formattedDate = format(date, "EEEE, MMMM d, yyyy");
 
                             return (
                               <TouchableOpacity
