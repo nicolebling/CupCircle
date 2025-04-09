@@ -176,7 +176,7 @@ export default function MatchingScreen() {
         if (slot.date > today) return true;
 
         // For today, only keep future time slots
-        if (slot.date === today) {
+        if (slot.date === today) {isSelected && { backgroundColor: colors.primary }
           return slot.start_time > currentTime;
         }
 
@@ -530,6 +530,7 @@ export default function MatchingScreen() {
                   profiles[currentIndex].favorite_cafes.length > 0 && (
                     <View
                       style={[
+                        isSelected && { backgroundColor: colors.primary }
                         styles.detailsCard,
                         {
                           backgroundColor: colors.card,
