@@ -530,7 +530,7 @@ export default function MatchingScreen() {
                   profiles[currentIndex].favorite_cafes.length > 0 && (
                     <View
                       style={[
-                        isSelected && { backgroundColor: colors.primary }
+                        selectedCafe && { backgroundColor: colors.primary },
                         styles.detailsCard,
                         {
                           backgroundColor: colors.card,
