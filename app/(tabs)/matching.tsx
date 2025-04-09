@@ -687,29 +687,7 @@ export default function MatchingScreen() {
               </Animated.View>
 
               <View style={styles.navigationControls}>
-                <TouchableOpacity
-                  onPress={handlePrevious}
-                  style={[
-                    styles.navButton,
-                    {
-                      backgroundColor: colors.card,
-                      opacity: currentIndex > 0 ? 1 : 0.5,
-                    },
-                  ]}
-                  disabled={currentIndex === 0}
-                >
-                  <Ionicons
-                    name="arrow-back"
-                    size={20}
-                    color={colors.primary}
-                  />
-                  <Text
-                    style={[styles.navButtonText, { color: colors.primary }]}
-                  >
-                    Previous
-                  </Text>
-                </TouchableOpacity>
-
+                
                 <TouchableOpacity
                   onPress={() => {}}
                   style={[styles.navButton, { backgroundColor: colors.card }]}
@@ -718,7 +696,7 @@ export default function MatchingScreen() {
                   <Text
                     style={[styles.navButtonText, { color: colors.primary }]}
                   >
-                    View Details
+                    Send request
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -1021,9 +999,9 @@ const styles = StyleSheet.create({
   },
   navigationControls: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "center",
     width: "100%",
-    marginTop: 16,
+    margin: 16,
   },
   navButton: {
     flexDirection: "row",
