@@ -176,7 +176,7 @@ export default function MatchingScreen() {
         if (slot.date > today) return true;
 
         // For today, only keep future time slots
-        if (slot.date === today) {isSelected && { backgroundColor: colors.primary }
+        if (slot.date === today) {selectedTimeSlot && { backgroundColor: colors.primary }
           return slot.start_time > currentTime;
         }
 
@@ -714,7 +714,7 @@ export default function MatchingScreen() {
                       const { data, error } = await supabase
                         .from('matching')
                         .insert([{
-                          user_id: user.id,
+                          user1_id: user.id,
                           user2_id: currentProfile.id,
                           status: 'pending',
                           meeting_date: selectedTimeSlot.date,
