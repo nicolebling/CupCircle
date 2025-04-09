@@ -707,9 +707,12 @@ export default function MatchingScreen() {
                       }
 
                       const currentProfile = profiles[currentIndex];
-                      const selectedTimeSlot = currentProfile.availabilitySlots[0]; // You may want to let user select specific slot
-                      const selectedCafe = currentProfile.favorite_cafes?.[0]; // You may want to let user select specific cafe
-                      const [cafeName, cafeAddress] = selectedCafe ? selectedCafe.split('|||') : ['', ''];
+                      if (!selectedCafe || !selectedTimeSlot) {
+                        alert('Please select both a cafe and a time slot');
+                        return;
+                      }
+
+                      const [cafeName, cafeAddress] = selectedCafe.split('|||');
 
                       const { data, error } = await supabase
                         .from('matching')
