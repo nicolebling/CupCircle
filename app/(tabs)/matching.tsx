@@ -71,8 +71,6 @@ export default function MatchingScreen() {
   const [matchAnimation, setMatchAnimation] = useState(false);
   const [hasAvailability, setHasAvailability] = useState(false);
   const [messageText, setMessageText] = useState('');
-  const [selectedCafe, setSelectedCafe] = useState('');
-  const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
 
   // Animation values
   const cardOffset = useSharedValue(0);
@@ -544,33 +542,45 @@ export default function MatchingScreen() {
                       </Text>
                       <View style={styles.cafeList}>
                         {profiles[currentIndex].favorite_cafes.map(
-                          (cafe, index) => (
-                            <TouchableOpacity
-                              key={index}
-                              style={[
-                                styles.cafeItem,
-                                { backgroundColor: colors.card },
-                              ]}
-                              onPress={() => setSelectedCafe(cafe)}
-                            >
-                              <View style={styles.cafeDetails}>
-                                <Text
-                                  style={[
-                                    styles.cafeName,
-                                    { color: colors.text },
-                                  ]}
-                                >
-                                  <Ionicons
-                                    name="cafe"
-                                    size={16}
-                                    color={colors.primary}
-                                    style={{ marginRight: 5 }}
-                                  />
-                                  {cafe}
-                                </Text>
-                              </View>
-                            </TouchableOpacity>
-                          ),
+                          (cafe, index) => {
+                            const [cafeName, cafeAddress] = cafe
+                              ? cafe.split("|||")
+                              : ["", ""];
+                            return (
+                              <TouchableOpacity
+                                key={index}
+                                style={[
+                                  styles.cafeItem,
+                                  { backgroundColor: colors.card },
+                                ]}
+                              >
+                                <View style={styles.cafeDetails}>
+                                  <Text
+                                    style={[
+                                      styles.cafeName,
+                                      { color: colors.text },
+                                    ]}
+                                  >
+                                    <Ionicons
+                                      name="cafe"
+                                      size={16}
+                                      color={colors.primary}
+                                      style={{ marginRight: 5 }}
+                                    />
+                                    {cafeName}
+                                  </Text>
+                                  <Text
+                                    style={[
+                                      styles.cafeAddress,
+                                      { color: colors.secondaryText },
+                                    ]}
+                                  >
+                                    {cafeAddress}
+                                  </Text>
+                                </View>
+                              </TouchableOpacity>
+                            );
+                          },
                         )}
                       </View>
                     </View>
@@ -594,33 +604,59 @@ export default function MatchingScreen() {
                       </Text>
                       <View style={styles.availabilityList}>
                         {profiles[currentIndex].availabilitySlots.map(
-                          (slot, index) => (
-                            <TouchableOpacity
-                              key={index}
-                              style={[
-                                styles.timeSlotItem,
-                                { backgroundColor: colors.card },
-                              ]}
-                              onPress={() => setSelectedTimeSlot(slot)}
-                            >
-                              <View style={styles.timeSlotDetails}>
-                                <Text
-                                  style={[
-                                    styles.timeSlotDate,
-                                    { color: colors.text },
-                                  ]}
-                                >
-                                  <Ionicons
-                                    name="calendar"
-                                    size={16}
-                                    color={colors.primary}
-                                    style={{ marginRight: 5 }}
-                                  />
-                                  {slot.date} {slot.start_time} - {slot.end_time}
-                                </Text>
-                              </View>
-                            </TouchableOpacity>
-                          ),
+                          (slot, index) => {
+                            // Format the date
+                            const date = new Date(slot.date);
+                            const formattedDate = date.toLocaleDateString(
+                              "en-US",
+                              {
+                                weekday: "short",
+                                month: "short",
+                                day: "numeric",
+                              },
+                            );
+
+                            return (
+                              <TouchableOpacity
+                                key={index}
+                                style={[
+                                  styles.timeSlotItem,
+                                  { backgroundColor: colors.card },
+                                ]}
+                              >
+                                <View style={styles.timeSlotDetails}>
+                                  <Text
+                                    style={[
+                                      styles.timeSlotDate,
+                                      { color: colors.text },
+                                    ]}
+                                  >
+                                    <Ionicons
+                                      name="calendar"
+                                      size={16}
+                                      color={colors.primary}
+                                      style={{ marginRight: 5 }}
+                                    />
+                                    {formattedDate}
+                                  </Text>
+                                  <Text
+                                    style={[
+                                      styles.timeSlotTime,
+                                      { color: colors.secondaryText },
+                                    ]}
+                                  >
+                                    <Ionicons
+                                      name="time"
+                                      size={16}
+                                      color={colors.secondaryText}
+                                      style={{ marginRight: 5 }}
+                                    />
+                                    {slot.start_time} - {slot.end_time}
+                                  </Text>
+                                </View>
+                              </TouchableOpacity>
+                            );
+                          },
                         )}
                       </View>
                     </View>
@@ -654,7 +690,7 @@ export default function MatchingScreen() {
               </Animated.View>
 
               <View style={styles.navigationControls}>
-
+                
                 <TouchableOpacity
                   onPress={async () => {
                     try {
@@ -664,13 +700,9 @@ export default function MatchingScreen() {
                       }
 
                       const currentProfile = profiles[currentIndex];
-                      
-                      if (!selectedTimeSlot || !selectedCafe) {
-                        alert('Please select a cafe and time slot.');
-                        return;
-                      }
-
-                      const [cafeName, cafeAddress] = selectedCafe.split('|||');
+                      const selectedTimeSlot = currentProfile.availabilitySlots[0]; // You may want to let user select specific slot
+                      const selectedCafe = currentProfile.favorite_cafes?.[0]; // You may want to let user select specific cafe
+                      const [cafeName, cafeAddress] = selectedCafe ? selectedCafe.split('|||') : ['', ''];
 
                       const { data, error } = await supabase
                         .from('matching')
@@ -688,7 +720,7 @@ export default function MatchingScreen() {
                         .select();
 
                       if (error) throw error;
-
+                      
                       alert('Match request sent successfully!');
                       // Move to next profile
                       if (currentIndex < profiles.length - 1) {
