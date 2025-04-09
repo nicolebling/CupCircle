@@ -71,6 +71,8 @@ export default function MatchingScreen() {
   const [matchAnimation, setMatchAnimation] = useState(false);
   const [hasAvailability, setHasAvailability] = useState(false);
   const [messageText, setMessageText] = useState('');
+  const [selectedCafe, setSelectedCafe] = useState('');
+  const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
 
   // Animation values
   const cardOffset = useSharedValue(0);
@@ -553,6 +555,7 @@ export default function MatchingScreen() {
                                   styles.cafeItem,
                                   { backgroundColor: colors.card },
                                 ]}
+                                onPress={() => setSelectedCafe(cafe)}
                               >
                                 <View style={styles.cafeDetails}>
                                   <Text
@@ -623,6 +626,7 @@ export default function MatchingScreen() {
                                   styles.timeSlotItem,
                                   { backgroundColor: colors.card },
                                 ]}
+                                onPress={() => setSelectedTimeSlot(slot)}
                               >
                                 <View style={styles.timeSlotDetails}>
                                   <Text
@@ -690,7 +694,7 @@ export default function MatchingScreen() {
               </Animated.View>
 
               <View style={styles.navigationControls}>
-                
+
                 <TouchableOpacity
                   onPress={async () => {
                     try {
@@ -720,7 +724,7 @@ export default function MatchingScreen() {
                         .select();
 
                       if (error) throw error;
-                      
+
                       alert('Match request sent successfully!');
                       // Move to next profile
                       if (currentIndex < profiles.length - 1) {
