@@ -71,8 +71,8 @@ export default function MatchingScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const [matchAnimation, setMatchAnimation] = useState(false);
   const [hasAvailability, setHasAvailability] = useState(false);
-  const [messageText, setMessageText] = useState('');
-  const [selectedCafe, setSelectedCafe] = useState('');
+  const [messageText, setMessageText] = useState("");
+  const [selectedCafe, setSelectedCafe] = useState("");
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
 
   // Animation values
@@ -109,7 +109,7 @@ export default function MatchingScreen() {
 
         // Filter out past availability
         const now = new Date();
-       
+
         const futureAvailability = data?.filter((slot) => {
           if (!slot.start_time) return false;
 
@@ -178,7 +178,8 @@ export default function MatchingScreen() {
         if (slot.date > today) return true;
 
         // For today, only keep future time slots
-        if (slot.date === today) {selectedTimeSlot && { backgroundColor: colors.primary }
+        if (slot.date === today) {
+          selectedTimeSlot && { backgroundColor: colors.primary };
           return slot.start_time > currentTime;
         }
 
@@ -556,8 +557,11 @@ export default function MatchingScreen() {
                                 key={index}
                                 style={[
                                   styles.cafeItem,
-                                  { 
-                                    backgroundColor: selectedCafe === cafe ? colors.primary : colors.card,
+                                  {
+                                    backgroundColor:
+                                      selectedCafe === cafe
+                                        ? colors.primary
+                                        : colors.card,
                                   },
                                 ]}
                                 onPress={() => setSelectedCafe(cafe)}
@@ -566,13 +570,22 @@ export default function MatchingScreen() {
                                   <Text
                                     style={[
                                       styles.cafeName,
-                                      { color: selectedCafe === cafe ? 'white' : colors.text },
+                                      {
+                                        color:
+                                          selectedCafe === cafe
+                                            ? "white"
+                                            : colors.text,
+                                      },
                                     ]}
                                   >
                                     <Ionicons
                                       name="cafe"
                                       size={16}
-                                      color={selectedCafe === cafe ? 'white' : colors.primary}
+                                      color={
+                                        selectedCafe === cafe
+                                          ? "white"
+                                          : colors.primary
+                                      }
                                       style={{ marginRight: 5 }}
                                     />
                                     {cafeName}
@@ -580,7 +593,12 @@ export default function MatchingScreen() {
                                   <Text
                                     style={[
                                       styles.cafeAddress,
-                                      { color: selectedCafe === cafe ? 'rgba(255,255,255,0.8)' : colors.secondaryText },
+                                      {
+                                        color:
+                                          selectedCafe === cafe
+                                            ? "rgba(255,255,255,0.8)"
+                                            : colors.secondaryText,
+                                      },
                                     ]}
                                   >
                                     {cafeAddress}
@@ -613,21 +631,29 @@ export default function MatchingScreen() {
                       <View style={styles.availabilityList}>
                         {profiles[currentIndex].availabilitySlots.map(
                           (slot, index) => {
-                            
-                            
                             // Split and use the year, month, and day directly in the local time zone
-                            const [year, month, day] = slot.date.split('-').map(Number);
+                            const [year, month, day] = slot.date
+                              .split("-")
+                              .map(Number);
 
                             // Format the date
                             const date = new Date(year, month - 1, day); // Note: month is 0-indexed
-                            const formattedDate = format(date, "EEEE, MMMM d, yyyy");
+                            const formattedDate = format(
+                              date,
+                              "EEEE, MMMM d, yyyy",
+                            );
 
                             return (
                               <TouchableOpacity
                                 key={index}
                                 style={[
                                   styles.timeSlotItem,
-                                  { backgroundColor: selectedTimeSlot === slot ? colors.primary : colors.card },
+                                  {
+                                    backgroundColor:
+                                      selectedTimeSlot === slot
+                                        ? colors.primary
+                                        : colors.card,
+                                  },
                                 ]}
                                 onPress={() => setSelectedTimeSlot(slot)}
                               >
@@ -635,13 +661,22 @@ export default function MatchingScreen() {
                                   <Text
                                     style={[
                                       styles.timeSlotDate,
-                                      { color: selectedTimeSlot === slot ? 'white' : colors.text },
+                                      {
+                                        color:
+                                          selectedTimeSlot === slot
+                                            ? "white"
+                                            : colors.text,
+                                      },
                                     ]}
                                   >
                                     <Ionicons
                                       name="calendar"
                                       size={16}
-                                      color={selectedTimeSlot === slot ? 'white' : colors.primary}
+                                      color={
+                                        selectedTimeSlot === slot
+                                          ? "white"
+                                          : colors.primary
+                                      }
                                       style={{ marginRight: 5 }}
                                     />
                                     {formattedDate}
@@ -649,16 +684,25 @@ export default function MatchingScreen() {
                                   <Text
                                     style={[
                                       styles.timeSlotTime,
-                                      { color: selectedTimeSlot === slot ? 'rgba(255,255,255,0.8)' : colors.secondaryText },
+                                      {
+                                        color:
+                                          selectedTimeSlot === slot
+                                            ? "rgba(255,255,255,0.8)"
+                                            : colors.secondaryText,
+                                      },
                                     ]}
                                   >
                                     <Ionicons
                                       name="time"
                                       size={16}
-                                      color={selectedTimeSlot === slot ? 'rgba(255,255,255,0.8)' : colors.secondaryText}
+                                      color={
+                                        selectedTimeSlot === slot
+                                          ? "rgba(255,255,255,0.8)"
+                                          : colors.secondaryText
+                                      }
                                       style={{ marginRight: 5 }}
                                     />
-                                    {slot.start_time.split('.')[0]} - {slot.end_time.split('.')[0]}
+                                    {`${slot.start_time.split(":")[0]}:${slot.start_time.split(":")[1]} - ${slot.end_time.split(":")[0]}:${slot.end_time.split(":")[1]}`}
                                   </Text>
                                 </View>
                               </TouchableOpacity>
@@ -697,48 +741,49 @@ export default function MatchingScreen() {
               </Animated.View>
 
               <View style={styles.navigationControls}>
-
                 <TouchableOpacity
                   onPress={async () => {
                     try {
                       if (!user?.id) {
-                        console.error('No user ID found');
+                        console.error("No user ID found");
                         return;
                       }
 
                       const currentProfile = profiles[currentIndex];
                       if (!selectedCafe || !selectedTimeSlot) {
-                        alert('Please select both a cafe and a time slot');
+                        alert("Please select both a cafe and a time slot");
                         return;
                       }
 
-                      const [cafeName, cafeAddress] = selectedCafe.split('|||');
+                      const [cafeName, cafeAddress] = selectedCafe.split("|||");
 
                       const { data, error } = await supabase
-                        .from('matching')
-                        .insert([{
-                          user1_id: user.id,
-                          user2_id: currentProfile.id,
-                          status: 'pending',
-                          meeting_date: selectedTimeSlot.date,
-                          meeting_location: `${cafeName}|||${cafeAddress}`,
-                          start_time: selectedTimeSlot.start_time,
-                          end_time: selectedTimeSlot.end_time,
-                          initial_message: messageText,
-                          created_at: new Date().toISOString()
-                        }])
+                        .from("matching")
+                        .insert([
+                          {
+                            user1_id: user.id,
+                            user2_id: currentProfile.id,
+                            status: "pending",
+                            meeting_date: selectedTimeSlot.date,
+                            meeting_location: `${cafeName}|||${cafeAddress}`,
+                            start_time: selectedTimeSlot.start_time,
+                            end_time: selectedTimeSlot.end_time,
+                            initial_message: messageText,
+                            created_at: new Date().toISOString(),
+                          },
+                        ])
                         .select();
 
                       if (error) throw error;
 
-                      alert('Match request sent successfully!');
+                      alert("Match request sent successfully!");
                       // Move to next profile
                       if (currentIndex < profiles.length - 1) {
                         setCurrentIndex(currentIndex + 1);
                       }
                     } catch (error) {
-                      console.error('Error sending match request:', error);
-                      alert('Failed to send match request. Please try again.');
+                      console.error("Error sending match request:", error);
+                      alert("Failed to send match request. Please try again.");
                     }
                   }}
                   style={[styles.navButton, { backgroundColor: colors.card }]}

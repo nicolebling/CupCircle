@@ -1,9 +1,9 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { format } from 'date-fns';
-import Colors from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
+import React from "react";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { format } from "date-fns";
+import Colors from "@/constants/Colors";
+import { useColorScheme } from "@/hooks/useColorScheme";
 
 type TimeSlot = {
   id: string;
@@ -17,23 +17,35 @@ type AvailabilityCardProps = {
   onDelete: () => void;
 };
 
-
-
-export default function AvailabilityCard({ timeSlot, onDelete }: AvailabilityCardProps) {
+export default function AvailabilityCard({
+  timeSlot,
+  onDelete,
+}: AvailabilityCardProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
 
   // Get timezone from props or fallback to system timezone
-  const timeZone = timeSlot.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
-  const timeZoneAbbr = timeZone.split('/')[1] || timeZone;
+  const timeZone =
+    timeSlot.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const timeZoneAbbr = timeZone.split("/")[1] || timeZone;
 
-  const formattedStartTime = timeSlot.startTime.split('.')[0];
-  const formattedEndTime = timeSlot.endTime.split('.')[0];
+  const formattedStartTime = `${timeSlot.startTime.split(":")[0]}:${timeSlot.startTime.split(":")[1]}`;
+  const formattedEndTime = `${timeSlot.endTime.split(":")[0]}:${timeSlot.endTime.split(":")[1]}`;
 
   return (
-    <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
+    <View
+      style={[
+        styles.card,
+        { backgroundColor: colors.card, borderColor: colors.border },
+      ]}
+    >
       <View style={styles.timeSlotInfo}>
-        <Ionicons name="time-outline" size={24} color={colors.primary} style={styles.icon} />
+        <Ionicons
+          name="time-outline"
+          size={24}
+          color={colors.primary}
+          style={styles.icon}
+        />
         <View style={styles.textContainer}>
           <Text style={[styles.timeRange, { color: colors.text }]}>
             {formattedStartTime} - {formattedEndTime}
@@ -44,10 +56,7 @@ export default function AvailabilityCard({ timeSlot, onDelete }: AvailabilityCar
         </View>
       </View>
 
-      <TouchableOpacity
-        style={styles.deleteButton}
-        onPress={onDelete}
-      >
+      <TouchableOpacity style={styles.deleteButton} onPress={onDelete}>
         <Ionicons name="trash-outline" size={20} color="#FF3B30" />
       </TouchableOpacity>
     </View>
@@ -56,17 +65,17 @@ export default function AvailabilityCard({ timeSlot, onDelete }: AvailabilityCar
 
 const styles = StyleSheet.create({
   card: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     padding: 16,
     borderRadius: 12,
     borderWidth: 1,
     marginBottom: 12,
   },
   timeSlotInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     flexShrink: 1, // Allow the timeSlotInfo to shrink when needed
   },
   icon: {
@@ -76,19 +85,19 @@ const styles = StyleSheet.create({
     flexShrink: 1, // Prevents the text container from taking excessive space
   },
   timeRange: {
-    fontFamily: 'K2D-SemiBold',
+    fontFamily: "K2D-SemiBold",
     fontSize: 16,
     marginBottom: 4,
   },
   timeZone: {
-    fontFamily: 'K2D-Regular',
+    fontFamily: "K2D-Regular",
     fontSize: 12,
   },
   deleteButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
