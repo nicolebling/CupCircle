@@ -554,7 +554,9 @@ export default function MatchingScreen() {
                                 key={index}
                                 style={[
                                   styles.cafeItem,
-                                  { backgroundColor: colors.card },
+                                  { 
+                                    backgroundColor: selectedCafe === cafe ? colors.primary : colors.card,
+                                  },
                                 ]}
                                 onPress={() => setSelectedCafe(cafe)}
                               >
@@ -562,7 +564,7 @@ export default function MatchingScreen() {
                                   <Text
                                     style={[
                                       styles.cafeName,
-                                      { color: colors.text },
+                                      { color: selectedCafe === cafe ? 'white' : colors.text },
                                     ]}
                                   >
                                     <Ionicons
@@ -576,7 +578,7 @@ export default function MatchingScreen() {
                                   <Text
                                     style={[
                                       styles.cafeAddress,
-                                      { color: colors.secondaryText },
+                                      { color: selectedCafe === cafe ? 'rgba(255,255,255,0.8)' : colors.secondaryText },
                                     ]}
                                   >
                                     {cafeAddress}
@@ -625,7 +627,7 @@ export default function MatchingScreen() {
                                 key={index}
                                 style={[
                                   styles.timeSlotItem,
-                                  { backgroundColor: colors.card },
+                                  { backgroundColor: selectedTimeSlot === slot ? colors.primary : colors.card },
                                 ]}
                                 onPress={() => setSelectedTimeSlot(slot)}
                               >
@@ -633,7 +635,7 @@ export default function MatchingScreen() {
                                   <Text
                                     style={[
                                       styles.timeSlotDate,
-                                      { color: colors.text },
+                                      { color: selectedTimeSlot === slot ? 'white' : colors.text },
                                     ]}
                                   >
                                     <Ionicons
@@ -647,7 +649,7 @@ export default function MatchingScreen() {
                                   <Text
                                     style={[
                                       styles.timeSlotTime,
-                                      { color: colors.secondaryText },
+                                      { color: selectedTimeSlot === slot ? 'rgba(255,255,255,0.8)' : colors.secondaryText },
                                     ]}
                                   >
                                     <Ionicons
