@@ -70,6 +70,7 @@ export default function MatchingScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const [matchAnimation, setMatchAnimation] = useState(false);
   const [hasAvailability, setHasAvailability] = useState(false);
+  const [messageText, setMessageText] = useState('');
 
   // Animation values
   const cardOffset = useSharedValue(0);
@@ -681,6 +682,8 @@ export default function MatchingScreen() {
                         placeholder="Send a message..."
                         multiline
                         numberOfLines={2}
+                        value={messageText}
+                        onChangeText={setMessageText}
                       />
                     </View>
                   )}
@@ -689,7 +692,45 @@ export default function MatchingScreen() {
               <View style={styles.navigationControls}>
                 
                 <TouchableOpacity
-                  onPress={() => {}}
+                  onPress={async () => {
+                    try {
+                      if (!user?.id) {
+                        console.error('No user ID found');
+                        return;
+                      }
+
+                      const currentProfile = profiles[currentIndex];
+                      const selectedTimeSlot = currentProfile.availabilitySlots[0]; // You may want to let user select specific slot
+                      const selectedCafe = currentProfile.favorite_cafes?.[0]; // You may want to let user select specific cafe
+                      const [cafeName, cafeAddress] = selectedCafe ? selectedCafe.split('|||') : ['', ''];
+
+                      const { data, error } = await supabase
+                        .from('matching')
+                        .insert([{
+                          user_id: user.id,
+                          user2_id: currentProfile.id,
+                          status: 'pending',
+                          meeting_date: selectedTimeSlot.date,
+                          meeting_location: `${cafeName}|||${cafeAddress}`,
+                          start_time: selectedTimeSlot.start_time,
+                          end_time: selectedTimeSlot.end_time,
+                          initial_message: messageText,
+                          created_at: new Date().toISOString()
+                        }])
+                        .select();
+
+                      if (error) throw error;
+                      
+                      alert('Match request sent successfully!');
+                      // Move to next profile
+                      if (currentIndex < profiles.length - 1) {
+                        setCurrentIndex(currentIndex + 1);
+                      }
+                    } catch (error) {
+                      console.error('Error sending match request:', error);
+                      alert('Failed to send match request. Please try again.');
+                    }
+                  }}
                   style={[styles.navButton, { backgroundColor: colors.card }]}
                 >
                   <Ionicons name="person" size={20} color={colors.primary} />
