@@ -120,7 +120,12 @@ export default function ChatsScreen() {
   );
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={[styles.container, { backgroundColor: colors.background }]}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+    >
+      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
 
       <View style={[styles.searchContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
         <Ionicons name="search" size={20} color={colors.secondaryText} />
@@ -146,6 +151,7 @@ export default function ChatsScreen() {
         ListEmptyComponent={EmptyListComponent}
       />
     </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 }
 
