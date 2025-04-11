@@ -94,12 +94,25 @@ export default function AvailabilityScreen() {
   };
 
   const handleAddSlot = async () => {
-    // Check if this time slot already exists for the selected date
+    // Format the selected date consistently for comparison
     const selectedDateString = format(selectedDate, "yyyy-MM-dd");
     
+    // Properly check for duplicates
     const isDuplicate = timeSlots.some(slot => {
-      const slotDateString = format(new Date(slot.date), "yyyy-MM-dd");
-      return slotDateString === selectedDateString && slot.startTime === selectedTime;
+      // Convert slot date to string in the same format
+      let slotDate;
+      if (slot.date instanceof Date) {
+        slotDate = slot.date;
+      } else {
+        // Handle case where slot.date might be a string
+        slotDate = new Date(slot.date);
+      }
+      
+      const slotDateString = format(slotDate, "yyyy-MM-dd");
+      
+      // Compare dates and times (using either startTime or start_time property)
+      const slotTime = slot.startTime || slot.start_time;
+      return slotDateString === selectedDateString && slotTime === selectedTime;
     });
 
     if (isDuplicate) {
