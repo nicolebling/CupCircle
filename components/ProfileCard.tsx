@@ -430,38 +430,45 @@ export default function ProfileCard({
           )}
 
           {/* Career Transitions */}
-          {profile.career_transitions &&
-            profile.career_transitions.length > 0 && (
-              <>
-                <Text style={[styles.sectionTitle, { color: colors.text }]}>
-                  Career Transitions
-                </Text>
-                {profile.career_transitions.map((transitionString, index) => {
-                  const transition =
-                    typeof transitionString === "string"
-                      ? JSON.parse(transitionString)
-                      : transitionString;
-                  return (
-                    <View key={index} style={styles.transitionCard}>
-                      <View style={styles.transitionText}>
-                        <Text style={[styles.position, { color: colors.text }]}>
-                          {transition.position1}
-                        </Text>
-                        <Ionicons
-                          name="arrow-forward"
-                          size={20}
-                          color={colors.primary}
-                          style={styles.transitionArrow}
-                        />
-                        <Text style={[styles.position, { color: colors.text }]}>
-                          {transition.position2}
-                        </Text>
-                      </View>
+          {profile.career_transitions && Array.isArray(profile.career_transitions) && profile.career_transitions.length > 0 && (
+            <>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                Career Transitions
+              </Text>
+              {profile.career_transitions.map((transition, index) => {
+                let transitionData;
+                try {
+                  transitionData = typeof transition === "string" ? JSON.parse(transition) : transition;
+                } catch (e) {
+                  console.error("Error parsing career transition:", e);
+                  return null;
+                }
+                
+                if (!transitionData || !transitionData.position1 || !transitionData.position2) {
+                  return null;
+                }
+
+                return (
+                  <View key={index} style={styles.transitionCard}>
+                    <View style={styles.transitionText}>
+                      <Text style={[styles.position, { color: colors.text }]}>
+                        {transitionData.position1}
+                      </Text>
+                      <Ionicons
+                        name="arrow-forward"
+                        size={20}
+                        color={colors.primary}
+                        style={styles.transitionArrow}
+                      />
+                      <Text style={[styles.position, { color: colors.text }]}>
+                        {transitionData.position2}
+                      </Text>
                     </View>
-                  );
-                })}
-              </>
-            )}
+                  </View>
+                );
+              })}
+            </>
+          )}
 
           {/* Education */}
           {profile.education && (
