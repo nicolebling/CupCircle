@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, TextInput, SafeAreaView, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, TextInput, SafeAreaView } from 'react-native';
 import Colors from '@/constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/contexts/AuthContext';
@@ -59,7 +59,6 @@ export default function ChatsScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [conversations, setConversations] = useState(MOCK_CONVERSATIONS);
   const [filteredConversations, setFilteredConversations] = useState(conversations);
-  const [message, setMessage] = useState('');
 
   useEffect(() => {
     // Filter conversations based on search query
@@ -123,50 +122,35 @@ export default function ChatsScreen() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}
+      style={[styles.container, { backgroundColor: colors.background }]}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
     >
       <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-        <View style={[styles.searchContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
-          <Ionicons name="search" size={20} color={colors.secondaryText} />
-          <TextInput
-            style={[styles.searchInput, { color: colors.text }]}
-            placeholder="Search conversations..."
-            placeholderTextColor={colors.secondaryText}
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-          />
-          {searchQuery !== '' && (
-            <TouchableOpacity onPress={() => setSearchQuery('')}>
-              <Ionicons name="close-circle" size={20} color={colors.secondaryText} />
-            </TouchableOpacity>
-          )}
-        </View>
 
-        <FlatList
-          data={filteredConversations}
-          keyExtractor={item => item.id}
-          renderItem={renderConversationItem}
-          contentContainerStyle={[
-            filteredConversations.length === 0 ? { flex: 1 } : null,
-            { paddingBottom: 80 } // Add padding for input
-          ]}
-          ListEmptyComponent={EmptyListComponent}
+      <View style={[styles.searchContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
+        <Ionicons name="search" size={20} color={colors.secondaryText} />
+        <TextInput
+          style={[styles.searchInput, { color: colors.text }]}
+          placeholder="Search conversations..."
+          placeholderTextColor={colors.secondaryText}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
         />
-
-        <View style={[styles.inputContainer, { backgroundColor: colors.card }]}>
-          <TextInput
-            style={[styles.messageInput, { color: colors.text }]}
-            placeholder="Type a message..."
-            placeholderTextColor={colors.secondaryText}
-            value={message}
-            onChangeText={setMessage}
-          />
-          <TouchableOpacity style={styles.sendButton}>
-            <Ionicons name="send" size={24} color={colors.primary} />
+        {searchQuery !== '' && (
+          <TouchableOpacity onPress={() => setSearchQuery('')}>
+            <Ionicons name="close-circle" size={20} color={colors.secondaryText} />
           </TouchableOpacity>
-        </View>
-      </SafeAreaView>
+        )}
+      </View>
+
+      <FlatList
+        data={filteredConversations}
+        keyExtractor={item => item.id}
+        renderItem={renderConversationItem}
+        contentContainerStyle={filteredConversations.length === 0 ? { flex: 1 } : null}
+        ListEmptyComponent={EmptyListComponent}
+      />
+    </SafeAreaView>
     </KeyboardAvoidingView>
   );
 }
@@ -276,32 +260,5 @@ const styles = StyleSheet.create({
     fontFamily: 'K2D-Regular',
     fontSize: 16,
     textAlign: 'center',
-  },
-  inputContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderTopWidth: 1,
-    borderTopColor: '#E0E0E0',
-  },
-  messageInput: {
-    flex: 1,
-    height: 40,
-    paddingHorizontal: 12,
-    borderRadius: 20,
-    backgroundColor: '#F5F5F5',
-    marginRight: 8,
-    fontFamily: 'K2D-Regular',
-  },
-  sendButton: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
 });
