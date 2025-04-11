@@ -732,8 +732,12 @@ export default function MatchingScreen() {
                         Send A Message
                       </Text>
                       <TextInput
-                        style={[styles.textArea, isDark && styles.inputDark]}
+                        style={[
+                          styles.textArea, 
+                          isDark ? styles.inputDark : {backgroundColor: '#f8f8f8'}
+                        ]}
                         placeholder="Send a message..."
+                        placeholderTextColor={colors.secondaryText}
                         multiline
                         numberOfLines={2}
                         value={messageText}
@@ -1409,6 +1413,11 @@ const styles = StyleSheet.create({
     color: "#333",
     height: 100,
     textAlignVertical: "top",
+  },
+  inputDark: {
+    backgroundColor: "#333",
+    borderColor: "#555",
+    color: "#fff",
   },
   textDark: {
     color: "#fff",
