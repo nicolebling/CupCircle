@@ -714,34 +714,29 @@ export default function MatchingScreen() {
                   )}
                 {profiles[currentIndex].availabilitySlots &&
                   profiles[currentIndex].availabilitySlots.length > 0 && (
-                    <KeyboardAvoidingView
-                      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                      keyboardVerticalOffset={100}
+                    <View
+                      style={[
+                        styles.detailsCard,
+                        {
+                          backgroundColor: colors.card,
+                          borderColor: colors.border,
+                        },
+                      ]}
                     >
-                      <View
-                        style={[
-                          styles.detailsCard,
-                          {
-                            backgroundColor: colors.card,
-                            borderColor: colors.border,
-                          },
-                        ]}
+                      <Text
+                        style={[styles.detailsTitle, { color: colors.text }]}
                       >
-                        <Text
-                          style={[styles.detailsTitle, { color: colors.text }]}
-                        >
-                          Send A Message
-                        </Text>
-                        <TextInput
-                          style={[styles.textArea, isDark && styles.inputDark]}
-                          placeholder="Send a message..."
-                          multiline
-                          numberOfLines={2}
-                          value={messageText}
-                          onChangeText={setMessageText}
-                        />
-                      </View>
-                    </KeyboardAvoidingView>
+                        Send A Message
+                      </Text>
+                      <TextInput
+                        style={[styles.textArea, isDark && styles.inputDark]}
+                        placeholder="Send a message..."
+                        multiline
+                        numberOfLines={2}
+                        value={messageText}
+                        onChangeText={setMessageText}
+                      />
+                    </View>
                   )}
               </Animated.View>
 
