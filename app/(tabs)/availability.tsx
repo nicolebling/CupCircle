@@ -457,16 +457,33 @@ export default function AvailabilityScreen() {
                   const slotTime = new Date(selectedDate);
                   slotTime.setHours(hour, parseInt(minutes), 0, 0);
                   const isPastTime = slotTime < now;
+                  
+                  // Check if this time slot is already in the user's list
+                  const isAlreadyAdded = timeSlots.some(slot => {
+                    // Convert dates to strings for comparison
+                    const slotDateStr = format(
+                      new Date(slot.date instanceof Date ? slot.date : new Date(slot.date)), 
+                      "yyyy-MM-dd"
+                    );
+                    const selectedDateStr = format(selectedDate, "yyyy-MM-dd");
+                    
+                    // Convert and normalize time strings for comparison
+                    const slotTimeStr = (slot.startTime || slot.start_time || "").trim().replace(/\s+/g, ' ');
+                    const itemTimeStr = item.trim().replace(/\s+/g, ' ');
+                    
+                    // Compare date and time
+                    return slotDateStr === selectedDateStr && slotTimeStr === itemTimeStr;
+                  });
 
                   return (
                     <TouchableOpacity
                       style={[
                         styles.timeButton,
                         isSelectedTime && { backgroundColor: colors.primary },
-                        (isTimeTaken || isPastTime) && styles.disabledTime,
+                        (isTimeTaken || isPastTime || isAlreadyAdded) && styles.disabledTime,
                       ]}
-                      onPress={() => !isTimeTaken && !isPastTime && setSelectedTime(item)}
-                      disabled={isTimeTaken || isPastTime}
+                      onPress={() => !isTimeTaken && !isPastTime && !isAlreadyAdded && setSelectedTime(item)}
+                      disabled={isTimeTaken || isPastTime || isAlreadyAdded}
                     >
                       <Text
                         style={[
