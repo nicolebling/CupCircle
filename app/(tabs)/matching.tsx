@@ -9,6 +9,8 @@ import {
   ScrollView,
   ActivityIndicator,
   TextInput,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import Colors from "@/constants/Colors";
 import ProfileCard from "@/components/ProfileCard";
@@ -723,9 +725,7 @@ export default function MatchingScreen() {
                         },
                       ]}
                     >
-                      <Text
-                        style={[styles.detailsTitle, { color: colors.text }]}
-                      >
+                      <Text style={[styles.detailsTitle, { color: colors.text }]}>
                         Send A Message
                       </Text>
                       <TextInput
@@ -735,6 +735,7 @@ export default function MatchingScreen() {
                         numberOfLines={2}
                         value={messageText}
                         onChangeText={setMessageText}
+                        textAlignVertical="top"
                       />
                     </View>
                   )}

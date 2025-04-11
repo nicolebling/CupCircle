@@ -96,33 +96,56 @@ export default function AvailabilityScreen() {
   const handleAddSlot = async () => {
     // Format the selected date consistently for comparison
     const selectedDateString = format(selectedDate, "yyyy-MM-dd");
-    
-    // More robust duplicate check
-    const isDuplicate = timeSlots.some(slot => {
-      // Convert slot date to a consistent format
-      let slotDate;
-      if (slot.date instanceof Date) {
-        slotDate = slot.date;
-      } else {
-        // Handle case where slot.date might be a string
-        slotDate = new Date(slot.date);
-      }
-      
+    // const normalizedSelectedTime = selectedTime
+    //   .trim()
+    //   .replace(/\s+/g, " ")
+    //   .toUpperCase();
+
+    // Check for exact duplicate
+    const isDuplicate = timeSlots.some((slot) => {
+      let slotDate =
+        slot.date instanceof Date ? slot.date : new Date(slot.date);
       const slotDateString = format(slotDate, "yyyy-MM-dd");
-      
-      // Handle both possible property names and normalize time format for comparison
-      const slotStartTime = (slot.startTime || slot.start_time || "").trim();
-      
-      // Do a direct string comparison
-      return slotDateString === selectedDateString && 
-             slotStartTime.replace(/\s+/g, ' ') === selectedTime.replace(/\s+/g, ' ');
+      const slotStartTime = (slot.startTime || slot.start_time || "")
+        .trim()
+        .replace(/\s+/g, " ")
+        .toUpperCase();
+      return (
+        slotDateString === selectedDateString &&
+        slotStartTime === normalizedSelectedTime
+      );
     });
 
     if (isDuplicate) {
-      alert("Already added into your availability");
+      alert("This time slot already exists.");
       return;
     }
-    
+
+    // Optional: Check for overlap
+    const newStart = new Date(
+      `1970-01-01T${to24Hour(selectedTime)}:00`,
+    ).getTime();
+    const newEnd = new Date(
+      `1970-01-01T${to24Hour(calculateEndTime(selectedTime))}:00`,
+    ).getTime();
+
+    const hasOverlap = timeSlots.some((slot) => {
+      if (format(new Date(slot.date), "yyyy-MM-dd") !== selectedDateString)
+        return false;
+      const slotStart = new Date(
+        `1970-01-01T${to24Hour(slot.startTime)}:00`,
+      ).getTime();
+      const slotEnd = new Date(
+        `1970-01-01T${to24Hour(slot.endTime)}:00`,
+      ).getTime();
+      return newStart < slotEnd && newEnd > slotStart;
+    });
+
+    if (hasOverlap) {
+      alert("This time slot overlaps with an existing one.");
+      return;
+    }
+
     const endTime = calculateEndTime(selectedTime);
     const result = await createSlot(selectedDate, selectedTime, endTime);
     if (result) {
@@ -135,7 +158,7 @@ export default function AvailabilityScreen() {
   // Generate next 7 days for calendar, filtering out current day if past 4 PM
   const now = new Date();
   const isPast4PM = now.getHours() >= 16; // 16 is 4 PM in 24-hour format
-  
+
   const next7Days = Array.from({ length: 7 }, (_, i) => {
     const date = addDays(new Date(), i);
     // If it's today and past 4 PM, return null
@@ -148,10 +171,10 @@ export default function AvailabilityScreen() {
   // Available time slots (30-minute increments from 9:30 AM to 4:00 PM)
   const availableTimes = [
     "9:30 AM",
-    "10:00 AM", 
+    "10:00 AM",
     "10:30 AM",
     "11:00 AM",
-    "11:30 AM", 
+    "11:30 AM",
     "12:00 PM",
     "12:30 PM",
     "1:00 PM",
@@ -272,22 +295,22 @@ export default function AvailabilityScreen() {
     (groups, slot) => {
       const now = new Date();
       const slotDate = new Date(slot.date);
-      
+
       // Parse the time (e.g., "10:00 AM")
-      const [time, period] = slot.start_time.split(' ');
-      const [hours, minutes] = time.split(':');
+      const [time, period] = slot.start_time.split(" ");
+      const [hours, minutes] = time.split(":");
       let hour = parseInt(hours);
-      
+
       // Convert to 24-hour format
-      if (period === 'PM' && hour !== 12) hour += 12;
-      if (period === 'AM' && hour === 12) hour = 0;
-      
+      if (period === "PM" && hour !== 12) hour += 12;
+      if (period === "AM" && hour === 12) hour = 0;
+
       // Set the slot's time
       slotDate.setHours(hour, parseInt(minutes), 0, 0);
-      
+
       // Skip if slot is in the past
       if (slotDate < now) return groups;
-      
+
       const dateString = format(slotDate, "yyyy-MM-dd");
       if (!groups[dateString]) {
         groups[dateString] = [];
@@ -448,31 +471,45 @@ export default function AvailabilityScreen() {
 
                   // Check if time slot is in the past
                   const now = new Date();
-                  const [time, period] = item.split(' ');
-                  const [hours, minutes] = time.split(':');
+                  const [time, period] = item.split(" ");
+                  const [hours, minutes] = time.split(":");
                   let hour = parseInt(hours);
-                  if (period === 'PM' && hour !== 12) hour += 12;
-                  if (period === 'AM' && hour === 12) hour = 0;
-                  
+                  if (period === "PM" && hour !== 12) hour += 12;
+                  if (period === "AM" && hour === 12) hour = 0;
+
                   const slotTime = new Date(selectedDate);
                   slotTime.setHours(hour, parseInt(minutes), 0, 0);
                   const isPastTime = slotTime < now;
-                  
+
                   // Check if this time slot is already in the user's list
-                  const isAlreadyAdded = timeSlots.some(slot => {
+                  const isAlreadyAdded = timeSlots.some((slot) => {
                     // Convert dates to strings for comparison
                     const slotDateStr = format(
-                      new Date(slot.date instanceof Date ? slot.date : new Date(slot.date)), 
-                      "yyyy-MM-dd"
+                      new Date(
+                        slot.date instanceof Date
+                          ? slot.date
+                          : new Date(slot.date),
+                      ),
+                      "yyyy-MM-dd",
                     );
+                    // console.log(slotDateStr);
                     const selectedDateStr = format(selectedDate, "yyyy-MM-dd");
-                    
+                    // console.log(selectedDateStr);
                     // Convert and normalize time strings for comparison
-                    const slotTimeStr = (slot.startTime || slot.start_time || "").trim().replace(/\s+/g, ' ');
-                    const itemTimeStr = item.trim().replace(/\s+/g, ' ');
-                    
+                    const slotTimeStr = (
+                      slot.startTime ||
+                      slot.start_time ||
+                      ""
+                    )
+                      .trim()
+                      .replace(/\s+/g, " ");
+                    const itemTimeStr = item.trim().replace(/\s+/g, " ");
+
                     // Compare date and time
-                    return slotDateStr === selectedDateStr && slotTimeStr === itemTimeStr;
+                    return (
+                      slotDateStr === selectedDateStr &&
+                      slotTimeStr === itemTimeStr
+                    );
                   });
 
                   return (
@@ -480,9 +517,15 @@ export default function AvailabilityScreen() {
                       style={[
                         styles.timeButton,
                         isSelectedTime && { backgroundColor: colors.primary },
-                        (isTimeTaken || isPastTime || isAlreadyAdded) && styles.disabledTime,
+                        (isTimeTaken || isPastTime || isAlreadyAdded) &&
+                          styles.disabledTime,
                       ]}
-                      onPress={() => !isTimeTaken && !isPastTime && !isAlreadyAdded && setSelectedTime(item)}
+                      onPress={() =>
+                        !isTimeTaken &&
+                        !isPastTime &&
+                        !isAlreadyAdded &&
+                        setSelectedTime(item)
+                      }
                       disabled={isTimeTaken || isPastTime || isAlreadyAdded}
                     >
                       <Text
