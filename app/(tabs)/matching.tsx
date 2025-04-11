@@ -1039,7 +1039,7 @@ export default function MatchingScreen() {
 
 const styles = StyleSheet.create({
   navigationFloating: {
-    position: "fixed",
+    position: "absolute",
     flexDirection: "row",
     justifyContent: "space-between",
     width: "100%",
@@ -1048,6 +1048,7 @@ const styles = StyleSheet.create({
     top: "50%",
     transform: [{ translateY: -25 }],
     pointerEvents: "box-none",
+    position: "fixed",
   },
   floatingButton: {
     width: 50,
