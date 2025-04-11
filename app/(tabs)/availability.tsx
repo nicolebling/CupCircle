@@ -96,10 +96,10 @@ export default function AvailabilityScreen() {
   const handleAddSlot = async () => {
     // Format the selected date consistently for comparison
     const selectedDateString = format(selectedDate, "yyyy-MM-dd");
-    // const normalizedSelectedTime = selectedTime
-    //   .trim()
-    //   .replace(/\s+/g, " ")
-    //   .toUpperCase();
+    const normalizedSelectedTime = selectedTime
+      .trim()
+      .replace(/\s+/g, " ")
+      .toUpperCase();
 
     // Check for exact duplicate
     const isDuplicate = timeSlots.some((slot) => {
@@ -121,6 +121,22 @@ export default function AvailabilityScreen() {
       return;
     }
 
+    // Helper function to convert 12-hour time to 24-hour format
+    const to24Hour = (time12h) => {
+      const [time, modifier] = time12h.split(' ');
+      let [hours, minutes] = time.split(':');
+      
+      if (hours === '12') {
+        hours = '00';
+      }
+      
+      if (modifier === 'PM') {
+        hours = parseInt(hours, 10) + 12;
+      }
+      
+      return `${hours}:${minutes}`;
+    };
+    
     // Optional: Check for overlap
     const newStart = new Date(
       `1970-01-01T${to24Hour(selectedTime)}:00`,
