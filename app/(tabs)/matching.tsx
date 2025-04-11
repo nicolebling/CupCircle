@@ -717,12 +717,7 @@ export default function MatchingScreen() {
                 {profiles[currentIndex].availabilitySlots &&
                   profiles[currentIndex].availabilitySlots.length > 0 && (
 
-                    <SafeAreaView
-                      style={[styles.container, { backgroundColor: colors.background }]}
-                    >
-                      <KeyboardAvoidingView
-                        behavior={Platform.OS === "ios" ? "padding" : "height"}
-                        style={styles.keyboardAvoidingView}>
+                   
                         
                     <View
                       style={[
@@ -746,8 +741,7 @@ export default function MatchingScreen() {
                         textAlignVertical="top"
                       />
                     </View>
-                        </KeyboardAvoidingView>
-                          </SafeAreaView>
+                        
                   )}
               </Animated.View>
 
@@ -1418,8 +1412,5 @@ const styles = StyleSheet.create({
   },
   textDark: {
     color: "#fff",
-  },
-  keyboardAvoidingView: {
-    flex: 1,
-  },
+  }
 });

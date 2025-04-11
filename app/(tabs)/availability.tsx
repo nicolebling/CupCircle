@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   FlatList,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Stack } from "expo-router";
@@ -134,7 +135,7 @@ export default function AvailabilityScreen() {
     });
 
     if (hasOverlap) {
-      alert("The time slot you choose is already existed.");
+      Alert.alert("Duplicate Time Slots", "The time slot you choose is already existed.");
       return;
     }
 
