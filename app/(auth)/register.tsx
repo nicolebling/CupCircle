@@ -76,11 +76,11 @@ export default function SignUpScreen() {
           setError("Please enter a valid email address.");
         }
       } else {
-        console.log("Signup successful:", data)
-        console.log("User created:", data.user)
-        console.log("Session created:", data.session)
-        console.log("User metadata:", data.user?.user_metadata)
-        console.log("Authentication method:", data.user?.app_metadata)
+        // console.log("Signup successful:", data)
+        // console.log("User created:", data.user)
+        // console.log("Session created:", data.session)
+        // console.log("User metadata:", data.user?.user_metadata)
+        // console.log("Authentication method:", data.user?.app_metadata)
 
         // Create profile for the new user
         if (data.user) {
