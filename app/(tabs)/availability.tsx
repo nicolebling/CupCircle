@@ -97,9 +97,9 @@ export default function AvailabilityScreen() {
     // Format the selected date consistently for comparison
     const selectedDateString = format(selectedDate, "yyyy-MM-dd");
     
-    // Properly check for duplicates
+    // More robust duplicate check
     const isDuplicate = timeSlots.some(slot => {
-      // Convert slot date to string in the same format
+      // Convert slot date to a consistent format
       let slotDate;
       if (slot.date instanceof Date) {
         slotDate = slot.date;
@@ -110,9 +110,12 @@ export default function AvailabilityScreen() {
       
       const slotDateString = format(slotDate, "yyyy-MM-dd");
       
-      // Compare dates and times (using either startTime or start_time property)
-      const slotTime = slot.startTime || slot.start_time;
-      return slotDateString === selectedDateString && slotTime === selectedTime;
+      // Handle both possible property names and normalize time format for comparison
+      const slotStartTime = (slot.startTime || slot.start_time || "").trim();
+      
+      // Do a direct string comparison
+      return slotDateString === selectedDateString && 
+             slotStartTime.replace(/\s+/g, ' ') === selectedTime.replace(/\s+/g, ' ');
     });
 
     if (isDuplicate) {
