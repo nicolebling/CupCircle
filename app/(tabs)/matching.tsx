@@ -439,6 +439,44 @@ export default function MatchingScreen() {
     <SafeAreaView
       style={[styles.container, { backgroundColor: colors.background }]}
     >
+      <View style={styles.navigationFloating}>
+        <TouchableOpacity
+          onPress={handlePrevious}
+          style={[
+            styles.floatingButton,
+            styles.leftButton,
+            { opacity: currentIndex > 0 ? 1 : 0.5 },
+          ]}
+          disabled={currentIndex === 0}
+        >
+          <Ionicons
+            name="arrow-back"
+            size={24}
+            color={colors.primary}
+          />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={handleLike}
+          style={[
+            styles.floatingButton,
+            styles.rightButton,
+            {
+              opacity:
+                currentIndex > 0 && currentIndex == profiles.length - 1
+                  ? 0.5
+                  : 1,
+            },
+          ]}
+          disabled={currentIndex == profiles.length - 1}
+        >
+          <Ionicons
+            name="arrow-forward"
+            size={24}
+            color={colors.primary}
+          />
+        </TouchableOpacity>
+      </View>
       <ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={{ paddingBottom: 20 }}
@@ -482,44 +520,7 @@ export default function MatchingScreen() {
             </View>
           ) : currentIndex < profiles.length ? (
             <>
-              <View style={styles.navigationFloating}>
-                <TouchableOpacity
-                  onPress={handlePrevious}
-                  style={[
-                    styles.floatingButton,
-                    styles.leftButton,
-                    { opacity: currentIndex > 0 ? 1 : 0.5 },
-                  ]}
-                  disabled={currentIndex === 0}
-                >
-                  <Ionicons
-                    name="arrow-back"
-                    size={24}
-                    color={colors.primary}
-                  />
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  onPress={handleLike}
-                  style={[
-                    styles.floatingButton,
-                    styles.rightButton,
-                    {
-                      opacity:
-                        currentIndex > 0 && currentIndex == profiles.length - 1
-                          ? 0.5
-                          : 1,
-                    },
-                  ]}
-                  disabled={currentIndex == profiles.length - 1}
-                >
-                  <Ionicons
-                    name="arrow-forward"
-                    size={24}
-                    color={colors.primary}
-                  />
-                </TouchableOpacity>
-              </View>
+              
 
               <Animated.View
                 style={[styles.animatedCardContainer, cardAnimatedStyle]}
