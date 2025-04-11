@@ -1039,13 +1039,13 @@ export default function MatchingScreen() {
 
 const styles = StyleSheet.create({
   navigationFloating: {
-    position: "fixed",
+    position: "absolute",
     flexDirection: "row",
     justifyContent: "space-between",
     width: "100%",
     paddingHorizontal: 20,
     zIndex: 1000,
-    top: "50vh",
+    top: "50%",
     transform: [{ translateY: -25 }],
     pointerEvents: "box-none",
     left: 0,
