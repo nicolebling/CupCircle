@@ -716,38 +716,33 @@ export default function MatchingScreen() {
                   )}
                 {profiles[currentIndex].availabilitySlots &&
                   profiles[currentIndex].availabilitySlots.length > 0 && (
-
-                    <SafeAreaView
-                      style={[styles.container, { backgroundColor: colors.background }]}
+                    <KeyboardAvoidingView
+                      behavior={Platform.OS === "ios" ? "padding" : "height"}
+                      keyboardVerticalOffset={Platform.OS === "ios" ? 120 : 20}
                     >
-                      <KeyboardAvoidingView
-                        behavior={Platform.OS === "ios" ? "padding" : "height"}
-                        style={styles.keyboardAvoidingView}>
-                        
-                    <View
-                      style={[
-                        styles.detailsCard,
-                        {
-                          backgroundColor: colors.card,
-                          borderColor: colors.border,
-                        },
-                      ]}
-                    >
-                      <Text style={[styles.detailsTitle, { color: colors.text }]}>
-                        Send A Message
-                      </Text>
-                      <TextInput
-                        style={[styles.textArea, isDark && styles.inputDark]}
-                        placeholder="Send a message..."
-                        multiline
-                        numberOfLines={2}
-                        value={messageText}
-                        onChangeText={setMessageText}
-                        textAlignVertical="top"
-                      />
-                    </View>
-                        </KeyboardAvoidingView>
-                          </SafeAreaView>
+                      <View
+                        style={[
+                          styles.detailsCard,
+                          {
+                            backgroundColor: colors.card,
+                            borderColor: colors.border,
+                          },
+                        ]}
+                      >
+                        <Text style={[styles.detailsTitle, { color: colors.text }]}>
+                          Send A Message
+                        </Text>
+                        <TextInput
+                          style={[styles.textArea, isDark && styles.inputDark]}
+                          placeholder="Send a message..."
+                          multiline
+                          numberOfLines={2}
+                          value={messageText}
+                          onChangeText={setMessageText}
+                          textAlignVertical="top"
+                        />
+                      </View>
+                    </KeyboardAvoidingView>
                   )}
               </Animated.View>
 
