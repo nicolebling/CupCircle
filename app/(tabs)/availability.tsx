@@ -96,48 +96,24 @@ export default function AvailabilityScreen() {
   const handleAddSlot = async () => {
     // Format the selected date consistently for comparison
     const selectedDateString = format(selectedDate, "yyyy-MM-dd");
-    const normalizedSelectedTime = selectedTime
-      .trim()
-      .replace(/\s+/g, " ")
-      .toUpperCase();
-
-    // Check for exact duplicate
-    const isDuplicate = timeSlots.some((slot) => {
-      let slotDate =
-        slot.date instanceof Date ? slot.date : new Date(slot.date);
-      const slotDateString = format(slotDate, "yyyy-MM-dd");
-      const slotStartTime = (slot.startTime || slot.start_time || "")
-        .trim()
-        .replace(/\s+/g, " ")
-        .toUpperCase();
-      return (
-        slotDateString === selectedDateString &&
-        slotStartTime === normalizedSelectedTime
-      );
-    });
-
-    if (isDuplicate) {
-      alert("This time slot already exists.");
-      return;
-    }
 
     // Helper function to convert 12-hour time to 24-hour format
     const to24Hour = (time12h) => {
-      const [time, modifier] = time12h.split(' ');
-      let [hours, minutes] = time.split(':');
-      
-      if (hours === '12') {
-        hours = '00';
+      const [time, modifier] = time12h.split(" ");
+      let [hours, minutes] = time.split(":");
+
+      if (hours === "12") {
+        hours = "00";
       }
-      
-      if (modifier === 'PM') {
+
+      if (modifier === "PM") {
         hours = parseInt(hours, 10) + 12;
       }
-      
+
       return `${hours}:${minutes}`;
     };
-    
-    // Optional: Check for overlap
+
+    // Check for overlap time slots
     const newStart = new Date(
       `1970-01-01T${to24Hour(selectedTime)}:00`,
     ).getTime();
@@ -158,7 +134,7 @@ export default function AvailabilityScreen() {
     });
 
     if (hasOverlap) {
-      alert("This time slot overlaps with an existing one.");
+      alert("The time slot you choose is already existed.");
       return;
     }
 
