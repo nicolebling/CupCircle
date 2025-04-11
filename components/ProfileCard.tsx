@@ -369,36 +369,7 @@ export default function ProfileCard({
 
           <View style={styles.divider} />
 
-          {/* Industries */}
-          {profile.industry_categories &&
-            profile.industry_categories.length > 0 && (
-              <>
-                <Text style={[styles.sectionTitle, { color: colors.text }]}>
-                  Industries
-                </Text>
-                <View style={styles.interestsContainer}>
-                  {profile.industry_categories.map((industry, index) => (
-                    <View
-                      key={index}
-                      style={[
-                        styles.interestTag,
-                        {
-                          backgroundColor: "transparent",
-                          borderWidth: 1,
-                          borderColor: colors.primary,
-                        },
-                      ]}
-                    >
-                      <Text
-                        style={[styles.interestText, { color: colors.primary }]}
-                      >
-                        {industry}
-                      </Text>
-                    </View>
-                  ))}
-                </View>
-              </>
-            )}
+          
 
           {/* Employment */}
           {profile.employment && profile.employment.length > 0 && (
@@ -503,6 +474,37 @@ export default function ProfileCard({
               </Text>
             </>
           )}
+
+          {/* Industries */}
+          {profile.industry_categories &&
+            profile.industry_categories.length > 0 && (
+              <>
+                <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                  Industries
+                </Text>
+                <View style={styles.interestsContainer}>
+                  {profile.industry_categories.map((industry, index) => (
+                    <View
+                      key={index}
+                      style={[
+                        styles.interestTag,
+                        {
+                          backgroundColor: "transparent",
+                          borderWidth: 1,
+                          borderColor: colors.primary,
+                        },
+                      ]}
+                    >
+                      <Text
+                        style={[styles.interestText, { color: colors.primary }]}
+                      >
+                        {industry}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              </>
+            )}
 
           {/* Interests */}
           <Text style={[styles.sectionTitle, { color: colors.text }]}>

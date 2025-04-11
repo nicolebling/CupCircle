@@ -11,6 +11,8 @@ import {
   TextInput,
   KeyboardAvoidingView,
   Platform,
+  TouchableWithoutFeedback,
+  Keyboard
 } from "react-native";
 import Colors from "@/constants/Colors";
 import ProfileCard from "@/components/ProfileCard";
@@ -449,11 +451,7 @@ export default function MatchingScreen() {
           ]}
           disabled={currentIndex === 0}
         >
-          <Ionicons
-            name="arrow-back"
-            size={24}
-            color={colors.primary}
-          />
+          <Ionicons name="arrow-back" size={24} color={colors.primary} />
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -470,11 +468,7 @@ export default function MatchingScreen() {
           ]}
           disabled={currentIndex == profiles.length - 1}
         >
-          <Ionicons
-            name="arrow-forward"
-            size={24}
-            color={colors.primary}
-          />
+          <Ionicons name="arrow-forward" size={24} color={colors.primary} />
         </TouchableOpacity>
       </View>
       <ScrollView
@@ -520,8 +514,6 @@ export default function MatchingScreen() {
             </View>
           ) : currentIndex < profiles.length ? (
             <>
-              
-
               <Animated.View
                 style={[styles.animatedCardContainer, cardAnimatedStyle]}
               >
@@ -717,9 +709,6 @@ export default function MatchingScreen() {
                   )}
                 {profiles[currentIndex].availabilitySlots &&
                   profiles[currentIndex].availabilitySlots.length > 0 && (
-
-                   
-                        
                     <View
                       style={[
                         styles.detailsCard,
@@ -729,24 +718,30 @@ export default function MatchingScreen() {
                         },
                       ]}
                     >
-                      <Text style={[styles.detailsTitle, { color: colors.text }]}>
+                      <Text
+                        style={[styles.detailsTitle, { color: colors.text }]}
+                      >
                         Send A Message
                       </Text>
-                      <TextInput
-                        style={[
-                          styles.textArea, 
-                          isDark ? styles.inputDark : {backgroundColor: '#f8f8f8'}
-                        ]}
-                        placeholder="Send a message..."
-                        placeholderTextColor={colors.secondaryText}
-                        multiline
-                        numberOfLines={2}
-                        value={messageText}
-                        onChangeText={setMessageText}
-                        textAlignVertical="top"
-                      />
+                      
+                        <TextInput
+                          style={[
+                            styles.textArea,
+                            isDark
+                              ? styles.inputDark
+                              : { backgroundColor: "#f8f8f8" },
+                          ]}
+                          placeholder="Send a message..."
+                          placeholderTextColor={colors.secondaryText}
+                          multiline
+                          numberOfLines={2}
+                          value={messageText}
+                          onChangeText={setMessageText}
+                          textAlignVertical="top"
+                        />
+                          
+              
                     </View>
-                        
                   )}
               </Animated.View>
 
@@ -1423,5 +1418,5 @@ const styles = StyleSheet.create({
   },
   textDark: {
     color: "#fff",
-  }
+  },
 });
