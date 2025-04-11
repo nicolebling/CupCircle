@@ -94,6 +94,19 @@ export default function AvailabilityScreen() {
   };
 
   const handleAddSlot = async () => {
+    // Check if this time slot already exists for the selected date
+    const selectedDateString = format(selectedDate, "yyyy-MM-dd");
+    
+    const isDuplicate = timeSlots.some(slot => {
+      const slotDateString = format(new Date(slot.date), "yyyy-MM-dd");
+      return slotDateString === selectedDateString && slot.startTime === selectedTime;
+    });
+
+    if (isDuplicate) {
+      alert("Already added into your availability");
+      return;
+    }
+    
     const endTime = calculateEndTime(selectedTime);
     const result = await createSlot(selectedDate, selectedTime, endTime);
     if (result) {
