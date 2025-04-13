@@ -13,7 +13,6 @@ import {
   Platform,
   TouchableWithoutFeedback,
   Keyboard,
-  Easing,
 } from "react-native";
 import Colors from "@/constants/Colors";
 import ProfileCard from "@/components/ProfileCard";
@@ -23,6 +22,7 @@ import Animated, {
   useAnimatedStyle,
   withSpring,
   withTiming,
+  Easing,
 } from "react-native-reanimated";
 import { format } from "date-fns";
 import { supabase } from "@/lib/supabase";
