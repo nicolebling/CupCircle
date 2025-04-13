@@ -30,6 +30,9 @@ import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { useRouter } from "expo-router"; // Import useRouter
+import IndustrySelector from "@/components/IndustrySelector";
+import ExperienceLevelSelector from "@/components/ExperienceLevelSelector";
+import InterestSelector from "@/components/InterestSelector";
 
 // Define the profile type for better type checking
 interface Profile {
@@ -954,58 +957,30 @@ export default function MatchingScreen() {
               <Text style={[styles.filterLabel, { color: colors.text }]}>
                 Industry
               </Text>
-              <View style={styles.filterOptions}>
-                {[
-                  "Technology",
-                  "Design",
-                  "Finance",
-                  "Marketing",
-                  "Education",
-                ].map((industry) => (
-                  <TouchableOpacity
-                    key={industry}
-                    style={[
-                      styles.filterChip,
-                      {
-                        backgroundColor: colors.card,
-                        borderColor: colors.border,
-                      },
-                    ]}
-                  >
-                    <Text
-                      style={[styles.filterChipText, { color: colors.text }]}
-                    >
-                      {industry}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
+              <IndustrySelector
+                selected={[]}
+                onChange={() => {}}
+                maxSelections={3}
+                isDark={false}
+              />
 
               <Text style={[styles.filterLabel, { color: colors.text }]}>
                 Experience Level
               </Text>
-              <View style={styles.filterOptions}>
-                {["Entry", "Mid-Level", "Senior", "Executive"].map((level) => (
-                  <TouchableOpacity
-                    key={level}
-                    style={[
-                      styles.filterChip,
-                      {
-                        backgroundColor: colors.card,
-                        borderColor: colors.border,
-                      },
-                    ]}
-                  >
-                    <Text
-                      style={[styles.filterChipText, { color: colors.text }]}
-                    >
-                      {level}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
+              <ExperienceLevelSelector
+                selected=""
+                onChange={() => {}}
+              />
 
-              
+              <Text style={[styles.filterLabel, { color: colors.text }]}>
+                Interests
+              </Text>
+              <InterestSelector
+                selected={[]}
+                onChange={() => {}}
+                maxInterests={5}
+                isDark={false}
+              />
             </ScrollView>
 
             <View style={styles.modalFooter}>
