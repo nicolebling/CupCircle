@@ -13,6 +13,7 @@ import {
   Platform,
   TouchableWithoutFeedback,
   Keyboard,
+ 
 } from "react-native";
 import Colors from "@/constants/Colors";
 import ProfileCard from "@/components/ProfileCard";
@@ -22,7 +23,7 @@ import Animated, {
   useAnimatedStyle,
   withSpring,
   withTiming,
-  Easing,
+  Easing
 } from "react-native-reanimated";
 import { format } from "date-fns";
 import { supabase } from "@/lib/supabase";
@@ -95,8 +96,8 @@ export default function MatchingScreen() {
         { translateX: cardOffset.value },
         { rotate: `${cardRotate.value}deg` },
         { translateY: cardTranslateY.value },
-      ],
-      opacity: cardOpacity.value,
+        ],
+        opacity: cardOpacity.value,
     };
   });
 
@@ -351,6 +352,10 @@ export default function MatchingScreen() {
   };
 
   const handleLike = () => {
+    // Animate card off-screen to the right
+    // cardOffset.value = withSpring(500);
+    // cardRotate.value = withSpring(20);
+
     if (profiles.length > 0 && currentIndex < profiles.length) {
       console.log(`Liked ${profiles[currentIndex].name}`);
 
@@ -362,6 +367,7 @@ export default function MatchingScreen() {
         duration: 300,
         easing: Easing.out(Easing.ease),
       });
+      
 
       // Here you would typically send a like request to your backend
       // For example: createMatch(profiles[currentIndex].id)
@@ -373,17 +379,17 @@ export default function MatchingScreen() {
           setTimeout(() => setMatchAnimation(false), 3000);
         }, 500);
       }
-
-      // Small delay before moving to next profile
-      setTimeout(() => {
-        if (currentIndex < profiles.length - 1) {
-          setCurrentIndex(currentIndex + 1);
-          // Reset animation values for next card
-          cardOpacity.value = 0;
-          cardTranslateY.value = 20;
-        }
-      }, 300);
     }
+
+    // Small delay before moving to next profile
+    setTimeout(() => {
+      if (currentIndex < profiles.length - 1) {
+        setCurrentIndex(currentIndex + 1);
+        // Reset animation values
+        cardOpacity.value = 0;
+        cardTranslateY.value = 20;
+      }
+    }, 300);
   };
 
   const handleSkip = () => {
@@ -408,20 +414,7 @@ export default function MatchingScreen() {
 
   const handlePrevious = () => {
     if (currentIndex > 0) {
-      cardOpacity.value = withTiming(0, {
-        duration: 300,
-        easing: Easing.out(Easing.ease),
-      });
-      cardTranslateY.value = withTiming(-20, {
-        duration: 300,
-        easing: Easing.out(Easing.ease),
-      });
-
-      setTimeout(() => {
-        setCurrentIndex(currentIndex - 1);
-        cardOpacity.value = 0;
-        cardTranslateY.value = 20;
-      }, 300);
+      setCurrentIndex(currentIndex - 1);
     }
   };
 
@@ -583,6 +576,7 @@ export default function MatchingScreen() {
               </View>
             ) : currentIndex < profiles.length ? (
               <>
+                
                 <Animated.View
                   style={[styles.animatedCardContainer, cardAnimatedStyle]}
                 >
@@ -1082,7 +1076,8 @@ export default function MatchingScreen() {
                 <Text style={styles.applyButtonText}>Apply Filters</Text>
               </TouchableOpacity>
             </View>
-          </View>        </View>
+          </View>
+        </View>
       </Modal>
 
       {/* Match Animation Modal */}
