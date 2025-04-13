@@ -400,29 +400,22 @@ export default function MatchingScreen() {
     }, 300);
   };
 
-  const handleSkip = () => {
-    // Animate card off-screen to the left
-    cardOffset.value = withSpring(-500);
-    cardRotate.value = withSpring(-20);
-
-    if (profiles.length > 0 && currentIndex < profiles.length) {
-      console.log(`Skipped ${profiles[currentIndex].name}`);
-    }
-
-    // Small delay before moving to next profile
-    setTimeout(() => {
-      if (currentIndex < profiles.length - 1) {
-        setCurrentIndex(currentIndex + 1);
-        // Reset animation values
-        cardOffset.value = 0;
-        cardRotate.value = 0;
-      }
-    }, 300);
-  };
-
   const handlePrevious = () => {
     if (currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1);
+      cardOpacity.value = withTiming(0, {
+        duration: 300,
+        easing: Easing.out(Easing.ease),
+      });
+      cardTranslateY.value = withTiming(-20, {
+        duration: 300,
+        easing: Easing.out(Easing.ease),
+      });
+
+      setTimeout(() => {
+        setCurrentIndex(currentIndex - 1);
+        cardOpacity.value = 0;
+        cardTranslateY.value = 20;
+      }, 300);
     }
   };
 
