@@ -81,8 +81,8 @@ export default function MatchingScreen() {
   const [isFilterModalVisible, setFilterModalVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [filterIndustries, setFilterIndustries] = useState<string[]>([]);
-  const [filterExperienceLevel, setFilterExperienceLevel] =
-    useState<string>("");
+  const [filterExperienceLevels, setFilterExperienceLevels] = 
+    useState<string[]>([]);
   const [filterInterests, setFilterInterests] = useState<string[]>([]);
   const [matchAnimation, setMatchAnimation] = useState(false);
   const [hasAvailability, setHasAvailability] = useState(false);
@@ -1002,21 +1002,41 @@ export default function MatchingScreen() {
                 Experience Level
               </Text>
               <ExperienceLevelSelector
-                selected={filterExperienceLevel || ""}
-                onChange={(level) => setFilterExperienceLevel(level)}
+                selected={filterExperienceLevels}
+                onChange={(level) => {
+                  if (filterExperienceLevels.includes(level)) {
+                    setFilterExperienceLevels(filterExperienceLevels.filter(l => l !== level));
+                  } else {
+                    setFilterExperienceLevels([...filterExperienceLevels, level]);
+                  }
+                }}
+                multiSelect={true}
               />
-              {filterExperienceLevel && (
+              {filterExperienceLevels.length > 0 && (
                 <View style={styles.selectedTagsContainer}>
-                  <View
-                    style={[
-                      styles.selectedTag,
-                      { backgroundColor: "transparent", borderColor: colors.primary },
-                    ]}
-                  >
-                    <Text style={[styles.selectedTagText, { color: colors.primary }]}>
-                      {filterExperienceLevel}
-                    </Text>
-                  </View>
+                  {filterExperienceLevels.map((level, index) => (
+                    <View
+                      key={index}
+                      style={[
+                        styles.selectedTag,
+                        { backgroundColor: "transparent", borderColor: colors.primary },
+                      ]}
+                    >
+                      <Text style={[styles.selectedTagText, { color: colors.primary }]}>
+                        {level}
+                      </Text>
+                      <TouchableOpacity
+                        onPress={() => setFilterExperienceLevels(filterExperienceLevels.filter(l => l !== level))}
+                      >
+                        <Ionicons
+                          name="close-circle"
+                          size={16}
+                          color={colors.primary}
+                          style={{ marginLeft: 4 }}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                  ))}
                 </View>
               )}
 

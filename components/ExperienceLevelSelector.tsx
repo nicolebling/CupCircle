@@ -17,8 +17,9 @@ const EXPERIENCE_LEVELS = [
 ];
 
 type ExperienceLevelSelectorProps = {
-  selected: string;
+  selected: string | string[];
   onChange: (level: string) => void;
+  multiSelect?: boolean;
 };
 
 export default function ExperienceLevelSelector({ 
@@ -36,7 +37,9 @@ export default function ExperienceLevelSelector({
   // Handle selection
   const handleSelect = (level: string) => {
     onChange(level);
-    setModalVisible(false);
+    if (!props.multiSelect) {
+      setModalVisible(false);
+    }
   };
   
   const getDisplayText = () => {
@@ -84,7 +87,9 @@ export default function ExperienceLevelSelector({
               data={EXPERIENCE_LEVELS}
               keyExtractor={(item) => item.level}
               renderItem={({ item }) => {
-                const isSelected = selected === item.level;
+                const isSelected = Array.isArray(selected) 
+                  ? selected.includes(item.level)
+                  : selected === item.level;
                 const coffeeColor = getCoffeeColor(item.level, colors.primary);
                 
                 return (
