@@ -19,14 +19,6 @@ import { supabase } from "@/lib/supabase";
 import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "@/contexts/AuthContext";
 import ProfileForm from "@/components/ProfileForm";
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  Easing,
-  withDelay,
-  runOnJS,
-} from "react-native-reanimated";
 
 const { width } = Dimensions.get("window");
 
@@ -268,7 +260,7 @@ export default function ProfileCard({
   // For matching view
   if (!isUserProfile && !isEditMode && !isOnboarding) {
     return (
-      <Animated.View
+      <View
         style={[
           styles.card,
           { backgroundColor: colors.card, borderColor: colors.border },
@@ -588,7 +580,7 @@ export default function ProfileCard({
             </TouchableOpacity>
           </View>
         )}
-      </Animated.View>
+      </View>
     );
   }
 
@@ -1212,7 +1204,7 @@ const styles = StyleSheet.create({
   occupationBadge: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal:10,
+    paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 16,
     alignSelf: "flex-start",
@@ -1491,7 +1483,7 @@ const styles = StyleSheet.create({
   positionContainer: {
     flexDirection: "row",
     alignItems: "center",
-
+    
     marginTop: 8,
   },
   position: {
