@@ -192,12 +192,12 @@ const styles = StyleSheet.create({
   levelItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderBottomWidth: 1,
     borderRadius: 8,
     marginBottom: 8,
+    gap: 12,
   },
   levelItemContent: {
     flexDirection: 'row',
