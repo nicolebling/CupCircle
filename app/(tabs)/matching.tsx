@@ -1361,12 +1361,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   detailsCard: {
-    width: "90%",
+    width: "100%",
     borderRadius: 16,
     borderWidth: 1,
     padding: 16,
     marginTop: 16,
-    alignSelf: "center",
   },
   detailsTitle: {
     fontFamily: "K2D-SemiBold",
