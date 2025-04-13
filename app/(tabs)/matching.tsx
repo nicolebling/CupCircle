@@ -563,7 +563,12 @@ export default function MatchingScreen() {
                     profile={profiles[currentIndex]}
                     isNewUser={false}
                   />
-                  <Text> Pick a café and time below to send your coffee chat invite: </Text>
+                  <View style={[styles.instructionContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
+                    <Ionicons name="information-circle-outline" size={20} color={colors.primary} />
+                    <Text style={[styles.instructionText, { color: colors.text }]}>
+                      Pick a café and time below to send your coffee chat invite
+                    </Text>
+                  </View>
                   {/* Cafe details and availability */}
                   {profiles[currentIndex].favorite_cafes &&
                     profiles[currentIndex].favorite_cafes.length > 0 && (
@@ -1463,5 +1468,24 @@ const styles = StyleSheet.create({
   },
   textDark: {
     color: "#fff",
+  },
+  instructionContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 16,
+    marginBottom: 8,
+    borderWidth: 1,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  instructionText: {
+    marginLeft: 8,
+    fontSize: 16,
+    fontFamily: 'K2D-Medium',
   },
 });
