@@ -608,7 +608,7 @@ export default function MatchingScreen() {
                                           : colors.card,
                                     },
                                   ]}
-                                  onPress={() => setSelectedCafe(cafe)}
+                                  onPress={() => setSelectedCafe(selectedCafe === cafe ? null : cafe)}
                                 >
                                   <View style={styles.cafeDetails}>
                                     <Text
@@ -699,7 +699,7 @@ export default function MatchingScreen() {
                                           : colors.card,
                                     },
                                   ]}
-                                  onPress={() => setSelectedTimeSlot(slot)}
+                                  onPress={() => setSelectedTimeSlot(selectedTimeSlot === slot ? null : slot)}
                                 >
                                   <View style={styles.timeSlotDetails}>
                                     <Text
@@ -802,8 +802,14 @@ export default function MatchingScreen() {
                         }
 
                         const currentProfile = profiles[currentIndex];
-                        if (!selectedCafe || !selectedTimeSlot) {
+                        if (!selectedCafe && !selectedTimeSlot) {
                           alert("Please select both a cafe and a time slot");
+                          return;
+                        } else if (!selectedCafe) {
+                          alert("Please select a cafe");
+                          return;
+                        } else if (!selectedTimeSlot) {
+                          alert("Please select a time slot");
                           return;
                         }
 
