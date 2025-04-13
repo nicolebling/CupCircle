@@ -509,11 +509,13 @@ export default function MatchingScreen() {
         >
           <View style={styles.cardsContainer}>
             {isLoading ? (
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color={colors.primary} />
-              <Text style={[styles.loadingText, { color: colors.text }]}>
-                Brewing your circle......
-              </Text>
+            <View style={[styles.loadingContainer, { height: '100%' }]}>
+              <View style={styles.loadingContent}>
+                <ActivityIndicator size="large" color={colors.primary} />
+                <Text style={[styles.loadingText, { color: colors.text }]}>
+                  Brewing your circle......
+                </Text>
+              </View>
             </View>
           ) : !hasAvailability ? (
             renderNoAvailabilityMessage()
@@ -1218,9 +1220,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   loadingContainer: {
-    flex: 1,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     alignItems: "center",
     justifyContent: "center",
+  },
+  loadingContent: {
+    alignItems: "center",
   },
   loadingText: {
     fontFamily: "K2D-Regular",
