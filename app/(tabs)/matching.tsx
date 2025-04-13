@@ -480,7 +480,7 @@ export default function MatchingScreen() {
             <View style={styles.loadingContainer}>
               <ActivityIndicator size="large" color={colors.primary} />
               <Text style={[styles.loadingText, { color: colors.text }]}>
-                Finding perfect matches...
+                Brewing your circle......
               </Text>
             </View>
           ) : !hasAvailability ? (
