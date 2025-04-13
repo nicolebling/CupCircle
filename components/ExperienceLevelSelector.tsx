@@ -8,7 +8,7 @@ import { useColorScheme } from '@/hooks/useColorScheme';
 // Experience levels with coffee themes
 const EXPERIENCE_LEVELS = [
   { level: 'Student', coffeeTheme: 'Warm Milk', icon: 'school-outline' },
-  { level: 'Internship', coffeeTheme: 'Latte', icon: 'cafe-outline' },
+  { level: 'Intern', coffeeTheme: 'Latte', icon: 'cafe-outline' },
   { level: 'Entry', coffeeTheme: 'Light Roast', icon: 'cafe-outline' },
   { level: 'Junior', coffeeTheme: 'Medium Roast', icon: 'cafe-outline' },
   { level: 'Senior', coffeeTheme: 'Dark Roast', icon: 'cafe-outline' },

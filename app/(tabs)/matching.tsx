@@ -13,7 +13,6 @@ import {
   Platform,
   TouchableWithoutFeedback,
   Keyboard,
-
 } from "react-native";
 import Colors from "@/constants/Colors";
 import ProfileCard from "@/components/ProfileCard";
@@ -23,7 +22,7 @@ import Animated, {
   useAnimatedStyle,
   withSpring,
   withTiming,
-  Easing
+  Easing,
 } from "react-native-reanimated";
 import { format } from "date-fns";
 import { supabase } from "@/lib/supabase";
@@ -82,7 +81,8 @@ export default function MatchingScreen() {
   const [isFilterModalVisible, setFilterModalVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [filterIndustries, setFilterIndustries] = useState<string[]>([]);
-  const [filterExperienceLevel, setFilterExperienceLevel] = useState<string>("");
+  const [filterExperienceLevel, setFilterExperienceLevel] =
+    useState<string>("");
   const [filterInterests, setFilterInterests] = useState<string[]>([]);
   const [matchAnimation, setMatchAnimation] = useState(false);
   const [hasAvailability, setHasAvailability] = useState(false);
@@ -372,7 +372,7 @@ export default function MatchingScreen() {
       // Fade out current card
       cardOpacity.value = withTiming(0, {
         duration: 200,
-        easing: Easing.out(Easing.ease)
+        easing: Easing.out(Easing.ease),
       });
 
       // Here you would typically send a like request to your backend
@@ -394,7 +394,6 @@ export default function MatchingScreen() {
         // Reset animation values
         cardOpacity.value = 0;
 
-
         // Animate new card in with slight delay
         setTimeout(() => {
           cardOpacity.value = withTiming(1, {
@@ -411,7 +410,7 @@ export default function MatchingScreen() {
       // Fade out current card
       cardOpacity.value = withTiming(0, {
         duration: 200,
-        easing: Easing.out(Easing.ease)
+        easing: Easing.out(Easing.ease),
       });
 
       setTimeout(() => {
@@ -537,16 +536,16 @@ export default function MatchingScreen() {
         </View>
       ) : (
         <ScrollView
-          style={{ flex: 1, width: '100%', padding: 16 }}
+          style={{ flex: 1, width: "100%", padding: 16 }}
           contentContainerStyle={{
             flexGrow: 1,
             paddingBottom: 20,
-            justifyContent: 'center',
-            alignItems: 'center',
+            justifyContent: "center",
+            alignItems: "center",
           }}
           nestedScrollEnabled={true}
         >
-          <View style={[styles.cardsContainer, { width: '100%' }]}>
+          <View style={[styles.cardsContainer, { width: "100%" }]}>
             {isLoading ? (
               <View style={styles.loadingContainer}>
                 <ActivityIndicator size="large" color={colors.primary} />
@@ -588,7 +587,6 @@ export default function MatchingScreen() {
               </View>
             ) : currentIndex < profiles.length ? (
               <>
-
                 <Animated.View
                   style={[styles.animatedCardContainer, cardAnimatedStyle]}
                 >
@@ -597,18 +595,36 @@ export default function MatchingScreen() {
                     profile={profiles[currentIndex]}
                     isNewUser={false}
                   />
-                  {profiles[currentIndex] && 
-                   profiles[currentIndex].favorite_cafes && 
-                   profiles[currentIndex].favorite_cafes.length > 0 &&
-                   profiles[currentIndex].availabilitySlots &&
-                   profiles[currentIndex].availabilitySlots.length > 0 && (
-                    <View style={[styles.instructionContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
-                      <Ionicons name="information-circle-outline" size={20} color={colors.primary} />
-                      <Text style={[styles.instructionText, { color: colors.text }]}>
-                        Pick a café and time below to send your coffee chat invite.
-                      </Text>
-                    </View>
-                  )}
+                  {profiles[currentIndex] &&
+                    profiles[currentIndex].favorite_cafes &&
+                    profiles[currentIndex].favorite_cafes.length > 0 &&
+                    profiles[currentIndex].availabilitySlots &&
+                    profiles[currentIndex].availabilitySlots.length > 0 && (
+                      <View
+                        style={[
+                          styles.instructionContainer,
+                          {
+                            backgroundColor: colors.card,
+                            borderColor: colors.border,
+                          },
+                        ]}
+                      >
+                        <Ionicons
+                          name="information-circle-outline"
+                          size={20}
+                          color={colors.primary}
+                        />
+                        <Text
+                          style={[
+                            styles.instructionText,
+                            { color: colors.text },
+                          ]}
+                        >
+                          Pick a café and time below to send your coffee chat
+                          invite.
+                        </Text>
+                      </View>
+                    )}
                   {/* Cafe details and availability */}
                   {profiles[currentIndex].favorite_cafes &&
                     profiles[currentIndex].favorite_cafes.length > 0 && (
@@ -645,7 +661,11 @@ export default function MatchingScreen() {
                                           : colors.card,
                                     },
                                   ]}
-                                  onPress={() => setSelectedCafe(selectedCafe === cafe ? null : cafe)}
+                                  onPress={() =>
+                                    setSelectedCafe(
+                                      selectedCafe === cafe ? null : cafe,
+                                    )
+                                  }
                                 >
                                   <View style={styles.cafeDetails}>
                                     <Text
@@ -736,7 +756,11 @@ export default function MatchingScreen() {
                                           : colors.card,
                                     },
                                   ]}
-                                  onPress={() => setSelectedTimeSlot(selectedTimeSlot === slot ? null : slot)}
+                                  onPress={() =>
+                                    setSelectedTimeSlot(
+                                      selectedTimeSlot === slot ? null : slot,
+                                    )
+                                  }
                                 >
                                   <View style={styles.timeSlotDetails}>
                                     <Text
@@ -884,7 +908,14 @@ export default function MatchingScreen() {
                         );
                       }
                     }}
-                    style={[styles.navButton, { backgroundColor: colors.card, borderWidth:1, borderColor: colors.border }]}
+                    style={[
+                      styles.navButton,
+                      {
+                        backgroundColor: colors.card,
+                        borderWidth: 1,
+                        borderColor: colors.border,
+                      },
+                    ]}
                   >
                     <Ionicons name="cafe" size={20} color={colors.primary} />
                     <Text
@@ -955,7 +986,6 @@ export default function MatchingScreen() {
                 <Ionicons name="close" size={24} color={colors.text} />
               </TouchableOpacity>
             </View>
-
             <ScrollView style={styles.modalBody}>
               <Text style={[styles.filterLabel, { color: colors.text }]}>
                 Industry
@@ -965,23 +995,6 @@ export default function MatchingScreen() {
                 onChange={(industries) => setFilterIndustries(industries)}
                 isDark={false}
               />
-              {filterIndustries && filterIndustries.length > 0 && (
-                <View style={styles.selectedTagsContainer}>
-                  {filterIndustries.map((industry, index) => (
-                    <View
-                      key={index}
-                      style={[
-                        styles.selectedTag,
-                        { backgroundColor: "transparent", borderColor: colors.primary },
-                      ]}
-                    >
-                      <Text style={[styles.selectedTagText, { color: colors.primary }]}>
-                        {industry}
-                      </Text>
-                    </View>
-                  ))}
-                </View>
-              )}
 
               <Text style={[styles.filterLabel, { color: colors.text }]}>
                 Experience Level
@@ -995,10 +1008,18 @@ export default function MatchingScreen() {
                   <View
                     style={[
                       styles.selectedTag,
-                      { backgroundColor: "transparent", borderColor: colors.primary },
+                      {
+                        backgroundColor: "transparent",
+                        borderColor: colors.primary,
+                      },
                     ]}
                   >
-                    <Text style={[styles.selectedTagText, { color: colors.primary }]}>
+                    <Text
+                      style={[
+                        styles.selectedTagText,
+                        { color: colors.primary },
+                      ]}
+                    >
                       {filterExperienceLevel}
                     </Text>
                   </View>
@@ -1013,25 +1034,7 @@ export default function MatchingScreen() {
                 onChange={(interests) => setFilterInterests(interests)}
                 isDark={false}
               />
-              {filterInterests && filterInterests.length > 0 && (
-                <View style={styles.selectedTagsContainer}>
-                  {filterInterests.map((interest, index) => (
-                    <View
-                      key={index}
-                      style={[
-                        styles.selectedTag,
-                        { backgroundColor: "transparent", borderColor: colors.primary },
-                      ]}
-                    >
-                      <Text style={[styles.selectedTagText, { color: colors.primary }]}>
-                        {interest}
-                      </Text>
-                    </View>
-                  ))}
-                </View>
-              )}
             </ScrollView>
-
             <View style={styles.modalFooter}>
               <TouchableOpacity
                 style={[
@@ -1053,7 +1056,8 @@ export default function MatchingScreen() {
               >
                 <Text style={styles.applyButtonText}>Apply Filters</Text>
               </TouchableOpacity>
-            </View>          </View>
+            </View>
+          </View>
         </View>
       </Modal>
 
@@ -1110,7 +1114,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },shadowOpacity: 0.25,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
     position: "absolute",
@@ -1305,8 +1310,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   selectedTagsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     marginTop: 8,
     marginBottom: 16,
   },
@@ -1319,7 +1324,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   selectedTagText: {
-    fontFamily: 'K2D-Medium',
+    fontFamily: "K2D-Medium",
     fontSize: 12,
   },
   clearButton: {
@@ -1492,8 +1497,8 @@ const styles = StyleSheet.create({
   },
   instructionContainer: {
     width: "100%",
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     padding: 16,
     borderRadius: 16,
     marginTop: 8,
@@ -1505,6 +1510,6 @@ const styles = StyleSheet.create({
   instructionText: {
     marginLeft: 8,
     fontSize: 12,
-    fontFamily: 'K2D-Regular',
+    fontFamily: "K2D-Regular",
   },
 });
