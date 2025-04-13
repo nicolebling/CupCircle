@@ -87,8 +87,8 @@ export default function MatchingScreen() {
   // Animation values
   const cardOffset = useSharedValue(0);
   const cardRotate = useSharedValue(0);
-  const cardOpacity = useSharedValue(0);
-  const cardTranslateY = useSharedValue(20);
+  const cardOpacity = useSharedValue(1);
+  const cardTranslateY = useSharedValue(0);
 
   const cardAnimatedStyle = useAnimatedStyle(() => {
     return {
@@ -96,10 +96,18 @@ export default function MatchingScreen() {
         { translateX: cardOffset.value },
         { rotate: `${cardRotate.value}deg` },
         { translateY: cardTranslateY.value },
-        ],
-        opacity: cardOpacity.value,
+      ],
+      opacity: cardOpacity.value,
     };
   });
+
+  // Reset animation values when currentIndex changes
+  useEffect(() => {
+    cardOpacity.value = 1;
+    cardTranslateY.value = 0;
+    cardOffset.value = 0;
+    cardRotate.value = 0;
+  }, [currentIndex]);
 
   useEffect(() => {
     // Check if current user has any availability slots
