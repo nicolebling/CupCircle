@@ -1025,16 +1025,6 @@ export default function MatchingScreen() {
                       <Text style={[styles.selectedTagText, { color: colors.primary }]}>
                         {level}
                       </Text>
-                      <TouchableOpacity
-                        onPress={() => setFilterExperienceLevels(filterExperienceLevels.filter(l => l !== level))}
-                      >
-                        <Ionicons
-                          name="close-circle"
-                          size={16}
-                          color={colors.primary}
-                          style={{ marginLeft: 4 }}
-                        />
-                      </TouchableOpacity>
                     </View>
                   ))}
                 </View>
@@ -1329,15 +1319,14 @@ const styles = StyleSheet.create({
   selectedTagsContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
-    marginTop: 8,
     marginBottom: 16,
   },
   selectedTag: {
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
+    marginTop: 8,
     marginRight: 8,
-    marginBottom: 8,
     borderWidth: 1,
   },
   selectedTagText: {

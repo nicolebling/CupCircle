@@ -51,6 +51,10 @@ export default function ExperienceLevelSelector(props: ExperienceLevelSelectorPr
     return selectedLevelData 
       ? `${selectedLevelData.level}` 
       : selected;
+
+    // return selectedLevelData 
+    // ? `${selectedLevelData.level} (${selectedLevelData.coffeeTheme})` 
+    // : selected;
   };
   
   return (
@@ -155,7 +159,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 12,
-    marginBottom: 16,
     backgroundColor: '#f8f8f8',
   },
   selectorText: {
