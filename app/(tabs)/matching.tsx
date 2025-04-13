@@ -22,7 +22,9 @@ import Animated, {
   useAnimatedStyle,
   withSpring,
   withTiming,
+  withDelay,
   Easing,
+  runOnJS,
 } from "react-native-reanimated";
 import { format } from "date-fns";
 import { supabase } from "@/lib/supabase";
@@ -104,6 +106,29 @@ export default function MatchingScreen() {
         { translateY: cardTranslateY.value },
       ],
       opacity: cardOpacity.value,
+    };
+  });
+
+  const pageAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: withDelay(
+        800,
+        withTiming(1, {
+          duration: 800,
+          easing: Easing.bezier(0.4, 0, 0.2, 1),
+        })
+      ),
+      transform: [
+        {
+          translateY: withDelay(
+            800,
+            withTiming(0, {
+              duration: 800,
+              easing: Easing.bezier(0.4, 0, 0.2, 1),
+            })
+          ),
+        },
+      ],
     };
   });
 
@@ -588,6 +613,13 @@ export default function MatchingScreen() {
             ) : currentIndex < profiles.length ? (
               <>
                 <Animated.View
+                  style={[
+                    styles.pageContainer,
+                    pageAnimatedStyle,
+                    { opacity: 0, transform: [{ translateY: 50 }] },
+                  ]}
+                >
+                <Animated.View
                   style={[styles.animatedCardContainer, cardAnimatedStyle]}
                 >
                   <ProfileCard
@@ -854,6 +886,7 @@ export default function MatchingScreen() {
                 </Animated.View>
 
                 <View style={styles.navigationControls}>
+                </Animated.View>
                   <TouchableOpacity
                     onPress={async () => {
                       try {
@@ -1101,6 +1134,10 @@ export default function MatchingScreen() {
 }
 
 const styles = StyleSheet.create({
+  pageContainer: {
+    flex: 1,
+    width: '100%',
+  },
   navigationFloating: {
     position: "absolute",
     flexDirection: "row",
