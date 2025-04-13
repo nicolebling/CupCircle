@@ -353,10 +353,10 @@ export default function AvailabilityScreen() {
           headerRight: () => (
             <TouchableOpacity
               style={styles.headerButton}
-              onPress={() => setShowAddSlot(!showAddSlot)}
+              onPress={() => setShowAddSlot(true)}
             >
               <Ionicons
-                name={showAddSlot ? "close" : "add"}
+                name="add"
                 size={24}
                 color={colors.primary}
               />
@@ -366,14 +366,28 @@ export default function AvailabilityScreen() {
         }}
       />
 
-      {/* <Text style={[styles.subtitle, { color: colors.secondaryText }]}>
-        Set your availability for coffee chats with other professionals
-      </Text>
- */}
-      {showAddSlot && (
-        <>
-          {/* Calendar Section */}
-          <View style={styles.calendarContainer}>
+      {/* Add Availability Modal */}
+      <Modal
+        visible={showAddSlot}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowAddSlot(false)}
+      >
+        <TouchableWithoutFeedback onPress={() => setShowAddSlot(false)}>
+          <View style={styles.modalOverlay}>
+            <TouchableWithoutFeedback>
+              <View style={[styles.addSlotModalContent, { backgroundColor: colors.background }]}>
+                <View style={styles.modalHeader}>
+                  <Text style={[styles.modalTitle, { color: colors.text }]}>
+                    Add Availability
+                  </Text>
+                  <TouchableOpacity onPress={() => setShowAddSlot(false)}>
+                    <Ionicons name="close" size={24} color={colors.text} />
+                  </TouchableOpacity>
+                </View>
+                
+                {/* Calendar Section */}
+                <View style={styles.calendarContainer}>
             <FlatList
               horizontal
               data={next7Days}
@@ -545,13 +559,18 @@ export default function AvailabilityScreen() {
 
             <TouchableOpacity
               style={[styles.saveButton, { backgroundColor: colors.primary }]}
-              onPress={handleAddSlot}
+              onPress={() => {
+                handleAddSlot();
+                setShowAddSlot(false);
+              }}
             >
               <Text style={styles.saveButtonText}>Save Time Slot</Text>
             </TouchableOpacity>
           </View>
-        </>
-      )}
+              </View>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
 
       {/* Time Slots List */}
       <View style={styles.slotsContainer}>
@@ -615,6 +634,27 @@ export default function AvailabilityScreen() {
 }
 
 const styles = StyleSheet.create({
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  addSlotModalContent: {
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 20,
+    maxHeight: '90%',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  modalTitle: {
+    fontFamily: 'K2D-Bold',
+    fontSize: 20,
+  },
   headerButton: {
     marginRight: 15,
     padding: 8,
