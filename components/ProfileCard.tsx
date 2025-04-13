@@ -148,8 +148,6 @@ export default function ProfileCard({
       fetchProfile();
     }
   }, [userId, isNewUser]);
-  
-  
 
   const fetchProfile = async () => {
     try {
@@ -322,6 +320,10 @@ export default function ProfileCard({
                 <Text style={[styles.position, { color: colors.primary }]}>
                   {profile.occupation}
                 </Text>
+              </View>
+
+              {/* Experience level */}
+              <View style={styles.locationContainer}>
                 {profile.experience_level &&
                   (profile.employment?.length > 0 ||
                     profile.career_transitions?.length > 0) && (
@@ -332,12 +334,6 @@ export default function ProfileCard({
                       ]}
                     >
                       {profile.experience_level}
-                      <Ionicons
-                        name="cafe"
-                        size={12}
-                        color={getCoffeeColor(profile.experience_level)}
-                        style={{ marginLeft: 4 }}
-                      />
                     </Text>
                   )}
               </View>
@@ -345,11 +341,11 @@ export default function ProfileCard({
               {/* Location */}
               {profile.city && (
                 <View style={styles.locationContainer}>
-                  <Ionicons
+                  {/* <Ionicons
                     name="location-outline"
                     size={14}
                     color={colors.secondaryText}
-                  />
+                  /> */}
                   <Text
                     style={[styles.location, { color: colors.secondaryText }]}
                   >
@@ -368,8 +364,6 @@ export default function ProfileCard({
           </View>
 
           <View style={styles.divider} />
-
-          
 
           {/* Employment */}
           {profile.employment && profile.employment.length > 0 && (
@@ -433,35 +427,61 @@ export default function ProfileCard({
           {profile.career_transitions &&
             profile.career_transitions.length > 0 && (
               <>
-                <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                <Text
+                  style={[
+                    styles.label,
+                    {
+                      color: colors.secondaryText,
+                      marginTop: 24,
+                      marginBottom: 16,
+                    },
+                  ]}
+                >
                   Career Transitions
                 </Text>
-                {profile.career_transitions.map((transitionString, index) => {
-                  const transition =
-                    typeof transitionString === "string"
-                      ? JSON.parse(transitionString)
-                      : transitionString;
-                  return (
-                    <View key={index} style={styles.transitionCard}>
-                      <View style={styles.transitionText}>
-                        <Text style={[styles.position, { color: colors.text }]}>
-                          {transition.position1}
-                        </Text>
-                        <Ionicons
-                          name="arrow-forward"
-                          size={20}
-                          color={colors.primary}
-                          style={styles.transitionArrow}
-                        />
-                        <Text style={[styles.position, { color: colors.text }]}>
-                          {transition.position2}
-                        </Text>
-                      </View>
-                    </View>
-                  );
-                })}
+                <View>
+                  {profile.career_transitions.map(
+                    (transitionString, index) => {
+                      const transition = JSON.parse(transitionString);
+                      return (
+                        <View
+                          key={index}
+                          style={styles.transitionContainer}
+                        >
+                          <View style={styles.transitionCard}>
+                            <View style={styles.transitionText}>
+                              <Text
+                                style={[
+                                  styles.position,
+                                  { color: colors.text },
+                                ]}
+                              >
+                                {transition.position1}
+                              </Text>
+                              <Ionicons
+                                name="arrow-forward"
+                                size={20}
+                                color={colors.primary}
+                                style={styles.transitionArrow}
+                              />
+                              <Text
+                                style={[
+                                  styles.position,
+                                  { color: colors.text },
+                                ]}
+                              >
+                                {transition.position2}
+                              </Text>
+                            </View>
+                          </View>
+                        </View>
+                      );
+                    },
+                  )}
+                </View>
               </>
             )}
+
 
           {/* Education */}
           {profile.education && (
@@ -623,15 +643,15 @@ export default function ProfileCard({
 
         {onLike && onSkip && (
           <View style={styles.buttonsContainer}>
-              <TouchableOpacity
-                onPress={handlePrevious}
-                style={[
-                  styles.actionButton,
-                  styles.likeButton,
-                  { backgroundColor: "#FFF" },
-                ]}
-                disabled={currentIndex === 0}
-              >
+            <TouchableOpacity
+              onPress={handlePrevious}
+              style={[
+                styles.actionButton,
+                styles.likeButton,
+                { backgroundColor: "#FFF" },
+              ]}
+              disabled={currentIndex === 0}
+            >
               <Ionicons name="arrow-back" size={24} color="#64748B" />
             </TouchableOpacity>
 
@@ -718,75 +738,26 @@ export default function ProfileCard({
                     { justifyContent: "center" },
                   ]}
                 >
-                  <Text style={[styles.position, { color: colors.text }]}>
+                  <Text style={[styles.position, { color: colors.primary,  }]}>
                     {profile.occupation}
                   </Text>
                 </View>
 
                 {/* Experience Level */}
-
-                {/* <View>
-                  {profile.experience_level && (
-                    <View
-                      style={[
-                        styles.tag,
-                        {
-                          backgroundColor: "transparent",
-                          borderWidth: 1,
-                          borderColor: colors.primary,
-                          alignSelf: "flex-start",
-                          marginTop: 4,
-                          flexDirection: "row",
-                          alignItems: "center",
-                        },
-                      ]}
-                    >
+                <View style={styles.locationContainer}>
+                  {profile.experience_level &&
+                    (profile.employment?.length > 0 ||
+                      profile.career_transitions?.length > 0) && (
                       <Text
-                        style={[styles.occupation, { color: colors.primary }]}
+                        style={[
+                          styles.experience,
+                          { color: colors.secondaryText },
+                        ]}
                       >
-                        {profile.occupation}
-                      </Text>
-                    </View>
-                  )}
-                </View> */}
-
-                {/* <View>
-                  {profile.experience_level && (
-                    <View
-                      style={[
-                        styles.tag,
-                        {
-                          backgroundColor: "transparent",
-                          borderWidth: 1,
-                          borderColor: colors.primary,
-                          alignSelf: "flex-start",
-                          marginTop: 4,
-                          flexDirection: "row",
-                          alignItems: "center",
-                        },
-                      ]}
-                    >
-                      <Text style={[styles.occupation, { color: colors.primary }]}>
                         {profile.experience_level}
-
-                        <Ionicons
-                          name="cafe"
-                          size={14}
-                          color={getCoffeeColor(profile.experience_level)}
-                        />
-                        <Text
-                          style={[
-                            styles.coffeeBadgeText,
-                            { color: getCoffeeColor(profile.experience_level) },
-                          ]}
-                        >
-
-                          {getCoffeeTheme(profile.experience_level)}
-                        </Text>
                       </Text>
-                    </View>
-                  )}
-                </View> */}
+                    )}
+                </View>
 
                 {profile.city && (
                   <View
@@ -795,11 +766,11 @@ export default function ProfileCard({
                       { justifyContent: "center" },
                     ]}
                   >
-                    <Ionicons
+                    {/* <Ionicons
                       name="location-outline"
                       size={14}
                       color={colors.secondaryText}
-                    />
+                    /> */}
                     <Text
                       style={[styles.location, { color: colors.secondaryText }]}
                     >
@@ -1599,7 +1570,7 @@ const styles = StyleSheet.create({
   positionContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 8,
+    
     marginTop: 8,
   },
   position: {

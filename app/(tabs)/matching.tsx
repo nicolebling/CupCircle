@@ -588,7 +588,7 @@ export default function MatchingScreen() {
                         <Text
                           style={[styles.detailsTitle, { color: colors.text }]}
                         >
-                          Favorite Cafes
+                          Cafe preferences
                         </Text>
                         <View style={styles.cafeList}>
                           {profiles[currentIndex].favorite_cafes.map(
@@ -670,7 +670,7 @@ export default function MatchingScreen() {
                         <Text
                           style={[styles.detailsTitle, { color: colors.text }]}
                         >
-                          Available Times
+                          Available times
                         </Text>
                         <View style={styles.availabilityList}>
                           {profiles[currentIndex].availabilitySlots.map(
@@ -770,7 +770,7 @@ export default function MatchingScreen() {
                         <Text
                           style={[styles.detailsTitle, { color: colors.text }]}
                         >
-                          Send A Message
+                          Send a message
                         </Text>
 
                         <TextInput
@@ -780,7 +780,7 @@ export default function MatchingScreen() {
                               ? styles.inputDark
                               : { backgroundColor: "#f8f8f8" },
                           ]}
-                          placeholder="Send a message..."
+                          placeholder="Optional"
                           placeholderTextColor={colors.secondaryText}
                           multiline
                           numberOfLines={2}
@@ -847,7 +847,7 @@ export default function MatchingScreen() {
                         );
                       }
                     }}
-                    style={[styles.navButton, { backgroundColor: colors.card, borderColor: colors.border }]}
+                    style={[styles.navButton, { backgroundColor: colors.card, borderWidth:1, borderColor: colors.border }]}
                   >
                     <Ionicons name="cafe" size={20} color={colors.primary} />
                     <Text
