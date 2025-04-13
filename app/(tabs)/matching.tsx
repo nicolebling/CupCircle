@@ -360,21 +360,11 @@ export default function MatchingScreen() {
   };
 
   const handleLike = () => {
-    // Animate card off-screen to the right
-    // cardOffset.value = withSpring(500);
-    // cardRotate.value = withSpring(20);
-
     if (profiles.length > 0 && currentIndex < profiles.length) {
       console.log(`Liked ${profiles[currentIndex].name}`);
-
-      cardOpacity.value = withTiming(0, {
-        duration: 300,
-        easing: Easing.out(Easing.ease),
-      });
-      cardTranslateY.value = withTiming(-20, {
-        duration: 300,
-        easing: Easing.out(Easing.ease),
-      });
+      
+      // Instantly hide current card
+      cardOpacity.value = 0;
       
 
       // Here you would typically send a like request to your backend
@@ -393,29 +383,44 @@ export default function MatchingScreen() {
     setTimeout(() => {
       if (currentIndex < profiles.length - 1) {
         setCurrentIndex(currentIndex + 1);
-        // Reset animation values
+        // Set initial position for new card
         cardOpacity.value = 0;
         cardTranslateY.value = 20;
+        
+        // Animate new card in
+        cardOpacity.value = withTiming(1, {
+          duration: 400,
+          easing: Easing.bezier(0.25, 0.1, 0.25, 1),
+        });
+        cardTranslateY.value = withTiming(0, {
+          duration: 400,
+          easing: Easing.bezier(0.25, 0.1, 0.25, 1),
+        });
       }
-    }, 300);
+    }, 50);
   };
 
   const handlePrevious = () => {
     if (currentIndex > 0) {
-      cardOpacity.value = withTiming(0, {
-        duration: 300,
-        easing: Easing.out(Easing.ease),
-      });
-      cardTranslateY.value = withTiming(-20, {
-        duration: 300,
-        easing: Easing.out(Easing.ease),
-      });
+      // Instantly hide current card
+      cardOpacity.value = 0;
 
       setTimeout(() => {
         setCurrentIndex(currentIndex - 1);
+        // Set initial position for new card
         cardOpacity.value = 0;
         cardTranslateY.value = 20;
-      }, 300);
+        
+        // Animate new card in
+        cardOpacity.value = withTiming(1, {
+          duration: 400,
+          easing: Easing.bezier(0.25, 0.1, 0.25, 1),
+        });
+        cardTranslateY.value = withTiming(0, {
+          duration: 400,
+          easing: Easing.bezier(0.25, 0.1, 0.25, 1),
+        });
+      }, 50);
     }
   };
 
