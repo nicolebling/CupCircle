@@ -312,6 +312,7 @@ export default function MatchingScreen() {
             bio: profile.bio || "No bio available",
             experience_level: profile.experience_level,
             city: profile.city,
+            education: profile.education,
             industry_categories: profile.industry_categories,
             interests: interests,
             favorite_cafes: profile.favorite_cafes,
@@ -781,7 +782,7 @@ export default function MatchingScreen() {
                               ? styles.inputDark
                               : { backgroundColor: "#f8f8f8" },
                           ]}
-                          placeholder="Optional"
+                          placeholder="..."
                           placeholderTextColor={colors.secondaryText}
                           multiline
                           numberOfLines={2}
@@ -1381,14 +1382,14 @@ const styles = StyleSheet.create({
   },
   detailsTitle: {
     fontFamily: "K2D-SemiBold",
-    fontSize: 18,
+    fontSize: 16,
     marginBottom: 12,
   },
   cafeList: {
     marginBottom: 8,
   },
   cafeItem: {
-    padding: 12,
+    padding: 16,
     borderRadius: 8,
     marginBottom: 8,
     shadowColor: "#000",
@@ -1402,7 +1403,7 @@ const styles = StyleSheet.create({
   },
   cafeName: {
     fontFamily: "K2D-Medium",
-    fontSize: 16,
+    fontSize: 14,
     marginBottom: 4,
   },
   cafeAddress: {
@@ -1427,12 +1428,12 @@ const styles = StyleSheet.create({
   },
   timeSlotDate: {
     fontFamily: "K2D-Medium",
-    fontSize: 16,
+    fontSize: 14,
     marginBottom: 4,
   },
   timeSlotTime: {
     fontFamily: "K2D-Regular",
-    fontSize: 14,
+    fontSize: 12,
   },
   label: {
     fontSize: 14,
@@ -1491,7 +1492,7 @@ const styles = StyleSheet.create({
   },
   instructionText: {
     marginLeft: 8,
-    fontSize: 16,
+    fontSize: 12,
     fontFamily: 'K2D-Regular',
   },
 });

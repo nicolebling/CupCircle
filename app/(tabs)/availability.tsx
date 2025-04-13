@@ -595,7 +595,7 @@ export default function AvailabilityScreen() {
                     { color: colors.secondaryText },
                   ]}
                 >
-                  {format(item.date, "EEEE, MMMM d, yyyy")}
+                  {format(item.date, "EEEE, MMMM d")}
                 </Text>
                 {item.slots.map((slot) => (
                   <AvailabilityCard

@@ -368,7 +368,7 @@ export default function ProfileCard({
           {/* Employment */}
           {profile.employment && profile.employment.length > 0 && (
             <>
-              <Text style={[styles.sectionTitle, { color: colors.text }]}>
+              <Text style={[styles.label, { color: colors.secondaryText }]}>
                 Experience
               </Text>
               {profile.employment.map((jobString, index) => {
@@ -482,14 +482,13 @@ export default function ProfileCard({
               </>
             )}
 
-
           {/* Education */}
           {profile.education && (
             <>
-              <Text style={[styles.sectionTitle, { color: colors.text }]}>
+              <Text style={[styles.label, { color: colors.secondaryText }]}>
                 Education
               </Text>
-              <Text style={[styles.sectionText, { color: colors.text }]}>
+              <Text style={[styles.value, { color: colors.text }]}>
                 {profile.education}
               </Text>
             </>
@@ -499,7 +498,7 @@ export default function ProfileCard({
           {profile.industry_categories &&
             profile.industry_categories.length > 0 && (
               <>
-                <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                <Text style={[styles.label, { color: colors.secondaryText }]}>
                   Industries
                 </Text>
                 <View style={styles.interestsContainer}>
@@ -507,16 +506,16 @@ export default function ProfileCard({
                     <View
                       key={index}
                       style={[
-                        styles.interestTag,
+                        styles.tag,
                         {
                           backgroundColor: "transparent",
                           borderWidth: 1,
-                          borderColor: colors.primary,
+                          borderColor: colors.text,
                         },
                       ]}
                     >
                       <Text
-                        style={[styles.interestText, { color: colors.primary }]}
+                        style={[styles.tagText, { color: colors.text }]}
                       >
                         {industry}
                       </Text>
@@ -527,7 +526,7 @@ export default function ProfileCard({
             )}
 
           {/* Interests */}
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>
+          <Text style={[styles.label, { color: colors.secondaryText }]}>
             Interests
           </Text>
           <View style={styles.interestsContainer}>
@@ -536,16 +535,16 @@ export default function ProfileCard({
                 <View
                   key={index}
                   style={[
-                    styles.interestTag,
+                    styles.tag,
                     {
                       backgroundColor: "transparent",
                       borderWidth: 1,
-                      borderColor: colors.primary,
+                      borderColor: colors.text,
                     },
                   ]}
                 >
                   <Text
-                    style={[styles.interestText, { color: colors.primary }]}
+                    style={[styles.tagText, { color: colors.text }]}
                   >
                     {interest}
                   </Text>
@@ -553,92 +552,6 @@ export default function ProfileCard({
               ))}
           </View>
 
-          {/* Favorite Cafes */}
-          {profile.favoriteCafes && profile.favoriteCafes.length > 0 && (
-            <>
-              <Text style={[styles.sectionTitle, { color: colors.text }]}>
-                Favorite Cafes
-              </Text>
-              <View style={styles.interestsContainer}>
-                {profile.favoriteCafes.slice(0, 3).map((cafe, index) => (
-                  <View
-                    key={index}
-                    style={[
-                      styles.interestTag,
-                      {
-                        backgroundColor: "transparent",
-                        borderWidth: 1,
-                        borderColor: colors.primary,
-                      },
-                    ]}
-                  >
-                    <Text
-                      style={[styles.interestText, { color: colors.primary }]}
-                    >
-                      <Ionicons
-                        name="cafe-outline"
-                        size={12}
-                        color={colors.primary}
-                      />
-                      {cafe}
-                    </Text>
-                  </View>
-                ))}
-              </View>
-            </>
-          )}
-
-          {/* Neighborhoods */}
-          {/* {profile.neighborhoods && profile.neighborhoods.length > 0 && (
-            <>
-              <Text style={[styles.sectionTitle, { color: colors.text }]}>
-                Neighborhoods
-              </Text>
-              <View style={styles.interestsContainer}>
-                {profile.neighborhoods
-                  .slice(0, 3)
-                  .map((neighborhood, index) => (
-                    <View
-                      key={index}
-                      style={[
-                        styles.interestTag,
-                        {
-                          backgroundColor: "transparent",
-                          borderWidth: 1,
-                          borderColor: colors.primary,
-                        },
-                      ]}
-                    >
-                      <Text
-                        style={[styles.interestText, { color: colors.primary }]}
-                      >
-                        <Ionicons
-                          name="location-outline"
-                          size={12}
-                          color={colors.primary}
-                        />
-                        {neighborhood}
-                      </Text>
-                    </View>
-                  ))}
-              </View>
-            </>
-          )} */}
-
-          {/* Experience */}
-          {profile.experience && (
-            <>
-              <Text style={[styles.sectionTitle, { color: colors.text }]}>
-                Experience
-              </Text>
-              <Text
-                style={[styles.sectionText, { color: colors.secondaryText }]}
-                numberOfLines={2}
-              >
-                {profile.experience}
-              </Text>
-            </>
-          )}
         </View>
 
         {onLike && onSkip && (
@@ -949,12 +862,12 @@ export default function ProfileCard({
                             {
                               backgroundColor: "transparent",
                               borderWidth: 1,
-                              borderColor: colors.primary,
+                              borderColor: colors.text,
                             },
                           ]}
                         >
                           <Text
-                            style={[styles.tagText, { color: colors.primary }]}
+                            style={[styles.tagText, { color: colors.text}]}
                           >
                             {industry}
                           </Text>
@@ -979,12 +892,12 @@ export default function ProfileCard({
                           {
                             backgroundColor: "transparent",
                             borderWidth: 1,
-                            borderColor: colors.primary,
+                            borderColor: colors.text,
                           },
                         ]}
                       >
                         <Text
-                          style={[styles.tagText, { color: colors.primary }]}
+                          style={[styles.tagText, { color: colors.text }]}
                         >
                           {interest}
                         </Text>
@@ -1050,7 +963,7 @@ export default function ProfileCard({
                             {
                               backgroundColor: "transparent",
                               borderWidth: 1,
-                              borderColor: colors.primary,
+                              borderColor: colors.text,
                               flexDirection: "column",
                               alignItems: "flex-start",
                               padding: 8,
@@ -1064,17 +977,17 @@ export default function ProfileCard({
                               marginBottom: 4,
                             }}
                           >
-                            <Ionicons
+                            {/* <Ionicons
                               name="cafe"
                               size={12}
                               color={colors.primary}
                               style={{ marginRight: 4 }}
-                            />
+                            /> */}
                             <Text
                               style={[
                                 styles.tagText,
                                 {
-                                  color: colors.primary,
+                                  color: colors.text,
                                   fontFamily: "K2D-Medium",
                                 },
                               ]}
@@ -1087,7 +1000,7 @@ export default function ProfileCard({
                               styles.tagText,
                               {
                                 color: colors.secondaryText,
-                                fontSize: 10,
+                                fontSize: 12,
                                 fontFamily: "K2D-Regular",
                               },
                             ]}
