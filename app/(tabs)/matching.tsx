@@ -319,6 +319,7 @@ export default function MatchingScreen() {
             // Check if there's a cafe match (simplified version)
             matchedCafe: checkCafeMatch(profile.favorite_cafes),
             employment: profile.employment,
+            career_transitions: profile.career_transitions || [],
             // Add the user's availability slots
             availabilitySlots: userAvailabilityMap[profile.id] || [],
           };
