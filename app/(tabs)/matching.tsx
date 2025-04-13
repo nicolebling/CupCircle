@@ -591,12 +591,14 @@ export default function MatchingScreen() {
                     profile={profiles[currentIndex]}
                     isNewUser={false}
                   />
-                  <View style={[styles.instructionContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
-                    <Ionicons name="information-circle-outline" size={20} color={colors.primary} />
-                    <Text style={[styles.instructionText, { color: colors.text }]}>
-                      Pick a café and time below to send your coffee chat invite.
-                    </Text>
-                  </View>
+                  {profiles[currentIndex] && (
+                    <View style={[styles.instructionContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
+                      <Ionicons name="information-circle-outline" size={20} color={colors.primary} />
+                      <Text style={[styles.instructionText, { color: colors.text }]}>
+                        Pick a café and time below to send your coffee chat invite.
+                      </Text>
+                    </View>
+                  )}
                   {/* Cafe details and availability */}
                   {profiles[currentIndex].favorite_cafes &&
                     profiles[currentIndex].favorite_cafes.length > 0 && (
