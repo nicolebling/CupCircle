@@ -43,8 +43,12 @@ export default function ExperienceLevelSelector({
     if (!selected) return 'Select your experience level';
     
     return selectedLevelData 
-      ? `${selectedLevelData.level} (${selectedLevelData.coffeeTheme})` 
+      ? `${selectedLevelData.level}` 
       : selected;
+
+    // return selectedLevelData 
+    // ? `${selectedLevelData.level} (${selectedLevelData.coffeeTheme})` 
+    // : selected;
   };
   
   return (
