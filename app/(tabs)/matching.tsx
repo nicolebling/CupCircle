@@ -847,7 +847,7 @@ export default function MatchingScreen() {
                         );
                       }
                     }}
-                    style={[styles.navButton, { backgroundColor: colors.card }]}
+                    style={[styles.navButton, { backgroundColor: colors.card, borderColor: colors.border }]}
                   >
                     <Ionicons name="cafe" size={20} color={colors.primary} />
                     <Text
