@@ -81,6 +81,7 @@ export default function IndustrySelector({
   onChange,
   maxIndustries = 3,
   isDark = false,
+  viewSelectionTracker = true, // Added default value
 }: IndustrySelectorProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];

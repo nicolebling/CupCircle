@@ -86,6 +86,7 @@ export default function InterestSelector({
   onChange,
   maxInterests = 10,
   isDark = false,
+  viewSelectionTracker = true,
 }: InterestSelectorProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
