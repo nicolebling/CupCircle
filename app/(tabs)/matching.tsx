@@ -395,7 +395,7 @@ export default function MatchingScreen() {
             duration: 800,
             easing: Easing.bezier(0.2, 0, 0.2, 1),
           });
-        }, 500);
+        }, 2000);
       }
     }, 200);
   };
@@ -419,7 +419,7 @@ export default function MatchingScreen() {
             duration: 800,
             easing: Easing.bezier(0.2, 0, 0.2, 1),
           });
-        }, 500);
+        }, 2000);
       }, 200);
     }
   };
@@ -1005,65 +1005,7 @@ export default function MatchingScreen() {
                 ))}
               </View>
 
-              <Text style={[styles.filterLabel, { color: colors.text }]}>
-                Neighborhoods
-              </Text>
-              <View style={styles.filterOptions}>
-                {[
-                  "Downtown",
-                  "Midtown",
-                  "Financial District",
-                  "Tech District",
-                  "Arts District",
-                ].map((neighborhood) => (
-                  <TouchableOpacity
-                    key={neighborhood}
-                    style={[
-                      styles.filterChip,
-                      {
-                        backgroundColor: colors.card,
-                        borderColor: colors.border,
-                      },
-                    ]}
-                  >
-                    <Text
-                      style={[styles.filterChipText, { color: colors.text }]}
-                    >
-                      {neighborhood}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-
-              <Text style={[styles.filterLabel, { color: colors.text }]}>
-                Favorite Cafés
-              </Text>
-              <View style={styles.filterOptions}>
-                {[
-                  "Coffee House",
-                  "The Roastery",
-                  "Bean There",
-                  "Morning Brew",
-                  "Finance Cafe",
-                ].map((cafe) => (
-                  <TouchableOpacity
-                    key={cafe}
-                    style={[
-                      styles.filterChip,
-                      {
-                        backgroundColor: colors.card,
-                        borderColor: colors.border,
-                      },
-                    ]}
-                  >
-                    <Text
-                      style={[styles.filterChipText, { color: colors.text }]}
-                    >
-                      {cafe}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
+              
             </ScrollView>
 
             <View style={styles.modalFooter}>
