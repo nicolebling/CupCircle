@@ -387,7 +387,7 @@ export default function MatchingScreen() {
         setCurrentIndex(currentIndex + 1);
         // Reset animation values
         cardOpacity.value = 0;
-        
+
 
         // Animate new card in with slight delay
         setTimeout(() => {
@@ -395,7 +395,7 @@ export default function MatchingScreen() {
             duration: 800,
             easing: Easing.bezier(0.2, 0, 0.2, 1),
           });
-        }, 100);
+        }, 500);
       }
     }, 200);
   };
@@ -412,14 +412,14 @@ export default function MatchingScreen() {
         setCurrentIndex(currentIndex - 1);
         // Set initial position for new card
         cardOpacity.value = 0;
-        
+
         // Animate new card in with slight delay
         setTimeout(() => {
           cardOpacity.value = withTiming(1, {
             duration: 800,
             easing: Easing.bezier(0.2, 0, 0.2, 1),
           });
-        }, 100);
+        }, 500);
       }, 200);
     }
   };
@@ -1087,8 +1087,7 @@ export default function MatchingScreen() {
               >
                 <Text style={styles.applyButtonText}>Apply Filters</Text>
               </TouchableOpacity>
-            </View>
-          </View>
+            </View>          </View>
         </View>
       </Modal>
 
