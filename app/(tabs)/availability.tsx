@@ -654,7 +654,7 @@ const styles = StyleSheet.create({
     position: "relative",
   },
   subtitle: {
-    fontFamily: "K2D-Regular, sans-serif",
+    fontFamily: "K2D-Regular",
     paddingLeft: 16,
     fontSize: 14,
   },
@@ -708,7 +708,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   sectionTitle: {
-    fontFamily: "K2D-Regular, sans-serif",
+    fontFamily: "K2D-Regular",
     fontWeight: "600",
     fontSize: 18,
     marginBottom: 16,
@@ -720,7 +720,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   loadingText: {
-    fontFamily: "K2D-Regular, sans-serif",
+    fontFamily: "K2D-Regular",
     fontSize: 16,
     marginTop: 16,
   },
@@ -730,7 +730,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   emptyStateText: {
-    fontFamily: "K2D-Regular, sans-serif",
+    fontFamily: "K2D-Medium",
     fontWeight: "500",
     fontSize: 16,
     marginTop: 16,
@@ -738,7 +738,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   emptyStateSubtext: {
-    fontFamily: "K2D-Regular, sans-serif",
+    fontFamily: "K2D-Regular",
     fontSize: 14,
     textAlign: "center",
     paddingHorizontal: 32,
