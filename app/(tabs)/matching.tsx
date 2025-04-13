@@ -508,7 +508,10 @@ export default function MatchingScreen() {
         <ScrollView
           style={{ flex: 1, width: '100%', padding: 16 }}
           contentContainerStyle={{
+            flexGrow: 1,
             paddingBottom: 20,
+            justifyContent: 'center',
+            alignItems: 'center',
           }}
           nestedScrollEnabled={true}
         >
@@ -566,7 +569,7 @@ export default function MatchingScreen() {
                   <View style={[styles.instructionContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
                     <Ionicons name="information-circle-outline" size={20} color={colors.primary} />
                     <Text style={[styles.instructionText, { color: colors.text }]}>
-                      Pick a café and time below to send your coffee chat invite
+                      Pick a café and time below to send your coffee chat invite.
                     </Text>
                   </View>
                   {/* Cafe details and availability */}
@@ -619,7 +622,7 @@ export default function MatchingScreen() {
                                         },
                                       ]}
                                     >
-                                      <Ionicons
+                                      {/* <Ionicons
                                         name="cafe"
                                         size={16}
                                         color={
@@ -628,7 +631,7 @@ export default function MatchingScreen() {
                                             : colors.primary
                                         }
                                         style={{ marginRight: 5 }}
-                                      />
+                                      /> */}
                                       {cafeName}
                                     </Text>
                                     <Text
@@ -681,7 +684,7 @@ export default function MatchingScreen() {
                               const date = new Date(year, month - 1, day); // Note: month is 0-indexed
                               const formattedDate = format(
                                 date,
-                                "EEEE, MMMM d, yyyy",
+                                "EEEE, MMMM d",
                               );
 
                               return (
@@ -710,7 +713,7 @@ export default function MatchingScreen() {
                                         },
                                       ]}
                                     >
-                                      <Ionicons
+                                      {/* <Ionicons
                                         name="calendar"
                                         size={16}
                                         color={
@@ -719,7 +722,7 @@ export default function MatchingScreen() {
                                             : colors.primary
                                         }
                                         style={{ marginRight: 5 }}
-                                      />
+                                      /> */}
                                       {formattedDate}
                                     </Text>
                                     <Text
@@ -733,7 +736,7 @@ export default function MatchingScreen() {
                                         },
                                       ]}
                                     >
-                                      <Ionicons
+                                      {/* <Ionicons
                                         name="time"
                                         size={16}
                                         color={
@@ -742,7 +745,7 @@ export default function MatchingScreen() {
                                             : colors.secondaryText
                                         }
                                         style={{ marginRight: 5 }}
-                                      />
+                                      /> */}
                                       {`${slot.start_time.split(":")[0]}:${slot.start_time.split(":")[1]} - ${slot.end_time.split(":")[0]}:${slot.end_time.split(":")[1]}`}
                                     </Text>
                                   </View>
@@ -840,7 +843,7 @@ export default function MatchingScreen() {
                     }}
                     style={[styles.navButton, { backgroundColor: colors.card }]}
                   >
-                    <Ionicons name="person" size={20} color={colors.primary} />
+                    <Ionicons name="cafe" size={20} color={colors.primary} />
                     <Text
                       style={[styles.navButtonText, { color: colors.primary }]}
                     >
@@ -1158,16 +1161,14 @@ const styles = StyleSheet.create({
   navButton: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 8,
+    padding: 16,
+    borderRadius: 16,
     flex: 1,
-    marginHorizontal: 8,
     justifyContent: "center",
   },
   navButtonText: {
     fontFamily: "K2D-Medium",
-    fontSize: 14,
+    fontSize: 16,
     marginLeft: 8,
   },
   emptyCard: {
@@ -1470,22 +1471,20 @@ const styles = StyleSheet.create({
     color: "#fff",
   },
   instructionContainer: {
+    width: "100%",
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 12,
-    borderRadius: 8,
-    marginTop: 16,
+    padding: 16,
+    borderRadius: 16,
+    marginTop: 8,
     marginBottom: 8,
     borderWidth: 1,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
     shadowRadius: 2,
     elevation: 1,
   },
   instructionText: {
     marginLeft: 8,
     fontSize: 16,
-    fontFamily: 'K2D-Medium',
+    fontFamily: 'K2D-Regular',
   },
 });
