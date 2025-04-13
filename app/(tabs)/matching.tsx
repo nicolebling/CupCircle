@@ -506,7 +506,7 @@ export default function MatchingScreen() {
         </View>
       ) : (
         <ScrollView
-          style={{ flex: 1, width: '100%' }}
+          style={{ flex: 1, width: '100%', padding: 16 }}
           contentContainerStyle={{
             paddingBottom: 20,
           }}
@@ -554,6 +554,7 @@ export default function MatchingScreen() {
               </View>
             ) : currentIndex < profiles.length ? (
               <>
+                
                 <Animated.View
                   style={[styles.animatedCardContainer, cardAnimatedStyle]}
                 >
@@ -562,7 +563,7 @@ export default function MatchingScreen() {
                     profile={profiles[currentIndex]}
                     isNewUser={false}
                   />
-
+                  <Text> Pick a café and time below to send your coffee chat invite: </Text>
                   {/* Cafe details and availability */}
                   {profiles[currentIndex].favorite_cafes &&
                     profiles[currentIndex].favorite_cafes.length > 0 && (
