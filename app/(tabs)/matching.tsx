@@ -392,14 +392,14 @@ export default function MatchingScreen() {
         // Animate new card in with slight delay
         setTimeout(() => {
           cardOpacity.value = withTiming(1, {
-            duration: 300,
-            easing: Easing.bezier(0.4, 0, 0.2, 1),
+            duration: 800,
+            easing: Easing.bezier(0.2, 0, 0.2, 1),
           });
           cardTranslateY.value = withTiming(0, {
-            duration: 300,
-            easing: Easing.bezier(0.4, 0, 0.2, 1),
+            duration: 800,
+            easing: Easing.bezier(0.2, 0, 0.2, 1),
           });
-        }, 50);
+        }, 100);
       }
     }, 200);
   };
@@ -421,14 +421,14 @@ export default function MatchingScreen() {
         // Animate new card in with slight delay
         setTimeout(() => {
           cardOpacity.value = withTiming(1, {
-            duration: 300,
-            easing: Easing.bezier(0.4, 0, 0.2, 1),
+            duration: 800,
+            easing: Easing.bezier(0.2, 0, 0.2, 1),
           });
           cardTranslateY.value = withTiming(0, {
-            duration: 300,
-            easing: Easing.bezier(0.4, 0, 0.2, 1),
+            duration: 800,
+            easing: Easing.bezier(0.2, 0, 0.2, 1),
           });
-        }, 50);
+        }, 100);
       }, 200);
     }
   };
