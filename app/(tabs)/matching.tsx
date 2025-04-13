@@ -26,6 +26,7 @@ import { format } from "date-fns";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { useRouter } from "expo-router"; // Import useRouter
 
 // Define the profile type for better type checking
 interface Profile {
@@ -62,6 +63,7 @@ interface TimeSlot {
 }
 
 export default function MatchingScreen() {
+  const router = useRouter(); // Initialize router
   // Expose the openFilterModal function to the header
   global.matchingScreen = { openFilterModal: null };
   const colorScheme = useColorScheme();
@@ -429,7 +431,7 @@ export default function MatchingScreen() {
       <TouchableOpacity
         style={[styles.emptyCardButton, { backgroundColor: colors.primary }]}
         onPress={() => {
-          /* Navigate to availability tab */
+          router.push("/(tabs)/availability"); // Navigate to availability tab
         }}
       >
         <Text style={styles.emptyCardButtonText}>Go to Availability</Text>
@@ -1099,8 +1101,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
+    shadowOffset: { width: 0, height: 2 },shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
     position: "absolute",
