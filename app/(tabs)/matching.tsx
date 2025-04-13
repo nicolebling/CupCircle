@@ -996,23 +996,6 @@ export default function MatchingScreen() {
                 maxIndustries={999}
                 isDark={false}
               />
-              {filterIndustries && filterIndustries.length > 0 && (
-                <View style={styles.selectedTagsContainer}>
-                  {filterIndustries.map((industry, index) => (
-                    <View
-                      key={index}
-                      style={[
-                        styles.selectedTag,
-                        { backgroundColor: "transparent", borderColor: colors.primary },
-                      ]}
-                    >
-                      <Text style={[styles.selectedTagText, { color: colors.primary }]}>
-                        {industry}
-                      </Text>
-                    </View>
-                  ))}
-                </View>
-              )}
 
               <Text style={[styles.filterLabel, { color: colors.text }]}>
                 Experience Level
@@ -1045,23 +1028,7 @@ export default function MatchingScreen() {
                 maxInterests={999}
                 isDark={false}
               />
-              {filterInterests && filterInterests.length > 0 && (
-                <View style={styles.selectedTagsContainer}>
-                  {filterInterests.map((interest, index) => (
-                    <View
-                      key={index}
-                      style={[
-                        styles.selectedTag,
-                        { backgroundColor: "transparent", borderColor: colors.primary },
-                      ]}
-                    >
-                      <Text style={[styles.selectedTagText, { color: colors.primary }]}>
-                        {interest}
-                      </Text>
-                    </View>
-                  ))}
-                </View>
-              )}
+            
             </ScrollView>
             <View style={styles.modalFooter}>
               <TouchableOpacity
@@ -1075,7 +1042,7 @@ export default function MatchingScreen() {
                 <Text style={{ color: colors.text }}>Clear All</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style=[
+                style={[
                   styles.modalButton,
                   styles.applyButton,
                   { backgroundColor: colors.primary },
