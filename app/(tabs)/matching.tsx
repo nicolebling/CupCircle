@@ -591,7 +591,11 @@ export default function MatchingScreen() {
                     profile={profiles[currentIndex]}
                     isNewUser={false}
                   />
-                  {profiles[currentIndex] && (
+                  {profiles[currentIndex] && 
+                   profiles[currentIndex].favorite_cafes && 
+                   profiles[currentIndex].favorite_cafes.length > 0 &&
+                   profiles[currentIndex].availabilitySlots &&
+                   profiles[currentIndex].availabilitySlots.length > 0 && (
                     <View style={[styles.instructionContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
                       <Ionicons name="information-circle-outline" size={20} color={colors.primary} />
                       <Text style={[styles.instructionText, { color: colors.text }]}>
