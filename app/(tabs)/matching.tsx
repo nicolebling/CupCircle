@@ -13,7 +13,7 @@ import {
   Platform,
   TouchableWithoutFeedback,
   Keyboard,
- 
+
 } from "react-native";
 import Colors from "@/constants/Colors";
 import ProfileCard from "@/components/ProfileCard";
@@ -360,22 +360,14 @@ export default function MatchingScreen() {
   };
 
   const handleLike = () => {
-    // Animate card off-screen to the right
-    // cardOffset.value = withSpring(500);
-    // cardRotate.value = withSpring(20);
-
     if (profiles.length > 0 && currentIndex < profiles.length) {
       console.log(`Liked ${profiles[currentIndex].name}`);
 
+      // Fade out current card
       cardOpacity.value = withTiming(0, {
-        duration: 300,
-        easing: Easing.out(Easing.ease),
+        duration: 200,
+        easing: Easing.out(Easing.ease)
       });
-      cardTranslateY.value = withTiming(-20, {
-        duration: 300,
-        easing: Easing.out(Easing.ease),
-      });
-      
 
       // Here you would typically send a like request to your backend
       // For example: createMatch(profiles[currentIndex].id)
@@ -395,27 +387,49 @@ export default function MatchingScreen() {
         setCurrentIndex(currentIndex + 1);
         // Reset animation values
         cardOpacity.value = 0;
-        cardTranslateY.value = 20;
+        cardTranslateY.value = 10;
+
+        // Animate new card in with slight delay
+        setTimeout(() => {
+          cardOpacity.value = withTiming(1, {
+            duration: 300,
+            easing: Easing.bezier(0.4, 0, 0.2, 1),
+          });
+          cardTranslateY.value = withTiming(0, {
+            duration: 300,
+            easing: Easing.bezier(0.4, 0, 0.2, 1),
+          });
+        }, 50);
       }
-    }, 300);
+    }, 200);
   };
 
   const handlePrevious = () => {
     if (currentIndex > 0) {
+      // Fade out current card
       cardOpacity.value = withTiming(0, {
-        duration: 300,
-        easing: Easing.out(Easing.ease),
-      });
-      cardTranslateY.value = withTiming(-20, {
-        duration: 300,
-        easing: Easing.out(Easing.ease),
+        duration: 200,
+        easing: Easing.out(Easing.ease)
       });
 
       setTimeout(() => {
         setCurrentIndex(currentIndex - 1);
+        // Set initial position for new card
         cardOpacity.value = 0;
-        cardTranslateY.value = 20;
-      }, 300);
+        cardTranslateY.value = 10;
+
+        // Animate new card in with slight delay
+        setTimeout(() => {
+          cardOpacity.value = withTiming(1, {
+            duration: 300,
+            easing: Easing.bezier(0.4, 0, 0.2, 1),
+          });
+          cardTranslateY.value = withTiming(0, {
+            duration: 300,
+            easing: Easing.bezier(0.4, 0, 0.2, 1),
+          });
+        }, 50);
+      }, 200);
     }
   };
 
@@ -577,7 +591,7 @@ export default function MatchingScreen() {
               </View>
             ) : currentIndex < profiles.length ? (
               <>
-                
+
                 <Animated.View
                   style={[styles.animatedCardContainer, cardAnimatedStyle]}
                 >
