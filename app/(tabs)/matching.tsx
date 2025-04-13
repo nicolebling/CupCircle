@@ -995,6 +995,7 @@ export default function MatchingScreen() {
                 onChange={(industries) => setFilterIndustries(industries)}
                 maxIndustries={999}
                 isDark={false}
+                viewSelectionTracker={false}
               />
 
               <Text style={[styles.filterLabel, { color: colors.text }]}>
@@ -1027,6 +1028,7 @@ export default function MatchingScreen() {
                 onChange={(interests) => setFilterInterests(interests)}
                 maxInterests={999}
                 isDark={false}
+                viewSelectionTracker={false}
               />
             
             </ScrollView>

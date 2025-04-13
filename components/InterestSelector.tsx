@@ -78,6 +78,7 @@ interface InterestSelectorProps {
   onChange: (interests: string[]) => void;
   maxInterests?: number;
   isDark?: boolean;
+  viewSelectionTracker?: boolean;
 }
 
 export default function InterestSelector({
@@ -208,7 +209,7 @@ export default function InterestSelector({
           >
             <View style={styles.modalHeader}>
               <Text style={[styles.modalTitle, { color: colors.text }]}>
-                Select Interests ({selected.length}/{maxInterests})
+                {viewSelectionTracker !== false ? `Select Interests (${selected.length}/${maxInterests})` : 'Select Interests'}
               </Text>
               <TouchableOpacity onPress={() => setModalVisible(false)}>
                 <Ionicons name="close" size={24} color={colors.text} />

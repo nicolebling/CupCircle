@@ -73,6 +73,7 @@ interface IndustrySelectorProps {
   onChange: (industries: string[]) => void;
   maxIndustries?: number;
   isDark?: boolean;
+  viewSelectionTracker?: boolean;
 }
 
 export default function IndustrySelector({
@@ -180,7 +181,7 @@ export default function IndustrySelector({
           >
             <View style={styles.modalHeader}>
               <Text style={[styles.modalTitle, { color: colors.text }]}>
-                Select Industries ({selected.length}/{maxIndustries})
+                {viewSelectionTracker !== false ? `Select Industries (${selected.length}/${maxIndustries})` : 'Select Industries'}
               </Text>
               <TouchableOpacity onPress={() => setModalVisible(false)}>
                 <Ionicons name="close" size={24} color={colors.text} />
