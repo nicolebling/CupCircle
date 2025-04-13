@@ -441,7 +441,7 @@ export default function MatchingScreen() {
     <SafeAreaView
       style={[styles.container, { backgroundColor: colors.background }]}
     >
-      {!isLoading && profiles.length > 0 && (
+      {!isLoading && profiles.length > 0 && hasAvailability && (
         <View style={styles.navigationFloating}>
           <TouchableOpacity
             onPress={handlePrevious}
