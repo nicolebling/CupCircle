@@ -508,11 +508,11 @@ export default function MatchingScreen() {
         <ScrollView
           style={{ flex: 1 }}
           contentContainerStyle={{
-            flex: 1,
             justifyContent: "center",
             alignItems: "center",
             paddingBottom: 20,
           }}
+          nestedScrollEnabled={true}
         >
           <View style={styles.cardsContainer}>
             {isLoading ? (
