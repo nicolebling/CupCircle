@@ -506,15 +506,13 @@ export default function MatchingScreen() {
         </View>
       ) : (
         <ScrollView
-          style={{ flex: 1 }}
+          style={{ flex: 1, width: '100%' }}
           contentContainerStyle={{
-            justifyContent: "center",
-            alignItems: "center",
             paddingBottom: 20,
           }}
           nestedScrollEnabled={true}
         >
-          <View style={styles.cardsContainer}>
+          <View style={[styles.cardsContainer, { width: '100%' }]}>
             {isLoading ? (
               <View style={styles.loadingContainer}>
                 <ActivityIndicator size="large" color={colors.primary} />
