@@ -12,12 +12,11 @@ import {
   KeyboardAvoidingView,
   Platform,
   TouchableWithoutFeedback,
-  Keyboard,
-  Dimensions
+  Keyboard
 } from "react-native";
 import Colors from "@/constants/Colors";
 import ProfileCard from "@/components/ProfileCard";
-import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -27,7 +26,6 @@ import { format } from "date-fns";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import LogoAnimation from '@/components/LogoAnimation';
 
 // Define the profile type for better type checking
 interface Profile {
@@ -70,7 +68,6 @@ export default function MatchingScreen() {
   const colors = Colors[colorScheme];
   const isDark = colorScheme === "dark";
   const { user } = useAuth();
-  const windowHeight = Dimensions.get('window').height;
 
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -446,35 +443,35 @@ export default function MatchingScreen() {
     >
       {(!isLoading && profiles.length > 0) && (
         <View style={styles.navigationFloating}>
-          <TouchableOpacity
-            onPress={handlePrevious}
-            style={[
-              styles.floatingButton,
-              styles.leftButton,
-              { opacity: currentIndex > 0 ? 1 : 0.5 },
-            ]}
-            disabled={currentIndex === 0}
-          >
-            <Ionicons name="arrow-back" size={24} color={colors.primary} />
-          </TouchableOpacity>
+        <TouchableOpacity
+          onPress={handlePrevious}
+          style={[
+            styles.floatingButton,
+            styles.leftButton,
+            { opacity: currentIndex > 0 ? 1 : 0.5 },
+          ]}
+          disabled={currentIndex === 0}
+        >
+          <Ionicons name="arrow-back" size={24} color={colors.primary} />
+        </TouchableOpacity>
 
-          <TouchableOpacity
-            onPress={handleLike}
-            style={[
-              styles.floatingButton,
-              styles.rightButton,
-              {
-                opacity:
-                  currentIndex > 0 && currentIndex == profiles.length - 1
-                    ? 0.5
-                    : 1,
-              },
-            ]}
-            disabled={currentIndex == profiles.length - 1}
-          >
-            <Ionicons name="arrow-forward" size={24} color={colors.primary} />
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity
+          onPress={handleLike}
+          style={[
+            styles.floatingButton,
+            styles.rightButton,
+            {
+              opacity:
+                currentIndex > 0 && currentIndex == profiles.length - 1
+                  ? 0.5
+                  : 1,
+            },
+          ]}
+          disabled={currentIndex == profiles.length - 1}
+        >
+          <Ionicons name="arrow-forward" size={24} color={colors.primary} />
+        </TouchableOpacity>
+      </View>
       )}
       {(!isLoading && profiles.length === 0) ? (
         <View style={[styles.cardsContainer, { justifyContent: 'center' }]}>
@@ -512,253 +509,253 @@ export default function MatchingScreen() {
         >
           <View style={styles.cardsContainer}>
             {isLoading ? (
-              <View style={styles.loadingContainer}>
-                <LogoAnimation size={100}/>
-                <Text style={[styles.loadingText, { color: colors.text, textAlign: 'center' }]}>
-                  Brewing your circle...
-                </Text>
-              </View>
-            ) : !hasAvailability ? (
-              renderNoAvailabilityMessage()
-            ) : profiles.length === 0 ? (
-              <View
-                style={[
-                  styles.noMoreCard,
-                  { backgroundColor: colors.card, borderColor: colors.border },
-                ]}
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color={colors.primary} />
+              <Text style={[styles.loadingText, { color: colors.text }]}>
+                Brewing your circle......
+              </Text>
+            </View>
+          ) : !hasAvailability ? (
+            renderNoAvailabilityMessage()
+          ) : profiles.length === 0 ? (
+            <View
+              style={[
+                styles.noMoreCard,
+                { backgroundColor: colors.card, borderColor: colors.border },
+              ]}
+            >
+              <Ionicons name="people" size={48} color={colors.primary} />
+              <Text style={[styles.noMoreText, { color: colors.text }]}>
+                No matches available
+              </Text>
+              <Text
+                style={[styles.checkBackText, { color: colors.secondaryText }]}
               >
-                <Ionicons name="people" size={48} color={colors.primary} />
-                <Text style={[styles.noMoreText, { color: colors.text }]}>
-                  No matches available
-                </Text>
-                <Text
-                  style={[styles.checkBackText, { color: colors.secondaryText }]}
-                >
-                  We couldn't find any users with availability in the next 7 days.
-                  Check back later as more users add their availability!
-                </Text>
-                <TouchableOpacity
-                  style={[
-                    styles.refreshButton,
-                    { backgroundColor: colors.primary },
-                  ]}
-                  onPress={openFilterModal}
-                >
-                  <Text style={styles.refreshButtonText}>Adjust Filters</Text>
-                </TouchableOpacity>
-              </View>
-            ) : currentIndex < profiles.length ? (
-              <>
-                <Animated.View
-                  style={[styles.animatedCardContainer, cardAnimatedStyle]}
-                >
-                  <ProfileCard
-                    userId={profiles[currentIndex].id}
-                    profile={profiles[currentIndex]}
-                    isNewUser={false}
-                  />
+                We couldn't find any users with availability in the next 7 days.
+                Check back later as more users add their availability!
+              </Text>
+              <TouchableOpacity
+                style={[
+                  styles.refreshButton,
+                  { backgroundColor: colors.primary },
+                ]}
+                onPress={openFilterModal}
+              >
+                <Text style={styles.refreshButtonText}>Adjust Filters</Text>
+              </TouchableOpacity>
+            </View>
+          ) : currentIndex < profiles.length ? (
+            <>
+              <Animated.View
+                style={[styles.animatedCardContainer, cardAnimatedStyle]}
+              >
+                <ProfileCard
+                  userId={profiles[currentIndex].id}
+                  profile={profiles[currentIndex]}
+                  isNewUser={false}
+                />
 
-                  {/* Cafe details and availability */}
-                  {profiles[currentIndex].favorite_cafes &&
-                    profiles[currentIndex].favorite_cafes.length > 0 && (
-                      <View
-                        style={[
-                          selectedCafe && { backgroundColor: colors.primary },
-                          styles.detailsCard,
-                          {
-                            backgroundColor: colors.card,
-                            borderColor: colors.border,
-                          },
-                        ]}
+                {/* Cafe details and availability */}
+                {profiles[currentIndex].favorite_cafes &&
+                  profiles[currentIndex].favorite_cafes.length > 0 && (
+                    <View
+                      style={[
+                        selectedCafe && { backgroundColor: colors.primary },
+                        styles.detailsCard,
+                        {
+                          backgroundColor: colors.card,
+                          borderColor: colors.border,
+                        },
+                      ]}
+                    >
+                      <Text
+                        style={[styles.detailsTitle, { color: colors.text }]}
                       >
-                        <Text
-                          style={[styles.detailsTitle, { color: colors.text }]}
-                        >
-                          Favorite Cafes
-                        </Text>
-                        <View style={styles.cafeList}>
-                          {profiles[currentIndex].favorite_cafes.map(
-                            (cafe, index) => {
-                              const [cafeName, cafeAddress] = cafe
-                                ? cafe.split("|||")
-                                : ["", ""];
-                              return (
-                                <TouchableOpacity
-                                  key={index}
-                                  style={[
-                                    styles.cafeItem,
-                                    {
-                                      backgroundColor:
-                                        selectedCafe === cafe
-                                          ? colors.primary
-                                          : colors.card,
-                                    },
-                                  ]}
-                                  onPress={() => setSelectedCafe(cafe)}
-                                >
-                                  <View style={styles.cafeDetails}>
-                                    <Text
-                                      style={[
-                                        styles.cafeName,
-                                        {
-                                          color:
-                                            selectedCafe === cafe
-                                              ? "white"
-                                              : colors.text,
-                                        },
-                                      ]}
-                                    >
-                                      <Ionicons
-                                        name="cafe"
-                                        size={16}
-                                        color={
+                        Favorite Cafes
+                      </Text>
+                      <View style={styles.cafeList}>
+                        {profiles[currentIndex].favorite_cafes.map(
+                          (cafe, index) => {
+                            const [cafeName, cafeAddress] = cafe
+                              ? cafe.split("|||")
+                              : ["", ""];
+                            return (
+                              <TouchableOpacity
+                                key={index}
+                                style={[
+                                  styles.cafeItem,
+                                  {
+                                    backgroundColor:
+                                      selectedCafe === cafe
+                                        ? colors.primary
+                                        : colors.card,
+                                  },
+                                ]}
+                                onPress={() => setSelectedCafe(cafe)}
+                              >
+                                <View style={styles.cafeDetails}>
+                                  <Text
+                                    style={[
+                                      styles.cafeName,
+                                      {
+                                        color:
                                           selectedCafe === cafe
                                             ? "white"
-                                            : colors.primary
-                                        }
-                                        style={{ marginRight: 5 }}
-                                      />
-                                      {cafeName}
-                                    </Text>
-                                    <Text
-                                      style={[
-                                        styles.cafeAddress,
-                                        {
-                                          color:
-                                            selectedCafe === cafe
-                                              ? "rgba(255,255,255,0.8)"
-                                              : colors.secondaryText,
-                                        },
-                                      ]}
-                                    >
-                                      {cafeAddress}
-                                    </Text>
-                                  </View>
-                                </TouchableOpacity>
-                              );
-                            },
-                          )}
-                        </View>
-                      </View>
-                    )}
-
-                  {profiles[currentIndex].availabilitySlots &&
-                    profiles[currentIndex].availabilitySlots.length > 0 && (
-                      <View
-                        style={[
-                          styles.detailsCard,
-                          {
-                            backgroundColor: colors.card,
-                            borderColor: colors.border,
+                                            : colors.text,
+                                      },
+                                    ]}
+                                  >
+                                    <Ionicons
+                                      name="cafe"
+                                      size={16}
+                                      color={
+                                        selectedCafe === cafe
+                                          ? "white"
+                                          : colors.primary
+                                      }
+                                      style={{ marginRight: 5 }}
+                                    />
+                                    {cafeName}
+                                  </Text>
+                                  <Text
+                                    style={[
+                                      styles.cafeAddress,
+                                      {
+                                        color:
+                                          selectedCafe === cafe
+                                            ? "rgba(255,255,255,0.8)"
+                                            : colors.secondaryText,
+                                      },
+                                    ]}
+                                  >
+                                    {cafeAddress}
+                                  </Text>
+                                </View>
+                              </TouchableOpacity>
+                            );
                           },
-                        ]}
+                        )}
+                      </View>
+                    </View>
+                  )}
+
+                {profiles[currentIndex].availabilitySlots &&
+                  profiles[currentIndex].availabilitySlots.length > 0 && (
+                    <View
+                      style={[
+                        styles.detailsCard,
+                        {
+                          backgroundColor: colors.card,
+                          borderColor: colors.border,
+                        },
+                      ]}
+                    >
+                      <Text
+                        style={[styles.detailsTitle, { color: colors.text }]}
                       >
-                        <Text
-                          style={[styles.detailsTitle, { color: colors.text }]}
-                        >
-                          Available Times
-                        </Text>
-                        <View style={styles.availabilityList}>
-                          {profiles[currentIndex].availabilitySlots.map(
-                            (slot, index) => {
-                              // Split and use the year, month, and day directly in the local time zone
-                              const [year, month, day] = slot.date
-                                .split("-")
-                                .map(Number);
+                        Available Times
+                      </Text>
+                      <View style={styles.availabilityList}>
+                        {profiles[currentIndex].availabilitySlots.map(
+                          (slot, index) => {
+                            // Split and use the year, month, and day directly in the local time zone
+                            const [year, month, day] = slot.date
+                              .split("-")
+                              .map(Number);
 
-                              // Format the date
-                              const date = new Date(year, month - 1, day); // Note: month is 0-indexed
-                              const formattedDate = format(
-                                date,
-                                "EEEE, MMMM d, yyyy",
-                              );
+                            // Format the date
+                            const date = new Date(year, month - 1, day); // Note: month is 0-indexed
+                            const formattedDate = format(
+                              date,
+                              "EEEE, MMMM d, yyyy",
+                            );
 
-                              return (
-                                <TouchableOpacity
-                                  key={index}
-                                  style={[
-                                    styles.timeSlotItem,
-                                    {
-                                      backgroundColor:
-                                        selectedTimeSlot === slot
-                                          ? colors.primary
-                                          : colors.card,
-                                    },
-                                  ]}
-                                  onPress={() => setSelectedTimeSlot(slot)}
-                                >
-                                  <View style={styles.timeSlotDetails}>
-                                    <Text
-                                      style={[
-                                        styles.timeSlotDate,
-                                        {
-                                          color:
-                                            selectedTimeSlot === slot
-                                              ? "white"
-                                              : colors.text,
-                                        },
-                                      ]}
-                                    >
-                                      <Ionicons
-                                        name="calendar"
-                                        size={16}
-                                        color={
+                            return (
+                              <TouchableOpacity
+                                key={index}
+                                style={[
+                                  styles.timeSlotItem,
+                                  {
+                                    backgroundColor:
+                                      selectedTimeSlot === slot
+                                        ? colors.primary
+                                        : colors.card,
+                                  },
+                                ]}
+                                onPress={() => setSelectedTimeSlot(slot)}
+                              >
+                                <View style={styles.timeSlotDetails}>
+                                  <Text
+                                    style={[
+                                      styles.timeSlotDate,
+                                      {
+                                        color:
                                           selectedTimeSlot === slot
                                             ? "white"
-                                            : colors.primary
-                                        }
-                                        style={{ marginRight: 5 }}
-                                      />
-                                      {formattedDate}
-                                    </Text>
-                                    <Text
-                                      style={[
-                                        styles.timeSlotTime,
-                                        {
-                                          color:
-                                            selectedTimeSlot === slot
-                                              ? "rgba(255,255,255,0.8)"
-                                              : colors.secondaryText,
-                                        },
-                                      ]}
-                                    >
-                                      <Ionicons
-                                        name="time"
-                                        size={16}
-                                        color={
+                                            : colors.text,
+                                      },
+                                    ]}
+                                  >
+                                    <Ionicons
+                                      name="calendar"
+                                      size={16}
+                                      color={
+                                        selectedTimeSlot === slot
+                                          ? "white"
+                                          : colors.primary
+                                      }
+                                      style={{ marginRight: 5 }}
+                                    />
+                                    {formattedDate}
+                                  </Text>
+                                  <Text
+                                    style={[
+                                      styles.timeSlotTime,
+                                      {
+                                        color:
                                           selectedTimeSlot === slot
                                             ? "rgba(255,255,255,0.8)"
-                                            : colors.secondaryText
-                                        }
-                                        style={{ marginRight: 5 }}
-                                      />
-                                      {`${slot.start_time.split(":")[0]}:${slot.start_time.split(":")[1]} - ${slot.end_time.split(":")[0]}:${slot.end_time.split(":")[1]}`}
-                                    </Text>
-                                  </View>
-                                </TouchableOpacity>
-                              );
-                            },
-                          )}
-                        </View>
-                      </View>
-                    )}
-                  {profiles[currentIndex].availabilitySlots &&
-                    profiles[currentIndex].availabilitySlots.length > 0 && (
-                      <View
-                        style={[
-                          styles.detailsCard,
-                          {
-                            backgroundColor: colors.card,
-                            borderColor: colors.border,
+                                            : colors.secondaryText,
+                                      },
+                                    ]}
+                                  >
+                                    <Ionicons
+                                      name="time"
+                                      size={16}
+                                      color={
+                                        selectedTimeSlot === slot
+                                          ? "rgba(255,255,255,0.8)"
+                                          : colors.secondaryText
+                                      }
+                                      style={{ marginRight: 5 }}
+                                    />
+                                    {`${slot.start_time.split(":")[0]}:${slot.start_time.split(":")[1]} - ${slot.end_time.split(":")[0]}:${slot.end_time.split(":")[1]}`}
+                                  </Text>
+                                </View>
+                              </TouchableOpacity>
+                            );
                           },
-                        ]}
+                        )}
+                      </View>
+                    </View>
+                  )}
+                {profiles[currentIndex].availabilitySlots &&
+                  profiles[currentIndex].availabilitySlots.length > 0 && (
+                    <View
+                      style={[
+                        styles.detailsCard,
+                        {
+                          backgroundColor: colors.card,
+                          borderColor: colors.border,
+                        },
+                      ]}
+                    >
+                      <Text
+                        style={[styles.detailsTitle, { color: colors.text }]}
                       >
-                        <Text
-                          style={[styles.detailsTitle, { color: colors.text }]}
-                        >
-                          Send A Message
-                        </Text>
-
+                        Send A Message
+                      </Text>
+                      
                         <TextInput
                           style={[
                             styles.textArea,
@@ -774,100 +771,100 @@ export default function MatchingScreen() {
                           onChangeText={setMessageText}
                           textAlignVertical="top"
                         />
+                          
+              
+                    </View>
+                  )}
+              </Animated.View>
 
-
-                      </View>
-                    )}
-                </Animated.View>
-
-                <View style={styles.navigationControls}>
-                  <TouchableOpacity
-                    onPress={async () => {
-                      try {
-                        if (!user?.id) {
-                          console.error("No user ID found");
-                          return;
-                        }
-
-                        const currentProfile = profiles[currentIndex];
-                        if (!selectedCafe || !selectedTimeSlot) {
-                          alert("Please select both a cafe and a time slot");
-                          return;
-                        }
-
-                        const [cafeName, cafeAddress] = selectedCafe.split("|||");
-
-                        const { data, error } = await supabase
-                          .from("matching")
-                          .insert([
-                            {
-                              user1_id: user.id,
-                              user2_id: currentProfile.id,
-                              status: "pending",
-                              meeting_date: selectedTimeSlot.date,
-                              meeting_location: `${cafeName}|||${cafeAddress}`,
-                              start_time: selectedTimeSlot.start_time,
-                              end_time: selectedTimeSlot.end_time,
-                              initial_message: messageText,
-                              created_at: new Date().toISOString(),
-                            },
-                          ])
-                          .select();
-
-                        if (error) throw error;
-
-                        alert("Match request sent successfully!");
-                        // Move to next profile
-                        if (currentIndex < profiles.length - 1) {
-                          setCurrentIndex(currentIndex + 1);
-                        }
-                      } catch (error) {
-                        console.error("Error sending match request:", error);
-                        alert("Failed to send match request. Please try again.");
-                      }
-                    }}
-                    style={[styles.navButton, { backgroundColor: colors.card }]}
-                  >
-                    <Ionicons name="person" size={20} color={colors.primary} />
-                    <Text
-                      style={[styles.navButtonText, { color: colors.primary }]}
-                    >
-                      Send request
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-              </>
-            ) : (
-              <View
-                style={[
-                  styles.noMoreCard,
-                  { backgroundColor: colors.card, borderColor: colors.border },
-                ]}
-              >
-                <Ionicons name="cafe" size={48} color={colors.primary} />
-                <Text style={[styles.noMoreText, { color: colors.text }]}>
-                  No more profiles to show
-                </Text>
-                <Text
-                  style={[styles.checkBackText, { color: colors.secondaryText }]}
-                >
-                  You've seen all available profiles! Check back later for more
-                  connections.
-                </Text>
+              <View style={styles.navigationControls}>
                 <TouchableOpacity
-                  style={[
-                    styles.refreshButton,
-                    { backgroundColor: colors.primary },
-                  ]}
-                  onPress={() => {
-                    setCurrentIndex(0);
-                    fetchProfiles();
+                  onPress={async () => {
+                    try {
+                      if (!user?.id) {
+                        console.error("No user ID found");
+                        return;
+                      }
+
+                      const currentProfile = profiles[currentIndex];
+                      if (!selectedCafe || !selectedTimeSlot) {
+                        alert("Please select both a cafe and a time slot");
+                        return;
+                      }
+
+                      const [cafeName, cafeAddress] = selectedCafe.split("|||");
+
+                      const { data, error } = await supabase
+                        .from("matching")
+                        .insert([
+                          {
+                            user1_id: user.id,
+                            user2_id: currentProfile.id,
+                            status: "pending",
+                            meeting_date: selectedTimeSlot.date,
+                            meeting_location: `${cafeName}|||${cafeAddress}`,
+                            start_time: selectedTimeSlot.start_time,
+                            end_time: selectedTimeSlot.end_time,
+                            initial_message: messageText,
+                            created_at: new Date().toISOString(),
+                          },
+                        ])
+                        .select();
+
+                      if (error) throw error;
+
+                      alert("Match request sent successfully!");
+                      // Move to next profile
+                      if (currentIndex < profiles.length - 1) {
+                        setCurrentIndex(currentIndex + 1);
+                      }
+                    } catch (error) {
+                      console.error("Error sending match request:", error);
+                      alert("Failed to send match request. Please try again.");
+                    }
                   }}
+                  style={[styles.navButton, { backgroundColor: colors.card }]}
                 >
-                  <Text style={styles.refreshButtonText}>Refresh</Text>
+                  <Ionicons name="person" size={20} color={colors.primary} />
+                  <Text
+                    style={[styles.navButtonText, { color: colors.primary }]}
+                  >
+                    Send request
+                  </Text>
                 </TouchableOpacity>
               </View>
-            )}
+            </>
+          ) : (
+            <View
+              style={[
+                styles.noMoreCard,
+                { backgroundColor: colors.card, borderColor: colors.border },
+              ]}
+            >
+              <Ionicons name="cafe" size={48} color={colors.primary} />
+              <Text style={[styles.noMoreText, { color: colors.text }]}>
+                No more profiles to show
+              </Text>
+              <Text
+                style={[styles.checkBackText, { color: colors.secondaryText }]}
+              >
+                You've seen all available profiles! Check back later for more
+                connections.
+              </Text>
+              <TouchableOpacity
+                style={[
+                  styles.refreshButton,
+                  { backgroundColor: colors.primary },
+                ]}
+                onPress={() => {
+                  setCurrentIndex(0);
+                  fetchProfiles();
+                }}
+              >
+                <Text style={styles.refreshButtonText}>Refresh</Text>
+              </TouchableOpacity>
+            </View>
+          )}
           </View>
         </ScrollView>
       )}
@@ -1223,8 +1220,6 @@ const styles = StyleSheet.create({
   loadingContainer: {
     alignItems: "center",
     justifyContent: "center",
-    height: windowHeight / 2, //added for vertical centering
-    display: 'flex',
   },
   loadingText: {
     fontFamily: "K2D-Regular",
