@@ -8,6 +8,8 @@ import {
   FlatList,
   ActivityIndicator,
   Alert,
+  Modal,
+  TouchableWithoutFeedback
 } from "react-native";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Stack } from "expo-router";
@@ -375,7 +377,7 @@ export default function AvailabilityScreen() {
       >
         <TouchableWithoutFeedback onPress={() => setShowAddSlot(false)}>
           <View style={styles.modalOverlay}>
-            <TouchableWithoutFeedback>
+            <TouchableWithoutFeedback onPress={() => {}}>
               <View style={[styles.addSlotModalContent, { backgroundColor: colors.background }]}>
                 <View style={styles.modalHeader}>
                   <Text style={[styles.modalTitle, { color: colors.text }]}>
@@ -385,192 +387,172 @@ export default function AvailabilityScreen() {
                     <Ionicons name="close" size={24} color={colors.text} />
                   </TouchableOpacity>
                 </View>
-                
+
                 {/* Calendar Section */}
                 <View style={styles.calendarContainer}>
-            <FlatList
-              horizontal
-              data={next7Days}
-              renderItem={({ item }) => {
-                const isSelected =
-                  selectedDate.toDateString() === item.toDateString();
-                const isPastDate = isPast(item) && !isToday(item);
-                const hasSlots = hasTimeSlotsOnDate(item);
+                  <FlatList
+                    horizontal
+                    data={next7Days}
+                    renderItem={({ item }) => {
+                      const isSelected = selectedDate.toDateString() === item.toDateString();
+                      const isPastDate = isPast(item) && !isToday(item);
+                      const hasSlots = hasTimeSlotsOnDate(item);
 
-                return (
+                      return (
+                        <TouchableOpacity
+                          style={[
+                            styles.dateButton,
+                            isSelected && { backgroundColor: colors.primary },
+                            isPastDate && styles.disabledDate,
+                          ]}
+                          onPress={() => !isPastDate && handleDateSelect(item)}
+                          disabled={isPastDate}
+                        >
+                          <Text
+                            style={[
+                              styles.dayText,
+                              { color: isSelected ? "white" : colors.text },
+                              isPastDate && styles.disabledText,
+                            ]}
+                          >
+                            {format(item, "EEE")}
+                          </Text>
+                          <Text
+                            style={[
+                              styles.dateText,
+                              { color: isSelected ? "white" : colors.text },
+                              isPastDate && styles.disabledText,
+                            ]}
+                          >
+                            {format(item, "d")}
+                          </Text>
+                          {hasSlots && !isSelected && (
+                            <View
+                              style={[
+                                styles.dotIndicator,
+                                { backgroundColor: colors.primary },
+                              ]}
+                            />
+                          )}
+                        </TouchableOpacity>
+                      );
+                    }}
+                    keyExtractor={(item) => item.toISOString()}
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={styles.calendarList}
+                  />
+                </View>
+
+                {/* Add Time Slot UI */}
+                <View
+                  style={[
+                    styles.addSlotContainer,
+                    { backgroundColor: colors.card, borderColor: colors.border },
+                  ]}
+                >
+                  <Text style={[styles.addSlotTitle, { color: colors.text }]}>
+                    Add Time Slot
+                  </Text>
+                  <Text style={[styles.selectedDateText, { color: colors.secondaryText }]}>
+                    {format(selectedDate, "EEEE, MMMM d, yyyy")}
+                  </Text>
+
+                  <Text style={[styles.timeSelectorLabel, { color: colors.text }]}>
+                    Select Start Time (30-minute duration)
+                  </Text>
+
+                  <View style={styles.timePickerContainer}>
+                    <FlatList
+                      horizontal
+                      data={availableTimes}
+                      renderItem={({ item }) => {
+                        const isSelectedTime = selectedTime === item;
+
+                        const isTimeTaken = timeSlots.some(
+                          (slot) =>
+                            slot.date.toDateString() === selectedDate.toDateString() &&
+                            slot.startTime === item,
+                        );
+
+                        const now = new Date();
+                        const [time, period] = item.split(" ");
+                        const [hours, minutes] = time.split(":");
+                        let hour = parseInt(hours);
+                        if (period === "PM" && hour !== 12) hour += 12;
+                        if (period === "AM" && hour === 12) hour = 0;
+
+                        const slotTime = new Date(selectedDate);
+                        slotTime.setHours(hour, parseInt(minutes), 0, 0);
+                        const isPastTime = slotTime < now;
+
+                        const isAlreadyAdded = timeSlots.some((slot) => {
+                          const slotDateStr = format(
+                            new Date(slot.date instanceof Date ? slot.date : new Date(slot.date)),
+                            "yyyy-MM-dd"
+                          );
+                          const selectedDateStr = format(selectedDate, "yyyy-MM-dd");
+
+                          const slotTimeStr = (slot.startTime || slot.start_time || "")
+                            .trim()
+                            .replace(/\s+/g, " ");
+                          const itemTimeStr = item.trim().replace(/\s+/g, " ");
+
+                          return slotDateStr === selectedDateStr && slotTimeStr === itemTimeStr;
+                        });
+
+                        return (
+                          <TouchableOpacity
+                            style={[
+                              styles.timeButton,
+                              isSelectedTime && { backgroundColor: colors.primary },
+                              (isTimeTaken || isPastTime || isAlreadyAdded) && styles.disabledTime,
+                            ]}
+                            onPress={() =>
+                              !isTimeTaken &&
+                              !isPastTime &&
+                              !isAlreadyAdded &&
+                              setSelectedTime(item)
+                            }
+                            disabled={isTimeTaken || isPastTime || isAlreadyAdded}
+                          >
+                            <Text
+                              style={[
+                                styles.timeText,
+                                { color: isSelectedTime ? "white" : colors.text },
+                                isTimeTaken && styles.disabledText,
+                              ]}
+                            >
+                              {item}
+                            </Text>
+                          </TouchableOpacity>
+                        );
+                      }}
+                      keyExtractor={(item) => item}
+                      showsHorizontalScrollIndicator={true}
+                      contentContainerStyle={styles.timesList}
+                    />
+                  </View>
+
+                  <Text style={[styles.endTimeText, { color: colors.secondaryText }]}>
+                    End Time: {calculateEndTime(selectedTime)}
+                  </Text>
+
                   <TouchableOpacity
-                    style={[
-                      styles.dateButton,
-                      isSelected && { backgroundColor: colors.primary },
-                      isPastDate && styles.disabledDate,
-                    ]}
-                    onPress={() => !isPastDate && handleDateSelect(item)}
-                    disabled={isPastDate}
+                    style={[styles.saveButton, { backgroundColor: colors.primary }]}
+                    onPress={() => {
+                      handleAddSlot();
+                      setShowAddSlot(false);
+                    }}
                   >
-                    <Text
-                      style={[
-                        styles.dayText,
-                        { color: isSelected ? "white" : colors.text },
-                        isPastDate && styles.disabledText,
-                      ]}
-                    >
-                      {format(item, "EEE")}
-                    </Text>
-                    <Text
-                      style={[
-                        styles.dateText,
-                        { color: isSelected ? "white" : colors.text },
-                        isPastDate && styles.disabledText,
-                      ]}
-                    >
-                      {format(item, "d")}
-                    </Text>
-                    {hasSlots && !isSelected && (
-                      <View
-                        style={[
-                          styles.dotIndicator,
-                          { backgroundColor: colors.primary },
-                        ]}
-                      />
-                    )}
+                    <Text style={styles.saveButtonText}>Save Time Slot</Text>
                   </TouchableOpacity>
-                );
-              }}
-              keyExtractor={(item) => item.toISOString()}
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.calendarList}
-            />
-          </View>
-
-          {/* Add Time Slot UI */}
-          <View
-            style={[
-              styles.addSlotContainer,
-              { backgroundColor: colors.card, borderColor: colors.border },
-            ]}
-          >
-            <Text style={[styles.addSlotTitle, { color: colors.text }]}>
-              Add Time Slot
-            </Text>
-            <Text
-              style={[styles.selectedDateText, { color: colors.secondaryText }]}
-            >
-              {format(selectedDate, "EEEE, MMMM d, yyyy")}
-            </Text>
-
-            <Text style={[styles.timeSelectorLabel, { color: colors.text }]}>
-              Select Start Time (30-minute duration)
-            </Text>
-
-            <View style={styles.timePickerContainer}>
-              <FlatList
-                horizontal
-                data={availableTimes}
-                renderItem={({ item }) => {
-                  const isSelectedTime = selectedTime === item;
-
-                  // Check if this time is already taken on selected date
-                  const isTimeTaken = timeSlots.some(
-                    (slot) =>
-                      slot.date.toDateString() ===
-                        selectedDate.toDateString() && slot.startTime === item,
-                  );
-
-                  // Check if time slot is in the past
-                  const now = new Date();
-                  const [time, period] = item.split(" ");
-                  const [hours, minutes] = time.split(":");
-                  let hour = parseInt(hours);
-                  if (period === "PM" && hour !== 12) hour += 12;
-                  if (period === "AM" && hour === 12) hour = 0;
-
-                  const slotTime = new Date(selectedDate);
-                  slotTime.setHours(hour, parseInt(minutes), 0, 0);
-                  const isPastTime = slotTime < now;
-
-                  // Check if this time slot is already in the user's list
-                  const isAlreadyAdded = timeSlots.some((slot) => {
-                    // Convert dates to strings for comparison
-                    const slotDateStr = format(
-                      new Date(
-                        slot.date instanceof Date
-                          ? slot.date
-                          : new Date(slot.date),
-                      ),
-                      "yyyy-MM-dd",
-                    );
-                    // console.log(slotDateStr);
-                    const selectedDateStr = format(selectedDate, "yyyy-MM-dd");
-                    // console.log(selectedDateStr);
-                    // Convert and normalize time strings for comparison
-                    const slotTimeStr = (
-                      slot.startTime ||
-                      slot.start_time ||
-                      ""
-                    )
-                      .trim()
-                      .replace(/\s+/g, " ");
-                    const itemTimeStr = item.trim().replace(/\s+/g, " ");
-
-                    // Compare date and time
-                    return (
-                      slotDateStr === selectedDateStr &&
-                      slotTimeStr === itemTimeStr
-                    );
-                  });
-
-                  return (
-                    <TouchableOpacity
-                      style={[
-                        styles.timeButton,
-                        isSelectedTime && { backgroundColor: colors.primary },
-                        (isTimeTaken || isPastTime || isAlreadyAdded) &&
-                          styles.disabledTime,
-                      ]}
-                      onPress={() =>
-                        !isTimeTaken &&
-                        !isPastTime &&
-                        !isAlreadyAdded &&
-                        setSelectedTime(item)
-                      }
-                      disabled={isTimeTaken || isPastTime || isAlreadyAdded}
-                    >
-                      <Text
-                        style={[
-                          styles.timeText,
-                          { color: isSelectedTime ? "white" : colors.text },
-                          isTimeTaken && styles.disabledText,
-                        ]}
-                      >
-                        {item}
-                      </Text>
-                    </TouchableOpacity>
-                  );
-                }}
-                keyExtractor={(item) => item}
-                showsHorizontalScrollIndicator={true}
-                contentContainerStyle={styles.timesList}
-              />
-            </View>
-
-            <Text style={[styles.endTimeText, { color: colors.secondaryText }]}>
-              End Time: {calculateEndTime(selectedTime)}
-            </Text>
-
-            <TouchableOpacity
-              style={[styles.saveButton, { backgroundColor: colors.primary }]}
-              onPress={() => {
-                handleAddSlot();
-                setShowAddSlot(false);
-              }}
-            >
-              <Text style={styles.saveButtonText}>Save Time Slot</Text>
-            </TouchableOpacity>
-          </View>
+                </View>
               </View>
+            </TouchableWithoutFeedback>
           </View>
         </TouchableWithoutFeedback>
       </Modal>
+
 
       {/* Time Slots List */}
       <View style={styles.slotsContainer}>
@@ -685,7 +667,6 @@ const styles = StyleSheet.create({
   },
   calendarContainer: {
     marginBottom: 24,
-    padding: 16,
   },
   calendarList: {
     paddingVertical: 8,
@@ -700,13 +681,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFF",
   },
   dayText: {
-    fontFamily: "K2D-Regular, sans-serif",
+    fontFamily: "K2D-Regular",
     fontWeight: "500",
     fontSize: 14,
     marginBottom: 4,
   },
   dateText: {
-    fontFamily: "K2D-Regular, sans-serif",
+    fontFamily: "K2D-Medium",
     fontWeight: "bold",
     fontSize: 20,
   },
@@ -770,7 +751,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   dateGroupTitle: {
-    fontFamily: "K2D-Regular, sans-serif",
+    fontFamily: "K2D-Medium",
     fontWeight: "500",
     fontSize: 16,
     marginBottom: 8,
@@ -782,18 +763,18 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   addSlotTitle: {
-    fontFamily: "K2D-Regular, sans-serif",
+    fontFamily: "K2D-Medium",
     fontWeight: "600",
     fontSize: 18,
     marginBottom: 8,
   },
   selectedDateText: {
-    fontFamily: "K2D-Regular, sans-serif",
+    fontFamily: "K2D-Regular",
     fontSize: 16,
     marginBottom: 16,
   },
   timeSelectorLabel: {
-    fontFamily: "K2D-Regular, sans-serif",
+    fontFamily: "K2D-Regular",
     fontWeight: "500",
     fontSize: 14,
     marginBottom: 8,
@@ -815,14 +796,14 @@ const styles = StyleSheet.create({
     backgroundColor: "#F5F5F5",
   },
   timeText: {
-    fontFamily: "K2D-Regular, sans-serif",
+    fontFamily: "K2D-Regular",
     fontSize: 14,
   },
   disabledTime: {
     opacity: 0.5,
   },
   endTimeText: {
-    fontFamily: "K2D-Regular, sans-serif",
+    fontFamily: "K2D-Regular",
     fontSize: 14,
     marginBottom: 16,
   },
@@ -833,7 +814,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   saveButtonText: {
-    fontFamily: "K2D-Regular, sans-serif",
+    fontFamily: "K2D-Medium",
     fontWeight: "600",
     fontSize: 16,
     color: "white",
