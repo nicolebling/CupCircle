@@ -207,8 +207,8 @@ export default function ProfileCard({
   if (loading && !isNewUser) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#0097FB" />
-        <Text style={styles.loadingText}>Loading your profile...</Text>
+        {/* <ActivityIndicator size="large" color={colors.primary} />
+        <Text style={styles.loadingText}>Loading your profile...</Text> */}
       </View>
     );
   }

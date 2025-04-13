@@ -387,15 +387,11 @@ export default function MatchingScreen() {
         setCurrentIndex(currentIndex + 1);
         // Reset animation values
         cardOpacity.value = 0;
-        cardTranslateY.value = 10;
+        
 
         // Animate new card in with slight delay
         setTimeout(() => {
           cardOpacity.value = withTiming(1, {
-            duration: 800,
-            easing: Easing.bezier(0.2, 0, 0.2, 1),
-          });
-          cardTranslateY.value = withTiming(0, {
             duration: 800,
             easing: Easing.bezier(0.2, 0, 0.2, 1),
           });
@@ -416,15 +412,10 @@ export default function MatchingScreen() {
         setCurrentIndex(currentIndex - 1);
         // Set initial position for new card
         cardOpacity.value = 0;
-        cardTranslateY.value = 10;
-
+        
         // Animate new card in with slight delay
         setTimeout(() => {
           cardOpacity.value = withTiming(1, {
-            duration: 800,
-            easing: Easing.bezier(0.2, 0, 0.2, 1),
-          });
-          cardTranslateY.value = withTiming(0, {
             duration: 800,
             easing: Easing.bezier(0.2, 0, 0.2, 1),
           });
