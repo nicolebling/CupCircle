@@ -993,8 +993,26 @@ export default function MatchingScreen() {
               <IndustrySelector
                 selected={filterIndustries || []}
                 onChange={(industries) => setFilterIndustries(industries)}
+                maxIndustries={999}
                 isDark={false}
               />
+              {filterIndustries && filterIndustries.length > 0 && (
+                <View style={styles.selectedTagsContainer}>
+                  {filterIndustries.map((industry, index) => (
+                    <View
+                      key={index}
+                      style={[
+                        styles.selectedTag,
+                        { backgroundColor: "transparent", borderColor: colors.primary },
+                      ]}
+                    >
+                      <Text style={[styles.selectedTagText, { color: colors.primary }]}>
+                        {industry}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              )}
 
               <Text style={[styles.filterLabel, { color: colors.text }]}>
                 Experience Level
@@ -1008,18 +1026,10 @@ export default function MatchingScreen() {
                   <View
                     style={[
                       styles.selectedTag,
-                      {
-                        backgroundColor: "transparent",
-                        borderColor: colors.primary,
-                      },
+                      { backgroundColor: "transparent", borderColor: colors.primary },
                     ]}
                   >
-                    <Text
-                      style={[
-                        styles.selectedTagText,
-                        { color: colors.primary },
-                      ]}
-                    >
+                    <Text style={[styles.selectedTagText, { color: colors.primary }]}>
                       {filterExperienceLevel}
                     </Text>
                   </View>
@@ -1032,8 +1042,26 @@ export default function MatchingScreen() {
               <InterestSelector
                 selected={filterInterests || []}
                 onChange={(interests) => setFilterInterests(interests)}
+                maxInterests={999}
                 isDark={false}
               />
+              {filterInterests && filterInterests.length > 0 && (
+                <View style={styles.selectedTagsContainer}>
+                  {filterInterests.map((interest, index) => (
+                    <View
+                      key={index}
+                      style={[
+                        styles.selectedTag,
+                        { backgroundColor: "transparent", borderColor: colors.primary },
+                      ]}
+                    >
+                      <Text style={[styles.selectedTagText, { color: colors.primary }]}>
+                        {interest}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              )}
             </ScrollView>
             <View style={styles.modalFooter}>
               <TouchableOpacity
@@ -1047,7 +1075,7 @@ export default function MatchingScreen() {
                 <Text style={{ color: colors.text }}>Clear All</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[
+                style=[
                   styles.modalButton,
                   styles.applyButton,
                   { backgroundColor: colors.primary },
