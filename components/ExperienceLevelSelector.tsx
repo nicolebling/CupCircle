@@ -22,10 +22,8 @@ type ExperienceLevelSelectorProps = {
   multiSelect?: boolean;
 };
 
-export default function ExperienceLevelSelector({ 
-  selected, 
-  onChange 
-}: ExperienceLevelSelectorProps) {
+export default function ExperienceLevelSelector(props: ExperienceLevelSelectorProps) {
+  const { selected, onChange, multiSelect } = props;
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   
