@@ -441,7 +441,8 @@ export default function MatchingScreen() {
     <SafeAreaView
       style={[styles.container, { backgroundColor: colors.background }]}
     >
-      <View style={styles.navigationFloating}>
+      {(!isLoading && profiles.length > 0) && (
+        <View style={styles.navigationFloating}>
         <TouchableOpacity
           onPress={handlePrevious}
           style={[
@@ -471,12 +472,43 @@ export default function MatchingScreen() {
           <Ionicons name="arrow-forward" size={24} color={colors.primary} />
         </TouchableOpacity>
       </View>
-      <ScrollView
-        style={{ flex: 1 }}
-        contentContainerStyle={{ paddingBottom: 20 }}
-      >
-        <View style={styles.cardsContainer}>
-          {isLoading ? (
+      )}
+      {(!isLoading && profiles.length === 0) ? (
+        <View style={[styles.cardsContainer, { justifyContent: 'center' }]}>
+          <View
+            style={[
+              styles.noMoreCard,
+              { backgroundColor: colors.card, borderColor: colors.border },
+            ]}
+          >
+            <Ionicons name="people" size={48} color={colors.primary} />
+            <Text style={[styles.noMoreText, { color: colors.text }]}>
+              No matches available
+            </Text>
+            <Text
+              style={[styles.checkBackText, { color: colors.secondaryText }]}
+            >
+              We couldn't find any users with availability in the next 7 days.
+              Check back later as more users add their availability!
+            </Text>
+            <TouchableOpacity
+              style={[
+                styles.refreshButton,
+                { backgroundColor: colors.primary },
+              ]}
+              onPress={openFilterModal}
+            >
+              <Text style={styles.refreshButtonText}>Adjust Filters</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      ) : (
+        <ScrollView
+          style={{ flex: 1 }}
+          contentContainerStyle={{ paddingBottom: 20 }}
+        >
+          <View style={styles.cardsContainer}>
+            {isLoading ? (
             <View style={styles.loadingContainer}>
               <ActivityIndicator size="large" color={colors.primary} />
               <Text style={[styles.loadingText, { color: colors.text }]}>
@@ -833,8 +865,9 @@ export default function MatchingScreen() {
               </TouchableOpacity>
             </View>
           )}
-        </View>
-      </ScrollView>
+          </View>
+        </ScrollView>
+      )}
 
       {/* Filter Modal */}
       <Modal
