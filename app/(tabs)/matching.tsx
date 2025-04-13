@@ -81,6 +81,9 @@ export default function MatchingScreen() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFilterModalVisible, setFilterModalVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [filterIndustries, setFilterIndustries] = useState<string[]>([]);
+  const [filterExperienceLevel, setFilterExperienceLevel] = useState<string>("");
+  const [filterInterests, setFilterInterests] = useState<string[]>([]);
   const [matchAnimation, setMatchAnimation] = useState(false);
   const [hasAvailability, setHasAvailability] = useState(false);
   const [messageText, setMessageText] = useState("");
@@ -958,29 +961,75 @@ export default function MatchingScreen() {
                 Industry
               </Text>
               <IndustrySelector
-                selected={[]}
-                onChange={() => {}}
-                maxSelections={3}
+                selected={filterIndustries || []}
+                onChange={(industries) => setFilterIndustries(industries)}
                 isDark={false}
               />
+              {filterIndustries && filterIndustries.length > 0 && (
+                <View style={styles.selectedTagsContainer}>
+                  {filterIndustries.map((industry, index) => (
+                    <View
+                      key={index}
+                      style={[
+                        styles.selectedTag,
+                        { backgroundColor: "transparent", borderColor: colors.primary },
+                      ]}
+                    >
+                      <Text style={[styles.selectedTagText, { color: colors.primary }]}>
+                        {industry}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              )}
 
               <Text style={[styles.filterLabel, { color: colors.text }]}>
                 Experience Level
               </Text>
               <ExperienceLevelSelector
-                selected=""
-                onChange={() => {}}
+                selected={filterExperienceLevel || ""}
+                onChange={(level) => setFilterExperienceLevel(level)}
               />
+              {filterExperienceLevel && (
+                <View style={styles.selectedTagsContainer}>
+                  <View
+                    style={[
+                      styles.selectedTag,
+                      { backgroundColor: "transparent", borderColor: colors.primary },
+                    ]}
+                  >
+                    <Text style={[styles.selectedTagText, { color: colors.primary }]}>
+                      {filterExperienceLevel}
+                    </Text>
+                  </View>
+                </View>
+              )}
 
               <Text style={[styles.filterLabel, { color: colors.text }]}>
                 Interests
               </Text>
               <InterestSelector
-                selected={[]}
-                onChange={() => {}}
-                maxInterests={5}
+                selected={filterInterests || []}
+                onChange={(interests) => setFilterInterests(interests)}
                 isDark={false}
               />
+              {filterInterests && filterInterests.length > 0 && (
+                <View style={styles.selectedTagsContainer}>
+                  {filterInterests.map((interest, index) => (
+                    <View
+                      key={index}
+                      style={[
+                        styles.selectedTag,
+                        { backgroundColor: "transparent", borderColor: colors.primary },
+                      ]}
+                    >
+                      <Text style={[styles.selectedTagText, { color: colors.primary }]}>
+                        {interest}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              )}
             </ScrollView>
 
             <View style={styles.modalFooter}>
@@ -1254,6 +1303,24 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     flex: 1,
     alignItems: "center",
+  },
+  selectedTagsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginTop: 8,
+    marginBottom: 16,
+  },
+  selectedTag: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    marginRight: 8,
+    marginBottom: 8,
+    borderWidth: 1,
+  },
+  selectedTagText: {
+    fontFamily: 'K2D-Medium',
+    fontSize: 12,
   },
   clearButton: {
     marginRight: 8,
