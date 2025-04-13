@@ -1218,6 +1218,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   loadingContainer: {
+    flex: 1,
     alignItems: "center",
     justifyContent: "center",
   },
