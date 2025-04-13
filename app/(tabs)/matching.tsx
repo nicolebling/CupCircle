@@ -13,7 +13,7 @@ import {
   Platform,
   TouchableWithoutFeedback,
   Keyboard,
-
+ 
 } from "react-native";
 import Colors from "@/constants/Colors";
 import ProfileCard from "@/components/ProfileCard";
@@ -375,7 +375,7 @@ export default function MatchingScreen() {
         duration: 300,
         easing: Easing.out(Easing.ease),
       });
-
+      
 
       // Here you would typically send a like request to your backend
       // For example: createMatch(profiles[currentIndex].id)
@@ -394,14 +394,8 @@ export default function MatchingScreen() {
       if (currentIndex < profiles.length - 1) {
         setCurrentIndex(currentIndex + 1);
         // Reset animation values
-        cardOpacity.value = withTiming(1, {
-          duration: 600,
-          easing: Easing.bezier(0.25, 0.1, 0.25, 1),
-        });
-        cardTranslateY.value = withTiming(0, {
-          duration: 600,
-          easing: Easing.bezier(0.25, 0.1, 0.25, 1),
-        });
+        cardOpacity.value = 0;
+        cardTranslateY.value = 20;
       }
     }, 300);
   };
@@ -583,7 +577,7 @@ export default function MatchingScreen() {
               </View>
             ) : currentIndex < profiles.length ? (
               <>
-
+                
                 <Animated.View
                   style={[styles.animatedCardContainer, cardAnimatedStyle]}
                 >
@@ -1084,7 +1078,8 @@ export default function MatchingScreen() {
               </TouchableOpacity>
             </View>
           </View>
-        </View>      </Modal>
+        </View>
+      </Modal>
 
       {/* Match Animation Modal */}
       {/* <Modal visible={matchAnimation} transparent={true} animationType="fade">
