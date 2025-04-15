@@ -140,7 +140,7 @@ export default function IndustrySelector({
             <Text
               style={[styles.selectorText, { color: colors.secondaryText }]}
             >
-              Select your industries
+              Select industries
             </Text>
           )}
         </View>

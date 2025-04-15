@@ -109,7 +109,10 @@ export default function MatchingScreen() {
 
   // Reset animation values when currentIndex changes
   useEffect(() => {
-    cardOpacity.value = 1;
+    cardOpacity.value = withTiming(1, {
+        duration: 800,
+        easing: Easing.bezier(0.4, 0, 0.2, 1),
+      });
     cardTranslateY.value = 0;
     cardOffset.value = 0;
     cardRotate.value = 0;
@@ -366,36 +369,20 @@ export default function MatchingScreen() {
   };
 
   const handleLike = () => {
-    if (profiles.length > 0 && currentIndex < profiles.length) {
+    if (profiles.length > 0 && currentIndex < profiles.length - 1) {
       console.log(`Liked ${profiles[currentIndex].name}`);
-
-      if (currentIndex < profiles.length - 1) {
-        // Set opacity to 0 for initial state of next card
-        cardOpacity.value = 0;
-        setCurrentIndex(currentIndex + 1);
-        
-        // Smoothly fade in the next card
-        cardOpacity.value = withTiming(1, {
-          duration: 800,
-          easing: Easing.bezier(0.4, 0, 0.2, 1),
-        });
-      }
+      cardOpacity.value = 0; // prepare next card to start invisible
+      setCurrentIndex(currentIndex + 1); // trigger re-render
     }
   };
 
   const handlePrevious = () => {
     if (currentIndex > 0) {
-      // Set opacity to 0 for initial state of previous card
-      cardOpacity.value = 0;
-      setCurrentIndex(currentIndex - 1);
-      
-      // Smoothly fade in the previous card
-      cardOpacity.value = withTiming(1, {
-        duration: 800,
-        easing: Easing.bezier(0.4, 0, 0.2, 1),
-      });
+      cardOpacity.value = 0; // prepare card to start invisible
+      setCurrentIndex(currentIndex - 1); // trigger re-render, fade handled in useEffect
     }
   };
+
 
   const openFilterModal = () => {
     setFilterModalVisible(true);

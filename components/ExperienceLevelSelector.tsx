@@ -63,7 +63,7 @@ export default function ExperienceLevelSelector(props: ExperienceLevelSelectorPr
         style={[styles.selector, { backgroundColor: colors.input, borderColor: colors.border }]} 
         onPress={() => setModalVisible(true)}
       >
-        <Text style={[styles.selectorText, { color: selected ? colors.text : colors.secondaryText }]}>
+        <Text style={[styles.selectorText, { color: selected ? colors.secondaryText : colors.secondaryText }]}>
           {getDisplayText()}
         </Text>
         <Ionicons name="chevron-down" size={20} color={colors.secondaryText} />
