@@ -84,6 +84,7 @@ export default function MatchingScreen() {
   const [filterExperienceLevels, setFilterExperienceLevels] = 
     useState<string[]>([]);
   const [filterInterests, setFilterInterests] = useState<string[]>([]);
+  const [filterKeyword, setFilterKeyword] = useState("");
   const [matchAnimation, setMatchAnimation] = useState(false);
   const [hasAvailability, setHasAvailability] = useState(false);
   const [messageText, setMessageText] = useState("");
@@ -995,6 +996,25 @@ export default function MatchingScreen() {
                 isDark={false}
                 viewSelectionTracker={false}
               />
+
+              <Text style={[styles.filterLabel, { color: colors.text }]}>
+                Keyword Search
+              </Text>
+              <View style={[styles.searchContainer, { backgroundColor: colors.input, borderColor: colors.border }]}>
+                <Ionicons name="search" size={20} color={colors.secondaryText} />
+                <TextInput
+                  style={[styles.searchInput, { color: colors.text }]}
+                  placeholder="Enter keyword to search profiles..."
+                  placeholderTextColor={colors.secondaryText}
+                  value={filterKeyword}
+                  onChangeText={setFilterKeyword}
+                />
+                {filterKeyword.length > 0 && (
+                  <TouchableOpacity onPress={() => setFilterKeyword("")}>
+                    <Ionicons name="close-circle" size={20} color={colors.secondaryText} />
+                  </TouchableOpacity>
+                )}
+              </View>
             
             </ScrollView>
             <View style={styles.modalFooter}>
@@ -1270,6 +1290,23 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     flex: 1,
     alignItems: "center",
+  },
+  searchContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderRadius: 8,
+    marginHorizontal: 16,
+    paddingHorizontal: 12,
+    height: 44,
+    marginBottom: 16,
+  },
+  searchInput: {
+    flex: 1,
+    height: "100%",
+    marginLeft: 8,
+    fontFamily: "K2D-Regular",
+    fontSize: 16,
   },
   selectedTagsContainer: {
     flexDirection: "row",
