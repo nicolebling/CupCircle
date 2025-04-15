@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal, FlatList } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -26,12 +25,12 @@ export default function ExperienceLevelSelector(props: ExperienceLevelSelectorPr
   const { selected, onChange, multiSelect } = props;
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
-  
+
   const [modalVisible, setModalVisible] = useState(false);
-  
+
   // Find the selected level's coffee theme
   const selectedLevelData = EXPERIENCE_LEVELS.find(item => item.level === selected);
-  
+
   // Handle selection
   const handleSelect = (level: string) => {
     onChange(level);
@@ -39,36 +38,36 @@ export default function ExperienceLevelSelector(props: ExperienceLevelSelectorPr
       setModalVisible(false);
     }
   };
-  
-  const getDisplayText = () => {
-    if (!selected) return 'Select your experience level';
-    
-    if (Array.isArray(selected)) {
-      const count = selected.length;
-      return count > 0 ? `${count} experience levels selected` : 'Select your experience level';
-    }
-    
-    return selectedLevelData 
-      ? `${selectedLevelData.level}` 
-      : selected;
 
-    // return selectedLevelData 
-    // ? `${selectedLevelData.level} (${selectedLevelData.coffeeTheme})` 
-    // : selected;
+  const getDisplayText = () => {
+    if (!selected || (Array.isArray(selected) && selected.length === 0)) {
+      return { text: 'Select your experience level', isPlaceholder: true };
+    }
+
+    if (Array.isArray(selected)) {
+      return { text: `${selected.length} experience levels selected`, isPlaceholder: false };
+    }
+
+    return {
+      text: selectedLevelData ? `${selectedLevelData.level}` : selected,
+      isPlaceholder: false
+    };
   };
-  
+
+  const displayText = getDisplayText();
+
   return (
     <View>
       <TouchableOpacity 
         style={[styles.selector, { backgroundColor: colors.input, borderColor: colors.border }]} 
         onPress={() => setModalVisible(true)}
       >
-        <Text style={[styles.selectorText, { color: selected ? colors.secondaryText : colors.secondaryText }]}>
-          {getDisplayText()}
+        <Text style={[styles.selectorText, { color: displayText.isPlaceholder ? colors.secondaryText : colors.text }]}>
+          {displayText.text}
         </Text>
         <Ionicons name="chevron-down" size={20} color={colors.secondaryText} />
       </TouchableOpacity>
-      
+
       <Modal
         visible={modalVisible}
         transparent={true}
@@ -85,7 +84,7 @@ export default function ExperienceLevelSelector(props: ExperienceLevelSelectorPr
                 <Ionicons name="close" size={24} color={colors.text} />
               </TouchableOpacity>
             </View>
-            
+
             <FlatList
               data={EXPERIENCE_LEVELS}
               keyExtractor={(item) => item.level}
@@ -94,7 +93,7 @@ export default function ExperienceLevelSelector(props: ExperienceLevelSelectorPr
                   ? selected.includes(item.level)
                   : selected === item.level;
                 const coffeeColor = getCoffeeColor(item.level, colors.primary);
-                
+
                 return (
                   <TouchableOpacity
                     style={[
