@@ -332,8 +332,13 @@ export default function MatchingScreen() {
           const matchesExperience = filterExperienceLevels.length === 0 ||
             (profile.experience_level && 
              filterExperienceLevels.includes(profile.experience_level));
+             
+          // Check interests filter if any are selected
+          const matchesInterests = filterInterests.length === 0 ||
+            (profile.interests && 
+             profile.interests.some(interest => filterInterests.includes(interest)));
 
-          return hasAvailability && matchesIndustry && matchesExperience;
+          return hasAvailability && matchesIndustry && matchesExperience && matchesInterests;
         })
         .map((profile) => {
           let interests = [];
