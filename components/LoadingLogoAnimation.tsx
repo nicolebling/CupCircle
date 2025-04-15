@@ -46,7 +46,7 @@ export default function LoadingLogoAnimation() {
           outputRange: ['0deg', '360deg']
         })
       },
-      { translateY: -9 },
+      { translateY: -16 },
     ],
   };
 
@@ -57,7 +57,7 @@ export default function LoadingLogoAnimation() {
           outputRange: ['180deg', '540deg']
         })
       },
-      { translateY: -9 },
+      { translateY: -16 },
     ],
   };
 
@@ -72,23 +72,23 @@ export default function LoadingLogoAnimation() {
 
 const styles = StyleSheet.create({
   circleContainer: {
-    width: 20,
-    height: 20,
+    width: 96,
+    height: 96,
     alignItems: 'center',
     justifyContent: 'center',
   },
   mainCircle: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    borderWidth: 1,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    borderWidth: 2,
     borderColor: '#F97415',
     position: 'absolute',
   },
   smallCircle: {
-    width: 2,
-    height: 2,
-    borderRadius: 1,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
     backgroundColor: '#F97415',
     position: 'absolute',
   },
