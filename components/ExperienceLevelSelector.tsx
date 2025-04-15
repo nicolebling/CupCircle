@@ -197,7 +197,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderRadius: 8,
     marginBottom: 8,
-    gap: 12,
+    paddingRight: 40
   },
   levelItemContent: {
     flexDirection: 'row',
