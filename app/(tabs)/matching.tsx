@@ -319,7 +319,17 @@ export default function MatchingScreen() {
 
       // Map profiles to the format expected by ProfileCard
       const formattedProfiles = profilesData
-        .filter((profile) => userAvailabilityMap[profile.id]?.length > 0)
+        .filter((profile) => {
+          // First check if profile has availability
+          const hasAvailability = userAvailabilityMap[profile.id]?.length > 0;
+          
+          // Then check industry filter if any are selected
+          const matchesIndustry = filterIndustries.length === 0 || 
+            (profile.industry_categories && 
+             profile.industry_categories.some(industry => filterIndustries.includes(industry)));
+
+          return hasAvailability && matchesIndustry;
+        })
         .map((profile) => {
           let interests = [];
           try {
