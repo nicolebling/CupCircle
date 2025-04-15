@@ -199,7 +199,7 @@ export default function SignUpScreen() {
             
             {/* Logo & Branding */}
             <View style={styles.header}>
-              <LogoAnimation />
+              <LogoAnimation showText={true} />
             </View>
 
             {/* Form Container */}

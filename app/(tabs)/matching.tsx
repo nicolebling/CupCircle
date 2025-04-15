@@ -551,7 +551,7 @@ export default function MatchingScreen() {
           <View style={[styles.cardsContainer, { width: "100%" }]}>
             {isLoading ? (
               <View style={styles.loadingContainer}>
-                <LoadingLogoAnimation />
+                <LogoAnimation size={20} />
                 <Text style={[styles.loadingText, { color: colors.text }]}>
                   Brewing your circle......
                 </Text>

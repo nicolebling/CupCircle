@@ -4,7 +4,12 @@ import { View, Text, StyleSheet, Animated, Easing } from 'react-native';
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
-export default function LogoAnimation() {
+interface LogoAnimationProps {
+  showText?: boolean;
+  size?: number;
+}
+
+export default function LogoAnimation({ showText = false, size = 96 }: LogoAnimationProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const rotateAnim1 = useRef(new Animated.Value(0)).current;
@@ -47,7 +52,7 @@ export default function LogoAnimation() {
           outputRange: ['0deg', '360deg']
         })
       },
-      { translateY: -16 },
+      { translateY: -(size/6) },
     ],
   };
 
@@ -58,22 +63,43 @@ export default function LogoAnimation() {
           outputRange: ['180deg', '540deg']
         })
       },
-      { translateY: -16 },
+      { translateY: -(size/6) },
     ],
   };
 
+  const dynamicStyles = {
+    circleContainer: {
+      width: size,
+      height: size,
+    },
+    mainCircle: {
+      width: size/2,
+      height: size/2,
+      borderRadius: size/4,
+    },
+    smallCircle: {
+      width: size/12,
+      height: size/12,
+      borderRadius: size/24,
+    }
+  };
+
   return (
-  <View style={styles.container}>
-    <View style={styles.circleContainer}>
-      <View style={styles.mainCircle} />
-      <Animated.View style={[styles.smallCircle, circle1Style]} />
-      <Animated.View style={[styles.smallCircle, circle2Style]} />
+    <View style={styles.container}>
+      <View style={[styles.circleContainer, dynamicStyles.circleContainer]}>
+        <View style={[styles.mainCircle, dynamicStyles.mainCircle]} />
+        <Animated.View style={[styles.smallCircle, dynamicStyles.smallCircle, circle1Style]} />
+        <Animated.View style={[styles.smallCircle, dynamicStyles.smallCircle, circle2Style]} />
+      </View>
+      {showText && (
+        <>
+          <Text style={[styles.title, { color: colors.primary }]}>CupCircle</Text>
+          <Text style={[styles.subtitle, { color: colors.primary }]}>Where every cup connects</Text>
+        </>
+      )}
     </View>
-    <Text style={[styles.title, { color: colors.primary }]}>CupCircle</Text>
-    <Text style={[styles.subtitle, { color: colors.primary }]}>Where every cup connects</Text>
-  </View>
-)
-};
+  );
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -81,23 +107,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   circleContainer: {
-    width: 96,
-    height: 96,
     alignItems: 'center',
     justifyContent: 'center',
   },
   mainCircle: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
     borderWidth: 2,
     borderColor: '#F97415',
     position: 'absolute',
   },
   smallCircle: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
     backgroundColor: '#F97415',
     position: 'absolute',
   },

@@ -160,7 +160,7 @@ export default function LoginScreen() {
           <View style={styles.content}>
             {/* Logo & Branding */}
             <View style={styles.header}>
-              <LogoAnimation />
+              <LogoAnimation showText={true} />
             </View>
 
             {/* Form Container */}
