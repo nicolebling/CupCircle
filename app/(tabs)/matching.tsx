@@ -1028,7 +1028,12 @@ export default function MatchingScreen() {
                   styles.clearButton,
                   { borderColor: colors.border },
                 ]}
-                onPress={() => setFilterModalVisible(false)}
+                onPress={() => {
+                  setFilterKeyword("");
+                  setFilterIndustries([]);
+                  setFilterExperienceLevels([]);
+                  setFilterInterests([]);
+                }}
               >
                 <Text style={{ color: colors.text }}>Clear All</Text>
               </TouchableOpacity>
