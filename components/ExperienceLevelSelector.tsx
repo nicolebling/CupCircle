@@ -41,7 +41,7 @@ export default function ExperienceLevelSelector(props: ExperienceLevelSelectorPr
 
   const getDisplayText = () => {
     if (!selected || (Array.isArray(selected) && selected.length === 0)) {
-      return { text: 'Select your experience level', isPlaceholder: true };
+      return { text: 'Select experience level', isPlaceholder: true };
     }
 
     if (Array.isArray(selected)) {

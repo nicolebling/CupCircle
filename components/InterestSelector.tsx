@@ -168,7 +168,7 @@ export default function InterestSelector({
             <Text
               style={[styles.selectorText, { color: colors.secondaryText }]}
             >
-              Select your interests
+              Select interests
             </Text>
           )}
         </View>

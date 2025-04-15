@@ -942,7 +942,30 @@ export default function MatchingScreen() {
                 <Ionicons name="close" size={24} color={colors.text} />
               </TouchableOpacity>
             </View>
+
+           
+            
             <ScrollView style={styles.modalBody}>
+
+              <Text style={[styles.filterLabel, { color: colors.text }]}>
+                Keyword Search
+              </Text>
+              <View style={[styles.searchContainer, { backgroundColor: colors.input, borderColor: colors.border }]}>
+                <Ionicons name="search" size={20} color={colors.secondaryText} />
+                <TextInput
+                  style={[styles.searchInput, { color: colors.text }]}
+                  placeholder="Enter a keyword to search profiles..."
+                  placeholderTextColor={colors.secondaryText}
+                  value={filterKeyword}
+                  onChangeText={setFilterKeyword}
+                />
+                {filterKeyword.length > 0 && (
+                  <TouchableOpacity onPress={() => setFilterKeyword("")}>
+                    <Ionicons name="close-circle" size={20} color={colors.secondaryText} />
+                  </TouchableOpacity>
+                )}
+              </View>
+              
               <Text style={[styles.filterLabel, { color: colors.text }]}>
                 Industry
               </Text>
@@ -996,25 +1019,6 @@ export default function MatchingScreen() {
                 isDark={false}
                 viewSelectionTracker={false}
               />
-
-              <Text style={[styles.filterLabel, { color: colors.text }]}>
-                Keyword Search
-              </Text>
-              <View style={[styles.searchContainer, { backgroundColor: colors.input, borderColor: colors.border }]}>
-                <Ionicons name="search" size={20} color={colors.secondaryText} />
-                <TextInput
-                  style={[styles.searchInput, { color: colors.text }]}
-                  placeholder="Enter keyword to search profiles..."
-                  placeholderTextColor={colors.secondaryText}
-                  value={filterKeyword}
-                  onChangeText={setFilterKeyword}
-                />
-                {filterKeyword.length > 0 && (
-                  <TouchableOpacity onPress={() => setFilterKeyword("")}>
-                    <Ionicons name="close-circle" size={20} color={colors.secondaryText} />
-                  </TouchableOpacity>
-                )}
-              </View>
             
             </ScrollView>
             <View style={styles.modalFooter}>
@@ -1238,11 +1242,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.5)",
     justifyContent: "flex-end",
+    
   },
   modalContent: {
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 20,
+    paddingBottom: 60,
     height: "80%",
   },
   modalHeader: {
@@ -1296,10 +1302,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderWidth: 1,
     borderRadius: 8,
-    marginHorizontal: 16,
     paddingHorizontal: 12,
-    height: 44,
-    marginBottom: 16,
+    height: 48,
+   
   },
   searchInput: {
     flex: 1,
