@@ -369,41 +369,30 @@ export default function MatchingScreen() {
     if (profiles.length > 0 && currentIndex < profiles.length) {
       console.log(`Liked ${profiles[currentIndex].name}`);
 
-      // Fade out current card
+      // Fade out current card (200ms → 600ms)
       cardOpacity.value = withTiming(0, {
-        duration: 200,
+        duration: 400,
         easing: Easing.out(Easing.ease),
       });
 
-      // Here you would typically send a like request to your backend
-      // For example: createMatch(profiles[currentIndex].id)
+      // Delay before moving to next profile (200ms → 600ms)
+      setTimeout(() => {
+        if (currentIndex < profiles.length - 1) {
+          setCurrentIndex(currentIndex + 1);
+          cardOpacity.value = 0;
 
-      // Show match animation randomly (simulate mutual match)
-      if (Math.random() > 0.7) {
-        setTimeout(() => {
-          setMatchAnimation(true);
-          setTimeout(() => setMatchAnimation(false), 3000);
-        }, 500);
-      }
+          // Animate new card in (800ms → 2400ms)
+          setTimeout(() => {
+            cardOpacity.value = withTiming(1, {
+              duration: 2400,
+              easing: Easing.bezier(0.2, 0, 0.2, 1),
+            });
+          }, 400); // optional delay before fade-in
+        }
+      }, 600);
     }
-
-    // Small delay before moving to next profile
-    setTimeout(() => {
-      if (currentIndex < profiles.length - 1) {
-        setCurrentIndex(currentIndex + 1);
-        // Reset animation values
-        cardOpacity.value = 0;
-
-        // Animate new card in with slight delay
-        setTimeout(() => {
-          cardOpacity.value = withTiming(1, {
-            duration: 800,
-            easing: Easing.bezier(0.2, 0, 0.2, 1),
-          });
-        }, 2000);
-      }
-    }, 200);
   };
+
 
   const handlePrevious = () => {
     if (currentIndex > 0) {
