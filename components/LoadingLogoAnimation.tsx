@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from 'react';
 import { View, StyleSheet, Animated, Easing } from 'react-native';
 import Colors from '@/constants/Colors';
@@ -47,7 +46,7 @@ export default function LoadingLogoAnimation() {
           outputRange: ['0deg', '360deg']
         })
       },
-      { translateY: -3 },
+      { translateY: -9 },
     ],
   };
 
@@ -58,7 +57,7 @@ export default function LoadingLogoAnimation() {
           outputRange: ['180deg', '540deg']
         })
       },
-      { translateY: -3 },
+      { translateY: -9 },
     ],
   };
 
