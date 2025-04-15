@@ -17,7 +17,7 @@ import {
 import Colors from "@/constants/Colors";
 import ProfileCard from "@/components/ProfileCard";
 import { Ionicons } from "@expo/vector-icons";
-import LogoAnimation from "@/components/LogoAnimation";
+import LoadingLogoAnimation from "@/components/LoadingLogoAnimation";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -551,7 +551,7 @@ export default function MatchingScreen() {
           <View style={[styles.cardsContainer, { width: "100%" }]}>
             {isLoading ? (
               <View style={styles.loadingContainer}>
-                <LogoAnimation />
+                <LoadingLogoAnimation />
                 <Text style={[styles.loadingText, { color: colors.text }]}>
                   Brewing your circle......
                 </Text>
