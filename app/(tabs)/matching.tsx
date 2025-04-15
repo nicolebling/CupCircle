@@ -369,52 +369,40 @@ export default function MatchingScreen() {
     if (profiles.length > 0 && currentIndex < profiles.length) {
       console.log(`Liked ${profiles[currentIndex].name}`);
 
-      // Fade out current card (200ms → 600ms)
-      cardOpacity.value = withTiming(0, {
-        duration: 400,
-        easing: Easing.out(Easing.ease),
-      });
+      // Instantly hide current card
+      cardOpacity.value = 0;
 
-      // Delay before moving to next profile (200ms → 600ms)
-      setTimeout(() => {
-        if (currentIndex < profiles.length - 1) {
-          setCurrentIndex(currentIndex + 1);
-          cardOpacity.value = 0;
-
-          // Animate new card in (800ms → 2400ms)
-          setTimeout(() => {
-            cardOpacity.value = withTiming(1, {
-              duration: 2400,
-              easing: Easing.bezier(0.2, 0, 0.2, 1),
-            });
-          }, 400); // optional delay before fade-in
-        }
-      }, 600);
+      // Move to next profile immediately
+      if (currentIndex < profiles.length - 1) {
+        setCurrentIndex(currentIndex + 1);
+        
+        // Fade in new card with a smooth animation
+        setTimeout(() => {
+          cardOpacity.value = withTiming(1, {
+            duration: 1200,
+            easing: Easing.bezier(0.4, 0, 0.2, 1),
+          });
+        }, 100);
+      }
     }
   };
 
 
   const handlePrevious = () => {
     if (currentIndex > 0) {
-      // Fade out current card
-      cardOpacity.value = withTiming(0, {
-        duration: 200,
-        easing: Easing.out(Easing.ease),
-      });
+      // Instantly hide current card
+      cardOpacity.value = 0;
 
+      // Move to previous profile immediately
+      setCurrentIndex(currentIndex - 1);
+      
+      // Fade in previous card with a smooth animation
       setTimeout(() => {
-        setCurrentIndex(currentIndex - 1);
-        // Set initial position for new card
-        cardOpacity.value = 0;
-
-        // Animate new card in with slight delay
-        setTimeout(() => {
-          cardOpacity.value = withTiming(1, {
-            duration: 800,
-            easing: Easing.bezier(0.2, 0, 0.2, 1),
-          });
-        }, 2000);
-      }, 200);
+        cardOpacity.value = withTiming(1, {
+          duration: 1200,
+          easing: Easing.bezier(0.4, 0, 0.2, 1),
+        });
+      }, 100);
     }
   };
 
