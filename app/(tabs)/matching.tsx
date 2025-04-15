@@ -338,7 +338,33 @@ export default function MatchingScreen() {
             (profile.interests && 
              profile.interests.some(interest => filterInterests.includes(interest)));
 
-          return hasAvailability && matchesIndustry && matchesExperience && matchesInterests;
+          // Check keyword filter if any
+          const matchesKeyword = !filterKeyword || filterKeyword.trim() === '' || (() => {
+            const keyword = filterKeyword.toLowerCase().trim();
+            
+            // Check bio
+            if (profile.bio?.toLowerCase().includes(keyword)) return true;
+            
+            // Check education
+            if (profile.education?.toLowerCase().includes(keyword)) return true;
+            
+            // Check employment history
+            if (profile.employment?.some(job => {
+              const jobData = typeof job === 'string' ? JSON.parse(job) : job;
+              return jobData.company.toLowerCase().includes(keyword) || 
+                     jobData.position.toLowerCase().includes(keyword);
+            })) return true;
+            
+            // Check career transitions
+            if (profile.career_transitions?.some(transition => {
+              return transition.position1?.toLowerCase().includes(keyword) ||
+                     transition.position2?.toLowerCase().includes(keyword);
+            })) return true;
+            
+            return false;
+          })();
+
+          return hasAvailability && matchesIndustry && matchesExperience && matchesInterests && matchesKeyword;
         })
         .map((profile) => {
           let interests = [];
