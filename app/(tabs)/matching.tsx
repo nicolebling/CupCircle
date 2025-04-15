@@ -369,40 +369,31 @@ export default function MatchingScreen() {
     if (profiles.length > 0 && currentIndex < profiles.length) {
       console.log(`Liked ${profiles[currentIndex].name}`);
 
-      // Instantly hide current card
-      cardOpacity.value = 0;
-
-      // Move to next profile immediately
       if (currentIndex < profiles.length - 1) {
+        // Set opacity to 0 for initial state of next card
+        cardOpacity.value = 0;
         setCurrentIndex(currentIndex + 1);
         
-        // Fade in new card with a smooth animation
-        setTimeout(() => {
-          cardOpacity.value = withTiming(1, {
-            duration: 1200,
-            easing: Easing.bezier(0.4, 0, 0.2, 1),
-          });
-        }, 100);
+        // Smoothly fade in the next card
+        cardOpacity.value = withTiming(1, {
+          duration: 800,
+          easing: Easing.bezier(0.4, 0, 0.2, 1),
+        });
       }
     }
   };
 
-
   const handlePrevious = () => {
     if (currentIndex > 0) {
-      // Instantly hide current card
+      // Set opacity to 0 for initial state of previous card
       cardOpacity.value = 0;
-
-      // Move to previous profile immediately
       setCurrentIndex(currentIndex - 1);
       
-      // Fade in previous card with a smooth animation
-      setTimeout(() => {
-        cardOpacity.value = withTiming(1, {
-          duration: 1200,
-          easing: Easing.bezier(0.4, 0, 0.2, 1),
-        });
-      }, 100);
+      // Smoothly fade in the previous card
+      cardOpacity.value = withTiming(1, {
+        duration: 800,
+        easing: Easing.bezier(0.4, 0, 0.2, 1),
+      });
     }
   };
 
