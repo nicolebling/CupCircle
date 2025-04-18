@@ -13,6 +13,7 @@ import {
   Platform,
   TouchableWithoutFeedback,
   Keyboard,
+  Alert,
 } from "react-native";
 import Colors from "@/constants/Colors";
 import ProfileCard from "@/components/ProfileCard";
@@ -469,7 +470,7 @@ export default function MatchingScreen() {
     return cafes && cafes.length > 0;
   };
 
-  const handleLike = () => {
+  const handleNext = () => {
     if (profiles.length > 0 && currentIndex < profiles.length - 1) {
       console.log(`Liked ${profiles[currentIndex].name}`);
       cardOpacity.value = 0; // prepare next card to start invisible
@@ -494,7 +495,7 @@ export default function MatchingScreen() {
     setIsLoading(true);
     setFilterModalVisible(false);
     setCurrentIndex(0); // Reset to first profile
-    
+
     // Re-fetch profiles with filters
     await fetchProfiles();
     setIsLoading(false);
@@ -530,38 +531,43 @@ export default function MatchingScreen() {
     <SafeAreaView
       style={[styles.container, { backgroundColor: colors.background }]}
     >
-      {!isLoading && profiles.length > 0 && hasAvailability && currentIndex < profiles.length && (
-        <View style={styles.navigationFloating}>
-          <TouchableOpacity
-            onPress={handlePrevious}
-            style={[
-              styles.floatingButton,
-              styles.leftButton,
-              { opacity: currentIndex > 0 ? 1 : 0.5 },
-            ]}
-            disabled={currentIndex === 0}
-          >
-            <Ionicons name="arrow-back" size={24} color={colors.primary} />
-          </TouchableOpacity>
+      {!isLoading &&
+        profiles.length > 0 &&
+        hasAvailability &&
+        currentIndex < profiles.length && (
+          <View style={styles.navigationFloating}>
+            {currentIndex > 0 && (
+              <TouchableOpacity
+                onPress={handlePrevious}
+                style={[styles.floatingButton, styles.leftButton]}
+              >
+                <Ionicons name="arrow-back" size={24} color={colors.primary} />
+              </TouchableOpacity>
+            )}
 
-          <TouchableOpacity
-            onPress={handleLike}
-            style={[
-              styles.floatingButton,
-              styles.rightButton,
-              {
-                opacity:
-                  currentIndex > 0 && currentIndex == profiles.length - 1
-                    ? 0.5
-                    : 1,
-              },
-            ]}
-            disabled={currentIndex == profiles.length - 1}
-          >
-            <Ionicons name="arrow-forward" size={24} color={colors.primary} />
-          </TouchableOpacity>
-        </View>
-      )}
+            <TouchableOpacity
+              onPress={() => {
+                if (currentIndex === profiles.length - 1) {
+                  Alert.alert(
+                    "End of the list",
+                    "You've reached the end of the list. Check back later for more connections.",
+                  );
+                } else {
+                  handleNext(); // move to next profile
+                }
+              }}
+              style={[
+                styles.floatingButton,
+                styles.rightButton,
+                {
+                  opacity: currentIndex === profiles.length - 1 ? 0.5 : 1,
+                },
+              ]}
+            >
+              <Ionicons name="arrow-forward" size={24} color={colors.primary} />
+            </TouchableOpacity>
+          </View>
+        )}
       {!isLoading && profiles.length === 0 ? (
         <View style={[styles.cardsContainer, { justifyContent: "center" }]}>
           <View
