@@ -490,12 +490,14 @@ export default function MatchingScreen() {
   // Make the function available to the header
   global.matchingScreen.openFilterModal = openFilterModal;
 
-  const applyFilters = () => {
+  const applyFilters = async () => {
     setIsLoading(true);
     setFilterModalVisible(false);
-
+    setCurrentIndex(0); // Reset to first profile
+    
     // Re-fetch profiles with filters
-    fetchProfiles();
+    await fetchProfiles();
+    setIsLoading(false);
   };
 
   const renderNoAvailabilityMessage = () => (
