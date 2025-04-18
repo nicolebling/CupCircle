@@ -33,6 +33,7 @@ import { useRouter } from "expo-router"; // Import useRouter
 import IndustrySelector from "@/components/IndustrySelector";
 import ExperienceLevelSelector from "@/components/ExperienceLevelSelector";
 import InterestSelector from "@/components/InterestSelector";
+import LogoAnimation from "@/components/LogoAnimation";
 
 // Define the profile type for better type checking
 interface Profile {
@@ -82,8 +83,9 @@ export default function MatchingScreen() {
   const [isFilterModalVisible, setFilterModalVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [filterIndustries, setFilterIndustries] = useState<string[]>([]);
-  const [filterExperienceLevels, setFilterExperienceLevels] = 
-    useState<string[]>([]);
+  const [filterExperienceLevels, setFilterExperienceLevels] = useState<
+    string[]
+  >([]);
   const [filterInterests, setFilterInterests] = useState<string[]>([]);
   const [filterKeyword, setFilterKeyword] = useState("");
   const [matchAnimation, setMatchAnimation] = useState(false);
@@ -112,9 +114,9 @@ export default function MatchingScreen() {
   // Reset animation values when currentIndex changes
   useEffect(() => {
     cardOpacity.value = withTiming(1, {
-        duration: 800,
-        easing: Easing.bezier(0.4, 0, 0.2, 1),
-      });
+      duration: 800,
+      easing: Easing.bezier(0.4, 0, 0.2, 1),
+    });
     cardTranslateY.value = 0;
     cardOffset.value = 0;
     cardRotate.value = 0;
@@ -323,49 +325,97 @@ export default function MatchingScreen() {
         .filter((profile) => {
           // First check if profile has availability
           const hasAvailability = userAvailabilityMap[profile.id]?.length > 0;
-          
+
           // Then check industry filter if any are selected
-          const matchesIndustry = filterIndustries.length === 0 || 
-            (profile.industry_categories && 
-             profile.industry_categories.some(industry => filterIndustries.includes(industry)));
+          const matchesIndustry =
+            filterIndustries.length === 0 ||
+            (profile.industry_categories &&
+              profile.industry_categories.some((industry) =>
+                filterIndustries.includes(industry),
+              ));
 
           // Check experience level filter if any are selected
-          const matchesExperience = filterExperienceLevels.length === 0 ||
-            (profile.experience_level && 
-             filterExperienceLevels.includes(profile.experience_level));
-             
+          const matchesExperience =
+            filterExperienceLevels.length === 0 ||
+            (profile.experience_level &&
+              filterExperienceLevels.includes(profile.experience_level));
+
           // Check interests filter if any are selected
-          const matchesInterests = filterInterests.length === 0 ||
-            (profile.interests && 
-             profile.interests.some(interest => filterInterests.includes(interest)));
+          const matchesInterests =
+            filterInterests.length === 0 ||
+            (profile.interests &&
+              profile.interests.some((interest) =>
+                filterInterests.includes(interest),
+              ));
 
           // Check keyword filter if any
-          const matchesKeyword = !filterKeyword || filterKeyword.trim() === '' || (() => {
-            const keyword = filterKeyword.toLowerCase().trim();
-            
-            // Check bio
-            if (profile.bio?.toLowerCase().includes(keyword)) return true;
-            
-            // Check education
-            if (profile.education?.toLowerCase().includes(keyword)) return true;
-            
-            // Check employment history
-            if (profile.employment?.some(job => {
-              const jobData = typeof job === 'string' ? JSON.parse(job) : job;
-              return jobData.company.toLowerCase().includes(keyword) || 
-                     jobData.position.toLowerCase().includes(keyword);
-            })) return true;
-            
-            // Check career transitions
-            if (profile.career_transitions?.some(transition => {
-              return transition.position1?.toLowerCase().includes(keyword) ||
-                     transition.position2?.toLowerCase().includes(keyword);
-            })) return true;
-            
-            return false;
-          })();
+          const matchesKeyword =
+            !filterKeyword ||
+            filterKeyword.trim() === "" ||
+            (() => {
+              const keyword = filterKeyword.toLowerCase().trim();
 
-          return hasAvailability && matchesIndustry && matchesExperience && matchesInterests && matchesKeyword;
+              // Check bio
+              if (profile.bio?.toLowerCase().includes(keyword.toLowerCase()))
+                return true;
+
+              // Check occupation
+              if (
+                profile.occupation
+                  ?.toLowerCase()
+                  .includes(keyword.toLowerCase())
+              )
+                return true;
+
+              // Check education
+              if (
+                profile.education?.toLowerCase().includes(keyword.toLowerCase())
+              )
+                return true;
+
+              // Check employment history
+              if (
+                profile.employment?.some((job) => {
+                  const jobData =
+                    typeof job === "string" ? JSON.parse(job) : job;
+                  return (
+                    jobData.company
+                      .toLowerCase()
+                      .includes(keyword.toLowerCase()) ||
+                    jobData.position
+                      .toLowerCase()
+                      .includes(keyword.toLowerCase())
+                  );
+                })
+              )
+                return true;
+
+              // Check career transitions
+              if (
+                profile.career_transitions?.some((transition) => {
+                  return (
+                    transition.position1
+                      ?.toLowerCase()
+                      .includes(keyword.toLowerCase()) ||
+                    transition.position2
+                      ?.toLowerCase()
+                      .includes(keyword.toLowerCase())
+                  );
+                })
+              )
+                console.log("!!!!!!!!!!!"+ TransitionEvent.position1?.toLowerCase() && 
+                return true;
+
+              return false;
+            })();
+
+          return (
+            hasAvailability &&
+            matchesIndustry &&
+            matchesExperience &&
+            matchesInterests &&
+            matchesKeyword
+          );
         })
         .map((profile) => {
           let interests = [];
@@ -430,7 +480,6 @@ export default function MatchingScreen() {
       setCurrentIndex(currentIndex - 1); // trigger re-render, fade handled in useEffect
     }
   };
-
 
   const openFilterModal = () => {
     setFilterModalVisible(true);
@@ -551,7 +600,7 @@ export default function MatchingScreen() {
           <View style={[styles.cardsContainer, { width: "100%" }]}>
             {isLoading ? (
               <View style={styles.loadingContainer}>
-                <LogoAnimation size={20} />
+                <LogoAnimation size={96} />
                 <Text style={[styles.loadingText, { color: colors.text }]}>
                   Brewing your circle......
                 </Text>
@@ -990,15 +1039,21 @@ export default function MatchingScreen() {
               </TouchableOpacity>
             </View>
 
-           
-            
             <ScrollView style={styles.modalBody}>
-
               <Text style={[styles.filterLabel, { color: colors.text }]}>
                 Keyword Search
               </Text>
-              <View style={[styles.searchContainer, { backgroundColor: colors.input, borderColor: colors.border }]}>
-                <Ionicons name="search" size={20} color={colors.secondaryText} />
+              <View
+                style={[
+                  styles.searchContainer,
+                  { backgroundColor: colors.input, borderColor: colors.border },
+                ]}
+              >
+                <Ionicons
+                  name="search"
+                  size={20}
+                  color={colors.secondaryText}
+                />
                 <TextInput
                   style={[styles.searchInput, { color: colors.text }]}
                   placeholder="Enter a keyword to search profiles..."
@@ -1008,11 +1063,15 @@ export default function MatchingScreen() {
                 />
                 {filterKeyword.length > 0 && (
                   <TouchableOpacity onPress={() => setFilterKeyword("")}>
-                    <Ionicons name="close-circle" size={20} color={colors.secondaryText} />
+                    <Ionicons
+                      name="close-circle"
+                      size={20}
+                      color={colors.secondaryText}
+                    />
                   </TouchableOpacity>
                 )}
               </View>
-              
+
               <Text style={[styles.filterLabel, { color: colors.text }]}>
                 Industry
               </Text>
@@ -1031,9 +1090,14 @@ export default function MatchingScreen() {
                 selected={filterExperienceLevels}
                 onChange={(level) => {
                   if (filterExperienceLevels.includes(level)) {
-                    setFilterExperienceLevels(filterExperienceLevels.filter(l => l !== level));
+                    setFilterExperienceLevels(
+                      filterExperienceLevels.filter((l) => l !== level),
+                    );
                   } else {
-                    setFilterExperienceLevels([...filterExperienceLevels, level]);
+                    setFilterExperienceLevels([
+                      ...filterExperienceLevels,
+                      level,
+                    ]);
                   }
                 }}
                 multiSelect={true}
@@ -1045,10 +1109,18 @@ export default function MatchingScreen() {
                       key={index}
                       style={[
                         styles.selectedTag,
-                        { backgroundColor: "transparent", borderColor: colors.primary },
+                        {
+                          backgroundColor: "transparent",
+                          borderColor: colors.primary,
+                        },
                       ]}
                     >
-                      <Text style={[styles.selectedTagText, { color: colors.primary }]}>
+                      <Text
+                        style={[
+                          styles.selectedTagText,
+                          { color: colors.primary },
+                        ]}
+                      >
                         {level}
                       </Text>
                     </View>
@@ -1066,7 +1138,6 @@ export default function MatchingScreen() {
                 isDark={false}
                 viewSelectionTracker={false}
               />
-            
             </ScrollView>
             <View style={styles.modalFooter}>
               <TouchableOpacity
@@ -1294,7 +1365,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.5)",
     justifyContent: "flex-end",
-    
   },
   modalContent: {
     borderTopLeftRadius: 20,
@@ -1356,7 +1426,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 12,
     height: 48,
-   
   },
   searchInput: {
     flex: 1,
