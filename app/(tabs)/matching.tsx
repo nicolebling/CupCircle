@@ -172,9 +172,13 @@ export default function MatchingScreen() {
         setHasAvailability(hasValidAvailability);
 
         // Always fetch profiles - we'll show appropriate UI based on hasAvailability state
-        fetchProfiles();
+        if (hasValidAvailability) {
+          // Only fetch profiles if user has valid availability
+          await fetchProfiles();
+        }
       } catch (error) {
         console.error("Error checking availability:", error);
+      } finally {
         setIsLoading(false);
       }
     };
