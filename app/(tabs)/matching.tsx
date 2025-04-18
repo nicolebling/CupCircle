@@ -57,6 +57,7 @@ interface Profile {
   interests: string[];
   matchedCafe?: boolean;
   employment?: string[];
+  career_transitions?: string[];
   availabilitySlots: TimeSlot[];
 }
 
@@ -355,7 +356,6 @@ export default function MatchingScreen() {
             (() => {
               const keyword = filterKeyword.toLowerCase().trim();
 
-              // Check bio
               if (profile.bio?.toLowerCase().includes(keyword.toLowerCase()))
                 return true;
 
@@ -393,17 +393,20 @@ export default function MatchingScreen() {
               // Check career transitions
               if (
                 profile.career_transitions?.some((transition) => {
+                  const careerTransition =
+                    typeof transition === "string"
+                      ? JSON.parse(transition)
+                      : transition;
                   return (
-                    transition.position1
+                    careerTransition.position1
                       ?.toLowerCase()
                       .includes(keyword.toLowerCase()) ||
-                    transition.position2
+                    careerTransition.position2
                       ?.toLowerCase()
                       .includes(keyword.toLowerCase())
                   );
                 })
               )
-                console.log("!!!!!!!!!!!"+ TransitionEvent.position1?.toLowerCase() && 
                 return true;
 
               return false;
@@ -428,10 +431,10 @@ export default function MatchingScreen() {
           console.log("Processing profile:", profile.id, profile.name);
           const formattedProfile = {
             id: profile.id,
-            name: profile.name || "Anonymous User",
+            name: profile.name,
             photo: profile.photo_url || "https://via.placeholder.com/150",
-            occupation: profile.occupation || "Professional",
-            bio: profile.bio || "No bio available",
+            occupation: profile.occupation,
+            bio: profile.bio,
             experience_level: profile.experience_level,
             city: profile.city,
             education: profile.education,
