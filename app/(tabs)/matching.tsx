@@ -459,10 +459,10 @@ export default function MatchingScreen() {
         });
 
       console.log("Formatted profiles:", formattedProfiles.length);
-      
+
       // Store all profiles and set pagination
       setAllProfiles(formattedProfiles);
-      
+
       // Check if there are more than PROFILES_PER_PAGE profiles
       if (formattedProfiles.length > PROFILES_PER_PAGE) {
         // Only show first page of profiles
@@ -472,7 +472,7 @@ export default function MatchingScreen() {
         setProfiles(formattedProfiles);
         setHasMoreProfiles(false);
       }
-      
+
       // Reset pagination state
       setCurrentPage(0);
       setCurrentIndex(0);
@@ -482,22 +482,22 @@ export default function MatchingScreen() {
       setIsLoading(false);
     }
   };
-  
+
   // Load next page of profiles
   const loadNextProfilesPage = () => {
     setIsLoading(true);
-    
+
     // Calculate next page start and end indices
     const nextPage = currentPage + 1;
     const startIdx = nextPage * PROFILES_PER_PAGE;
     const endIdx = startIdx + PROFILES_PER_PAGE;
-    
+
     // Get profiles for next page
     const nextPageProfiles = allProfiles.slice(startIdx, endIdx);
-    
+
     // Check if there are more profiles after this page
     setHasMoreProfiles(endIdx < allProfiles.length);
-    
+
     // Update state
     setProfiles(nextPageProfiles);
     setCurrentPage(nextPage);
@@ -698,7 +698,11 @@ export default function MatchingScreen() {
                   { backgroundColor: colors.card, borderColor: colors.border },
                 ]}
               >
-                <Ionicons name="refresh-circle" size={48} color={colors.primary} />
+                <Ionicons
+                  name="refresh-circle"
+                  size={48}
+                  color={colors.primary}
+                />
                 <Text style={[styles.noMoreText, { color: colors.text }]}>
                   More profiles available!
                 </Text>
@@ -708,7 +712,8 @@ export default function MatchingScreen() {
                     { color: colors.secondaryText },
                   ]}
                 >
-                  You've viewed all profiles on this page. Load more to continue exploring connections.
+                  You've viewed all profiles on this page. Load more to continue
+                  exploring connections.
                 </Text>
                 <TouchableOpacity
                   style={[
@@ -1070,8 +1075,8 @@ export default function MatchingScreen() {
               >
                 <Ionicons name="cafe" size={48} color={colors.primary} />
                 <Text style={[styles.noMoreText, { color: colors.text }]}>
-                  {hasMoreProfiles 
-                    ? "Ready for more connections?" 
+                  {hasMoreProfiles
+                    ? "Ready for more connections?"
                     : "No more profiles to show"}
                 </Text>
                 <Text
@@ -1080,8 +1085,8 @@ export default function MatchingScreen() {
                     { color: colors.secondaryText },
                   ]}
                 >
-                  {hasMoreProfiles 
-                    ? "You've seen all profiles on this page. Load more to continue exploring!" 
+                  {hasMoreProfiles
+                    ? "You've seen all profiles on this page. Load more to continue exploring!"
                     : "You've seen all available profiles! Check back later for more connections."}
                 </Text>
                 <TouchableOpacity
