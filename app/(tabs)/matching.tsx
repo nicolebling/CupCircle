@@ -81,7 +81,9 @@ export default function MatchingScreen() {
   const { user } = useAuth();
 
   const [profiles, setProfiles] = useState<Profile[]>([]);
+  const [allProfiles, setAllProfiles] = useState<Profile[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentPage, setCurrentPage] = useState(0);
   const [isFilterModalVisible, setFilterModalVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [filterIndustries, setFilterIndustries] = useState<string[]>([]);
@@ -95,6 +97,8 @@ export default function MatchingScreen() {
   const [messageText, setMessageText] = useState("");
   const [selectedCafe, setSelectedCafe] = useState("");
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
+  const [hasMoreProfiles, setHasMoreProfiles] = useState(false);
+  const PROFILES_PER_PAGE = 10;
 
   // Animation values
   const cardOffset = useSharedValue(0);
@@ -455,12 +459,50 @@ export default function MatchingScreen() {
         });
 
       console.log("Formatted profiles:", formattedProfiles.length);
-      setProfiles(formattedProfiles);
+      
+      // Store all profiles and set pagination
+      setAllProfiles(formattedProfiles);
+      
+      // Check if there are more than PROFILES_PER_PAGE profiles
+      if (formattedProfiles.length > PROFILES_PER_PAGE) {
+        // Only show first page of profiles
+        setProfiles(formattedProfiles.slice(0, PROFILES_PER_PAGE));
+        setHasMoreProfiles(true);
+      } else {
+        setProfiles(formattedProfiles);
+        setHasMoreProfiles(false);
+      }
+      
+      // Reset pagination state
+      setCurrentPage(0);
+      setCurrentIndex(0);
     } catch (error) {
       console.error("Error fetching profiles:", error);
     } finally {
       setIsLoading(false);
     }
+  };
+  
+  // Load next page of profiles
+  const loadNextProfilesPage = () => {
+    setIsLoading(true);
+    
+    // Calculate next page start and end indices
+    const nextPage = currentPage + 1;
+    const startIdx = nextPage * PROFILES_PER_PAGE;
+    const endIdx = startIdx + PROFILES_PER_PAGE;
+    
+    // Get profiles for next page
+    const nextPageProfiles = allProfiles.slice(startIdx, endIdx);
+    
+    // Check if there are more profiles after this page
+    setHasMoreProfiles(endIdx < allProfiles.length);
+    
+    // Update state
+    setProfiles(nextPageProfiles);
+    setCurrentPage(nextPage);
+    setCurrentIndex(0);
+    setIsLoading(false);
   };
 
   // Simplified function to check if there's a cafe match
@@ -646,6 +688,36 @@ export default function MatchingScreen() {
                   onPress={openFilterModal}
                 >
                   <Text style={styles.refreshButtonText}>Adjust Filters</Text>
+                </TouchableOpacity>
+              </View>
+            ) : hasMoreProfiles && currentIndex >= profiles.length ? (
+              // Show refresh card when we've reached the end of the current page of profiles
+              <View
+                style={[
+                  styles.noMoreCard,
+                  { backgroundColor: colors.card, borderColor: colors.border },
+                ]}
+              >
+                <Ionicons name="refresh-circle" size={48} color={colors.primary} />
+                <Text style={[styles.noMoreText, { color: colors.text }]}>
+                  More profiles available!
+                </Text>
+                <Text
+                  style={[
+                    styles.checkBackText,
+                    { color: colors.secondaryText },
+                  ]}
+                >
+                  You've viewed all profiles on this page. Load more to continue exploring connections.
+                </Text>
+                <TouchableOpacity
+                  style={[
+                    styles.refreshButton,
+                    { backgroundColor: colors.primary },
+                  ]}
+                  onPress={loadNextProfilesPage}
+                >
+                  <Text style={styles.refreshButtonText}>Load More</Text>
                 </TouchableOpacity>
               </View>
             ) : currentIndex < profiles.length ? (
@@ -998,7 +1070,9 @@ export default function MatchingScreen() {
               >
                 <Ionicons name="cafe" size={48} color={colors.primary} />
                 <Text style={[styles.noMoreText, { color: colors.text }]}>
-                  No more profiles to show
+                  {hasMoreProfiles 
+                    ? "Ready for more connections?" 
+                    : "No more profiles to show"}
                 </Text>
                 <Text
                   style={[
@@ -1006,8 +1080,9 @@ export default function MatchingScreen() {
                     { color: colors.secondaryText },
                   ]}
                 >
-                  You've seen all available profiles! Check back later for more
-                  connections.
+                  {hasMoreProfiles 
+                    ? "You've seen all profiles on this page. Load more to continue exploring!" 
+                    : "You've seen all available profiles! Check back later for more connections."}
                 </Text>
                 <TouchableOpacity
                   style={[
@@ -1015,11 +1090,17 @@ export default function MatchingScreen() {
                     { backgroundColor: colors.primary },
                   ]}
                   onPress={() => {
-                    setCurrentIndex(0);
-                    fetchProfiles();
+                    if (hasMoreProfiles) {
+                      loadNextProfilesPage();
+                    } else {
+                      setCurrentIndex(0);
+                      fetchProfiles();
+                    }
                   }}
                 >
-                  <Text style={styles.refreshButtonText}>Refresh</Text>
+                  <Text style={styles.refreshButtonText}>
+                    {hasMoreProfiles ? "Load More" : "Refresh"}
+                  </Text>
                 </TouchableOpacity>
               </View>
             )}
