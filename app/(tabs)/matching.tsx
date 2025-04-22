@@ -514,7 +514,7 @@ export default function MatchingScreen() {
     // Update state
     // setProfiles(nextPageProfiles);
     setProfiles(nextPageProfiles);
-    setCurrentPage(currentPage);
+    setCurrentPage(nextPage);
     setCurrentIndex(0);
     setHasMoreProfiles(endIdx < allProfiles.length);
     setIsLoading(false);
