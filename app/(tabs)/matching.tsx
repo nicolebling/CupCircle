@@ -498,7 +498,7 @@ export default function MatchingScreen() {
   };
 
   // Load next page of profiles
-  const loadNextProfilesPage = () => {
+  const loadNextProfilesPage = async () => {
     // Prevent loading if already loading or no more profiles
     if (isLoading || !hasMoreProfiles) return;
 
@@ -508,17 +508,26 @@ export default function MatchingScreen() {
     const startIdx = nextPage * PROFILES_PER_PAGE;
     const endIdx = startIdx + PROFILES_PER_PAGE;
 
+    // Simulate network delay
+    await new Promise(resolve => setTimeout(resolve, 1500));
+
     // Slice next page profiles
     const nextPageProfiles = allProfiles.slice(startIdx, endIdx);
 
     // Update state
-    // setProfiles(nextPageProfiles);
     setProfiles(nextPageProfiles);
     setCurrentPage(nextPage);
     setCurrentIndex(0);
     setHasMoreProfiles(endIdx < allProfiles.length);
     setIsLoading(false);
   };
+
+  // Watch for currentIndex changes to auto-load more profiles
+  useEffect(() => {
+    if (currentIndex === profiles.length - 1 && hasMoreProfiles) {
+      loadNextProfilesPage();
+    }
+  }, [currentIndex]);
 
   // Simplified function to check if there's a cafe match
   // In a real implementation, you would compare with the current user's favorite cafes
