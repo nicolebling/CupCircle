@@ -513,7 +513,7 @@ export default function MatchingScreen() {
 
     // Update state
     // setProfiles(nextPageProfiles);
-    setProfiles(nextPageProfiles);
+    setProfiles([...profiles, ...nextPageProfiles]);
     setCurrentPage(nextPage);
     setCurrentIndex(0);
     setHasMoreProfiles(endIdx < allProfiles.length);
@@ -705,7 +705,7 @@ export default function MatchingScreen() {
                   <Text style={styles.refreshButtonText}>Adjust Filters</Text>
                 </TouchableOpacity>
               </View>
-            ) : hasMoreProfiles || currentIndex % 10 == 9 ? (
+            ) : hasMoreProfiles && currentIndex % 10 == 9 ? (
               // Show refresh card when we've reached the end of the current page of profiles
               <View
                 style={[
