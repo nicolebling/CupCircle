@@ -487,25 +487,36 @@ export default function MatchingScreen() {
     }
   };
 
+  const shuffleArray = (array) => {
+    const result = [...array]; //shallow copy
+    for (let i = result.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [result[i], result[j]] = [result[j], result[i]];
+    }
+
+    return result;
+  };
+
   // Load next page of profiles
   const loadNextProfilesPage = () => {
+    // Prevent loading if already loading or no more profiles
+    if (isLoading || !hasMoreProfiles) return;
+
     setIsLoading(true);
 
-    // Calculate next page start and end indices
     const nextPage = currentPage + 1;
     const startIdx = nextPage * PROFILES_PER_PAGE;
     const endIdx = startIdx + PROFILES_PER_PAGE;
 
-    // Get profiles for next page
+    // Slice next page profiles
     const nextPageProfiles = allProfiles.slice(startIdx, endIdx);
 
-    // Check if there are more profiles after this page
-    setHasMoreProfiles(endIdx < allProfiles.length);
-
     // Update state
+    // setProfiles(nextPageProfiles);
     setProfiles(nextPageProfiles);
     setCurrentPage(nextPage);
     setCurrentIndex(0);
+    setHasMoreProfiles(endIdx < allProfiles.length);
     setIsLoading(false);
   };
 
@@ -582,7 +593,7 @@ export default function MatchingScreen() {
         hasAvailability &&
         currentIndex < profiles.length && (
           <View style={styles.navigationFloating}>
-            {currentIndex > 0 && (
+            {currentIndex > 0 && ( //MISTAKEEEEEEE
               <TouchableOpacity
                 onPress={handlePrevious}
                 style={[styles.floatingButton, styles.leftButton]}
@@ -694,7 +705,7 @@ export default function MatchingScreen() {
                   <Text style={styles.refreshButtonText}>Adjust Filters</Text>
                 </TouchableOpacity>
               </View>
-            ) : hasMoreProfiles && currentIndex >= profiles.length ? (
+            ) : hasMoreProfiles || currentIndex % 10 == 9 ? (
               // Show refresh card when we've reached the end of the current page of profiles
               <View
                 style={[
