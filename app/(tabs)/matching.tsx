@@ -497,8 +497,7 @@ export default function MatchingScreen() {
     return result;
   };
 
-  // Load next page of profiles
-  const loadNextProfilesPage = () => {
+  const loadNextProfilesPage = async () => {
     // Prevent loading if already loading or no more profiles
     if (isLoading || !hasMoreProfiles) return;
 
@@ -508,17 +507,25 @@ export default function MatchingScreen() {
     const startIdx = nextPage * PROFILES_PER_PAGE;
     const endIdx = startIdx + PROFILES_PER_PAGE;
 
+    // Add artificial delay to show loading state
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
     // Slice next page profiles
     const nextPageProfiles = allProfiles.slice(startIdx, endIdx);
 
-    // Update state
-    // setProfiles(nextPageProfiles);
+    // Update state with new profiles
     setProfiles([...profiles, ...nextPageProfiles]);
     setCurrentPage(nextPage);
-    setCurrentIndex(0);
     setHasMoreProfiles(endIdx < allProfiles.length);
     setIsLoading(false);
   };
+
+  // Watch for currentIndex to auto-load more profiles
+  useEffect(() => {
+    if (currentIndex > 0 && currentIndex % PROFILES_PER_PAGE === PROFILES_PER_PAGE - 1) {
+      loadNextProfilesPage();
+    }
+  }, [currentIndex]);
 
   // Simplified function to check if there's a cafe match
   // In a real implementation, you would compare with the current user's favorite cafes
@@ -593,7 +600,7 @@ export default function MatchingScreen() {
         hasAvailability &&
         currentIndex < profiles.length && (
           <View style={styles.navigationFloating}>
-            {currentIndex > 0 && ( //MISTAKEEEEEEE
+            {currentIndex > 0 && (
               <TouchableOpacity
                 onPress={handlePrevious}
                 style={[styles.floatingButton, styles.leftButton]}
@@ -703,41 +710,6 @@ export default function MatchingScreen() {
                   onPress={openFilterModal}
                 >
                   <Text style={styles.refreshButtonText}>Adjust Filters</Text>
-                </TouchableOpacity>
-              </View>
-            ) : hasMoreProfiles && currentIndex % 10 == 9 ? (
-              // Show refresh card when we've reached the end of the current page of profiles
-              <View
-                style={[
-                  styles.noMoreCard,
-                  { backgroundColor: colors.card, borderColor: colors.border },
-                ]}
-              >
-                <Ionicons
-                  name="refresh-circle"
-                  size={48}
-                  color={colors.primary}
-                />
-                <Text style={[styles.noMoreText, { color: colors.text }]}>
-                  More profiles available!
-                </Text>
-                <Text
-                  style={[
-                    styles.checkBackText,
-                    { color: colors.secondaryText },
-                  ]}
-                >
-                  You've viewed all profiles on this page. Load more to continue
-                  exploring connections.
-                </Text>
-                <TouchableOpacity
-                  style={[
-                    styles.refreshButton,
-                    { backgroundColor: colors.primary },
-                  ]}
-                  onPress={loadNextProfilesPage}
-                >
-                  <Text style={styles.refreshButtonText}>Load More</Text>
                 </TouchableOpacity>
               </View>
             ) : currentIndex < profiles.length ? (
