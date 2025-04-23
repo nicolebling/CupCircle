@@ -1,282 +1,306 @@
-import { Image, StyleSheet, Platform, SafeAreaView } from 'react-native';
-
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
 
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Switch } from 'react-native';
+import Colors from '@/constants/Colors';
+import { useColorScheme } from '@/hooks/useColorScheme';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/contexts/AuthContext';
-import { useColorScheme } from '@/hooks/useColorScheme';
-import Colors from '@/constants/Colors';
 
-export default function HomeScreen() {
-  const { user } = useAuth();
+// Mock data for testing
+const MOCK_CHATS = [
+  {
+    id: '1',
+    partner: {
+      name: 'Alex Thompson',
+      photo: 'https://randomuser.me/api/portraits/men/32.jpg',
+      occupation: 'Software Engineer'
+    },
+    status: 'confirmed',
+    meetingDate: '2024-03-25',
+    meetingTime: '10:00 AM',
+    location: 'Blue Bottle Coffee, Downtown',
+    initialMessage: "Hi! I'd love to discuss tech innovations over coffee.",
+  },
+  {
+    id: '2',
+    partner: {
+      name: 'Sarah Chen',
+      photo: 'https://randomuser.me/api/portraits/women/44.jpg',
+      occupation: 'Product Manager'
+    },
+    status: 'pending_acceptance',
+    meetingDate: '2024-03-26',
+    meetingTime: '2:00 PM',
+    location: 'Starbucks Reserve, Financial District',
+    initialMessage: "Would love to chat about product management practices!",
+  },
+  {
+    id: '3',
+    partner: {
+      name: 'Mike Rogers',
+      photo: 'https://randomuser.me/api/portraits/men/67.jpg',
+      occupation: 'UX Designer'
+    },
+    status: 'pending',
+    meetingDate: '2024-03-27',
+    meetingTime: '3:30 PM',
+    location: 'Philz Coffee, Mission District',
+    initialMessage: "Let's discuss design systems and coffee!",
+  }
+];
+
+export default function CircleChatsScreen() {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
+  const { user } = useAuth();
+  const [showPastChats, setShowPastChats] = useState(false);
 
-  const [upcomingMeetings, setUpcomingMeetings] = useState([
-    { id: 1, name: 'Sarah Johnson', position: 'UX Designer', company: 'Design Co', date: 'Today, 2:00 PM', location: 'Coffee Bean', distance: '0.5 miles' },
-    { id: 2, name: 'Michael Chang', position: 'Software Engineer', company: 'Tech Solutions', date: 'Tomorrow, 10:00 AM', location: 'Starbucks', distance: '1.2 miles' },
-  ]);
+  const handleAction = (chatId: string, action: 'accept' | 'cancel' | 'message') => {
+    console.log(`${action} chat ${chatId}`);
+    // Implement action handlers
+  };
 
-  return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.header}>
-          <Text style={[styles.greeting, { color: colors.text }]}>Hello, {user?.displayName || 'Guest'}</Text>
-          <View style={styles.notificationIcon}>
-            <Ionicons name="notifications-outline" size={24} color={colors.text} />
+  const renderChatCard = (chat: typeof MOCK_CHATS[0]) => {
+    const isExpired = new Date(chat.meetingDate) < new Date();
+    if (isExpired && !showPastChats) return null;
+
+    return (
+      <View key={chat.id} style={[styles.chatCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+        <View style={styles.chatHeader}>
+          <View style={styles.profileSection}>
+            <Image source={{ uri: chat.partner.photo }} style={styles.profilePhoto} />
+            <View style={styles.profileInfo}>
+              <Text style={[styles.partnerName, { color: colors.text }]}>{chat.partner.name}</Text>
+              <Text style={[styles.occupation, { color: colors.secondaryText }]}>{chat.partner.occupation}</Text>
+            </View>
+          </View>
+          <View style={[styles.statusBadge, { backgroundColor: getBadgeColor(chat.status, colors) }]}>
+            <Text style={styles.statusText}>{getStatusText(chat.status)}</Text>
           </View>
         </View>
 
-        <View style={[styles.upcomingSection, { backgroundColor: colors.card, borderColor: colors.border }]}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>Upcoming Coffee Meetings</Text>
+        <View style={styles.meetingDetails}>
+          <View style={styles.detailRow}>
+            <Ionicons name="calendar" size={16} color={colors.secondaryText} />
+            <Text style={[styles.detailText, { color: colors.text }]}>
+              {chat.meetingDate} at {chat.meetingTime}
+            </Text>
+          </View>
+          <View style={styles.detailRow}>
+            <Ionicons name="location" size={16} color={colors.secondaryText} />
+            <Text style={[styles.detailText, { color: colors.text }]}>{chat.location}</Text>
+          </View>
+        </View>
 
-          {upcomingMeetings.length > 0 ? (
-            upcomingMeetings.map(meeting => (
-              <View key={meeting.id} style={[styles.meetingCard, { borderColor: colors.border }]}>
-                <View style={styles.meetingHeader}>
-                  <Image 
-                    source={{ uri: 'https://randomuser.me/api/portraits/men/32.jpg' }} 
-                    style={styles.profileImage} 
-                  />
-                  <View style={styles.meetingInfo}>
-                    <Text style={[styles.personName, { color: colors.text }]}>{meeting.name}</Text>
-                    <Text style={[styles.position, { color: colors.secondaryText }]}>{meeting.position} at {meeting.company}</Text>
-                  </View>
-                </View>
+        {chat.initialMessage && (
+          <Text style={[styles.message, { color: colors.secondaryText }]}>
+            "{chat.initialMessage}"
+          </Text>
+        )}
 
-                <View style={styles.meetingDetails}>
-                  <View style={styles.detailItem}>
-                    <Ionicons name="calendar-outline" size={16} color={colors.primary} />
-                    <Text style={[styles.detailText, { color: colors.secondaryText }]}>{meeting.date}</Text>
-                  </View>
-
-                  <View style={styles.detailItem}>
-                    <Ionicons name="location-outline" size={16} color={colors.primary} />
-                    <Text style={[styles.detailText, { color: colors.secondaryText }]}>{meeting.location} ({meeting.distance})</Text>
-                  </View>
-                </View>
-
-                <View style={styles.actionButtons}>
-                  <TouchableOpacity style={styles.messageButton}>
-                    <Ionicons name="chatbubble-outline" size={16} color={colors.primary} />
-                    <Text style={[styles.buttonText, { color: colors.primary }]}>Message</Text>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity style={[styles.rescheduleButton, { backgroundColor: colors.primary }]}>
-                    <Text style={styles.rescheduleText}>Reschedule</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            ))
-          ) : (
-            <View style={styles.emptyState}>
-              <Ionicons name="calendar-outline" size={48} color={colors.secondaryText} />
-              <Text style={[styles.emptyText, { color: colors.secondaryText }]}>No upcoming meetings</Text>
-              <TouchableOpacity style={[styles.findButton, { backgroundColor: colors.primary }]}>
-                <Text style={styles.findButtonText}>Find Coffee Partners</Text>
+        <View style={styles.actions}>
+          {chat.status === 'pending_acceptance' && (
+            <>
+              <TouchableOpacity 
+                style={[styles.actionButton, { backgroundColor: colors.primary }]}
+                onPress={() => handleAction(chat.id, 'accept')}
+              >
+                <Text style={styles.actionButtonText}>Accept</Text>
               </TouchableOpacity>
-            </View>
+              <TouchableOpacity 
+                style={[styles.actionButton, styles.cancelButton]}
+                onPress={() => handleAction(chat.id, 'cancel')}
+              >
+                <Text style={[styles.actionButtonText, { color: colors.text }]}>Cancel</Text>
+              </TouchableOpacity>
+            </>
+          )}
+          {chat.status === 'confirmed' && (
+            <>
+              <TouchableOpacity 
+                style={[styles.actionButton, { backgroundColor: colors.primary }]}
+                onPress={() => handleAction(chat.id, 'message')}
+              >
+                <Text style={styles.actionButtonText}>Message</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={[styles.actionButton, styles.cancelButton]}
+                onPress={() => handleAction(chat.id, 'cancel')}
+              >
+                <Text style={[styles.actionButtonText, { color: colors.text }]}>Cancel</Text>
+              </TouchableOpacity>
+            </>
           )}
         </View>
+      </View>
+    );
+  };
 
-        <View style={[styles.suggestedSection, { backgroundColor: colors.card, borderColor: colors.border }]}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>Suggested Connections</Text>
+  const filterChatsByStatus = (status: string) => 
+    MOCK_CHATS.filter(chat => chat.status === status);
 
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.suggestedScroll}>
-            {[1, 2, 3, 4].map(id => (
-              <View key={id} style={[styles.suggestedCard, { backgroundColor: colors.background, borderColor: colors.border }]}>
-                <Image 
-                  source={{ uri: `https://randomuser.me/api/portraits/${id % 2 === 0 ? 'women' : 'men'}/${id * 10}.jpg` }} 
-                  style={styles.suggestedImage} 
-                />
-                <Text style={[styles.suggestedName, { color: colors.text }]}>Jane Doe</Text>
-                <Text style={[styles.suggestedPosition, { color: colors.secondaryText }]}>Product Manager</Text>
-                <Text style={[styles.suggestedCompany, { color: colors.secondaryText }]}>Tech Inc.</Text>
-                <TouchableOpacity style={[styles.connectButton, { backgroundColor: colors.primary }]}>
-                  <Text style={styles.connectText}>Connect</Text>
-                </TouchableOpacity>
-              </View>
-            ))}
-          </ScrollView>
+  return (
+    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={styles.header}>
+        <Text style={[styles.title, { color: colors.text }]}>Circle Chats</Text>
+        <View style={styles.toggleContainer}>
+          <Text style={[styles.toggleLabel, { color: colors.text }]}>Show Past Chats</Text>
+          <Switch
+            value={showPastChats}
+            onValueChange={setShowPastChats}
+            trackColor={{ false: colors.border, true: colors.primary }}
+          />
         </View>
-      </ScrollView>
-    </SafeAreaView>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>Confirmed Chats</Text>
+        {filterChatsByStatus('confirmed').map(renderChatCard)}
+      </View>
+
+      <View style={styles.section}>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>Pending Acceptance</Text>
+        {filterChatsByStatus('pending_acceptance').map(renderChatCard)}
+      </View>
+
+      <View style={styles.section}>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>Pending Chats</Text>
+        {filterChatsByStatus('pending').map(renderChatCard)}
+      </View>
+    </ScrollView>
   );
 }
+
+const getBadgeColor = (status: string, colors: any) => {
+  switch (status) {
+    case 'confirmed': return colors.primary + '40';
+    case 'pending': return colors.secondaryText + '40';
+    case 'pending_acceptance': return '#F97415' + '40';
+    default: return colors.border;
+  }
+};
+
+const getStatusText = (status: string) => {
+  switch (status) {
+    case 'confirmed': return 'Confirmed';
+    case 'pending': return 'Pending';
+    case 'pending_acceptance': return 'Action Needed';
+    default: return status;
+  }
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  scrollContent: {
-    padding: 16,
-  },
   header: {
+    padding: 16,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 24,
   },
-  greeting: {
-    fontSize: 24,
+  title: {
     fontFamily: 'K2D-Bold',
+    fontSize: 24,
   },
-  notificationIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: 'center',
+  toggleContainer: {
+    flexDirection: 'row',
     alignItems: 'center',
   },
-  upcomingSection: {
-    borderRadius: 16,
+  toggleLabel: {
+    marginRight: 8,
+    fontFamily: 'K2D-Regular',
+    fontSize: 14,
+  },
+  section: {
     padding: 16,
-    marginBottom: 24,
-    borderWidth: 1,
   },
   sectionTitle: {
-    fontSize: 18,
     fontFamily: 'K2D-SemiBold',
-    marginBottom: 16,
-  },
-  meetingCard: {
-    borderBottomWidth: 1,
-    paddingVertical: 16,
-  },
-  meetingHeader: {
-    flexDirection: 'row',
+    fontSize: 18,
     marginBottom: 12,
   },
-  profileImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+  chatCard: {
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
   },
-  meetingInfo: {
+  chatHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 12,
+  },
+  profileSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  profilePhoto: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+  },
+  profileInfo: {
     marginLeft: 12,
-    flex: 1,
-    justifyContent: 'center',
   },
-  personName: {
-    fontSize: 16,
+  partnerName: {
     fontFamily: 'K2D-SemiBold',
-    marginBottom: 4,
+    fontSize: 16,
   },
-  position: {
-    fontSize: 14,
+  occupation: {
     fontFamily: 'K2D-Regular',
+    fontSize: 14,
+  },
+  statusBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+  },
+  statusText: {
+    fontFamily: 'K2D-Medium',
+    fontSize: 12,
+    color: '#000000',
   },
   meetingDetails: {
     marginBottom: 12,
   },
-  detailItem: {
+  detailRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 6,
+    marginBottom: 4,
   },
   detailText: {
+    fontFamily: 'K2D-Regular',
+    fontSize: 14,
     marginLeft: 8,
-    fontSize: 14,
+  },
+  message: {
     fontFamily: 'K2D-Regular',
-  },
-  actionButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  messageButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-  },
-  buttonText: {
-    marginLeft: 6,
     fontSize: 14,
-    fontFamily: 'K2D-Medium',
+    fontStyle: 'italic',
+    marginBottom: 12,
   },
-  rescheduleButton: {
-    paddingVertical: 8,
+  actions: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    gap: 8,
+  },
+  actionButton: {
     paddingHorizontal: 16,
-    borderRadius: 20,
-  },
-  rescheduleText: {
-    color: '#FFF',
-    fontSize: 14,
-    fontFamily: 'K2D-Medium',
-  },
-  emptyState: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 32,
-  },
-  emptyText: {
-    fontSize: 16,
-    fontFamily: 'K2D-Medium',
-    marginTop: 12,
-    marginBottom: 16,
-  },
-  findButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 20,
-  },
-  findButtonText: {
-    color: '#FFF',
-    fontSize: 14,
-    fontFamily: 'K2D-SemiBold',
-  },
-  suggestedSection: {
-    borderRadius: 16,
-    padding: 16,
-    borderWidth: 1,
-  },
-  suggestedScroll: {
     paddingVertical: 8,
-  },
-  suggestedCard: {
-    width: 160,
-    borderRadius: 12,
-    padding: 12,
-    marginRight: 16,
+    borderRadius: 20,
+    minWidth: 100,
     alignItems: 'center',
-    borderWidth: 1,
   },
-  suggestedImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    marginBottom: 12,
-  },
-  suggestedName: {
-    fontSize: 16,
-    fontFamily: 'K2D-SemiBold',
-    marginBottom: 4,
-    textAlign: 'center',
-  },
-  suggestedPosition: {
-    fontSize: 14,
-    fontFamily: 'K2D-Regular',
-    textAlign: 'center',
-  },
-  suggestedCompany: {
-    fontSize: 12,
-    fontFamily: 'K2D-Regular',
-    marginBottom: 12,
-    textAlign: 'center',
-  },
-  connectButton: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 16,
-  },
-  connectText: {
-    color: '#FFF',
-    fontSize: 12,
+  actionButtonText: {
+    color: '#FFFFFF',
     fontFamily: 'K2D-Medium',
+    fontSize: 14,
+  },
+  cancelButton: {
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: '#666',
   },
 });
