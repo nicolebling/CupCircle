@@ -1,77 +1,105 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Switch } from 'react-native';
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/contexts/AuthContext';
-
-// Mock data for testing
-const MOCK_CHATS = [
-  {
-    id: '1',
-    partner: {
-      name: 'Alex Thompson',
-      photo: 'https://randomuser.me/api/portraits/men/32.jpg',
-      occupation: 'Software Engineer'
-    },
-    status: 'confirmed',
-    meetingDate: '2024-03-25',
-    meetingTime: '10:00 AM',
-    location: 'Blue Bottle Coffee, Downtown',
-    initialMessage: "Hi! I'd love to discuss tech innovations over coffee.",
-  },
-  {
-    id: '2',
-    partner: {
-      name: 'Sarah Chen',
-      photo: 'https://randomuser.me/api/portraits/women/44.jpg',
-      occupation: 'Product Manager'
-    },
-    status: 'pending_acceptance',
-    meetingDate: '2024-03-26',
-    meetingTime: '2:00 PM',
-    location: 'Starbucks Reserve, Financial District',
-    initialMessage: "Would love to chat about product management practices!",
-  },
-  {
-    id: '3',
-    partner: {
-      name: 'Mike Rogers',
-      photo: 'https://randomuser.me/api/portraits/men/67.jpg',
-      occupation: 'UX Designer'
-    },
-    status: 'pending',
-    meetingDate: '2024-03-27',
-    meetingTime: '3:30 PM',
-    location: 'Philz Coffee, Mission District',
-    initialMessage: "Let's discuss design systems and coffee!",
-  }
-];
+import { supabase } from '@/lib/supabase';
 
 export default function CircleChatsScreen() {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const { user } = useAuth();
   const [showPastChats, setShowPastChats] = useState(false);
+  const [chats, setChats] = useState([]);
+  const [profiles, setProfiles] = useState({});
 
-  const handleAction = (chatId: string, action: 'accept' | 'cancel' | 'message') => {
-    console.log(`${action} chat ${chatId}`);
-    // Implement action handlers
+  useEffect(() => {
+    if (user) {
+      fetchChats();
+    }
+  }, [user]);
+
+  const fetchChats = async () => {
+    try {
+      // Fetch all matches where the current user is either user1 or user2
+      const { data: matchesData, error: matchesError } = await supabase
+        .from('matches')
+        .select('*')
+        .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`);
+
+      if (matchesError) throw matchesError;
+
+      // Fetch profiles for all users involved in matches
+      const userIds = new Set();
+      matchesData.forEach(match => {
+        userIds.add(match.user1_id);
+        userIds.add(match.user2_id);
+      });
+
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('profiles')
+        .select('*')
+        .in('id', Array.from(userIds));
+
+      if (profilesError) throw profilesError;
+
+      // Create a map of user IDs to profiles
+      const profileMap = {};
+      profilesData.forEach(profile => {
+        profileMap[profile.id] = profile;
+      });
+
+      setProfiles(profileMap);
+      setChats(matchesData);
+    } catch (error) {
+      console.error('Error fetching chats:', error);
+    }
   };
 
-  const renderChatCard = (chat: typeof MOCK_CHATS[0]) => {
-    const isExpired = new Date(chat.meetingDate) < new Date();
+  const handleAction = async (chatId: string, action: 'accept' | 'cancel' | 'message') => {
+    try {
+      if (action === 'accept') {
+        await supabase
+          .from('matches')
+          .update({ status: 'confirmed' })
+          .eq('id', chatId);
+      } else if (action === 'cancel') {
+        await supabase
+          .from('matches')
+          .update({ status: 'cancelled' })
+          .eq('id', chatId);
+      }
+      
+      fetchChats(); // Refresh the chats
+    } catch (error) {
+      console.error(`Error performing ${action} action:`, error);
+    }
+  };
+
+  const getPartnerProfile = (chat) => {
+    const partnerId = chat.user1_id === user.id ? chat.user2_id : chat.user1_id;
+    return profiles[partnerId] || {};
+  };
+
+  const renderChatCard = (chat) => {
+    const isExpired = new Date(chat.meeting_date) < new Date();
     if (isExpired && !showPastChats) return null;
+
+    const partnerProfile = getPartnerProfile(chat);
 
     return (
       <View key={chat.id} style={[styles.chatCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
         <View style={styles.chatHeader}>
           <View style={styles.profileSection}>
-            <Image source={{ uri: chat.partner.photo }} style={styles.profilePhoto} />
+            <Image 
+              source={{ uri: partnerProfile.photo_url || 'https://via.placeholder.com/150' }} 
+              style={styles.profilePhoto} 
+            />
             <View style={styles.profileInfo}>
-              <Text style={[styles.partnerName, { color: colors.text }]}>{chat.partner.name}</Text>
-              <Text style={[styles.occupation, { color: colors.secondaryText }]}>{chat.partner.occupation}</Text>
+              <Text style={[styles.partnerName, { color: colors.text }]}>{partnerProfile.name || 'Unknown'}</Text>
+              <Text style={[styles.occupation, { color: colors.secondaryText }]}>{partnerProfile.occupation || 'No occupation listed'}</Text>
             </View>
           </View>
           <View style={[styles.statusBadge, { backgroundColor: getBadgeColor(chat.status, colors) }]}>
@@ -83,23 +111,25 @@ export default function CircleChatsScreen() {
           <View style={styles.detailRow}>
             <Ionicons name="calendar" size={16} color={colors.secondaryText} />
             <Text style={[styles.detailText, { color: colors.text }]}>
-              {chat.meetingDate} at {chat.meetingTime}
+              {new Date(chat.meeting_date).toLocaleDateString()} at {chat.start_time}
             </Text>
           </View>
           <View style={styles.detailRow}>
             <Ionicons name="location" size={16} color={colors.secondaryText} />
-            <Text style={[styles.detailText, { color: colors.text }]}>{chat.location}</Text>
+            <Text style={[styles.detailText, { color: colors.text }]}>
+              {chat.meeting_location?.name || 'Location not set'}
+            </Text>
           </View>
         </View>
 
-        {chat.initialMessage && (
+        {chat.initial_message && (
           <Text style={[styles.message, { color: colors.secondaryText }]}>
-            "{chat.initialMessage}"
+            "{chat.initial_message}"
           </Text>
         )}
 
         <View style={styles.actions}>
-          {chat.status === 'pending_acceptance' && (
+          {chat.status === 'pending' && chat.user2_id === user.id && (
             <>
               <TouchableOpacity 
                 style={[styles.actionButton, { backgroundColor: colors.primary }]}
@@ -136,8 +166,17 @@ export default function CircleChatsScreen() {
     );
   };
 
-  const filterChatsByStatus = (status: string) => 
-    MOCK_CHATS.filter(chat => chat.status === status);
+  const filterChatsByStatus = (status) => 
+    chats.filter(chat => {
+      if (status === 'pending') {
+        if (chat.user1_id === user.id) {
+          return chat.status === 'pending'; // Requests you sent
+        } else {
+          return chat.status === 'pending'; // Requests you received
+        }
+      }
+      return chat.status === status;
+    });
 
   return (
     <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
@@ -160,12 +199,16 @@ export default function CircleChatsScreen() {
 
       <View style={styles.section}>
         <Text style={[styles.sectionTitle, { color: colors.text }]}>Pending Acceptance</Text>
-        {filterChatsByStatus('pending_acceptance').map(renderChatCard)}
+        {filterChatsByStatus('pending')
+          .filter(chat => chat.user2_id === user.id)
+          .map(renderChatCard)}
       </View>
 
       <View style={styles.section}>
         <Text style={[styles.sectionTitle, { color: colors.text }]}>Pending Chats</Text>
-        {filterChatsByStatus('pending').map(renderChatCard)}
+        {filterChatsByStatus('pending')
+          .filter(chat => chat.user1_id === user.id)
+          .map(renderChatCard)}
       </View>
     </ScrollView>
   );
@@ -175,7 +218,7 @@ const getBadgeColor = (status: string, colors: any) => {
   switch (status) {
     case 'confirmed': return colors.primary + '40';
     case 'pending': return colors.secondaryText + '40';
-    case 'pending_acceptance': return '#F97415' + '40';
+    case 'cancelled': return '#FF0000' + '40';
     default: return colors.border;
   }
 };
@@ -184,7 +227,7 @@ const getStatusText = (status: string) => {
   switch (status) {
     case 'confirmed': return 'Confirmed';
     case 'pending': return 'Pending';
-    case 'pending_acceptance': return 'Action Needed';
+    case 'cancelled': return 'Cancelled';
     default: return status;
   }
 };
