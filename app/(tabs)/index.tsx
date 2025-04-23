@@ -194,33 +194,21 @@ export default function CircleChatsScreen() {
 
       <View style={styles.section}>
         <Text style={[styles.sectionTitle, { color: colors.text }]}>Confirmed Chats</Text>
-        {filterChatsByStatus('confirmed').map((chat) => (
-          <React.Fragment key={chat.id}>
-            {renderChatCard(chat)}
-          </React.Fragment>
-        ))}
+        {filterChatsByStatus('confirmed').map(renderChatCard)}
       </View>
 
       <View style={styles.section}>
         <Text style={[styles.sectionTitle, { color: colors.text }]}>Pending Acceptance</Text>
         {filterChatsByStatus('pending')
           .filter(chat => chat.user2_id === user.id)
-          .map((chat) => (
-            <React.Fragment key={chat.id}>
-              {renderChatCard(chat)}
-            </React.Fragment>
-          ))}
+          .map(renderChatCard)}
       </View>
 
       <View style={styles.section}>
         <Text style={[styles.sectionTitle, { color: colors.text }]}>Pending Chats</Text>
         {filterChatsByStatus('pending')
           .filter(chat => chat.user1_id === user.id)
-          .map((chat) => (
-            <React.Fragment key={chat.id}>
-              {renderChatCard(chat)}
-            </React.Fragment>
-          ))}
+          .map(renderChatCard)}
       </View>
     </ScrollView>
   );
