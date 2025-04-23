@@ -25,7 +25,7 @@ export default function CircleChatsScreen() {
     try {
       // Fetch all matches where the current user is either user1 or user2
       const { data: matchesData, error: matchesError } = await supabase
-        .from('matches')
+        .from('matching')
         .select('*')
         .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`);
 
