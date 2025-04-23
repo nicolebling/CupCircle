@@ -1,11 +1,18 @@
-
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Switch } from 'react-native';
-import Colors from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
-import { Ionicons } from '@expo/vector-icons';
-import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/lib/supabase';
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  ScrollView,
+  Switch,
+} from "react-native";
+import Colors from "@/constants/Colors";
+import { useColorScheme } from "@/hooks/useColorScheme";
+import { Ionicons } from "@expo/vector-icons";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/lib/supabase";
 
 export default function CircleChatsScreen() {
   const colorScheme = useColorScheme();
@@ -25,53 +32,56 @@ export default function CircleChatsScreen() {
     try {
       // Fetch all matches where the current user is either user1 or user2
       const { data: matchesData, error: matchesError } = await supabase
-        .from('matching')
-        .select('*')
+        .from("matching")
+        .select("*")
         .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`);
 
       if (matchesError) throw matchesError;
 
       // Fetch profiles for all users involved in matches
       const userIds = new Set();
-      matchesData.forEach(match => {
+      matchesData.forEach((match) => {
         userIds.add(match.user1_id);
         userIds.add(match.user2_id);
       });
 
       const { data: profilesData, error: profilesError } = await supabase
-        .from('profiles')
-        .select('*')
-        .in('id', Array.from(userIds));
+        .from("profiles")
+        .select("*")
+        .in("id", Array.from(userIds));
 
       if (profilesError) throw profilesError;
 
       // Create a map of user IDs to profiles
       const profileMap = {};
-      profilesData.forEach(profile => {
+      profilesData.forEach((profile) => {
         profileMap[profile.id] = profile;
       });
 
       setProfiles(profileMap);
       setChats(matchesData);
     } catch (error) {
-      console.error('Error fetching chats:', error);
+      console.error("Error fetching chats:", error);
     }
   };
 
-  const handleAction = async (chatId: string, action: 'accept' | 'cancel' | 'message') => {
+  const handleAction = async (
+    chatId: string,
+    action: "accept" | "cancel" | "message",
+  ) => {
     try {
-      if (action === 'accept') {
+      if (action === "accept") {
         await supabase
-          .from('matches')
-          .update({ status: 'confirmed' })
-          .eq('id', chatId);
-      } else if (action === 'cancel') {
+          .from("matches")
+          .update({ status: "confirmed" })
+          .eq("id", chatId);
+      } else if (action === "cancel") {
         await supabase
-          .from('matches')
-          .update({ status: 'cancelled' })
-          .eq('id', chatId);
+          .from("matches")
+          .update({ status: "cancelled" })
+          .eq("id", chatId);
       }
-      
+
       fetchChats(); // Refresh the chats
     } catch (error) {
       console.error(`Error performing ${action} action:`, error);
@@ -90,74 +100,110 @@ export default function CircleChatsScreen() {
     const partnerProfile = getPartnerProfile(chat);
 
     return (
-      <View key={chat.id} style={[styles.chatCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+      <View
+        key={chat.id}
+        style={[
+          styles.chatCard,
+          { backgroundColor: colors.card, borderColor: colors.border },
+        ]}
+      >
         <View style={styles.chatHeader}>
           <View style={styles.profileSection}>
-            <Image 
-              source={{ uri: partnerProfile.photo_url || 'https://via.placeholder.com/150' }} 
-              style={styles.profilePhoto} 
+            <Image
+              source={{
+                uri:
+                  partnerProfile.photo_url || "https://via.placeholder.com/150",
+              }}
+              style={styles.profilePhoto}
             />
             <View style={styles.profileInfo}>
-              <Text style={[styles.partnerName, { color: colors.text }]}>{partnerProfile.name || 'Unknown'}</Text>
-              <Text style={[styles.occupation, { color: colors.secondaryText }]}>{partnerProfile.occupation || 'No occupation listed'}</Text>
+              <Text style={[styles.partnerName, { color: colors.text }]}>
+                {partnerProfile.name || "Unknown"}
+              </Text>
+              <Text
+                style={[styles.occupation, { color: colors.secondaryText }]}
+              >
+                {partnerProfile.occupation || "No occupation listed"}
+              </Text>
             </View>
           </View>
-          <View style={[styles.statusBadge, { backgroundColor: getBadgeColor(chat.status, colors) }]}>
+          <View
+            style={[
+              styles.statusBadge,
+              { backgroundColor: getBadgeColor(chat.status, colors) },
+            ]}
+          >
             <Text style={styles.statusText}>{getStatusText(chat.status)}</Text>
           </View>
         </View>
 
         <View style={styles.meetingDetails}>
           <View style={styles.detailRow}>
-            <Ionicons name="calendar" size={16} color={colors.secondaryText} />
             <Text style={[styles.detailText, { color: colors.text }]}>
-              {new Date(chat.meeting_date).toLocaleDateString()} at {chat.start_time}
+              {new Date(chat.meeting_date).toLocaleDateString()} at{" "}
+              {chat.start_time}
             </Text>
           </View>
           <View style={styles.detailRow}>
-            <Ionicons name="location" size={16} color={colors.secondaryText} />
             <Text style={[styles.detailText, { color: colors.text }]}>
-              {chat.meeting_location?.name || 'Location not set'}
+              {chat.meeting_location.split("|||")[0] || "Location not set"}
+            </Text>
+          </View>
+          <View style={styles.detailRow}>
+            <Text style={[styles.detailText, { color: colors.text }]}>
+              {chat.meeting_location.split("|||")[1] || "Location not set"}
             </Text>
           </View>
         </View>
-
-        {chat.initial_message && (
-          <Text style={[styles.message, { color: colors.secondaryText }]}>
-            "{chat.initial_message}"
-          </Text>
+        {chat.initial_message && chat.initial_message.length > 0 && (
+          <>
+            <Text>Initial Message:</Text>
+            <Text style={[styles.message, { color: colors.secondaryText }]}>
+              "{chat.initial_message}"
+            </Text>
+          </>
         )}
 
         <View style={styles.actions}>
-          {chat.status === 'pending' && chat.user2_id === user.id && (
+          {chat.status === "pending" && chat.user2_id === user.id && (
             <>
-              <TouchableOpacity 
-                style={[styles.actionButton, { backgroundColor: colors.primary }]}
-                onPress={() => handleAction(chat.id, 'accept')}
+              <TouchableOpacity
+                style={[
+                  styles.actionButton,
+                  { backgroundColor: colors.primary },
+                ]}
+                onPress={() => handleAction(chat.id, "accept")}
               >
                 <Text style={styles.actionButtonText}>Accept</Text>
               </TouchableOpacity>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={[styles.actionButton, styles.cancelButton]}
-                onPress={() => handleAction(chat.id, 'cancel')}
+                onPress={() => handleAction(chat.id, "cancel")}
               >
-                <Text style={[styles.actionButtonText, { color: colors.text }]}>Cancel</Text>
+                <Text style={[styles.actionButtonText, { color: colors.text }]}>
+                  Cancel
+                </Text>
               </TouchableOpacity>
             </>
           )}
-          {chat.status === 'confirmed' && (
+          {chat.status === "confirmed" && (
             <>
-              <TouchableOpacity 
-                style={[styles.actionButton, { backgroundColor: colors.primary }]}
-                onPress={() => handleAction(chat.id, 'message')}
+              <TouchableOpacity
+                style={[
+                  styles.actionButton,
+                  { backgroundColor: colors.primary },
+                ]}
+                onPress={() => handleAction(chat.id, "message")}
               >
                 <Text style={styles.actionButtonText}>Message</Text>
               </TouchableOpacity>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={[styles.actionButton, styles.cancelButton]}
-                onPress={() => handleAction(chat.id, 'cancel')}
+                onPress={() => handleAction(chat.id, "cancel")}
               >
-                <Text style={[styles.actionButtonText, { color: colors.text }]}>Cancel</Text>
+                <Text style={[styles.actionButtonText, { color: colors.text }]}>
+                  Cancel
+                </Text>
               </TouchableOpacity>
             </>
           )}
@@ -166,24 +212,28 @@ export default function CircleChatsScreen() {
     );
   };
 
-  const filterChatsByStatus = (status) => 
-    chats.filter(chat => {
-      if (status === 'pending') {
+  const filterChatsByStatus = (status) =>
+    chats.filter((chat) => {
+      if (status === "pending") {
         if (chat.user1_id === user.id) {
-          return chat.status === 'pending'; // Requests you sent
+          return chat.status === "pending"; // Requests you sent
         } else {
-          return chat.status === 'pending'; // Requests you received
+          return chat.status === "pending"; // Requests you received
         }
       }
       return chat.status === status;
     });
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
+    <ScrollView
+      style={[styles.container, { backgroundColor: colors.background }]}
+    >
       <View style={styles.header}>
         <Text style={[styles.title, { color: colors.text }]}>Circle Chats</Text>
         <View style={styles.toggleContainer}>
-          <Text style={[styles.toggleLabel, { color: colors.text }]}>Show Past Chats</Text>
+          <Text style={[styles.toggleLabel, { color: colors.text }]}>
+            Show Past Chats
+          </Text>
           <Switch
             value={showPastChats}
             onValueChange={setShowPastChats}
@@ -193,21 +243,27 @@ export default function CircleChatsScreen() {
       </View>
 
       <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>Confirmed Chats</Text>
-        {filterChatsByStatus('confirmed').map(renderChatCard)}
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>
+          Confirmed Chats
+        </Text>
+        {filterChatsByStatus("confirmed").map(renderChatCard)}
       </View>
 
       <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>Pending Acceptance</Text>
-        {filterChatsByStatus('pending')
-          .filter(chat => chat.user2_id === user.id)
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>
+          Pending Acceptance
+        </Text>
+        {filterChatsByStatus("pending")
+          .filter((chat) => chat.user2_id === user.id)
           .map(renderChatCard)}
       </View>
 
       <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>Pending Chats</Text>
-        {filterChatsByStatus('pending')
-          .filter(chat => chat.user1_id === user.id)
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>
+          Pending Chats
+        </Text>
+        {filterChatsByStatus("pending")
+          .filter((chat) => chat.user1_id === user.id)
           .map(renderChatCard)}
       </View>
     </ScrollView>
@@ -216,19 +272,27 @@ export default function CircleChatsScreen() {
 
 const getBadgeColor = (status: string, colors: any) => {
   switch (status) {
-    case 'confirmed': return colors.primary + '40';
-    case 'pending': return colors.secondaryText + '40';
-    case 'cancelled': return '#FF0000' + '40';
-    default: return colors.border;
+    case "confirmed":
+      return colors.primary + "40";
+    case "pending":
+      return colors.secondaryText + "40";
+    case "cancelled":
+      return "#FF0000" + "40";
+    default:
+      return colors.border;
   }
 };
 
 const getStatusText = (status: string) => {
   switch (status) {
-    case 'confirmed': return 'Confirmed';
-    case 'pending': return 'Pending';
-    case 'cancelled': return 'Cancelled';
-    default: return status;
+    case "confirmed":
+      return "Confirmed";
+    case "pending":
+      return "Pending";
+    case "cancelled":
+      return "Cancelled";
+    default:
+      return status;
   }
 };
 
@@ -238,28 +302,28 @@ const styles = StyleSheet.create({
   },
   header: {
     padding: 16,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   title: {
-    fontFamily: 'K2D-Bold',
+    fontFamily: "K2D-Bold",
     fontSize: 24,
   },
   toggleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   toggleLabel: {
     marginRight: 8,
-    fontFamily: 'K2D-Regular',
+    fontFamily: "K2D-Regular",
     fontSize: 14,
   },
   section: {
     padding: 16,
   },
   sectionTitle: {
-    fontFamily: 'K2D-SemiBold',
+    fontFamily: "K2D-SemiBold",
     fontSize: 18,
     marginBottom: 12,
   },
@@ -270,14 +334,14 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   chatHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
     marginBottom: 12,
   },
   profileSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   profilePhoto: {
     width: 48,
@@ -288,11 +352,11 @@ const styles = StyleSheet.create({
     marginLeft: 12,
   },
   partnerName: {
-    fontFamily: 'K2D-SemiBold',
+    fontFamily: "K2D-SemiBold",
     fontSize: 16,
   },
   occupation: {
-    fontFamily: 'K2D-Regular',
+    fontFamily: "K2D-Regular",
     fontSize: 14,
   },
   statusBadge: {
@@ -301,32 +365,32 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   statusText: {
-    fontFamily: 'K2D-Medium',
+    fontFamily: "K2D-Medium",
     fontSize: 12,
-    color: '#000000',
+    color: "#000000",
   },
   meetingDetails: {
     marginBottom: 12,
   },
   detailRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 4,
   },
   detailText: {
-    fontFamily: 'K2D-Regular',
+    fontFamily: "K2D-Regular",
     fontSize: 14,
     marginLeft: 8,
   },
   message: {
-    fontFamily: 'K2D-Regular',
+    fontFamily: "K2D-Regular",
     fontSize: 14,
-    fontStyle: 'italic',
+    fontStyle: "italic",
     marginBottom: 12,
   },
   actions: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
+    flexDirection: "row",
+    justifyContent: "flex-end",
     gap: 8,
   },
   actionButton: {
@@ -334,16 +398,16 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 20,
     minWidth: 100,
-    alignItems: 'center',
+    alignItems: "center",
   },
   actionButtonText: {
-    color: '#FFFFFF',
-    fontFamily: 'K2D-Medium',
+    color: "#FFFFFF",
+    fontFamily: "K2D-Medium",
     fontSize: 14,
   },
   cancelButton: {
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
     borderWidth: 1,
-    borderColor: '#666',
+    borderColor: "#666",
   },
 });

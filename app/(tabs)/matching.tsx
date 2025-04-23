@@ -522,7 +522,10 @@ export default function MatchingScreen() {
 
   // Watch for currentIndex to auto-load more profiles
   useEffect(() => {
-    if (currentIndex > 0 && currentIndex % PROFILES_PER_PAGE === PROFILES_PER_PAGE - 1) {
+    if (
+      currentIndex > 0 &&
+      currentIndex % PROFILES_PER_PAGE === PROFILES_PER_PAGE - 1
+    ) {
       loadNextProfilesPage();
     }
   }, [currentIndex]);
