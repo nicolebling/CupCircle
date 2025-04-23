@@ -264,27 +264,7 @@ export default function CircleChatsScreen() {
         </Text>
         {filterChatsByStatus("pending")
           .filter((chat) => chat.user1_id === user.id)
-          .map((chat) => (
-            <View key={chat.id}>
-              {renderChatCard(chat)}
-              <TouchableOpacity
-                style={[styles.actionButton, { backgroundColor: colors.primary }]}
-                onPress={async () => {
-                  try {
-                    await supabase
-                      .from('matching')
-                      .update({ status: 'confirmed' })
-                      .eq('id', chat.id);
-                    fetchChats(); // Refresh the chats
-                  } catch (error) {
-                    console.error('Error accepting chat:', error);
-                  }
-                }}
-              >
-                <Text style={styles.actionButtonText}>Accept</Text>
-              </TouchableOpacity>
-            </View>
-          ))}
+          .map(renderChatCard)}
       </View>
     </ScrollView>
   );
