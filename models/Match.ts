@@ -1,7 +1,7 @@
 
 import { query } from '../services/database';
 
-export type MatchStatus = 'pending' | 'accepted' | 'confirmed' | 'cancelled' | 'completed' | 'pending_acceptance';
+export type MatchStatus = 'pending' | 'confirmed' | 'cancelled' | 'completed' | 'pending_acceptance';
 
 export interface Match {
   id: string;
