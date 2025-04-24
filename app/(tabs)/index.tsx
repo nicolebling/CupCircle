@@ -174,7 +174,9 @@ export default function CircleChatsScreen() {
           {chat.status === "pending" && (
             <TouchableOpacity
               style={[styles.actionButton, styles.cancelButton]}
-              onPress={() => handleAction(chat.id, "cancel")}
+              onPress={() => 
+                
+                handleAction(chat.id, "cancel")}
             >
               <Text style={[styles.actionButtonText, { color: colors.text }]}>
                 Cancel
