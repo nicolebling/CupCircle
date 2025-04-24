@@ -33,12 +33,27 @@ export default function CircleChatsScreen() {
 
   const fetchChats = async () => {
     try {
+      console.log("Fetching chats for user:", user.id);
+      
       const { data: matchesData, error: matchesError } = await supabase
         .from("matching")
         .select("*")
-        .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`);
+        .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`)
+        .order('created_at', { ascending: false });
 
-      if (matchesError) throw matchesError;
+      if (matchesError) {
+        console.error("Error fetching matches:", matchesError);
+        throw matchesError;
+      }
+      
+      console.log("Fetched matches:", matchesData?.length || 0);
+
+      // If no matches, set empty state and return early
+      if (!matchesData || matchesData.length === 0) {
+        setChats([]);
+        setProfiles({});
+        return;
+      }
 
       const userIds = new Set();
       matchesData.forEach((match) => {
@@ -51,7 +66,10 @@ export default function CircleChatsScreen() {
         .select("*")
         .in("id", Array.from(userIds));
 
-      if (profilesError) throw profilesError;
+      if (profilesError) {
+        console.error("Error fetching profiles:", profilesError);
+        throw profilesError;
+      }
 
       const profileMap = {};
       profilesData.forEach((profile) => {
@@ -60,6 +78,8 @@ export default function CircleChatsScreen() {
 
       setProfiles(profileMap);
       setChats(matchesData);
+      
+      console.log("Chats and profiles updated successfully");
     } catch (error) {
       console.error("Error fetching chats:", error);
     }
@@ -70,22 +90,54 @@ export default function CircleChatsScreen() {
     action
   ) => {
     try {
+      console.log(`Performing action: ${action} on chat ID: ${chatId}`);
+      
       if (action === "confirmed" || action === "accept") {
-        await supabase.from("matching").update({ status: "confirmed" }).eq("id", chatId);
+        const { data, error } = await supabase
+          .from("matching")
+          .update({ status: "confirmed" })
+          .eq("id", chatId)
+          .select();
+          
+        if (error) throw error;
+        console.log("Chat status updated to confirmed:", data);
       } else if (action === "cancel") {
-        await supabase.from("matching").update({ status: "cancelled" }).eq("id", chatId);
+        const { data, error } = await supabase
+          .from("matching")
+          .update({ status: "cancelled" })
+          .eq("id", chatId)
+          .select();
+          
+        if (error) throw error;
+        console.log("Chat status updated to cancelled:", data);
       } else if (action === "pending_acceptance") {
-        await supabase.from("matching").update({ status: "pending_acceptance" }).eq("id", chatId);
+        const { data, error } = await supabase
+          .from("matching")
+          .update({ status: "pending_acceptance" })
+          .eq("id", chatId)
+          .select();
+          
+        if (error) throw error;
       } else if (action === "pending") {
-        await supabase.from("matching").update({ status: "pending" }).eq("id", chatId);
+        const { data, error } = await supabase
+          .from("matching")
+          .update({ status: "pending" })
+          .eq("id", chatId)
+          .select();
+          
+        if (error) throw error;
       } else if (action === "message") {
         router.push(`/chat/${chatId}`);
         return; // Don't refresh chat list on navigation
       }
 
-      fetchChats(); // Refresh after update
+      // Delay slightly to ensure Supabase has processed the update
+      setTimeout(() => {
+        fetchChats(); // Refresh after update
+      }, 300);
     } catch (error) {
       console.error(`Error performing ${action} action:`, error);
+      console.error("Error details:", JSON.stringify(error));
     }
   };
 
