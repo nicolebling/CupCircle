@@ -65,25 +65,29 @@ export default function CircleChatsScreen() {
     }
   };
 
-  const handleAction = async (
-    chatId,
-    action
-  ) => {
+  const handleAction = async (chatId, action) => {
     try {
       if (action === "confirmed" || action === "accept") {
-        await supabase.from("matching").update({ status: "confirmed" }).eq("id", chatId);
+        await supabase
+          .from("matching")
+          .update({ status: "confirmed" })
+          .eq("match_id", chatId);
       } else if (action === "cancel") {
-        await supabase.from("matching").update({ status: "cancelled" }).eq("id", chatId);
+        await supabase
+          .from("matching")
+          .update({ status: "cancelled" })
+          .eq("match_id", chatId);
       } else if (action === "pending_acceptance") {
-        await supabase.from("matching").update({ status: "pending_acceptance" }).eq("id", chatId);
+        await supabase
+          .from("matching")
+          .update({ status: "pending_acceptance" })
+          .eq("match_id", chatId);
       } else if (action === "pending") {
-        await supabase.from("matching").update({ status: "pending" }).eq("id", chatId);
-      } else if (action === "message") {
-        router.push(`/chat/${chatId}`);
-        return; // Don't refresh chat list on navigation
+        await supabase
+          .from("matching")
+          .update({ status: "pending" })
+          .eq("match_id", chatId);
       }
-
-      fetchChats(); // Refresh after update
     } catch (error) {
       console.error(`Error performing ${action} action:`, error);
     }
@@ -102,7 +106,7 @@ export default function CircleChatsScreen() {
 
     return (
       <View
-        key={chat.id}
+        key={chat.match_id}
         style={[
           styles.chatCard,
           { backgroundColor: colors.card, borderColor: colors.border },
@@ -111,14 +115,19 @@ export default function CircleChatsScreen() {
         <View style={styles.chatHeader}>
           <View style={styles.profileSection}>
             <Image
-              source={{ uri: partnerProfile.photo_url || "https://via.placeholder.com/150" }}
+              source={{
+                uri:
+                  partnerProfile.photo_url || "https://via.placeholder.com/150",
+              }}
               style={styles.profilePhoto}
             />
             <View style={styles.profileInfo}>
               <Text style={[styles.partnerName, { color: colors.text }]}>
                 {partnerProfile.name || "Unknown"}
               </Text>
-              <Text style={[styles.occupation, { color: colors.secondaryText }]}>
+              <Text
+                style={[styles.occupation, { color: colors.secondaryText }]}
+              >
                 {partnerProfile.occupation || "No occupation listed"}
               </Text>
             </View>
@@ -136,7 +145,8 @@ export default function CircleChatsScreen() {
         <View style={styles.meetingDetails}>
           <View style={styles.detailRow}>
             <Text style={[styles.detailText, { color: colors.text }]}>
-              {new Date(chat.meeting_date).toLocaleDateString()} at {chat.start_time}
+              {new Date(chat.meeting_date).toLocaleDateString()} at{" "}
+              {chat.start_time}
             </Text>
           </View>
           <View style={styles.detailRow}>
@@ -166,13 +176,18 @@ export default function CircleChatsScreen() {
               style={[styles.actionButton, styles.cancelButton]}
               onPress={() => handleAction(chat.id, "cancel")}
             >
-              <Text style={[styles.actionButtonText, { color: colors.text }]}>Cancel</Text>
+              <Text style={[styles.actionButtonText, { color: colors.text }]}>
+                Cancel
+              </Text>
             </TouchableOpacity>
           )}
           {chat.status === "confirmed" && (
             <>
               <TouchableOpacity
-                style={[styles.actionButton, { backgroundColor: colors.primary }]}
+                style={[
+                  styles.actionButton,
+                  { backgroundColor: colors.primary },
+                ]}
                 onPress={() => handleAction(chat.id, "message")}
               >
                 <Text style={styles.actionButtonText}>Message</Text>
@@ -181,23 +196,30 @@ export default function CircleChatsScreen() {
                 style={[styles.actionButton, styles.cancelButton]}
                 onPress={() => handleAction(chat.id, "cancel")}
               >
-                <Text style={[styles.actionButtonText, { color: colors.text }]}>Cancel</Text>
+                <Text style={[styles.actionButtonText, { color: colors.text }]}>
+                  Cancel
+                </Text>
               </TouchableOpacity>
             </>
           )}
           {chat.status === "pending_acceptance" && (
             <>
               <TouchableOpacity
-                style={[styles.actionButton, { backgroundColor: colors.primary }]}
-                onPress={() => handleAction(chat.id, "accept")}
+                style={[
+                  styles.actionButton,
+                  { backgroundColor: colors.primary },
+                ]}
+                onPress={() => handleAction(chat.match_id, "accept")}
               >
                 <Text style={styles.actionButtonText}>Accept</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.actionButton, styles.cancelButton]}
-                onPress={() => handleAction(chat.id, "cancel")}
+                onPress={() => handleAction(chat.match_id, "cancel")}
               >
-                <Text style={[styles.actionButtonText, { color: colors.text }]}>Cancel</Text>
+                <Text style={[styles.actionButtonText, { color: colors.text }]}>
+                  Cancel
+                </Text>
               </TouchableOpacity>
             </>
           )}
@@ -219,11 +241,15 @@ export default function CircleChatsScreen() {
     });
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
+    <ScrollView
+      style={[styles.container, { backgroundColor: colors.background }]}
+    >
       <View style={styles.header}>
         <Text style={[styles.title, { color: colors.text }]}>Circle Chats</Text>
         <View style={styles.toggleContainer}>
-          <Text style={[styles.toggleLabel, { color: colors.text }]}>Show Past Chats</Text>
+          <Text style={[styles.toggleLabel, { color: colors.text }]}>
+            Show Past Chats
+          </Text>
           <Switch
             value={showPastChats}
             onValueChange={setShowPastChats}
@@ -233,19 +259,25 @@ export default function CircleChatsScreen() {
       </View>
 
       <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>Confirmed Chats</Text>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>
+          Confirmed Chats
+        </Text>
         {filterChatsByStatus("confirmed").map(renderChatCard)}
       </View>
 
       <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>Pending Acceptance</Text>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>
+          Pending Acceptance
+        </Text>
         {filterChatsByStatus("pending_acceptance")
           .filter((chat) => chat.user2_id === user.id)
           .map(renderChatCard)}
       </View>
 
       <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>Pending</Text>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>
+          Pending
+        </Text>
         {filterChatsByStatus("pending")
           .filter((chat) => chat.user1_id === user.id)
           .map(renderChatCard)}
@@ -337,7 +369,11 @@ const styles = StyleSheet.create({
     minWidth: 100,
     alignItems: "center",
   },
-  actionButtonText: { color: "#FFFFFF", fontFamily: "K2D-Medium", fontSize: 14 },
+  actionButtonText: {
+    color: "#FFFFFF",
+    fontFamily: "K2D-Medium",
+    fontSize: 14,
+  },
   cancelButton: {
     backgroundColor: "transparent",
     borderWidth: 1,
