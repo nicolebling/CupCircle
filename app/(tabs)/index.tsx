@@ -287,8 +287,30 @@ export default function CircleChatsScreen() {
         {filterChatsByStatus("pending")
           .filter((chat) => chat.user1_id === user.id)
           .map((chat) => (
-            <React.Fragment key={chat.match_id}>
+            <React.Fragment key={chat.id || chat.match_id}>
               {renderChatCard(chat)}
+              <View style={styles.actions}>
+                <TouchableOpacity
+                  style={[styles.actionButton, styles.cancelButton]}
+                  onPress={async () => {
+                    try {
+                      await supabase
+                        .from("matching")
+                        .update({ status: "cancelled" })
+                        .eq("id", chat.id);
+                      
+                      // Refresh the chats list after updating
+                      fetchChats();
+                    } catch (error) {
+                      console.error("Error cancelling chat:", error);
+                    }
+                  }}
+                >
+                  <Text style={[styles.actionButtonText, { color: colors.text }]}>
+                    Cancel
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </React.Fragment>
           ))}
       </View>
