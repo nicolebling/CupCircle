@@ -67,7 +67,7 @@ export default function CircleChatsScreen() {
 
   const handleAction = async (
     chatId: string,
-    action: "accept" | "cancel" | "message",
+    action: "accept" | "cancel" | "message" | "pending_acceptance",
   ) => {
     try {
       if (action === "accept") {
@@ -80,6 +80,12 @@ export default function CircleChatsScreen() {
           .from("matches")
           .update({ status: "cancelled" })
           .eq("id", chatId);
+      }
+        else if (action === "pending_acceptance") {
+          await supabase
+            .from("matches")
+            .update({ status: "pending_acceptance" })
+            .eq("id", chatId);
       }
 
       fetchChats(); // Refresh the chats
@@ -187,6 +193,27 @@ export default function CircleChatsScreen() {
             </>
           )}
           {chat.status === "confirmed" && (
+            <>
+              <TouchableOpacity
+                style={[
+                  styles.actionButton,
+                  { backgroundColor: colors.primary },
+                ]}
+                onPress={() => handleAction(chat.id, "message")}
+              >
+                <Text style={styles.actionButtonText}>Message</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.actionButton, styles.cancelButton]}
+                onPress={() => handleAction(chat.id, "cancel")}
+              >
+                <Text style={[styles.actionButtonText, { color: colors.text }]}>
+                  Cancel
+                </Text>
+              </TouchableOpacity>
+            </>
+          )}
+          {chat.status === "pending_acceptance" && (
             <>
               <TouchableOpacity
                 style={[
