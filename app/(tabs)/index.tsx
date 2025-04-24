@@ -67,25 +67,29 @@ export default function CircleChatsScreen() {
 
   const handleAction = async (
     chatId: string,
-    action: "accept" | "cancel" | "message" | "pending_acceptance",
+    action: "accept" | "cancel" | "message" | "pending_acceptance" | "pending",
   ) => {
     try {
       if (action === "accept") {
         await supabase
-          .from("matches")
+          .from("matching")
           .update({ status: "confirmed" })
           .eq("id", chatId);
       } else if (action === "cancel") {
         await supabase
-          .from("matches")
+          .from("matching")
           .update({ status: "cancelled" })
           .eq("id", chatId);
-      }
-        else if (action === "pending_acceptance") {
-          await supabase
-            .from("matches")
-            .update({ status: "pending_acceptance" })
-            .eq("id", chatId);
+      } else if (action === "pending_acceptance") {
+        await supabase
+          .from("matching")
+          .update({ status: "pending_acceptance" })
+          .eq("id", chatId);
+      } else if (action === "pending") {
+        await supabase
+          .from("matching")
+          .update({ status: "pending" })
+          .eq("id", chatId);
       }
 
       fetchChats(); // Refresh the chats
@@ -107,7 +111,7 @@ export default function CircleChatsScreen() {
 
     return (
       <View
-        key={chat.id}
+        key={chat.match_id}
         style={[
           styles.chatCard,
           { backgroundColor: colors.card, borderColor: colors.border },
@@ -171,17 +175,8 @@ export default function CircleChatsScreen() {
         )}
 
         <View style={styles.actions}>
-          {chat.status === "pending" && chat.user2_id === user.id && (
+          {chat.status === "pending" && (
             <>
-              <TouchableOpacity
-                style={[
-                  styles.actionButton,
-                  { backgroundColor: colors.primary },
-                ]}
-                onPress={() => handleAction(chat.id, "accept")}
-              >
-                <Text style={styles.actionButtonText}>Accept</Text>
-              </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.actionButton, styles.cancelButton]}
                 onPress={() => handleAction(chat.id, "cancel")}
@@ -220,9 +215,9 @@ export default function CircleChatsScreen() {
                   styles.actionButton,
                   { backgroundColor: colors.primary },
                 ]}
-                onPress={() => handleAction(chat.id, "message")}
+                onPress={() => handleAction(chat.id, "accept")}
               >
-                <Text style={styles.actionButtonText}>Message</Text>
+                <Text style={styles.actionButtonText}>Accept</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.actionButton, styles.cancelButton]}
@@ -245,7 +240,7 @@ export default function CircleChatsScreen() {
         if (chat.user1_id === user.id) {
           return chat.status === "pending"; // Requests you sent
         } else {
-          return chat.status === "pending"; // Requests you received
+          return chat.status === "pending_acceptance"; // Requests you received
         }
       }
       return chat.status === status;
@@ -280,7 +275,7 @@ export default function CircleChatsScreen() {
         <Text style={[styles.sectionTitle, { color: colors.text }]}>
           Pending Acceptance
         </Text>
-        {filterChatsByStatus("pending")
+        {filterChatsByStatus("pending_acceptance")
           .filter((chat) => chat.user2_id === user.id)
           .map(renderChatCard)}
       </View>
@@ -292,18 +287,8 @@ export default function CircleChatsScreen() {
         {filterChatsByStatus("pending")
           .filter((chat) => chat.user1_id === user.id)
           .map((chat) => (
-            <React.Fragment key={chat.id}>
+            <React.Fragment key={chat.match_id}>
               {renderChatCard(chat)}
-              <View style={styles.actions}>
-                <TouchableOpacity
-                  style={[styles.actionButton, styles.cancelButton]}
-                  onPress={() => handleAction(chat.id, "cancel")}
-                >
-                  <Text style={[styles.actionButtonText, { color: colors.text }]}>
-                    Cancel
-                  </Text>
-                </TouchableOpacity>
-              </View>
             </React.Fragment>
           ))}
       </View>

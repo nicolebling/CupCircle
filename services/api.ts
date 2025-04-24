@@ -140,7 +140,7 @@ export const availabilityService = {
 
       if (error) throw error;
       return data;
-    } catch (error) {
+    } catch (error) {2
       console.error("Failed to create availability:", error);
       throw error;
     }
