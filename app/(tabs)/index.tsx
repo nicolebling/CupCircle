@@ -291,7 +291,21 @@ export default function CircleChatsScreen() {
         </Text>
         {filterChatsByStatus("pending")
           .filter((chat) => chat.user1_id === user.id)
-          .map(renderChatCard)}
+          .map((chat) => (
+            <React.Fragment key={chat.id}>
+              {renderChatCard(chat)}
+              <View style={styles.actions}>
+                <TouchableOpacity
+                  style={[styles.actionButton, styles.cancelButton]}
+                  onPress={() => handleAction(chat.id, "cancel")}
+                >
+                  <Text style={[styles.actionButtonText, { color: colors.text }]}>
+                    Cancel
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </React.Fragment>
+          ))}
       </View>
     </ScrollView>
   );
