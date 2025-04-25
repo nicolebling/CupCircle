@@ -72,7 +72,14 @@ export default function CircleChatsScreen() {
           .from("matching")
           .update({ status: "confirmed" })
           .eq("match_id", chatId);
+        
+        // Refresh chats after update
+        fetchChats();
       } else if (action === "cancel") {
+        // Immediately remove the chat from UI
+        setChats(prevChats => prevChats.filter(chat => chat.match_id !== chatId));
+        
+        // Then update the database
         await supabase
           .from("matching")
           .update({ status: "cancelled" })
@@ -82,14 +89,26 @@ export default function CircleChatsScreen() {
           .from("matching")
           .update({ status: "pending_acceptance" })
           .eq("match_id", chatId);
+        
+        // Refresh chats after update
+        fetchChats();
       } else if (action === "pending") {
         await supabase
           .from("matching")
           .update({ status: "pending" })
           .eq("match_id", chatId);
+        
+        // Refresh chats after update
+        fetchChats();
+      } else if (action === "message") {
+        router.push(`/chat/${chatId}`);
       }
     } catch (error) {
       console.error(`Error performing ${action} action:`, error);
+      console.error("Error details:", JSON.stringify(error));
+      
+      // If there was an error, refresh to ensure UI is in sync with database
+      fetchChats();
     }
   };
 
