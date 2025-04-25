@@ -443,7 +443,7 @@ export default function MatchingScreen() {
             name: profile.name,
             photo:
               profile.photo_url ||
-              require("../../assets/images/cupcircle_dummyprofile.jpg"),
+              "https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg",
             occupation: profile.occupation,
             bio: profile.bio,
             experience_level: profile.experience_level,
