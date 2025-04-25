@@ -279,30 +279,38 @@ export default function CircleChatsScreen() {
         </View>
       </View>
 
-      <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>
-          Confirmed Chats
-        </Text>
-        {filterChatsByStatus("confirmed").map(renderChatCard)}
-      </View>
+      {filterChatsByStatus("confirmed").length > 0 && (
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>
+            Confirmed Chats
+          </Text>
+          {filterChatsByStatus("confirmed").map(renderChatCard)}
+        </View>
+      )}
 
-      <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>
-          Pending Acceptance
-        </Text>
-        {filterChatsByStatus("pending_acceptance")
-          .filter((chat) => chat.user2_id === user.id)
-          .map(renderChatCard)}
-      </View>
+      {filterChatsByStatus("pending_acceptance")
+        .filter((chat) => chat.user2_id === user.id).length > 0 && (
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>
+            Pending Acceptance
+          </Text>
+          {filterChatsByStatus("pending_acceptance")
+            .filter((chat) => chat.user2_id === user.id)
+            .map(renderChatCard)}
+        </View>
+      )}
 
-      <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>
-          Pending
-        </Text>
-        {filterChatsByStatus("pending")
-          .filter((chat) => chat.user1_id === user.id)
-          .map(renderChatCard)}
-      </View>
+      {filterChatsByStatus("pending")
+        .filter((chat) => chat.user1_id === user.id).length > 0 && (
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>
+            Pending
+          </Text>
+          {filterChatsByStatus("pending")
+            .filter((chat) => chat.user1_id === user.id)
+            .map(renderChatCard)}
+        </View>
+      )}
     </ScrollView>
   );
 }
