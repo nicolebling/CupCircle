@@ -121,7 +121,7 @@ export default function CircleChatsScreen() {
 
   const renderChatCard = (chat) => {
     const isExpired = new Date(chat.meeting_date) < new Date();
-    
+
     // When showing past chats, only show expired confirmed chats
     if (showPastChats) {
       if (!isExpired || chat.status !== "confirmed") return null;
@@ -173,26 +173,27 @@ export default function CircleChatsScreen() {
 
         <View style={styles.meetingDetails}>
           <View style={styles.detailRow}>
+            <Ionicons name="calendar-outline" size={20} color={colors.secondaryText} style={styles.detailIcon} />
             <Text style={[styles.detailText, { color: colors.text }]}>
-             
-          
               {chat.meeting_date}
-              {/* {new Date(chat.meeting_date).toISOString()} at{" "} */}
-              {"\n"}
-             
-              {chat.start_time.split(":")[0]}{":"}
-              {chat.start_time.split(":")[1]} {"-"}
-              {chat.end_time.split(":")[0]}{":"}{chat.end_time.split(":")[1]}
             </Text>
           </View>
-          
+
           <View style={styles.detailRow}>
-            
+            <Ionicons name="time-outline" size={20} color={colors.secondaryText} style={styles.detailIcon} />
+            <Text style={[styles.detailText, { color: colors.text }]}>
+              {chat.start_time.split(":")[0]}:{chat.start_time.split(":")[1]} - {chat.end_time.split(":")[0]}:{chat.end_time.split(":")[1]}
+            </Text>
+          </View>
+
+          <View style={styles.detailRow}>
+            <Ionicons name="location-outline" size={20} color={colors.secondaryText} style={styles.detailIcon} />
             <Text style={[styles.detailText, { color: colors.text }]}>
               {chat.meeting_location.split("|||")[0] || "Location not set"}
             </Text>
           </View>
           <View style={styles.detailRow}>
+            <Ionicons name="location-outline" size={20} color={colors.secondaryText} style={styles.detailIcon} />
             <Text style={[styles.detailText, { color: colors.text }]}>
               {chat.meeting_location.split("|||")[1] || "Location not set"}
             </Text>
@@ -427,6 +428,7 @@ const styles = StyleSheet.create({
   meetingDetails: { marginBottom: 12 },
   detailRow: { flexDirection: "row", alignItems: "center", marginBottom: 4 },
   detailText: { fontFamily: "K2D-Regular", fontSize: 14, marginLeft: 8 },
+  detailIcon: { marginRight: 8 },
   message: {
     fontFamily: "K2D-Regular",
     fontSize: 14,
