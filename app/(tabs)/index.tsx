@@ -76,32 +76,16 @@ export default function CircleChatsScreen() {
         // Refresh chats after update
         fetchChats();
       } else if (action === "cancel") {
-        Alert.alert(
-          "Cancel Chat",
-          "Are you sure you want to cancel this chat?",
-          [
-            {
-              text: "No",
-              style: "cancel"
-            },
-            {
-              text: "Yes",
-              style: "destructive",
-              onPress: async () => {
-                // Immediately remove the chat from UI
-                setChats((prevChats) =>
-                  prevChats.filter((chat) => chat.match_id !== chatId),
-                );
-
-                // Then update the database
-                await supabase
-                  .from("matching")
-                  .update({ status: "cancelled" })
-                  .eq("match_id", chatId);
-              }
-            }
-          ]
+        // Immediately remove the chat from UI
+        setChats((prevChats) =>
+          prevChats.filter((chat) => chat.match_id !== chatId),
         );
+
+        // Then update the database
+        await supabase
+          .from("matching")
+          .update({ status: "cancelled" })
+          .eq("match_id", chatId);
       } else if (action === "pending_acceptance") {
         await supabase
           .from("matching")
