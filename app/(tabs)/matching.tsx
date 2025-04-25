@@ -441,7 +441,7 @@ export default function MatchingScreen() {
           const formattedProfile = {
             id: profile.id,
             name: profile.name,
-            photo: profile.photo_url || "https://via.placeholder.com/150",
+            photo: profile.photo_url || "assets/images/cupcircle_dummyprofile.jpg",
             occupation: profile.occupation,
             bio: profile.bio,
             experience_level: profile.experience_level,

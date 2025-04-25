@@ -150,7 +150,7 @@ export default function CircleChatsScreen() {
             <Image
               source={{
                 uri:
-                  partnerProfile.photo_url || "https://via.placeholder.com/150",
+                  partnerProfile.photo_url || "https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg",
               }}
               style={styles.profilePhoto}
             />
@@ -201,27 +201,21 @@ export default function CircleChatsScreen() {
             </Text>
           </View>
 
-          <View style={styles.detailRow}>
+          <View style={[styles.detailRow, { alignItems: 'flex-start' }]}>
             <Ionicons
               name="location-outline"
               size={20}
               color={colors.secondaryText}
-              style={styles.detailIcon}
+              style={[styles.detailIcon, { marginTop: 2 }]} // tweak marginTop as needed
             />
-            <Text style={[styles.detailText, { color: colors.primary }]}>
-              {chat.meeting_location.split("|||")[0] || "Location not set"}
-            </Text>
-          </View>
-          <View style={styles.detailRow}>
-            <Ionicons
-              name="location-outline"
-              size={20}
-              color={colors.secondaryText}
-              style={styles.detailIcon}
-            />
-            <Text style={[styles.detailText, { color: colors.secondaryText }]}>
-              {chat.meeting_location.split("|||")[1] || "Location not set"}
-            </Text>
+            <View style={{ flex: 1 }}>
+              <Text style={[styles.detailTextBold, { color: colors.primary }]}>
+                {chat.meeting_location.split("|||")[0] || "Location not set"}
+              </Text>
+              <Text style={[styles.detailText, { color: colors.secondaryText }]}>
+                {chat.meeting_location.split("|||")[1] || "Location not set"}
+              </Text>
+            </View>
           </View>
         </View>
 
@@ -451,6 +445,7 @@ const styles = StyleSheet.create({
   meetingDetails: { marginBottom: 12 },
   detailRow: { flexDirection: "row", alignItems: "center", marginBottom: 4 },
   detailText: { fontFamily: "K2D-Regular", fontSize: 14, marginLeft: 8 },
+  detailTextBold: { fontFamily: "K2D-Bold", fontSize: 14, marginLeft: 8 },
   detailIcon: { marginRight: 8 },
   message: {
     fontFamily: "K2D-Regular",
