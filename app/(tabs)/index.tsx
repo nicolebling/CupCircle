@@ -174,9 +174,9 @@ export default function CircleChatsScreen() {
           {chat.status === "pending" && (
             <TouchableOpacity
               style={[styles.actionButton, styles.cancelButton]}
-              onPress={() => 
-                
-                handleAction(chat.id, "cancel")}
+              onPress={() => {
+                handleAction(chat.match_id, "cancel");
+              }}
             >
               <Text style={[styles.actionButtonText, { color: colors.text }]}>
                 Cancel
@@ -190,13 +190,13 @@ export default function CircleChatsScreen() {
                   styles.actionButton,
                   { backgroundColor: colors.primary },
                 ]}
-                onPress={() => handleAction(chat.id, "message")}
+                onPress={() => handleAction(chat.match_id, "message")}
               >
                 <Text style={styles.actionButtonText}>Message</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.actionButton, styles.cancelButton]}
-                onPress={() => handleAction(chat.id, "cancel")}
+                onPress={() => handleAction(chat.match_id, "cancel")}
               >
                 <Text style={[styles.actionButtonText, { color: colors.text }]}>
                   Cancel
