@@ -167,6 +167,7 @@ export default function CircleChatsScreen() {
         <View style={styles.meetingDetails}>
           <View style={styles.detailRow}>
             <Text style={[styles.detailText, { color: colors.text }]}>
+              
               {new Date(chat.meeting_date).toLocaleDateString()} at{" "}
               {chat.start_time}
             </Text>

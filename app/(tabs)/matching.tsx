@@ -1013,7 +1013,7 @@ export default function MatchingScreen() {
                             {
                               user1_id: user.id,
                               user2_id: currentProfile.id,
-                              status: "pending_acceptance",
+                              status: "pending",
                               meeting_date: selectedTimeSlot.date,
                               meeting_location: `${cafeName}|||${cafeAddress}`,
                               start_time: selectedTimeSlot.start_time,
