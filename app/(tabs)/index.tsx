@@ -72,13 +72,15 @@ export default function CircleChatsScreen() {
           .from("matching")
           .update({ status: "confirmed" })
           .eq("match_id", chatId);
-        
+
         // Refresh chats after update
         fetchChats();
       } else if (action === "cancel") {
         // Immediately remove the chat from UI
-        setChats(prevChats => prevChats.filter(chat => chat.match_id !== chatId));
-        
+        setChats((prevChats) =>
+          prevChats.filter((chat) => chat.match_id !== chatId),
+        );
+
         // Then update the database
         await supabase
           .from("matching")
@@ -89,7 +91,7 @@ export default function CircleChatsScreen() {
           .from("matching")
           .update({ status: "pending_acceptance" })
           .eq("match_id", chatId);
-        
+
         // Refresh chats after update
         fetchChats();
       } else if (action === "pending") {
@@ -97,7 +99,7 @@ export default function CircleChatsScreen() {
           .from("matching")
           .update({ status: "pending" })
           .eq("match_id", chatId);
-        
+
         // Refresh chats after update
         fetchChats();
       } else if (action === "message") {
@@ -106,7 +108,7 @@ export default function CircleChatsScreen() {
     } catch (error) {
       console.error(`Error performing ${action} action:`, error);
       console.error("Error details:", JSON.stringify(error));
-      
+
       // If there was an error, refresh to ensure UI is in sync with database
       fetchChats();
     }
@@ -167,12 +169,25 @@ export default function CircleChatsScreen() {
         <View style={styles.meetingDetails}>
           <View style={styles.detailRow}>
             <Text style={[styles.detailText, { color: colors.text }]}>
-              
-              {new Date(chat.meeting_date).toLocaleDateString()} at{" "}
-              {chat.start_time}
+              <Ionicons
+                name="calendar-outline"
+                size={14}
+                color={colors.primary}
+                style={{ marginRight: 5 }}
+              />
+          
+              {chat.meeting_date}
+              {/* {new Date(chat.meeting_date).toISOString()} at{" "} */}
+              {"\n"}
+             
+              {chat.start_time.split(":")[0]}{":"}
+              {chat.start_time.split(":")[1]} {"-"}
+              {chat.end_time.split(":")[0]}{":"}{chat.end_time.split(":")[1]}
             </Text>
           </View>
+          
           <View style={styles.detailRow}>
+            
             <Text style={[styles.detailText, { color: colors.text }]}>
               {chat.meeting_location.split("|||")[0] || "Location not set"}
             </Text>
@@ -292,8 +307,9 @@ export default function CircleChatsScreen() {
         </View>
       )}
 
-      {filterChatsByStatus("pending_acceptance")
-        .filter((chat) => chat.user2_id === user.id).length > 0 && (
+      {filterChatsByStatus("pending_acceptance").filter(
+        (chat) => chat.user2_id === user.id,
+      ).length > 0 && (
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>
             Pending Acceptance
@@ -304,8 +320,9 @@ export default function CircleChatsScreen() {
         </View>
       )}
 
-      {filterChatsByStatus("pending")
-        .filter((chat) => chat.user1_id === user.id).length > 0 && (
+      {filterChatsByStatus("pending").filter(
+        (chat) => chat.user1_id === user.id,
+      ).length > 0 && (
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>
             Pending
