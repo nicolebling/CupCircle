@@ -121,10 +121,15 @@ export default function CircleChatsScreen() {
 
   const renderChatCard = (chat) => {
     const isExpired = new Date(chat.meeting_date) < new Date();
-    // Don't show expired chats unless showPastChats is true
-    if (isExpired && !showPastChats) return null;
-    // For past chats, only show confirmed status
-    if (isExpired && showPastChats && chat.status !== "confirmed") return null;
+    
+    // When showing past chats, only show expired confirmed chats
+    if (showPastChats) {
+      if (!isExpired || chat.status !== "confirmed") return null;
+    } 
+    // When showing current chats, don't show expired chats
+    else {
+      if (isExpired) return null;
+    }
 
     const partnerProfile = getPartnerProfile(chat);
 
