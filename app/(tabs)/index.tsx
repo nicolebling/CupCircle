@@ -138,7 +138,11 @@ export default function CircleChatsScreen() {
         key={chat.match_id}
         style={[
           styles.chatCard,
-          { backgroundColor: colors.card, borderColor: colors.border },
+          { 
+            backgroundColor: colors.card, 
+            borderColor: colors.border,
+            opacity: showPastChats ? 0.7 : 1 
+          },
         ]}
       >
         <View style={styles.chatHeader}>
