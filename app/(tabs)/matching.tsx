@@ -537,10 +537,18 @@ export default function MatchingScreen() {
     return cafes && cafes.length > 0;
   };
 
+  const clearSelections = () => {
+    // Clear all user selections
+    setSelectedCafe("");
+    setSelectedTimeSlot(null);
+    setMessageText("");
+  };
+
   const handleNext = () => {
     if (profiles.length > 0 && currentIndex < profiles.length - 1) {
       console.log(`Liked ${profiles[currentIndex].name}`);
       cardOpacity.value = 0; // prepare next card to start invisible
+      clearSelections(); // Clear all selections
       setCurrentIndex(currentIndex + 1); // trigger re-render
     }
   };
@@ -548,6 +556,7 @@ export default function MatchingScreen() {
   const handlePrevious = () => {
     if (currentIndex > 0) {
       cardOpacity.value = 0; // prepare card to start invisible
+      clearSelections(); // Clear all selections
       setCurrentIndex(currentIndex - 1); // trigger re-render, fade handled in useEffect
     }
   };
@@ -1027,6 +1036,10 @@ export default function MatchingScreen() {
                         if (error) throw error;
 
                         alert("Match request sent successfully!");
+                        // Clear selections after successful request
+                        setSelectedCafe("");
+                        setSelectedTimeSlot(null);
+                        setMessageText("");
                         // Move to next profile
                         if (currentIndex < profiles.length - 1) {
                           setCurrentIndex(currentIndex + 1);
