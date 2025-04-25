@@ -221,7 +221,7 @@ export default function CircleChatsScreen() {
               </Text>
             </TouchableOpacity>
           )}
-          {chat.status === "confirmed" && (
+          {chat.status === "confirmed" && !showPastChats && (
             <>
               <TouchableOpacity
                 style={[
