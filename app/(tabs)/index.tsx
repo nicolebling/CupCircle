@@ -67,7 +67,7 @@ export default function CircleChatsScreen() {
 
   const handleAction = async (chatId, action) => {
     try {
-      if (action === "confirmed" || action === "accept") {
+      if (action === "confirmed") {
         await supabase
           .from("matching")
           .update({ status: "confirmed" })
@@ -230,7 +230,7 @@ export default function CircleChatsScreen() {
                   styles.actionButton,
                   { backgroundColor: colors.primary },
                 ]}
-                onPress={() => handleAction(chat.match_id, "accept")}
+                onPress={() => handleAction(chat.match_id, "confirmed")}
               >
                 <Text style={styles.actionButtonText}>Accept</Text>
               </TouchableOpacity>
