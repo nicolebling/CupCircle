@@ -298,12 +298,30 @@ export default function CircleChatsScreen() {
         </View>
       </View>
 
-      {filterChatsByStatus("confirmed").length > 0 && (
+      {filterChatsByStatus("confirmed")
+        .filter(chat => {
+          if (showPastChats) {
+            // For past chats, only show confirmed chats where the date has passed
+            return new Date(chat.meeting_date) < new Date();
+          } else {
+            // For current chats, only show confirmed chats where the date hasn't passed
+            return new Date(chat.meeting_date) >= new Date();
+          }
+        })
+        .length > 0 && (
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>
             Confirmed Chats
           </Text>
-          {filterChatsByStatus("confirmed").map(renderChatCard)}
+          {filterChatsByStatus("confirmed")
+            .filter(chat => {
+              if (showPastChats) {
+                return new Date(chat.meeting_date) < new Date();
+              } else {
+                return new Date(chat.meeting_date) >= new Date();
+              }
+            })
+            .map(renderChatCard)}
         </View>
       )}
 
