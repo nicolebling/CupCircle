@@ -174,12 +174,7 @@ export default function CircleChatsScreen() {
         <View style={styles.meetingDetails}>
           <View style={styles.detailRow}>
             <Text style={[styles.detailText, { color: colors.text }]}>
-              <Ionicons
-                name="calendar-outline"
-                size={14}
-                color={colors.primary}
-                style={{ marginRight: 5 }}
-              />
+             
           
               {chat.meeting_date}
               {/* {new Date(chat.meeting_date).toISOString()} at{" "} */}
