@@ -337,7 +337,7 @@ export default function CircleChatsScreen() {
             </View>
             {selectedProfile && (
               <ScrollView style={{ flex: 1 }}>
-                <View style={{ alignItems: 'center' }}>
+                <View style={{ alignItems: "center" }}>
                   <ProfileCard
                     profile={selectedProfile}
                     userId={selectedProfile.id}
@@ -351,7 +351,7 @@ export default function CircleChatsScreen() {
       </Modal>
 
       <View style={styles.header}>
-        {/* <Text style={[styles.title, { color: colors.text }]}>Circle Chats</Text> */}
+       
         <View style={styles.toggleContainer}>
           <Text style={[styles.toggleLabel, { color: colors.text }]}>
             Show Past Chats
@@ -525,11 +525,11 @@ const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "center",
+    justifyContent: "flex-end",
     alignItems: "center",
   },
   modalContent: {
-    width: "90%",
+    width: "100%",
     maxHeight: "85%",
     backgroundColor: "white",
     borderRadius: 16,

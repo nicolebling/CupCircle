@@ -168,7 +168,7 @@ export default function ProfileCard({
       }
 
       if (data) {
-        // Parse and set employment data
+       
        
         if (data.employment) {
           try {
@@ -181,14 +181,12 @@ export default function ProfileCard({
             } else {
               employmentData = [JSON.parse(data.employment)];
             }
-            console.log("Processed employment data:", employmentData);
+            
           } catch (e) {
             console.error("Error parsing employment data:", e);
-            console.error("Error details:", e.message);
+
           }
-        } else {
-          console.log("No employment data found");
-        }
+        } 
       }
       setProfileData(data);
     } catch (error) {
