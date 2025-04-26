@@ -164,15 +164,12 @@ export default function ProfileCard({
         .single();
 
       if (error) {
-        console.error("Error fetching profile:", error);
         throw error;
       }
 
-      console.log("Profile data fetched:", data);
-
       if (data) {
         // Parse and set employment data
-        console.log("Raw employment data:", data.employment);
+       
         if (data.employment) {
           try {
             let employmentData = [];
