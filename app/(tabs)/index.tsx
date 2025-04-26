@@ -337,11 +337,13 @@ export default function CircleChatsScreen() {
             </View>
             {selectedProfile && (
               <ScrollView style={{ flex: 1 }}>
-                <ProfileCard
-                  profile={selectedProfile}
-                  userId={selectedProfile.id}
-                  isNewUser={false}
-                />
+                <View style={{ alignItems: 'center' }}>
+                  <ProfileCard
+                    profile={selectedProfile}
+                    userId={selectedProfile.id}
+                    isNewUser={false}
+                  />
+                </View>
               </ScrollView>
             )}
           </View>
