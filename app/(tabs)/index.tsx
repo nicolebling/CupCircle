@@ -30,10 +30,59 @@ export default function CircleChatsScreen() {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [selectedProfile, setSelectedProfile] = useState(null);
 
+  // Make fetchChats available globally for other screens to call
+  const fetchChats = async () => {
+    try {
+      const { data: matchesData, error: matchesError } = await supabase
+        .from("matching")
+        .select("*")
+        .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`);
+
+      if (matchesError) throw matchesError;
+
+      const userIds = new Set();
+      matchesData.forEach((match) => {
+        userIds.add(match.user1_id);
+        userIds.add(match.user2_id);
+      });
+
+      const { data: profilesData, error: profilesError } = await supabase
+        .from("profiles")
+        .select("*")
+        .in("id", Array.from(userIds));
+
+      if (profilesError) throw profilesError;
+
+      const profileMap = {};
+      profilesData.forEach((profile) => {
+        profileMap[profile.id] = profile;
+      });
+
+      setProfiles(profileMap);
+      setChats(matchesData);
+    } catch (error) {
+      console.error("Error fetching chats:", error);
+    }
+  };
+
+  // Make refreshData function available globally
   useEffect(() => {
     if (user) {
       fetchChats();
     }
+    
+    // Expose the refresh function globally
+    if (!global.circleChatsScreen) {
+      global.circleChatsScreen = {};
+    }
+    global.circleChatsScreen.refreshData = fetchChats;
+    
+    return () => {
+      // Clean up when component unmounts
+      if (global.circleChatsScreen) {
+        global.circleChatsScreen.refreshData = null;
+      }
+    };
   }, [user]);
 
   const fetchChats = async () => {

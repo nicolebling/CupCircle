@@ -1042,6 +1042,12 @@ export default function MatchingScreen() {
                         setSelectedCafe("");
                         setSelectedTimeSlot(null);
                         setMessageText("");
+                        
+                        // Refresh index.tsx chats data if function is available
+                        if (global.circleChatsScreen && global.circleChatsScreen.refreshData) {
+                          global.circleChatsScreen.refreshData();
+                        }
+                        
                         // Move to next profile
                         if (currentIndex < profiles.length - 1) {
                           setCurrentIndex(currentIndex + 1);
