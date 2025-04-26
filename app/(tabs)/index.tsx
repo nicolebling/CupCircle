@@ -30,7 +30,6 @@ export default function CircleChatsScreen() {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [selectedProfile, setSelectedProfile] = useState(null);
 
-  // Make fetchChats available globally for other screens to call
   const fetchChats = async () => {
     try {
       const { data: matchesData, error: matchesError } = await supabase
@@ -84,8 +83,6 @@ export default function CircleChatsScreen() {
       }
     };
   }, [user]);
-
-  const fetchChats = async () => {
     try {
       const { data: matchesData, error: matchesError } = await supabase
         .from("matching")
