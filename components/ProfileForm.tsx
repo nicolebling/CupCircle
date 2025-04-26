@@ -94,7 +94,7 @@ export default function ProfileForm({
   const fetchProfile = async () => {
     try {
       setLoading(true);
-      console.log("Fetching profile for user ID:", userId);
+      
 
       const { data, error } = await supabase
         .from("profiles")
@@ -103,11 +103,9 @@ export default function ProfileForm({
         .single();
 
       if (error) {
-        console.error("Error fetching profile:", error);
         throw error;
       }
-      // console.log(userId);
-      // console.log("Profile fetched:", data);
+     
 
       if (data) {
         setName(data.name || "");
@@ -157,22 +155,11 @@ export default function ProfileForm({
           }
         }
         setCareerTransitions(transitionsData);
-
-        console.log(data.employment);
-
-        console.log("Profile data loaded into form state");
       }
     } catch (error) {
-      console.error("Failed to fetch profile:", error);
       Alert.alert("Error", "Failed to load profile information");
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleAddSkill = (skill: string) => {
-    if (skill.trim() && !skills.includes(skill.trim())) {
-      setSkills([...skills, skill.trim()]);
     }
   };
 
@@ -209,7 +196,6 @@ export default function ProfileForm({
   const uploadImage = async (uri: string) => {
     try {
       setLoading(true);
-      console.log("Starting upload for:", uri);
 
       // Ensure permission is granted
       const hasPermission = await requestPermission();
@@ -246,7 +232,6 @@ export default function ProfileForm({
 
       setAvatar(data.publicUrl);
     } catch (error) {
-      console.error("Error uploading image:", error);
       Alert.alert("Error", "Failed to upload image. Please try again.");
     } finally {
       setLoading(false);
@@ -290,27 +275,19 @@ export default function ProfileForm({
         updated_at: new Date(),
       };
 
-      console.log(
-        "Profile data being sent:",
-        JSON.stringify(profileData, null, 2),
-      );
-
       const { data, error } = await supabase
         .from("profiles")
         .upsert(profileData, { onConflict: "id" })
         .select();
 
       if (error) {
-        console.error("Supabase error response:", error);
-        console.error("Error details:", JSON.stringify(error));
         Alert.alert(
           "Profile Save Error",
           error?.message || "Failed to save profile. Please try again.",
         );
         throw error;
       }
-
-      console.log("Profile saved successfully:", data);
+      
       Alert.alert("Success", "Your profile has been saved");
       if (onSave) {
         onSave({
@@ -332,7 +309,6 @@ export default function ProfileForm({
         });
       }
     } catch (error: any) {
-      console.error("Error saving profile:", error);
       setError("Failed to save profile. Please try again.");
       if (error.code === "23505") {
         Alert.alert(

@@ -152,7 +152,6 @@ export default function ProfileCard({
   const fetchProfile = async () => {
     try {
       setLoading(true);
-      console.log("Fetching profile for user ID:", userId);
 
       const { data: session } = await supabase.auth.getSession();
       //const userId = session?.user?.id;
