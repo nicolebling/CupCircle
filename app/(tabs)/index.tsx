@@ -105,7 +105,7 @@ export default function CircleChatsScreen() {
               style: "cancel",
             },
             {
-              text: "Yes, Remove",
+              text: "Yes, Cancel",
               style: "destructive",
               onPress: () => {
                 setChats((prevChats) =>
