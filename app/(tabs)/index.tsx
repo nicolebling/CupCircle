@@ -69,13 +69,13 @@ export default function CircleChatsScreen() {
     if (user) {
       fetchChats();
     }
-    
+
     // Expose the refresh function globally
     if (!global.circleChatsScreen) {
       global.circleChatsScreen = {};
     }
     global.circleChatsScreen.refreshData = fetchChats;
-    
+
     return () => {
       // Clean up when component unmounts
       if (global.circleChatsScreen) {
@@ -83,38 +83,6 @@ export default function CircleChatsScreen() {
       }
     };
   }, [user]);
-    try {
-      const { data: matchesData, error: matchesError } = await supabase
-        .from("matching")
-        .select("*")
-        .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`);
-
-      if (matchesError) throw matchesError;
-
-      const userIds = new Set();
-      matchesData.forEach((match) => {
-        userIds.add(match.user1_id);
-        userIds.add(match.user2_id);
-      });
-
-      const { data: profilesData, error: profilesError } = await supabase
-        .from("profiles")
-        .select("*")
-        .in("id", Array.from(userIds));
-
-      if (profilesError) throw profilesError;
-
-      const profileMap = {};
-      profilesData.forEach((profile) => {
-        profileMap[profile.id] = profile;
-      });
-
-      setProfiles(profileMap);
-      setChats(matchesData);
-    } catch (error) {
-      console.error("Error fetching chats:", error);
-    }
-  };
 
   const handleAction = async (chatId, action) => {
     try {
@@ -128,26 +96,25 @@ export default function CircleChatsScreen() {
         fetchChats();
       } else if (action === "cancel") {
         // Immediately remove the chat from UI
-                 Alert.alert(
-                   "Cancel Chat",
-                   "Are you sure you want to cancel this chat?",
-                   [
-                     {
-                       text: "Cancel",
-                       style: "cancel",
-                     },
-                     {
-                       text: "Yes, Remove",
-                       style: "destructive",
-                       onPress: () => {
-                         setChats((prevChats) =>
-                           prevChats.filter((chat) => chat.match_id !== chatId)
-                         );
-                       },
-                     },
-                   ],
-                   { cancelable: true }
-                
+        Alert.alert(
+          "Cancel Chat",
+          "Are you sure you want to cancel this chat?",
+          [
+            {
+              text: "Cancel",
+              style: "cancel",
+            },
+            {
+              text: "Yes, Remove",
+              style: "destructive",
+              onPress: () => {
+                setChats((prevChats) =>
+                  prevChats.filter((chat) => chat.match_id !== chatId),
+                );
+              },
+            },
+          ],
+          { cancelable: true },
         );
 
         // Then update the database
@@ -416,7 +383,6 @@ export default function CircleChatsScreen() {
       </Modal>
 
       <View style={styles.header}>
-       
         <View style={styles.toggleContainer}>
           <Text style={[styles.toggleLabel, { color: colors.text }]}>
             Show Past Chats
