@@ -106,8 +106,8 @@ export default function ProfileForm({
         console.error("Error fetching profile:", error);
         throw error;
       }
-      console.log(userId);
-      console.log("Profile fetched:", data);
+      // console.log(userId);
+      // console.log("Profile fetched:", data);
 
       if (data) {
         setName(data.name || "");
