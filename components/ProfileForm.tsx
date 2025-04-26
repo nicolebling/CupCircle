@@ -94,7 +94,6 @@ export default function ProfileForm({
   const fetchProfile = async () => {
     try {
       setLoading(true);
-      
 
       const { data, error } = await supabase
         .from("profiles")
@@ -105,7 +104,6 @@ export default function ProfileForm({
       if (error) {
         throw error;
       }
-     
 
       if (data) {
         setName(data.name || "");
@@ -146,8 +144,10 @@ export default function ProfileForm({
         if (data.career_transitions) {
           try {
             transitionsData = Array.isArray(data.career_transitions)
-              ? data.career_transitions.map(transition => 
-                  typeof transition === 'string' ? JSON.parse(transition) : transition
+              ? data.career_transitions.map((transition) =>
+                  typeof transition === "string"
+                    ? JSON.parse(transition)
+                    : transition,
                 )
               : [JSON.parse(data.career_transitions)];
           } catch (e) {
@@ -287,7 +287,7 @@ export default function ProfileForm({
         );
         throw error;
       }
-      
+
       Alert.alert("Success", "Your profile has been saved");
       if (onSave) {
         onSave({
@@ -405,19 +405,19 @@ export default function ProfileForm({
                   resizeMode="cover"
                 />
               ) : (
-      <View
-        style={[
-          styles.image,
-          {
-            backgroundColor: "#ededed",
-            justifyContent: "center",
-            alignItems: "center",
-            marginTop: 0,
-          },
-        ]}
-      >
-        <Ionicons name="person" size={60} color="#fff" />
-      </View>
+                <View
+                  style={[
+                    styles.image,
+                    {
+                      backgroundColor: "#ededed",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      marginTop: 0,
+                    },
+                  ]}
+                >
+                  <Ionicons name="person" size={60} color="#fff" />
+                </View>
               )}
               <View style={styles.editButton}>
                 <Ionicons name="camera" size={20} color="#666" />
@@ -617,7 +617,7 @@ export default function ProfileForm({
 
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isDark && styles.textDark]}>
-                Favorite Cafes
+                Cafe Preferences
               </Text>
               <CafeSelector
                 selected={favoriteCafes}
