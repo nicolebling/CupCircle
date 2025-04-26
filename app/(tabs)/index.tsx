@@ -336,11 +336,13 @@ export default function CircleChatsScreen() {
               </TouchableOpacity>
             </View>
             {selectedProfile && (
-              <ProfileCard
-                profile={selectedProfile}
-                userId={selectedProfile.id}
-                isNewUser={false}
-              />
+              <ScrollView style={{ flex: 1 }}>
+                <ProfileCard
+                  profile={selectedProfile}
+                  userId={selectedProfile.id}
+                  isNewUser={false}
+                />
+              </ScrollView>
             )}
           </View>
         </View>
@@ -530,6 +532,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: 16,
     overflow: "hidden",
+    flex: 1,
   },
   modalHeader: {
     flexDirection: "row",
