@@ -145,19 +145,18 @@ export default function ProfileCard({
 
   useEffect(() => {
     if (!isNewUser) {
-      const cachedProfile = sessionStorage.getItem(`profile_${user?.id}`);
-      if (cachedProfile) {
-        setProfileData(JSON.parse(cachedProfile));
-        setLoading(false);
-      }
       fetchProfile();
     }
   }, [userId, isNewUser]);
 
   const fetchProfile = async () => {
     try {
-      if (!user?.id) return;
-      
+      setLoading(true);
+
+      const { data: session } = await supabase.auth.getSession();
+      //const userId = session?.user?.id;
+      if (!session?.user) return;
+
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
@@ -166,11 +165,6 @@ export default function ProfileCard({
 
       if (error) {
         throw error;
-      }
-
-      if (data) {
-        sessionStorage.setItem(`profile_${user.id}`, JSON.stringify(data));
-        setProfileData(data);
       }
 
       if (data) {
