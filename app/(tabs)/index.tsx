@@ -8,6 +8,7 @@ import {
   ScrollView,
   Switch,
   Modal,
+  Alert,
 } from "react-native";
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
@@ -81,8 +82,26 @@ export default function CircleChatsScreen() {
         fetchChats();
       } else if (action === "cancel") {
         // Immediately remove the chat from UI
-        setChats((prevChats) =>
-          prevChats.filter((chat) => chat.match_id !== chatId),
+                 Alert.alert(
+                   "Cancel Chat",
+                   "Are you sure you want to cancel this chat?",
+                   [
+                     {
+                       text: "Cancel",
+                       style: "cancel",
+                     },
+                     {
+                       text: "Yes, Remove",
+                       style: "destructive",
+                       onPress: () => {
+                         setChats((prevChats) =>
+                           prevChats.filter((chat) => chat.match_id !== chatId)
+                         );
+                       },
+                     },
+                   ],
+                   { cancelable: true }
+                
         );
 
         // Then update the database
@@ -330,7 +349,7 @@ export default function CircleChatsScreen() {
             <View style={styles.modalHeader}>
               <TouchableOpacity
                 onPress={() => setShowProfileModal(false)}
-                style={styles.closeButton}
+                style={styles.floatingCloseButton}
               >
                 <Ionicons name="close" size={24} color={colors.text} />
               </TouchableOpacity>
@@ -539,9 +558,15 @@ const styles = StyleSheet.create({
   modalHeader: {
     flexDirection: "row",
     justifyContent: "flex-end",
-    padding: 12,
+    paddingHorizontal: 12,
   },
   closeButton: {
     padding: 8,
+  },
+  floatingCloseButton: {
+    position: "absolute",
+    top: 20,
+    right: 20,
+    zIndex: 1,
   },
 });

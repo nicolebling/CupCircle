@@ -1737,11 +1737,5 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     fontSize: 12,
     fontFamily: "K2D-Regular",
-  },
-  floatingCloseButton: {
-    position: "absolute",
-    top: 20,
-    right: 20,
-    zIndex: 1,
-  },
+  }
 });
