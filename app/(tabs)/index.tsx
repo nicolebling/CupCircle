@@ -308,7 +308,7 @@ export default function CircleChatsScreen() {
       style={[styles.container, { backgroundColor: colors.background }]}
     >
       <View style={styles.header}>
-        <Text style={[styles.title, { color: colors.text }]}>Circle Chats</Text>
+        {/* <Text style={[styles.title, { color: colors.text }]}>Circle Chats</Text> */}
         <View style={styles.toggleContainer}>
           <Text style={[styles.toggleLabel, { color: colors.text }]}>
             Show Past Chats
@@ -418,7 +418,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   title: { fontFamily: "K2D-Bold", fontSize: 24 },
-  toggleContainer: { flexDirection: "row", alignItems: "center" },
+  toggleContainer: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-end",
+  },
   toggleLabel: { marginRight: 8, fontFamily: "K2D-Regular", fontSize: 14 },
   section: { padding: 16 },
   sectionTitle: { fontFamily: "K2D-SemiBold", fontSize: 18, marginBottom: 12 },
