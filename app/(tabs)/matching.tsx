@@ -191,6 +191,30 @@ export default function MatchingScreen() {
     try {
       console.log("Fetching profiles for users with availability");
 
+      // First, fetch all past confirmed meetings with the current user
+      const { data: pastMeetings, error: pastMeetingsError } = await supabase
+        .from("matching")
+        .select("*")
+        .or(`user1_id.eq.${user?.id},user2_id.eq.${user?.id}`)
+        .eq("status", "confirmed");
+
+      if (pastMeetingsError) {
+        console.error("Error fetching past meetings:", pastMeetingsError);
+        throw pastMeetingsError;
+      }
+
+      // Extract user IDs that the current user has already met with
+      const pastMeetingUserIds = new Set();
+      pastMeetings?.forEach(meeting => {
+        if (meeting.user1_id === user?.id) {
+          pastMeetingUserIds.add(meeting.user2_id);
+        } else {
+          pastMeetingUserIds.add(meeting.user1_id);
+        }
+      });
+      
+      console.log("Users with past meetings:", Array.from(pastMeetingUserIds));
+
       // Get users with availability
       console.log("Current user ID:", user?.id);
       const today = new Date().toISOString().split("T")[0];
@@ -205,7 +229,6 @@ export default function MatchingScreen() {
 
       if (availabilityError) {
         console.error("Error fetching availability data:", availabilityError);
-
         throw availabilityError;
       }
 
@@ -239,9 +262,10 @@ export default function MatchingScreen() {
         return;
       }
 
-      // Get unique user IDs
-      let userIds = [...new Set(availabilityData.map((item) => item.id))];
-      console.log("Unique user IDs with availability:", userIds);
+      // Get unique user IDs and filter out users that have past confirmed meetings
+      let userIds = [...new Set(availabilityData.map((item) => item.id))]
+        .filter(id => !pastMeetingUserIds.has(id));
+      console.log("Unique user IDs with availability (excluding past meetings):", userIds);
 
       if (userIds.length === 0) {
         console.log("No users with availability found after filtering");
