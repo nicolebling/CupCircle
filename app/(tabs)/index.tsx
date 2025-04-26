@@ -7,6 +7,7 @@ import {
   Image,
   ScrollView,
   Switch,
+  Modal,
 } from "react-native";
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
@@ -14,6 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "expo-router";
+import ProfileCard from "@/components/ProfileCard";
 
 export default function CircleChatsScreen() {
   const colorScheme = useColorScheme();
@@ -24,6 +26,8 @@ export default function CircleChatsScreen() {
   const [showPastChats, setShowPastChats] = useState(false);
   const [chats, setChats] = useState([]);
   const [profiles, setProfiles] = useState({});
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [selectedProfile, setSelectedProfile] = useState(null);
 
   useEffect(() => {
     if (user) {
@@ -147,14 +151,21 @@ export default function CircleChatsScreen() {
       >
         <View style={styles.chatHeader}>
           <View style={styles.profileSection}>
-            <Image
-              source={{
-                uri:
-                  partnerProfile.photo_url ||
-                  "https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg",
+            <TouchableOpacity
+              onPress={() => {
+                setSelectedProfile(partnerProfile);
+                setShowProfileModal(true);
               }}
-              style={styles.profilePhoto}
-            />
+            >
+              <Image
+                source={{
+                  uri:
+                    partnerProfile.photo_url ||
+                    "https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg",
+                }}
+                style={styles.profilePhoto}
+              />
+            </TouchableOpacity>
             <View style={styles.profileInfo}>
               <Text style={[styles.partnerName, { color: colors.text }]}>
                 {partnerProfile.name || "Unknown"}
@@ -307,6 +318,34 @@ export default function CircleChatsScreen() {
     <ScrollView
       style={[styles.container, { backgroundColor: colors.background }]}
     >
+      {/* Profile Modal */}
+      <Modal
+        visible={showProfileModal}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowProfileModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <TouchableOpacity
+                onPress={() => setShowProfileModal(false)}
+                style={styles.closeButton}
+              >
+                <Ionicons name="close" size={24} color={colors.text} />
+              </TouchableOpacity>
+            </View>
+            {selectedProfile && (
+              <ProfileCard
+                profile={selectedProfile}
+                userId={selectedProfile.id}
+                isNewUser={false}
+              />
+            )}
+          </View>
+        </View>
+      </Modal>
+
       <View style={styles.header}>
         {/* <Text style={[styles.title, { color: colors.text }]}>Circle Chats</Text> */}
         <View style={styles.toggleContainer}>
@@ -478,5 +517,26 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
     borderWidth: 1,
     borderColor: "#666",
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContent: {
+    width: "90%",
+    maxHeight: "85%",
+    backgroundColor: "white",
+    borderRadius: 16,
+    overflow: "hidden",
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    padding: 12,
+  },
+  closeButton: {
+    padding: 8,
   },
 });
