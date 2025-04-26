@@ -191,29 +191,30 @@ export default function MatchingScreen() {
     try {
       console.log("Fetching profiles for users with availability");
 
-      // First, fetch all past confirmed meetings with the current user
-      const { data: pastMeetings, error: pastMeetingsError } = await supabase
+      // Fetch all active and past meetings with the current user
+      // This includes pending, pending_acceptance, and confirmed status
+      const { data: allMeetings, error: meetingsError } = await supabase
         .from("matching")
         .select("*")
         .or(`user1_id.eq.${user?.id},user2_id.eq.${user?.id}`)
-        .eq("status", "confirmed");
+        .in("status", ["pending", "pending_acceptance", "confirmed"]);
 
-      if (pastMeetingsError) {
-        console.error("Error fetching past meetings:", pastMeetingsError);
-        throw pastMeetingsError;
+      if (meetingsError) {
+        console.error("Error fetching meetings:", meetingsError);
+        throw meetingsError;
       }
 
-      // Extract user IDs that the current user has already met with
-      const pastMeetingUserIds = new Set();
-      pastMeetings?.forEach(meeting => {
+      // Extract user IDs that the current user has active chats with or has already met
+      const excludedUserIds = new Set();
+      allMeetings?.forEach(meeting => {
         if (meeting.user1_id === user?.id) {
-          pastMeetingUserIds.add(meeting.user2_id);
+          excludedUserIds.add(meeting.user2_id);
         } else {
-          pastMeetingUserIds.add(meeting.user1_id);
+          excludedUserIds.add(meeting.user1_id);
         }
       });
       
-      console.log("Users with past meetings:", Array.from(pastMeetingUserIds));
+      console.log("Users with active or past meetings:", Array.from(excludedUserIds));
 
       // Get users with availability
       console.log("Current user ID:", user?.id);
@@ -262,10 +263,10 @@ export default function MatchingScreen() {
         return;
       }
 
-      // Get unique user IDs and filter out users that have past confirmed meetings
+      // Get unique user IDs and filter out users that have active or past chats
       let userIds = [...new Set(availabilityData.map((item) => item.id))]
-        .filter(id => !pastMeetingUserIds.has(id));
-      console.log("Unique user IDs with availability (excluding past meetings):", userIds);
+        .filter(id => !excludedUserIds.has(id));
+      console.log("Unique user IDs with availability (excluding active and past meetings):", userIds);
 
       if (userIds.length === 0) {
         console.log("No users with availability found after filtering");
