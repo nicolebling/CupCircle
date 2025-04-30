@@ -92,7 +92,7 @@ export default function MessageScreen() {
       const { data: matchingData, error: matchingError } = await supabase
         .from("matching")
         .select("user1_id, user2_id")
-        .eq("id", id)
+        .eq("match_id", id)
         .single();
 
       if (matchingError) throw matchingError;
@@ -144,9 +144,9 @@ export default function MessageScreen() {
   const markMessageAsRead = async (messageId: string) => {
     try {
       await supabase
-        .from("messages")
+        .from("message")
         .update({ read: true })
-        .eq("id", messageId);
+        .eq("chat_id", messageId);
     } catch (error) {
       console.error("Error marking message as read:", error);
     }
