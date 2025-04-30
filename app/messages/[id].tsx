@@ -159,7 +159,6 @@ export default function MessageScreen() {
       setSending(true);
 
       const message = {
-        chat_id: id,
         sender_id: user.id,
         receiver_id: partner.id,
         content: newMessage.trim(),
@@ -167,7 +166,10 @@ export default function MessageScreen() {
         read: false,
       };
 
-      const { error } = await supabase.from("message").insert([message]);
+      const { data, error } = await supabase
+        .from("message")
+        .insert([message])
+        .select();
 
       if (error) throw error;
 
