@@ -10,6 +10,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
+  ScrollView,
 } from "react-native";
 import { useLocalSearchParams, useRouter, Stack } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -18,6 +19,7 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import Colors from "@/constants/Colors";
 import { supabase } from "@/lib/supabase";
 import { Image } from "react-native";
+import ProfileCard from "@/components/ProfileCard";
 
 type Message = {
   id: string;
@@ -46,6 +48,7 @@ export default function MessageScreen() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [partner, setPartner] = useState<Profile | null>(null);
+  const [partnerProfile, setPartnerProfile] = useState(null);
   const [activeTab, setActiveTab] = useState("messages"); // 'messages' or 'profile'
 
   const flatListRef = useRef<FlatList>(null);
@@ -108,7 +111,7 @@ export default function MessageScreen() {
           ? matchingData.user2_id
           : matchingData.user1_id;
 
-      // Fetch partner profile
+      // Fetch basic partner profile info
       const { data: profileData, error: profileError } = await supabase
         .from("profiles")
         .select("id, name, photo_url")
@@ -118,6 +121,19 @@ export default function MessageScreen() {
       if (profileError) throw profileError;
 
       setPartner(profileData);
+      
+      // Fetch complete profile data for the partner
+      const { data: fullProfileData, error: fullProfileError } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", partnerId)
+        .single();
+        
+      if (fullProfileError) {
+        console.error("Error fetching full profile:", fullProfileError);
+      } else if (fullProfileData) {
+        setPartnerProfile(fullProfileData);
+      }
 
       // Fetch messages - first check if chat_id exists in table columns
       const { data: messagesData, error: messagesError } = await supabase
@@ -456,37 +472,39 @@ export default function MessageScreen() {
         ) : (
           <View style={styles.profileTab}>
             {partner ? (
-              <View style={styles.profileDetails}>
-                <Image
-                  source={{
-                    uri: partner.photo_url || "https://via.placeholder.com/200",
-                  }}
-                  style={styles.largeProfileImage}
-                />
-                <Text style={[styles.largeName, { color: colors.text }]}>
-                  {partner.name || "Chat Partner"}
-                </Text>
-
-                {/* Add more profile details here as needed */}
-                <View
-                  style={[
-                    styles.profileSection,
-                    { borderTopColor: colors.border },
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.sectionTitle,
-                      { color: colors.secondaryText },
-                    ]}
-                  >
-                    About
-                  </Text>
-                  <Text style={[styles.sectionContent, { color: colors.text }]}>
-                    No information available
-                  </Text>
-                </View>
-              </View>
+              <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 20 }}>
+                {loading ? (
+                  <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color={colors.primary} />
+                  </View>
+                ) : (
+                  <View style={{ paddingHorizontal: 10 }}>
+                    {/* We'll use the ProfileCard component to display partner profile */}
+                    {partnerProfile ? (
+                      <ProfileCard
+                        profile={partnerProfile}
+                        userId={partner.id}
+                        isNewUser={false}
+                      />
+                    ) : (
+                      <View style={styles.profileDetails}>
+                        <Image
+                          source={{
+                            uri: partner.photo_url || "https://via.placeholder.com/200",
+                          }}
+                          style={styles.largeProfileImage}
+                        />
+                        <Text style={[styles.largeName, { color: colors.text }]}>
+                          {partner.name || "Chat Partner"}
+                        </Text>
+                        <Text style={[styles.sectionContent, { color: colors.text, textAlign: 'center' }]}>
+                          Profile information not available
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+                )}
+              </ScrollView>
             ) : (
               <View style={styles.loadingContainer}>
                 <ActivityIndicator size="large" color={colors.primary} />
