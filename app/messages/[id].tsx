@@ -65,15 +65,20 @@ export default function MessageScreen() {
           event: "INSERT",
           schema: "public",
           table: "message",
-          filter: `chat_id=eq.${id}`,
         },
         (payload) => {
           const newMsg = payload.new as Message;
-          setMessages((prev) => [...prev, newMsg]);
+          
+          // Only add message if it belongs to this conversation
+          if ((newMsg.sender_id === user.id && newMsg.receiver_id === partnerId) || 
+              (newMsg.sender_id === partnerId && newMsg.receiver_id === user.id)) {
+            console.log("New message received:", newMsg.content);
+            setMessages((prev) => [...prev, newMsg]);
 
-          // Mark as read if received by this user
-          if (newMsg.receiver_id === user.id) {
-            markMessageAsRead(newMsg.id);
+            // Mark as read if received by this user
+            if (newMsg.receiver_id === user.id) {
+              markMessageAsRead(newMsg.id);
+            }
           }
         },
       )
@@ -114,16 +119,23 @@ export default function MessageScreen() {
 
       setPartner(profileData);
 
-      // Fetch messages
+      // Fetch messages - first check if chat_id exists in table columns
       const { data: messagesData, error: messagesError } = await supabase
         .from("message")
         .select("*")
-        .eq("chat_id", id)
+        .or(`sender_id.eq.${user?.id},receiver_id.eq.${user?.id}`)
         .order("created_at", { ascending: true });
 
       if (messagesError) throw messagesError;
 
-      setMessages(messagesData || []);
+      // Filter messages that belong to this conversation (between these two users)
+      const filteredMessages = messagesData?.filter(msg => 
+        (msg.sender_id === user?.id && msg.receiver_id === partnerId) || 
+        (msg.sender_id === partnerId && msg.receiver_id === user?.id)
+      ) || [];
+      
+      console.log(`Found ${filteredMessages.length} messages for this conversation`);
+      setMessages(filteredMessages);
 
       // Mark all unread messages as read
       const unreadMessages =
@@ -162,17 +174,22 @@ export default function MessageScreen() {
         sender_id: user.id,
         receiver_id: partner.id,
         content: newMessage.trim(),
-        created_at: new Date().toISOString(), // ？？？？？？？？？？？？？？？
+        created_at: new Date().toISOString(),
         read: false,
       };
 
+      console.log("Sending message:", message);
       const { data, error } = await supabase
         .from("message")
         .insert([message])
         .select();
 
-      if (error) throw error;
-
+      if (error) {
+        console.error("Error inserting message:", error);
+        throw error;
+      }
+      
+      console.log("Message sent successfully:", data);
       setNewMessage("");
     } catch (error) {
       console.error("Error sending message:", error);
