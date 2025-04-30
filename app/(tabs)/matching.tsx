@@ -134,18 +134,18 @@ export default function MatchingScreen() {
       if (!user) return;
 
       try {
-        console.log("Checking availability for user:", user.id);
+        //console.log("Checking availability for user:", user.id);
         const { data, error } = await supabase
           .from("availability")
           .select("*")
           .eq("id", user.id);
 
         if (error) {
-          console.error("Error fetching user availability:", error);
+          //console.error("Error fetching user availability:", error);
           throw error;
         }
 
-        console.log("User availability data:", data);
+        //console.log("User availability data:", data);
 
         // Filter out past availability
         const now = new Date();
@@ -168,7 +168,7 @@ export default function MatchingScreen() {
 
         const hasValidAvailability =
           futureAvailability && futureAvailability.length > 0;
-        console.log("User has valid availability:", hasValidAvailability);
+        // console.log("User has valid availability:", hasValidAvailability);
         setHasAvailability(hasValidAvailability);
 
         // Always fetch profiles - we'll show appropriate UI based on hasAvailability state
@@ -189,7 +189,7 @@ export default function MatchingScreen() {
   const fetchProfiles = async () => {
     setIsLoading(true);
     try {
-      console.log("Fetching profiles for users with availability");
+      //console.log("Fetching profiles for users with availability");
 
       // Fetch all active and past meetings with the current user
       // This includes pending, pending_acceptance, and confirmed status
@@ -200,7 +200,7 @@ export default function MatchingScreen() {
         .in("status", ["pending", "pending_acceptance", "confirmed"]);
 
       if (meetingsError) {
-        console.error("Error fetching meetings:", meetingsError);
+        // console.error("Error fetching meetings:", meetingsError);
         throw meetingsError;
       }
 
@@ -214,12 +214,12 @@ export default function MatchingScreen() {
         }
       });
       
-      console.log("Users with active or past meetings:", Array.from(excludedUserIds));
+      //console.log("Users with active or past meetings:", Array.from(excludedUserIds));
 
       // Get users with availability
-      console.log("Current user ID:", user?.id);
+      //console.log("Current user ID:", user?.id);
       const today = new Date().toISOString().split("T")[0];
-      console.log("Fetching availability from date:", today);
+      //console.log("Fetching availability from date:", today);
 
       const { data: availabilityData, error: availabilityError } =
         await supabase
@@ -229,11 +229,11 @@ export default function MatchingScreen() {
           .order("date", { ascending: true });
 
       if (availabilityError) {
-        console.error("Error fetching availability data:", availabilityError);
+        // console.error("Error fetching availability data:", availabilityError);
         throw availabilityError;
       }
 
-      console.log("Retrieved availability data:", availabilityData);
+      // console.log("Retrieved availability data:", availabilityData);
 
       // Filter out expired time slots for today
       const now = new Date();
@@ -254,10 +254,10 @@ export default function MatchingScreen() {
         return false;
       });
 
-      console.log("Filtered availability data:", validAvailability);
+      // console.log("Filtered availability data:", validAvailability);
 
       if (!availabilityData || availabilityData.length === 0) {
-        console.log("No users with availability found");
+        //console.log("No users with availability found");
         setProfiles([]);
         setIsLoading(false);
         return;
@@ -266,10 +266,10 @@ export default function MatchingScreen() {
       // Get unique user IDs and filter out users that have active or past chats
       let userIds = [...new Set(availabilityData.map((item) => item.id))]
         .filter(id => !excludedUserIds.has(id));
-      console.log("Unique user IDs with availability (excluding active and past meetings):", userIds);
+      // console.log("Unique user IDs with availability (excluding active and past meetings):", userIds);
 
       if (userIds.length === 0) {
-        console.log("No users with availability found after filtering");
+        // console.log("No users with availability found after filtering");
         setProfiles([]);
         setIsLoading(false);
         return;
@@ -282,14 +282,14 @@ export default function MatchingScreen() {
         .in("id", userIds);
 
       if (profilesError) {
-        console.error("Error fetching profile data:", profilesError);
+        // console.error("Error fetching profile data:", profilesError);
         throw profilesError;
       }
 
-      console.log("Retrieved profiles data:", profilesData);
+      //console.log("Retrieved profiles data:", profilesData);
 
       if (!profilesData || profilesData.length === 0) {
-        console.log("No profile data found for available users");
+        
         setProfiles([]);
         setIsLoading(false);
         return;
@@ -305,9 +305,9 @@ export default function MatchingScreen() {
       const sevenDaysLaterStr = sevenDaysLater.toISOString().split("T")[0];
       const todayStr = now.toISOString().split("T")[0];
 
-      console.log(
-        `Filtering availability between ${todayStr} and ${sevenDaysLaterStr}`,
-      );
+      // console.log(
+      //   `Filtering availability between ${todayStr} and ${sevenDaysLaterStr}`,
+      // );
 
       for (const userId of userIds) {
         const { data: userAvail, error: availError } = await supabase
@@ -344,12 +344,12 @@ export default function MatchingScreen() {
 
       // Filter user IDs to only those with upcoming availability
       userIds = usersWithUpcomingAvailability;
-      console.log(
-        `Found ${userIds.length} users with availability in the next 7 days`,
-      );
+      // console.log(
+      //   `Found ${userIds.length} users with availability in the next 7 days`,
+      // );
 
       if (userIds.length === 0) {
-        console.log("No users with upcoming availability found");
+        // console.log("No users with upcoming availability found");
         setProfiles([]);
         setIsLoading(false);
         return;
@@ -462,7 +462,7 @@ export default function MatchingScreen() {
             console.error("Error parsing interests:", e);
           }
 
-          console.log("Processing profile:", profile.id, profile.name);
+          // console.log("Processing profile:", profile.id, profile.name);
           const formattedProfile = {
             id: profile.id,
             name: profile.name,
@@ -489,7 +489,7 @@ export default function MatchingScreen() {
           return formattedProfile;
         });
 
-      console.log("Formatted profiles:", formattedProfiles.length);
+      // console.log("Formatted profiles:", formattedProfiles.length);
 
       // Store all profiles and set pagination
       setAllProfiles(formattedProfiles);
@@ -573,7 +573,7 @@ export default function MatchingScreen() {
 
   const handleNext = () => {
     if (profiles.length > 0 && currentIndex < profiles.length - 1) {
-      console.log(`Liked ${profiles[currentIndex].name}`);
+      //console.log(`Liked ${profiles[currentIndex].name}`);
       cardOpacity.value = 0; // prepare next card to start invisible
       clearSelections(); // Clear all selections
       setCurrentIndex(currentIndex + 1); // trigger re-render
@@ -1024,7 +1024,7 @@ export default function MatchingScreen() {
                     onPress={async () => {
                       try {
                         if (!user?.id) {
-                          console.error("No user ID found");
+                          //console.error("No user ID found");
                           return;
                         }
 
@@ -1078,7 +1078,7 @@ export default function MatchingScreen() {
                           setCurrentIndex(currentIndex + 1);
                         }
                       } catch (error) {
-                        console.error("Error sending match request:", error);
+                        //console.error("Error sending match request:", error);
                         alert(
                           "Failed to send match request. Please try again.",
                         );

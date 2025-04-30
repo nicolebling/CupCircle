@@ -221,7 +221,6 @@ export default function ProfileCard({
 
       if (error) throw error;
     } catch (error) {
-      console.error("Error saving cafe selections:", error);
       Alert.alert("Error", "Failed to save cafe selections");
     }
   };
@@ -243,7 +242,7 @@ export default function ProfileCard({
       setProfileData(data);
       setIsEditMode(false);
     } catch (error) {
-      console.error("Error saving profile:", error);
+      
       Alert.alert("Error", "Failed to save profile changes");
     }
   };
