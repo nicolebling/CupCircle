@@ -71,10 +71,13 @@ export default function MessageScreen() {
         },
         (payload) => {
           const newMsg = payload.new as Message;
-          
+
           // Only add message if it belongs to this conversation
-          if ((newMsg.sender_id === user.id && newMsg.receiver_id === partnerId) || 
-              (newMsg.sender_id === partnerId && newMsg.receiver_id === user.id)) {
+          if (
+            (newMsg.sender_id === user.id &&
+              newMsg.receiver_id === partnerId) ||
+            (newMsg.sender_id === partnerId && newMsg.receiver_id === user.id)
+          ) {
             console.log("New message received:", newMsg.content);
             setMessages((prev) => [...prev, newMsg]);
 
@@ -121,14 +124,14 @@ export default function MessageScreen() {
       if (profileError) throw profileError;
 
       setPartner(profileData);
-      
+
       // Fetch complete profile data for the partner
       const { data: fullProfileData, error: fullProfileError } = await supabase
         .from("profiles")
         .select("*")
         .eq("id", partnerId)
         .single();
-        
+
       if (fullProfileError) {
         console.error("Error fetching full profile:", fullProfileError);
       } else if (fullProfileData) {
@@ -145,12 +148,16 @@ export default function MessageScreen() {
       if (messagesError) throw messagesError;
 
       // Filter messages that belong to this conversation (between these two users)
-      const filteredMessages = messagesData?.filter(msg => 
-        (msg.sender_id === user?.id && msg.receiver_id === partnerId) || 
-        (msg.sender_id === partnerId && msg.receiver_id === user?.id)
-      ) || [];
-      
-      console.log(`Found ${filteredMessages.length} messages for this conversation`);
+      const filteredMessages =
+        messagesData?.filter(
+          (msg) =>
+            (msg.sender_id === user?.id && msg.receiver_id === partnerId) ||
+            (msg.sender_id === partnerId && msg.receiver_id === user?.id),
+        ) || [];
+
+      console.log(
+        `Found ${filteredMessages.length} messages for this conversation`,
+      );
       setMessages(filteredMessages);
 
       // Mark all unread messages as read
@@ -204,7 +211,7 @@ export default function MessageScreen() {
         console.error("Error inserting message:", error);
         throw error;
       }
-      
+
       console.log("Message sent successfully:", data);
       setNewMessage("");
     } catch (error) {
@@ -307,7 +314,7 @@ export default function MessageScreen() {
             </View>
           </View>
         </View>
-      </>
+      </View>
     );
   };
 
@@ -472,7 +479,10 @@ export default function MessageScreen() {
         ) : (
           <View style={styles.profileTab}>
             {partner ? (
-              <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 20 }}>
+              <ScrollView
+                style={{ flex: 1 }}
+                contentContainerStyle={{ paddingBottom: 20 }}
+              >
                 {loading ? (
                   <View style={styles.loadingContainer}>
                     <ActivityIndicator size="large" color={colors.primary} />
@@ -490,14 +500,23 @@ export default function MessageScreen() {
                       <View style={styles.profileDetails}>
                         <Image
                           source={{
-                            uri: partner.photo_url || "https://via.placeholder.com/200",
+                            uri:
+                              partner.photo_url ||
+                              "https://via.placeholder.com/200",
                           }}
                           style={styles.largeProfileImage}
                         />
-                        <Text style={[styles.largeName, { color: colors.text }]}>
+                        <Text
+                          style={[styles.largeName, { color: colors.text }]}
+                        >
                           {partner.name || "Chat Partner"}
                         </Text>
-                        <Text style={[styles.sectionContent, { color: colors.text, textAlign: 'center' }]}>
+                        <Text
+                          style={[
+                            styles.sectionContent,
+                            { color: colors.text, textAlign: "center" },
+                          ]}
+                        >
                           Profile information not available
                         </Text>
                       </View>
