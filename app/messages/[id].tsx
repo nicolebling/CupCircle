@@ -242,7 +242,7 @@ export default function MessageScreen() {
         formatDate(item.created_at);
 
     return (
-      <>
+      <View key={item.id || `msg-${index}`}>
         {showDate && (
           <View style={styles.dateContainer}>
             <Text style={[styles.dateText, { color: colors.secondaryText }]}>
