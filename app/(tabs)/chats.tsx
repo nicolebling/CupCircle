@@ -56,7 +56,7 @@ export default function ChatsScreen() {
     
     try {
       setLoading(true);
-      
+      p
       // Fetch all confirmed matches with the current user
       const { data: matchesData, error: matchesError } = await supabase
         .from("matching")
