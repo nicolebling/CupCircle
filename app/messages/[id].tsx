@@ -64,7 +64,7 @@ export default function MessageScreen() {
         {
           event: "INSERT",
           schema: "public",
-          table: "messages",
+          table: "message",
           filter: `chat_id=eq.${id}`,
         },
         (payload) => {
