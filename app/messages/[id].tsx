@@ -59,39 +59,87 @@ export default function MessageScreen() {
 
     fetchChatDetails();
 
-    // Subscribe to new messages
-    const messageSubscription = supabase
-      .channel("messages_channel")
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "message",
-        },
-        (payload) => {
-          const newMsg = payload.new as Message;
-
-          // Only add message if it belongs to this conversation
-          if (
-            (newMsg.sender_id === user.id &&
-              newMsg.receiver_id === partnerId) ||
-            (newMsg.sender_id === partnerId && newMsg.receiver_id === user.id)
-          ) {
-            console.log("New message received:", newMsg.content);
-            setMessages((prev) => [...prev, newMsg]);
-
-            // Mark as read if received by this user
-            if (newMsg.receiver_id === user.id) {
-              markMessageAsRead(newMsg.id);
+    // Define partnerId variable in parent scope for subscription use
+    let partnerId: string | null = null;
+    
+    // Get partner ID from matching table
+    const getPartnerId = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("matching")
+          .select("user1_id, user2_id")
+          .eq("match_id", id)
+          .single();
+        
+        if (error) throw error;
+        
+        partnerId = data.user1_id === user?.id ? data.user2_id : data.user1_id;
+        console.log("Subscribing to messages between", user.id, "and", partnerId);
+        
+        // Set up subscription after we have partner ID
+        setupMessageSubscription(partnerId);
+      } catch (error) {
+        console.error("Error getting partner ID:", error);
+      }
+    };
+    
+    getPartnerId();
+    
+    // Setup message subscription function
+    const setupMessageSubscription = (partnerUserId: string) => {
+      const messageSubscription = supabase
+        .channel("messages_channel")
+        .on(
+          "postgres_changes",
+          {
+            event: "INSERT",
+            schema: "public",
+            table: "message",
+          },
+          (payload) => {
+            const newMsg = payload.new as Message;
+            
+            // Only add message if it belongs to this conversation
+            if (
+              (newMsg.sender_id === user.id && newMsg.receiver_id === partnerUserId) ||
+              (newMsg.sender_id === partnerUserId && newMsg.receiver_id === user.id)
+            ) {
+              console.log("New message received:", newMsg);
+              
+              // Use functional update to ensure we don't miss any messages
+              setMessages((prev) => {
+                // Check if message already exists to avoid duplicates
+                const exists = prev.some(msg => msg.id === newMsg.id);
+                if (exists) return prev;
+                return [...prev, newMsg];
+              });
+              
+              // Mark as read if received by this user
+              if (newMsg.receiver_id === user.id) {
+                markMessageAsRead(newMsg.id);
+              }
+              
+              // Scroll to bottom when new message arrives
+              setTimeout(() => {
+                flatListRef.current?.scrollToEnd({ animated: true });
+              }, 100);
             }
-          }
-        },
-      )
-      .subscribe();
-
+          },
+        )
+        .subscribe();
+        
+      // Return cleanup function
+      return messageSubscription;
+    };
+    
+    // Store subscription for cleanup
+    let subscription: any = null;
+    
+    // Return cleanup function
     return () => {
-      supabase.removeChannel(messageSubscription);
+      if (subscription) {
+        supabase.removeChannel(subscription);
+      }
     };
   }, [user, id]);
 
@@ -181,9 +229,58 @@ export default function MessageScreen() {
       await supabase
         .from("message")
         .update({ read: true })
-        .eq("chat_id", messageId);
+        .eq("id", messageId);
     } catch (error) {
       console.error("Error marking message as read:", error);
+    }
+  };
+  
+  // Add polling mechanism to fetch messages periodically as a fallback
+  useEffect(() => {
+    if (!user?.id || !id || !partner?.id) return;
+    
+    // Poll for new messages every 10 seconds as a fallback
+    const pollingInterval = setInterval(() => {
+      refreshMessages(partner.id);
+    }, 10000);
+    
+    return () => {
+      clearInterval(pollingInterval);
+    };
+  }, [user?.id, id, partner?.id]);
+  
+  // Function to refresh messages
+  const refreshMessages = async (partnerId: string) => {
+    try {
+      if (!user?.id || !partnerId) return;
+      
+      const { data: messagesData, error: messagesError } = await supabase
+        .from("message")
+        .select("*")
+        .or(`sender_id.eq.${user?.id},receiver_id.eq.${user?.id}`)
+        .order("created_at", { ascending: true });
+
+      if (messagesError) throw messagesError;
+
+      // Filter messages that belong to this conversation
+      const filteredMessages =
+        messagesData?.filter(
+          (msg) =>
+            (msg.sender_id === user?.id && msg.receiver_id === partnerId) ||
+            (msg.sender_id === partnerId && msg.receiver_id === user?.id),
+        ) || [];
+
+      if (filteredMessages.length > messages.length) {
+        console.log(`Found ${filteredMessages.length} messages, updating from polling`);
+        setMessages(filteredMessages);
+        
+        // Mark unread messages as read
+        filteredMessages
+          .filter(msg => msg.receiver_id === user?.id && !msg.read)
+          .forEach(msg => markMessageAsRead(msg.id));
+      }
+    } catch (error) {
+      console.error("Error refreshing messages:", error);
     }
   };
 
@@ -192,7 +289,8 @@ export default function MessageScreen() {
 
     try {
       setSending(true);
-
+      
+      // Create message object
       const message = {
         sender_id: user.id,
         receiver_id: partner.id,
@@ -200,7 +298,23 @@ export default function MessageScreen() {
         created_at: new Date().toISOString(),
         read: false,
       };
-
+      
+      // Generate temporary ID for optimistic update
+      const tempId = `temp-${Date.now()}`;
+      const optimisticMessage = { ...message, id: tempId };
+      
+      // Update UI immediately with optimistic message
+      setMessages(prevMessages => [...prevMessages, optimisticMessage]);
+      
+      // Scroll to bottom
+      setTimeout(() => {
+        flatListRef.current?.scrollToEnd({ animated: true });
+      }, 50);
+      
+      // Clear input field immediately for better UX
+      setNewMessage("");
+      
+      // Send the message to the database
       console.log("Sending message:", message);
       const { data, error } = await supabase
         .from("message")
@@ -209,11 +323,24 @@ export default function MessageScreen() {
 
       if (error) {
         console.error("Error inserting message:", error);
+        // Remove optimistic message on error
+        setMessages(prevMessages => 
+          prevMessages.filter(msg => msg.id !== tempId)
+        );
         throw error;
       }
 
       console.log("Message sent successfully:", data);
-      setNewMessage("");
+      
+      // Replace optimistic message with actual message from server
+      if (data && data.length > 0) {
+        setMessages(prevMessages => 
+          prevMessages.map(msg => 
+            msg.id === tempId ? data[0] : msg
+          )
+        );
+      }
+      
     } catch (error) {
       console.error("Error sending message:", error);
     } finally {
