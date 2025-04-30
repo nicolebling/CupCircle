@@ -167,7 +167,7 @@ export default function MessageScreen() {
         read: false,
       };
 
-      const { error } = await supabase.from("messages").insert([message]);
+      const { error } = await supabase.from("message").insert([message]);
 
       if (error) throw error;
 
