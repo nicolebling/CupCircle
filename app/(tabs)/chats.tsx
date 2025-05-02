@@ -274,7 +274,7 @@ export default function ChatsScreen() {
 
         <FlatList
           data={filteredConversations}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item.match_id || item.id}
           renderItem={renderConversationItem}
           contentContainerStyle={
             filteredConversations.length === 0 ? { flex: 1 } : null
