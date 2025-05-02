@@ -49,7 +49,7 @@ export default function MessageScreen() {
   const [newMessage, setNewMessage] = useState("");
   const [partner, setPartner] = useState<Profile | null>(null);
   const [partnerProfile, setPartnerProfile] = useState(null);
-  const [activeTab, setActiveTab] = useState("messages"); // 'messages' or 'profile'
+  //const [activeTab, setActiveTab] = useState("messages"); // 'messages' or 'profile' - Removed
 
   const flatListRef = useRef<FlatList>(null);
 
@@ -494,57 +494,7 @@ export default function MessageScreen() {
             />
           </View>
         )}
-
-        <View style={styles.tabContainer}>
-          <TouchableOpacity
-            style={[
-              styles.tab,
-              activeTab === "messages" && [
-                styles.activeTab,
-                { borderBottomColor: colors.primary },
-              ],
-            ]}
-            onPress={() => setActiveTab("messages")}
-          >
-            <Text
-              style={[
-                styles.tabText,
-                {
-                  color:
-                    activeTab === "messages"
-                      ? colors.primary
-                      : colors.secondaryText,
-                },
-              ]}
-            >
-              Messages
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.tab,
-              activeTab === "profile" && [
-                styles.activeTab,
-                { borderBottomColor: colors.primary },
-              ],
-            ]}
-            onPress={() => setActiveTab("profile")}
-          >
-            <Text
-              style={[
-                styles.tabText,
-                {
-                  color:
-                    activeTab === "profile"
-                      ? colors.primary
-                      : colors.secondaryText,
-                },
-              ]}
-            >
-              Profile
-            </Text>
-          </TouchableOpacity>
-        </View>
+        {/*Removed Tab Container*/}
       </View>
 
       {/* Content */}
@@ -553,113 +503,56 @@ export default function MessageScreen() {
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
       >
-        {activeTab === "messages" ? (
-          <>
-            {loading ? (
-              <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color={colors.primary} />
-              </View>
-            ) : (
-              <FlatList
-                ref={flatListRef}
-                data={messages}
-                renderItem={renderItem}
-                contentContainerStyle={styles.messagesList}
-                onContentSizeChange={() => {
-                  if (messages.length > 0) {
-                    flatListRef.current?.scrollToEnd({ animated: false });
-                  }
-                }}
-                onLayout={() => {
-                  if (messages.length > 0) {
-                    flatListRef.current?.scrollToEnd({ animated: false });
-                  }
-                }}
-              />
-            )}
-
-            {/* Input Area */}
-            <View style={[styles.inputArea, { borderTopColor: colors.border }]}>
-              <TextInput
-                style={[
-                  styles.input,
-                  { color: colors.text, backgroundColor: colors.card },
-                ]}
-                placeholder="Type a message..."
-                placeholderTextColor={colors.secondaryText}
-                value={newMessage}
-                onChangeText={setNewMessage}
-                multiline
-                maxLength={500}
-              />
-              <TouchableOpacity
-                style={[styles.sendButton, { backgroundColor: colors.primary }]}
-                onPress={sendMessage}
-                disabled={sending || !newMessage.trim()}
-              >
-                {sending ? (
-                  <ActivityIndicator size="small" color="#ffffff" />
-                ) : (
-                  <Ionicons name="send" size={20} color="#ffffff" />
-                )}
-              </TouchableOpacity>
-            </View>
-          </>
-        ) : (
-          <View style={styles.profileTab}>
-            {partner ? (
-              <ScrollView
-                style={{ flex: 1 }}
-                contentContainerStyle={{ paddingBottom: 20 }}
-              >
-                {loading ? (
-                  <View style={styles.loadingContainer}>
-                    <ActivityIndicator size="large" color={colors.primary} />
-                  </View>
-                ) : (
-                  <View style={{ paddingHorizontal: 10 }}>
-                    {/* We'll use the ProfileCard component to display partner profile */}
-                    {partnerProfile ? (
-                      <ProfileCard
-                        profile={partnerProfile}
-                        userId={partner.id}
-                        isNewUser={false}
-                      />
-                    ) : (
-                      <View style={styles.profileDetails}>
-                        <Image
-                          source={{
-                            uri:
-                              partner.photo_url ||
-                              "https://via.placeholder.com/100",
-                          }}
-                          style={styles.profileImage}
-                        />
-                        <Text
-                          style={[styles.largeName, { color: colors.text }]}
-                        >
-                          {partner.name || "Chat Partner"}
-                        </Text>
-                        <Text
-                          style={[
-                            styles.sectionContent,
-                            { color: colors.text, textAlign: "center" },
-                          ]}
-                        >
-                          Profile information not available
-                        </Text>
-                      </View>
-                    )}
-                  </View>
-                )}
-              </ScrollView>
-            ) : (
-              <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color={colors.primary} />
-              </View>
-            )}
+        {loading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={colors.primary} />
           </View>
+        ) : (
+          <FlatList
+            ref={flatListRef}
+            data={messages}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id || `msg-${item.created_at}-${item.sender_id}`}
+            contentContainerStyle={styles.messagesList}
+            onContentSizeChange={() => {
+              if (messages.length > 0) {
+                flatListRef.current?.scrollToEnd({ animated: false });
+              }
+            }}
+            onLayout={() => {
+              if (messages.length > 0) {
+                flatListRef.current?.scrollToEnd({ animated: false });
+              }
+            }}
+          />
         )}
+
+        {/* Input Area */}
+        <View style={[styles.inputArea, { borderTopColor: colors.border }]}>
+          <TextInput
+            style={[
+              styles.input,
+              { color: colors.text, backgroundColor: colors.card },
+            ]}
+            placeholder="Type a message..."
+            placeholderTextColor={colors.secondaryText}
+            value={newMessage}
+            onChangeText={setNewMessage}
+            multiline
+            maxLength={500}
+          />
+          <TouchableOpacity
+            style={[styles.sendButton, { backgroundColor: colors.primary }]}
+            onPress={sendMessage}
+            disabled={sending || !newMessage.trim()}
+          >
+            {sending ? (
+              <ActivityIndicator size="small" color="#ffffff" />
+            ) : (
+              <Ionicons name="send" size={20} color="#ffffff" />
+            )}
+          </TouchableOpacity>
+        </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -699,21 +592,21 @@ const styles = StyleSheet.create({
     height: 20,
     borderRadius: 4,
   },
-  tabContainer: {
-    flexDirection: "row",
-  },
-  tab: {
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    marginRight: 15,
-  },
-  activeTab: {
-    borderBottomWidth: 2,
-  },
-  tabText: {
-    fontSize: 14,
-    fontFamily: "K2D-Medium",
-  },
+  //tabContainer: { Removed
+  //  flexDirection: "row",
+  //},
+  //tab: { Removed
+  //  paddingVertical: 10,
+  //  paddingHorizontal: 15,
+  //  marginRight: 15,
+  //},
+  //activeTab: { Removed
+  //  borderBottomWidth: 2,
+  //},
+  //tabText: { Removed
+  //  fontSize: 14,
+  //  fontFamily: "K2D-Medium",
+  //},
   content: {
     flex: 1,
   },
@@ -802,10 +695,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  profileTab: {
-    flex: 1,
-    padding: 20,
-  },
+  //profileTab: { Removed
+  //  flex: 1,
+  //  padding: 20,
+  //},
   profileDetails: {
     alignItems: "center",
   },
