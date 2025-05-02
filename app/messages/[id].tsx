@@ -49,6 +49,7 @@ export default function MessageScreen() {
   const [newMessage, setNewMessage] = useState("");
   const [partner, setPartner] = useState<Profile | null>(null);
   const [partnerProfile, setPartnerProfile] = useState(null);
+  const [showProfileModal, setShowProfileModal] = useState(false);
   //const [activeTab, setActiveTab] = useState("messages"); // 'messages' or 'profile' - Removed
 
   const flatListRef = useRef<FlatList>(null);
@@ -467,7 +468,14 @@ export default function MessageScreen() {
       {/* Header */}
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
         {partner ? (
-          <View style={styles.profileInfo}>
+          <TouchableOpacity 
+            style={styles.profileInfo}
+            onPress={() => {
+              if (partnerProfile) {
+                setShowProfileModal(true);
+              }
+            }}
+          >
             <Image
               source={{
                 uri: partner.photo_url || "https://via.placeholder.com/100",
@@ -477,7 +485,7 @@ export default function MessageScreen() {
             <Text style={[styles.profileName, { color: colors.text }]}>
               {partner.name || "Chat Partner"}
             </Text>
-          </View>
+          </TouchableOpacity>
         ) : (
           <View style={styles.profileInfo}>
             <View
@@ -554,11 +562,59 @@ export default function MessageScreen() {
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
+
+      {/* Profile Modal */}
+      <Modal
+        visible={showProfileModal}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowProfileModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { backgroundColor: colors.background }]}>
+            <View style={styles.modalHeader}>
+              <TouchableOpacity
+                onPress={() => setShowProfileModal(false)}
+                style={styles.closeButton}
+              >
+                <Ionicons name="close" size={24} color={colors.text} />
+              </TouchableOpacity>
+            </View>
+            {partnerProfile && (
+              <ScrollView style={{ flex: 1 }}>
+                <ProfileCard
+                  profile={partnerProfile}
+                  userId={partnerProfile.id}
+                  isNewUser={false}
+                />
+              </ScrollView>
+            )}
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    height: '90%',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+  modalHeader: {
+    padding: 16,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+  },
+  closeButton: {
+    padding: 8,
+  },
   container: {
     flex: 1,
   },
