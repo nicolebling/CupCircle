@@ -11,6 +11,7 @@ import {
   Platform,
   ActivityIndicator,
   ScrollView,
+  Modal,
 } from "react-native";
 import { useLocalSearchParams, useRouter, Stack } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -468,7 +469,7 @@ export default function MessageScreen() {
       {/* Header */}
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
         {partner ? (
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.profileInfo}
             onPress={() => {
               if (partnerProfile) {
@@ -520,7 +521,9 @@ export default function MessageScreen() {
             ref={flatListRef}
             data={messages}
             renderItem={renderItem}
-            keyExtractor={(item) => item.id || `msg-${item.created_at}-${item.sender_id}`}
+            keyExtractor={(item) =>
+              item.id || `msg-${item.created_at}-${item.sender_id}`
+            }
             contentContainerStyle={styles.messagesList}
             onContentSizeChange={() => {
               if (messages.length > 0) {
@@ -571,7 +574,12 @@ export default function MessageScreen() {
         onRequestClose={() => setShowProfileModal(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={[styles.modalContent, { backgroundColor: colors.background }]}>
+          <View
+            style={[
+              styles.modalContent,
+              { backgroundColor: colors.background },
+            ]}
+          >
             <View style={styles.modalHeader}>
               <TouchableOpacity
                 onPress={() => setShowProfileModal(false)}
@@ -599,18 +607,18 @@ export default function MessageScreen() {
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'flex-end',
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "flex-end",
   },
   modalContent: {
-    height: '90%',
+    height: "90%",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
   },
   modalHeader: {
     padding: 16,
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
+    flexDirection: "row",
+    justifyContent: "flex-end",
   },
   closeButton: {
     padding: 8,
