@@ -127,8 +127,7 @@ export default function ChatsScreen() {
             id: partnerId,
             name: partnerProfile.name || "User",
             photo:
-              partnerProfile.avatar_url ||
-"https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg",
+              partnerProfile.photo_url || "https://via.placeholder.com/100",
             occupation: partnerProfile.occupation || "Professional",
           },
           lastMessage: {
