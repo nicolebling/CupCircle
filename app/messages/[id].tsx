@@ -615,6 +615,7 @@ const styles = StyleSheet.create({
     height: "90%",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
+    overflow: "hidden",
   },
   modalHeader: {
     padding: 16,
