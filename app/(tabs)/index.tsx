@@ -371,7 +371,10 @@ export default function CircleChatsScreen() {
               <ScrollView style={{ flex: 1 }}>
                 <View style={{ alignItems: "center" }}>
                   <ProfileCard
-                    profile={selectedProfile}
+                    profile = {{
+                      ...selectedProfile,
+                      photo: selectedProfile.photo_url // Map photo_url to photo for ProfileCard
+                    }}
                     userId={selectedProfile.id}
                     isNewUser={false}
                   />
@@ -562,7 +565,7 @@ const styles = StyleSheet.create({
   modalContent: {
     width: "100%",
     maxHeight: "85%",
-    backgroundColor: "white",
+  
     borderRadius: 16,
     overflow: "hidden",
     flex: 1,

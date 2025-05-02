@@ -574,27 +574,28 @@ export default function MessageScreen() {
         onRequestClose={() => setShowProfileModal(false)}
       >
         <View style={styles.modalOverlay}>
-          <View
-            style={[
-              styles.modalContent,
-              { backgroundColor: colors.background },
-            ]}
-          >
+          <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
               <TouchableOpacity
                 onPress={() => setShowProfileModal(false)}
-                style={styles.closeButton}
+                style={styles.floatingCloseButton}
               >
                 <Ionicons name="close" size={24} color={colors.text} />
               </TouchableOpacity>
             </View>
             {partnerProfile && (
               <ScrollView style={{ flex: 1 }}>
-                <ProfileCard
-                  profile={partnerProfile}
-                  userId={partnerProfile.id}
-                  isNewUser={false}
-                />
+                <View style={{ alignItems: "center" }}>
+                  <ProfileCard
+                    profile = {{
+                      ...partnerProfile,
+                      photo: partnerProfile.photo_url // Map photo_url to photo for ProfileCard
+                    }}
+                    userId={partnerProfile.id}
+                    isNewUser={false}
+                    
+                  />
+                </View>
               </ScrollView>
             )}
           </View>
@@ -792,5 +793,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: "K2D-Regular",
     lineHeight: 22,
+  },
+  floatingCloseButton: {
+    position: "absolute",
+    top: 20,
+    right: 20,
+    zIndex: 1,
   },
 });
