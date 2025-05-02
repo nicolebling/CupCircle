@@ -61,7 +61,7 @@ export default function MessageScreen() {
 
     // Define partnerId variable in parent scope for subscription use
     let partnerId: string | null = null;
-    
+
     // Get partner ID from matching table
     const getPartnerId = async () => {
       try {
@@ -70,21 +70,26 @@ export default function MessageScreen() {
           .select("user1_id, user2_id")
           .eq("match_id", id)
           .single();
-        
+
         if (error) throw error;
-        
+
         partnerId = data.user1_id === user?.id ? data.user2_id : data.user1_id;
-        console.log("Subscribing to messages between", user.id, "and", partnerId);
-        
+        console.log(
+          "Subscribing to messages between",
+          user.id,
+          "and",
+          partnerId,
+        );
+
         // Set up subscription after we have partner ID
         setupMessageSubscription(partnerId);
       } catch (error) {
         console.error("Error getting partner ID:", error);
       }
     };
-    
+
     getPartnerId();
-    
+
     // Setup message subscription function
     const setupMessageSubscription = (partnerUserId: string) => {
       const messageSubscription = supabase
@@ -98,27 +103,29 @@ export default function MessageScreen() {
           },
           (payload) => {
             const newMsg = payload.new as Message;
-            
+
             // Only add message if it belongs to this conversation
             if (
-              (newMsg.sender_id === user.id && newMsg.receiver_id === partnerUserId) ||
-              (newMsg.sender_id === partnerUserId && newMsg.receiver_id === user.id)
+              (newMsg.sender_id === user.id &&
+                newMsg.receiver_id === partnerUserId) ||
+              (newMsg.sender_id === partnerUserId &&
+                newMsg.receiver_id === user.id)
             ) {
               console.log("New message received:", newMsg);
-              
+
               // Use functional update to ensure we don't miss any messages
               setMessages((prev) => {
                 // Check if message already exists to avoid duplicates
-                const exists = prev.some(msg => msg.id === newMsg.id);
+                const exists = prev.some((msg) => msg.id === newMsg.id);
                 if (exists) return prev;
                 return [...prev, newMsg];
               });
-              
+
               // Mark as read if received by this user
               if (newMsg.receiver_id === user.id) {
                 markMessageAsRead(newMsg.id);
               }
-              
+
               // Scroll to bottom when new message arrives
               setTimeout(() => {
                 flatListRef.current?.scrollToEnd({ animated: true });
@@ -127,14 +134,14 @@ export default function MessageScreen() {
           },
         )
         .subscribe();
-        
+
       // Return cleanup function
       return messageSubscription;
     };
-    
+
     // Store subscription for cleanup
     let subscription: any = null;
-    
+
     // Return cleanup function
     return () => {
       if (subscription) {
@@ -226,34 +233,31 @@ export default function MessageScreen() {
 
   const markMessageAsRead = async (messageId: string) => {
     try {
-      await supabase
-        .from("message")
-        .update({ read: true })
-        .eq("id", messageId);
+      await supabase.from("message").update({ read: true }).eq("id", messageId);
     } catch (error) {
       console.error("Error marking message as read:", error);
     }
   };
-  
+
   // Add polling mechanism to fetch messages periodically as a fallback
   useEffect(() => {
     if (!user?.id || !id || !partner?.id) return;
-    
+
     // Poll for new messages every 10 seconds as a fallback
     const pollingInterval = setInterval(() => {
       refreshMessages(partner.id);
     }, 10000);
-    
+
     return () => {
       clearInterval(pollingInterval);
     };
   }, [user?.id, id, partner?.id]);
-  
+
   // Function to refresh messages
   const refreshMessages = async (partnerId: string) => {
     try {
       if (!user?.id || !partnerId) return;
-      
+
       const { data: messagesData, error: messagesError } = await supabase
         .from("message")
         .select("*")
@@ -271,13 +275,15 @@ export default function MessageScreen() {
         ) || [];
 
       if (filteredMessages.length > messages.length) {
-        console.log(`Found ${filteredMessages.length} messages, updating from polling`);
+        console.log(
+          `Found ${filteredMessages.length} messages, updating from polling`,
+        );
         setMessages(filteredMessages);
-        
+
         // Mark unread messages as read
         filteredMessages
-          .filter(msg => msg.receiver_id === user?.id && !msg.read)
-          .forEach(msg => markMessageAsRead(msg.id));
+          .filter((msg) => msg.receiver_id === user?.id && !msg.read)
+          .forEach((msg) => markMessageAsRead(msg.id));
       }
     } catch (error) {
       console.error("Error refreshing messages:", error);
@@ -289,7 +295,7 @@ export default function MessageScreen() {
 
     try {
       setSending(true);
-      
+
       // Create message object
       const message = {
         sender_id: user.id,
@@ -298,22 +304,22 @@ export default function MessageScreen() {
         created_at: new Date().toISOString(),
         read: false,
       };
-      
+
       // Generate temporary ID for optimistic update
       const tempId = `temp-${Date.now()}`;
       const optimisticMessage = { ...message, id: tempId };
-      
+
       // Update UI immediately with optimistic message
-      setMessages(prevMessages => [...prevMessages, optimisticMessage]);
-      
+      setMessages((prevMessages) => [...prevMessages, optimisticMessage]);
+
       // Scroll to bottom
       setTimeout(() => {
         flatListRef.current?.scrollToEnd({ animated: true });
       }, 50);
-      
+
       // Clear input field immediately for better UX
       setNewMessage("");
-      
+
       // Send the message to the database
       console.log("Sending message:", message);
       const { data, error } = await supabase
@@ -324,23 +330,20 @@ export default function MessageScreen() {
       if (error) {
         console.error("Error inserting message:", error);
         // Remove optimistic message on error
-        setMessages(prevMessages => 
-          prevMessages.filter(msg => msg.id !== tempId)
+        setMessages((prevMessages) =>
+          prevMessages.filter((msg) => msg.id !== tempId),
         );
         throw error;
       }
 
       console.log("Message sent successfully:", data);
-      
+
       // Replace optimistic message with actual message from server
       if (data && data.length > 0) {
-        setMessages(prevMessages => 
-          prevMessages.map(msg => 
-            msg.id === tempId ? data[0] : msg
-          )
+        setMessages((prevMessages) =>
+          prevMessages.map((msg) => (msg.id === tempId ? data[0] : msg)),
         );
       }
-      
     } catch (error) {
       console.error("Error sending message:", error);
     } finally {
@@ -376,7 +379,7 @@ export default function MessageScreen() {
         formatDate(item.created_at);
 
     return (
-      <View key={item.id || `msg-${index}`}>
+      <View>
         {showDate && (
           <View style={styles.dateContainer}>
             <Text style={[styles.dateText, { color: colors.secondaryText }]}>
@@ -561,7 +564,6 @@ export default function MessageScreen() {
                 ref={flatListRef}
                 data={messages}
                 renderItem={renderItem}
-                keyExtractor={(item) => item.id}
                 contentContainerStyle={styles.messagesList}
                 onContentSizeChange={() => {
                   if (messages.length > 0) {
@@ -629,9 +631,9 @@ export default function MessageScreen() {
                           source={{
                             uri:
                               partner.photo_url ||
-                              "https://via.placeholder.com/200",
+                              "https://via.placeholder.com/100",
                           }}
-                          style={styles.largeProfileImage}
+                          style={styles.profileImage}
                         />
                         <Text
                           style={[styles.largeName, { color: colors.text }]}
