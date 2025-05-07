@@ -68,20 +68,14 @@ export default function CircleChatsScreen() {
   useEffect(() => {
     if (user) {
       fetchChats();
+      
+      // Set up polling every 30 seconds
+      const pollInterval = setInterval(fetchChats, 30000);
+      
+      return () => {
+        clearInterval(pollInterval);
+      };
     }
-
-    // Expose the refresh function globally
-    if (!global.circleChatsScreen) {
-      global.circleChatsScreen = {};
-    }
-    global.circleChatsScreen.refreshData = fetchChats;
-
-    return () => {
-      // Clean up when component unmounts
-      if (global.circleChatsScreen) {
-        global.circleChatsScreen.refreshData = null;
-      }
-    };
   }, [user]);
 
   const handleAction = async (chatId, action) => {
