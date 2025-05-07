@@ -527,12 +527,12 @@ export default function MessageScreen() {
             contentContainerStyle={styles.messagesList}
             onContentSizeChange={() => {
               if (messages.length > 0) {
-                flatListRef.current?.scrollToEnd({ animated: false });
+                flatListRef.current?.scrollToEnd({ animated: true });
               }
             }}
             onLayout={() => {
               if (messages.length > 0) {
-                flatListRef.current?.scrollToEnd({ animated: false });
+                flatListRef.current?.scrollToEnd({ animated: true });
               }
             }}
           />
@@ -635,7 +635,7 @@ const styles = StyleSheet.create({
   profileInfo: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 15,
+    
   },
   profileImage: {
     width: 40,
@@ -658,21 +658,6 @@ const styles = StyleSheet.create({
     height: 20,
     borderRadius: 4,
   },
-  //tabContainer: { Removed
-  //  flexDirection: "row",
-  //},
-  //tab: { Removed
-  //  paddingVertical: 10,
-  //  paddingHorizontal: 15,
-  //  marginRight: 15,
-  //},
-  //activeTab: { Removed
-  //  borderBottomWidth: 2,
-  //},
-  //tabText: { Removed
-  //  fontSize: 14,
-  //  fontFamily: "K2D-Medium",
-  //},
   content: {
     flex: 1,
   },
