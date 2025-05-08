@@ -19,4 +19,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   db: {
     schema: "public",
   },
+  realtime: {
+    enabled: false,
+  },
 });
