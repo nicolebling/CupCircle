@@ -29,7 +29,7 @@ mode = "sequential"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "EXPO_NO_DAEMON=1 REACT_NATIVE_PACKAGER_HOSTNAME=$REPLIT_DEV_DOMAIN npx expo start --tunnel"
+args = "EXPO_NO_DAEMON=1 REACT_NATIVE_PACKAGER_HOSTNAME=$REPLIT_DEV_DOMAIN npx expo start --tunnel --no-web"
 
 [[workflows.workflow]]
 name = "EAS Init"
