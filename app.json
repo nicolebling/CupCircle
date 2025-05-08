@@ -9,6 +9,7 @@
     "icon": "./assets/images/icon.png",
     "scheme": "cupcircle",
     "userInterfaceStyle": "automatic",
+    "platforms": ["ios", "android"],
     "newArchEnabled": true,
     "extra": {
       "API_URL": "https://cupcircle-api.yourusername.replit.app",
