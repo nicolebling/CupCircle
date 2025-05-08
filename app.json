@@ -1,3 +1,4 @@
+
 {
   "expo": {
     "sdkVersion": "53.0.0",
@@ -11,13 +12,13 @@
     "newArchEnabled": true,
     "extra": {
       "API_URL": "https://cupcircle-api.yourusername.replit.app",
-      "router": {},
       "eas": {
         "projectId": "c6804025-69e9-411a-9b2a-9eaa2dfb565e"
       }
     },
     "ios": {
       "supportsTablet": true,
+      "bundleIdentifier": "com.cupcircle.app",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "This app requires location access to function properly.",
         "NSLocationAlwaysUsageDescription": "This app needs location access even in the background.",
@@ -25,6 +26,7 @@
       }
     },
     "android": {
+      "package": "com.cupcircle.app",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -33,18 +35,9 @@
         "ACCESS_FINE_LOCATION",
         "ACCESS_COARSE_LOCATION",
         "READ_MEDIA_IMAGES",
-        "CAMERA",
-        "android.permission.ACCESS_COARSE_LOCATION",
-        "android.permission.ACCESS_FINE_LOCATION",
-        "ACCESS_FINE_LOCATION",
-        "ACCESS_COARSE_LOCATION",
-        "READ_MEDIA_IMAGES",
-        "CAMERA",
-        "android.permission.ACCESS_COARSE_LOCATION",
-        "android.permission.ACCESS_FINE_LOCATION"
+        "CAMERA"
       ]
     },
-    
     "plugins": [
       "expo-router",
       [
