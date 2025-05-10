@@ -1,3 +1,4 @@
+import 'react-native-url-polyfill/auto';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Stack, useRouter, useSegments } from 'expo-router';
@@ -11,6 +12,7 @@ import { NetworkProvider } from '@/contexts/NetworkContext';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { Text, TextInput } from 'react-native';
 import Colors from '@/constants/Colors';
+
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();

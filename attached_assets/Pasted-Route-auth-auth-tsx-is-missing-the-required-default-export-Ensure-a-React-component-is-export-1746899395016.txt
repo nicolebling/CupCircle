@@ -1,0 +1,13 @@
+Route "./(auth)/auth.tsx" is missing the required default export. Ensure a React component is exported as default.
+ ERROR  Invariant Violation: TurboModuleRegistry.getEnforcing(...): 'RNMapsAirModule' could not be found. Verify that a module by this name is registered in the native binary., js engine: hermes
+ WARN  Route "./(auth)/onboarding.tsx" is missing the required default export. Ensure a React component is exported as default.
+ ERROR  Invariant Violation: TurboModuleRegistry.getEnforcing(...): 'RNMapsAirModule' could not be found. Verify that a module by this name is registered in the native binary., js engine: hermes
+ WARN  Route "./(auth)/profile-setup.tsx" is missing the required default export. Ensure a React component is exported as default.
+ ERROR  Invariant Violation: TurboModuleRegistry.getEnforcing(...): 'RNMapsAirModule' could not be found. Verify that a module by this name is registered in the native binary., js engine: hermes
+ WARN  Route "./(tabs)/index.tsx" is missing the required default export. Ensure a React component is exported as default.
+ ERROR  Invariant Violation: TurboModuleRegistry.getEnforcing(...): 'RNMapsAirModule' could not be found. Verify that a module by this name is registered in the native binary., js engine: hermes
+ WARN  Route "./(tabs)/matching.tsx" is missing the required default export. Ensure a React component is exported as default.
+ ERROR  Invariant Violation: TurboModuleRegistry.getEnforcing(...): 'RNMapsAirModule' could not be found. Verify that a module by this name is registered in the native binary., js engine: hermes
+ WARN  Route "./(tabs)/profile.tsx" is missing the required default export. Ensure a React component is exported as default.
+ ERROR  Invariant Violation: TurboModuleRegistry.getEnforcing(...): 'RNMapsAirModule' could not be found. Verify that a module by this name is registered in the native binary., js engine: hermes
+ WARN  Route "./messages/[id].tsx" is missing the required default export. Ensure a React component is exported as default.
