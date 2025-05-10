@@ -9,7 +9,6 @@ import {
   SafeAreaView,
   KeyboardAvoidingView,
   Platform,
-  Image,
 } from "react-native";
 import { Link, router } from "expo-router";
 import LogoAnimation from "@/components/LogoAnimation";
