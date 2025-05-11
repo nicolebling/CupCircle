@@ -222,7 +222,7 @@ export default function CircleChatsScreen() {
               style={styles.detailIcon}
             />
             <Text style={[styles.detailText, { color: colors.text }]}>
-              {chat.meeting_date}
+              {chat.meeting_date || 'Date not set'}
             </Text>
           </View>
 
@@ -234,8 +234,9 @@ export default function CircleChatsScreen() {
               style={styles.detailIcon}
             />
             <Text style={[styles.detailText, { color: colors.text }]}>
-              {chat.start_time.split(":")[0]}:{chat.start_time.split(":")[1]} -{" "}
-              {chat.end_time.split(":")[0]}:{chat.end_time.split(":")[1]}
+              {chat.start_time && chat.end_time ? 
+                `${chat.start_time.split(":")[0]}:${chat.start_time.split(":")[1]} - ${chat.end_time.split(":")[0]}:${chat.end_time.split(":")[1]}`
+                : 'Time not set'}
             </Text>
           </View>
 
