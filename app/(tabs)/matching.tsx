@@ -187,7 +187,7 @@ export default function MatchingScreen() {
   const fetchProfiles = async () => {
     setIsLoading(true);
     try {
-      //console.log("Fetching profiles for users with availability");
+      console.log("Fetching profiles for users with availability");
 
       // Fetch all active and past meetings with the current user
       // This includes pending, pending_acceptance, and confirmed status
@@ -198,7 +198,7 @@ export default function MatchingScreen() {
         .in("status", ["pending", "pending_acceptance", "confirmed"]);
 
       if (meetingsError) {
-        // console.error("Error fetching meetings:", meetingsError);
+        console.error("Error fetching meetings:", meetingsError);
         throw meetingsError;
       }
 
@@ -215,7 +215,7 @@ export default function MatchingScreen() {
       //console.log("Users with active or past meetings:", Array.from(excludedUserIds));
 
       // Get users with availability
-      //console.log("Current user ID:", user?.id);
+      console.log("Current user ID:", user?.id);
       const today = new Date().toISOString().split("T")[0];
       //console.log("Fetching availability from date:", today);
 
