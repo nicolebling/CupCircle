@@ -2,7 +2,8 @@
 import { Tabs } from 'expo-router';
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
-import { TouchableOpacity } from "react-native";
+import { TouchableOpacity, View, Text, Image } from "react-native";
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function TabLayout() {
   const colors = Colors.light;
@@ -78,12 +79,27 @@ export default function TabLayout() {
 
       <Tabs.Screen
         name="chats"
-        options={{
-          title: 'Inbox',
+        options={({ navigation }) => ({
+          headerTitle: () => {
+            const { user, profile } = useAuth();
+            return (
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Image
+                  source={{ 
+                    uri: profile?.photo_url || 'https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg'
+                  }}
+                  style={{ width: 30, height: 30, borderRadius: 15, marginRight: 10 }}
+                />
+                <Text style={{ fontFamily: 'K2D-SemiBold', fontSize: 16, color: colors.text }}>
+                  {profile?.name || 'Messages'}
+                </Text>
+              </View>
+            );
+          },
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="chatbubbles" size={size} color={color} />
           ),
-        }}
+        })}
       />
 
       <Tabs.Screen
