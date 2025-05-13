@@ -103,8 +103,7 @@ export default function CircleChatsScreen() {
                   prevChats.filter((chat) => chat.match_id !== chatId)
                 );
               }
-              },
-            },
+            }
           ],
           { cancelable: true },
         );
