@@ -48,9 +48,17 @@ function RootLayoutNav() {
   }
 
   return (
-    <Stack screenOptions={{
-        headerBackTitleVisible: false
-      }}>
+    <Stack 
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: colors.background,
+        },
+        headerTintColor: colors.text,
+        headerTitleStyle: {
+          fontFamily: 'K2D-SemiBold',
+        },
+      }}
+    >
       <Stack.Screen name="(auth)" options={{ headerShown: false }} />
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="+not-found" options={{ title: 'Not Found' }} />
