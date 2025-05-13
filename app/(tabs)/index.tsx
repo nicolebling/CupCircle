@@ -336,9 +336,9 @@ export default function CircleChatsScreen() {
         return chat.user1_id === user.id && chat.status === "pending";
       }
       // When looking for pending_acceptance chats, we want ones where:
-      // 1. The current user is user2 (the receiver) AND the status is "pending_acceptance"
+      // 1. The current user is user2 (the receiver) AND the status is either "pending_acceptance" OR "pending"
       else if (status === "pending_acceptance") {
-        return chat.user2_id === user.id && chat.status === "pending_acceptance";
+        return chat.user2_id === user.id && (chat.status === "pending_acceptance" || chat.status === "pending");
       }
       // For all other statuses (like "confirmed"), just match the status directly
       return chat.status === status;
