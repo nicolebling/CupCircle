@@ -419,13 +419,31 @@ export default function CircleChatsScreen() {
 
       {!showPastChats && (
         <>
-          {filterChatsByStatus("pending_acceptance")
-            .filter((chat) => chat.user2_id === user.id)
-            .map((chat) => renderChatCard({ item: chat }))}
+          {filterChatsByStatus("pending_acceptance").filter(
+            (chat) => chat.user2_id === user.id,
+          ).length > 0 && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                Pending Acceptance
+              </Text>
+              {filterChatsByStatus("pending_acceptance")
+                .filter((chat) => chat.user2_id === user.id)
+                .map(renderChatCard)}
+            </View>
+          )}
 
-          {filterChatsByStatus("pending")
-            .filter((chat) => chat.user1_id === user.id)
-            .map((chat) => renderChatCard({ item: chat }))}
+          {filterChatsByStatus("pending").filter(
+            (chat) => chat.user1_id === user.id,
+          ).length > 0 && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                Pending
+              </Text>
+              {filterChatsByStatus("pending")
+                .filter((chat) => chat.user1_id === user.id)
+                .map(renderChatCard)}
+            </View>
+          )}
         </>
       )}
     </ScrollView>
