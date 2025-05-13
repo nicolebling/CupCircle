@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -14,6 +14,7 @@ import {
   Keyboard,
   Alert,
 } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
 import Colors from "@/constants/Colors";
 import ProfileCard from "@/components/ProfileCard";
 import { Ionicons } from "@expo/vector-icons";
@@ -126,63 +127,58 @@ export default function MatchingScreen() {
     cardRotate.value = 0;
   }, [currentIndex]);
 
-  useEffect(() => {
-    // Check if current user has any availability slots
-    const checkUserAvailability = async () => {
-      if (!user) return;
+  // Define checkUserAvailability outside of useFocusEffect
+  const checkUserAvailability = useCallback(async () => {
+    if (!user) return;
+    setIsLoading(true);
 
-      try {
-        //console.log("Checking availability for user:", user.id);
-        const { data, error } = await supabase
-          .from("availability")
-          .select("*")
-          .eq("id", user.id);
+    try {
+      const { data, error } = await supabase
+        .from("availability")
+        .select("*")
+        .eq("id", user.id);
 
-        if (error) {
-          //console.error("Error fetching user availability:", error);
-          throw error;
-        }
-
-        //console.log("User availability data:", data);
-
-        // Filter out past availability
-        const now = new Date();
-
-        const futureAvailability = data?.filter((slot) => {
-          if (!slot.start_time) return false;
-
-          const slotDate = new Date(slot.date);
-          const [time, period] = slot.start_time.split(" ");
-          const [hours, minutes] = time.split(":");
-          let hour = parseInt(hours);
-
-          // Convert to 24-hour format
-          if (period === "PM" && hour !== 12) hour += 12;
-          if (period === "AM" && hour === 12) hour = 0;
-
-          slotDate.setHours(hour, parseInt(minutes), 0, 0);
-          return slotDate > now;
-        });
-
-        const hasValidAvailability =
-          futureAvailability && futureAvailability.length > 0;
-        // console.log("User has valid availability:", hasValidAvailability);
-        setHasAvailability(hasValidAvailability);
-
-        // Always fetch profiles - we'll show appropriate UI based on hasAvailability state
-        if (hasValidAvailability) {
-          // Only fetch profiles if user has valid availability
-          await fetchProfiles();
-        }
-      } catch (error) {
-        console.error("Error checking availability:", error);
-      } finally {
-        setIsLoading(false);
+      if (error) {
+        throw error;
       }
-    };
 
-    checkUserAvailability();
-  }, [user]);
+      const now = new Date();
+
+      const futureAvailability = data?.filter((slot) => {
+        if (!slot.start_time) return false;
+
+        const slotDate = new Date(slot.date);
+        const [time, period] = slot.start_time.split(" ");
+        const [hours, minutes] = time.split(":");
+        let hour = parseInt(hours);
+
+        if (period === "PM" && hour !== 12) hour += 12;
+        if (period === "AM" && hour === 12) hour = 0;
+
+        slotDate.setHours(hour, parseInt(minutes), 0, 0);
+        return slotDate > now;
+      });
+
+      const hasValidAvailability =
+        futureAvailability && futureAvailability.length > 0;
+      setHasAvailability(hasValidAvailability);
+
+      if (hasValidAvailability) {
+        await fetchProfiles();
+      }
+    } catch (error) {
+      console.error("Error checking availability:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [user, fetchProfiles]);
+
+  // Use useFocusEffect to run check when screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      checkUserAvailability();
+    }, [checkUserAvailability])
+  );
 
   const fetchProfiles = async () => {
     setIsLoading(true);
