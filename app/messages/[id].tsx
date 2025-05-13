@@ -159,7 +159,7 @@ export default function MessageScreen() {
       // Fetch the partner profile from the matching table
       const { data: matchingData, error: matchingError } = await supabase
         .from("matching")
-        .select("user1_id, user2_id")
+        .select("user1_id, user2_id, initial_message")
         .eq("match_id", id)
         .single();
 
@@ -215,8 +215,19 @@ export default function MessageScreen() {
       console.log(
         `Found ${filteredMessages.length} messages for this conversation`,
       );
-      setMessages(filteredMessages);
-
+      // If there's an initial message, add it to the beginning of the messages array
+      const initialMessages = [...filteredMessages];
+      if (matchingData.initial_message) {
+        initialMessages.unshift({
+          id: `initial-${id}`,
+          sender_id: matchingData.user1_id,
+          receiver_id: matchingData.user2_id,
+          content: matchingData.initial_message,
+          created_at: new Date(0).toISOString(), // Set to earliest possible date
+          read: true
+        });
+      }
+      setMessages(initialMessages);
       // Mark all unread messages as read
       const unreadMessages =
         messagesData?.filter(
@@ -593,7 +604,7 @@ export default function MessageScreen() {
                     }}
                     userId={partnerProfile.id}
                     isNewUser={false}
-                    
+
                   />
                 </View>
               </ScrollView>
@@ -635,7 +646,7 @@ const styles = StyleSheet.create({
   profileInfo: {
     flexDirection: "row",
     alignItems: "center",
-    
+
   },
   profileImage: {
     width: 40,
