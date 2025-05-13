@@ -42,6 +42,23 @@ interface Profile {
   photo?: string;
   birthday?: string;
   age?: number;
+
+  useEffect(() => {
+    checkUserAvailability();
+  }, [user]);
+
+  // Add focus effect to recheck availability
+  useEffect(() => {
+    const unsubscribe = router.addListener('focus', () => {
+      checkUserAvailability();
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
+
   occupation: string;
   experience_level?: string;
   industry_categories?: string[];
@@ -129,23 +146,7 @@ export default function MatchingScreen() {
   // Separate the check availability function
   const checkUserAvailability = async () => {
     if (!user) return;
-
-  useEffect(() => {
-    checkUserAvailability();
-  }, [user]);
-
-  // Add focus effect to recheck availability
-  useEffect(() => {
-    const unsubscribe = router.addListener('focus', () => {
-      checkUserAvailability();
-    });
-
-    return () => {
-      unsubscribe();
-    };
-  }, []);
-
-      try {
+    try {
         //console.log("Checking availability for user:", user.id);
         const { data, error } = await supabase
           .from("availability")
