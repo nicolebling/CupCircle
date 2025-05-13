@@ -68,10 +68,10 @@ export default function CircleChatsScreen() {
   useEffect(() => {
     if (user) {
       fetchChats();
-      
+
       // Set up polling every 30 seconds
       const pollInterval = setInterval(fetchChats, 30000);
-      
+
       return () => {
         clearInterval(pollInterval);
       };
@@ -101,7 +101,7 @@ export default function CircleChatsScreen() {
             {
               text: "Yes, Cancel",
               style: "destructive",
-              onPress: () => {
+              onPress={() => {
                 setChats((prevChats) =>
                   prevChats.filter((chat) => chat.match_id !== chatId),
                 );
@@ -438,35 +438,28 @@ export default function CircleChatsScreen() {
             </View>
           )}
 
-          {/* Only show pending sections for current chats */}
-          {!showPastChats && (
-            <>
-              {filterChatsByStatus("pending_acceptance").filter(
-                (chat) => chat.user2_id === user.id,
-              ).length > 0 && (
-                <View style={styles.section}>
-                  <Text style={[styles.sectionTitle, { color: colors.text }]}>
-                    Pending Acceptance
-                  </Text>
-                  {filterChatsByStatus("pending_acceptance")
-                    .filter((chat) => chat.user2_id === user.id)
-                    .map(renderChatCard)}
-                </View>
-              )}
+          {/* Only show Pending Acceptance section if there are chats to display */}
+          {!showPastChats && filterChatsByStatus("pending_acceptance").filter(chat => chat.user2_id === user.id).length > 0 && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                Pending Acceptance
+              </Text>
+              {filterChatsByStatus("pending_acceptance")
+                .filter(chat => chat.user2_id === user.id)
+                .map(renderChatCard)}
+            </View>
+          )}
 
-              {filterChatsByStatus("pending").filter(
-                (chat) => chat.user1_id === user.id,
-              ).length > 0 && (
-                <View style={styles.section}>
-                  <Text style={[styles.sectionTitle, { color: colors.text }]}>
-                    Pending
-                  </Text>
-                  {filterChatsByStatus("pending")
-                    .filter((chat) => chat.user1_id === user.id)
-                    .map(renderChatCard)}
-                </View>
-              )}
-            </>
+          {/* Only show Pending section if there are chats to display */}
+          {!showPastChats && filterChatsByStatus("pending").filter(chat => chat.user1_id === user.id).length > 0 && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                Pending
+              </Text>
+              {filterChatsByStatus("pending")
+                .filter(chat => chat.user1_id === user.id)
+                .map(renderChatCard)}
+            </View>
           )}
         </>
       )}
@@ -600,7 +593,7 @@ const styles = StyleSheet.create({
   modalContent: {
     width: "100%",
     maxHeight: "85%",
-  
+
     borderRadius: 16,
     overflow: "hidden",
     flex: 1,
