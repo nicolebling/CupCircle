@@ -603,12 +603,13 @@ export default function MatchingScreen() {
   };
 
   const renderNoAvailabilityMessage = () => (
-    <View
-      style={[
-        styles.emptyCard,
-        { backgroundColor: colors.card, borderColor: colors.border },
-      ]}
-    >
+    <View style={[styles.cardsContainer, { justifyContent: "center" }]}>
+      <View
+        style={[
+          styles.emptyCard,
+          { backgroundColor: colors.card, borderColor: colors.border },
+        ]}
+      >
       <Ionicons name="calendar-outline" size={48} color={colors.primary} />
       <Text style={[styles.emptyCardTitle, { color: colors.text }]}>
         Set Your Availability
@@ -625,6 +626,7 @@ export default function MatchingScreen() {
       >
         <Text style={styles.emptyCardButtonText}>Go to Availability</Text>
       </TouchableOpacity>
+    </View>
     </View>
   );
 
