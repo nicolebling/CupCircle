@@ -56,7 +56,7 @@ function RootLayoutNav() {
         headerTintColor: colors.text,
         headerTitleStyle: {
           fontFamily: 'K2D-SemiBold',
-        },
+        }
       }}
     >
       <Stack.Screen name="(auth)" options={{ headerShown: false }} />
