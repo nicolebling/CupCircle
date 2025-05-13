@@ -184,6 +184,22 @@ export default function MatchingScreen() {
     checkUserAvailability();
   }, [user]);
 
+  // Add focus effect to recheck availability and fetch profiles
+  useEffect(() => {
+    const unsubscribe = router.addListener('focus', () => {
+      setIsLoading(true);
+      checkUserAvailability().then(() => {
+        if (hasAvailability) {
+          fetchProfiles();
+        }
+      });
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [hasAvailability]);
+
   const fetchProfiles = async () => {
     setIsLoading(true);
     try {
@@ -211,7 +227,7 @@ export default function MatchingScreen() {
           excludedUserIds.add(meeting.user1_id);
         }
       });
-      
+
       //console.log("Users with active or past meetings:", Array.from(excludedUserIds));
 
       // Get users with availability
@@ -287,7 +303,7 @@ export default function MatchingScreen() {
       //console.log("Retrieved profiles data:", profilesData);
 
       if (!profilesData || profilesData.length === 0) {
-        
+
         setProfiles([]);
         setIsLoading(false);
         return;
@@ -1045,7 +1061,7 @@ export default function MatchingScreen() {
                         const [cafeName, cafeAddress] =
                           selectedCafe.split("|||");
 
-                        const { data, error } = await supabase
+                        const { data, error }await supabase
                           .from("matching")
                           .insert([
                             {
@@ -1069,12 +1085,12 @@ export default function MatchingScreen() {
                         setSelectedCafe("");
                         setSelectedTimeSlot(null);
                         setMessageText("");
-                        
+
                         // Refresh index.tsx chats data if function is available
                         if (global.circleChatsScreen && global.circleChatsScreen.refreshData) {
                           global.circleChatsScreen.refreshData();
                         }
-                        
+
                         // Move to next profile
                         if (currentIndex < profiles.length - 1) {
                           setCurrentIndex(currentIndex + 1);
