@@ -218,12 +218,19 @@ export default function MessageScreen() {
       // If there's an initial message, add it to the beginning of the messages array
       const initialMessages = [...filteredMessages];
       if (matchingData.initial_message) {
+        // Get the created_at timestamp from matching data
+        const { data: timestampData } = await supabase
+          .from("matching")
+          .select("created_at")
+          .eq("match_id", id)
+          .single();
+
         initialMessages.unshift({
           id: `initial-${id}`,
           sender_id: matchingData.user1_id,
           receiver_id: matchingData.user2_id,
           content: matchingData.initial_message,
-          created_at: matchingData.created_at ? new Date(matchingData.created_at).toISOString() : new Date().toISOString(), // Parse and format matching timestamp
+          created_at: timestampData?.created_at || new Date().toISOString(),
           read: true
         });
       }
