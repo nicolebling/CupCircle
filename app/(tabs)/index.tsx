@@ -456,43 +456,31 @@ export default function CircleChatsScreen() {
           )}
 
           {/* Only show Pending Acceptance section if there are chats to display */}
-          {!showPastChats &&
-            (() => {
-              const filtered = filterChatsByStatus("pending_acceptance").filter(
-                (chat) =>
-                  new Date(chat.meeting_date) >= new Date() &&
-                  chat.user2_id === user.id,
-              );
-              if (filtered.length === 0) return null;
+          {!showPastChats && filterChatsByStatus("pending_acceptance").filter(
+            (chat) => new Date(chat.meeting_date) >= new Date() && chat.user2_id === user.id
+          ).length > 0 && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                Pending Acceptance
+              </Text>
+              {filterChatsByStatus("pending_acceptance")
+                .filter((chat) => new Date(chat.meeting_date) >= new Date() && chat.user2_id === user.id)
+                .map(renderChatCard)}
+            </View>
+          )}
 
-              return (
-                <View style={styles.section}>
-                  <Text style={[styles.sectionTitle, { color: colors.text }]}>
-                    Pending Acceptance
-                  </Text>
-                  {filtered.map(renderChatCard)}
-                </View>
-              );
-            })()}
-
-          {!showPastChats &&
-            (() => {
-              const filtered = filterChatsByStatus("pending").filter(
-                (chat) =>
-                  new Date(chat.meeting_date) >= new Date() &&
-                  chat.user1_id === user.id,
-              );
-              if (filtered.length === 0) return null;
-
-              return (
-                <View style={styles.section}>
-                  <Text style={[styles.sectionTitle, { color: colors.text }]}>
-                    Pending
-                  </Text>
-                  {filtered.map(renderChatCard)}
-                </View>
-              );
-            })()}
+          {!showPastChats && filterChatsByStatus("pending").filter(
+            (chat) => new Date(chat.meeting_date) >= new Date() && chat.user1_id === user.id
+          ).length > 0 && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                Pending
+              </Text>
+              {filterChatsByStatus("pending")
+                .filter((chat) => new Date(chat.meeting_date) >= new Date() && chat.user1_id === user.id)
+                .map(renderChatCard)}
+            </View>
+          )}
         </>
       )}
     </ScrollView>
