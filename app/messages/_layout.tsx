@@ -16,7 +16,6 @@ export default function MessagesLayout() {
         },
         headerTintColor: colors.text,
         headerBackTitleVisible: false,
-        headerShadowVisible: false,
       }}
     />
   );
