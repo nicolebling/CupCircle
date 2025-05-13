@@ -5,9 +5,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
-  ScrollView,
-  Switch,
-  Modal,
   Alert,
 } from "react-native";
 import Colors from "@/constants/Colors";
@@ -101,10 +98,11 @@ export default function CircleChatsScreen() {
             {
               text: "Yes, Cancel",
               style: "destructive",
-              onPress={() => {
+              onPress: () => {
                 setChats((prevChats) =>
-                  prevChats.filter((chat) => chat.match_id !== chatId),
+                  prevChats.filter((chat) => chat.match_id !== chatId)
                 );
+              }
               },
             },
           ],
