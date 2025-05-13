@@ -9,7 +9,7 @@ export default function MessagesLayout() {
       },
       headerTintColor: '#000', // Replace with your actual color
       headerBackTitle: " ",
-      headerBackTitleVisible: false,
+      headerBackVisible: true,
     }}/>
   );
 }
