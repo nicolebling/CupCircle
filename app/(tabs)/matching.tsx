@@ -669,7 +669,9 @@ export default function MatchingScreen() {
             </TouchableOpacity>
           </View>
         )}
-      {!isLoading && profiles.length === 0 ? (
+      {!isLoading && !hasAvailability ? (
+        renderNoAvailabilityMessage()
+      ) : !isLoading && profiles.length === 0 ? (
         <View style={[styles.cardsContainer, { justifyContent: "center" }]}>
           <View
             style={[
