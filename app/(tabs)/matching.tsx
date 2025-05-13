@@ -126,10 +126,24 @@ export default function MatchingScreen() {
     cardRotate.value = 0;
   }, [currentIndex]);
 
+  // Separate the check availability function
+  const checkUserAvailability = async () => {
+    if (!user) return;
+
   useEffect(() => {
-    // Check if current user has any availability slots
-    const checkUserAvailability = async () => {
-      if (!user) return;
+    checkUserAvailability();
+  }, [user]);
+
+  // Add focus effect to recheck availability
+  useEffect(() => {
+    const unsubscribe = router.addListener('focus', () => {
+      checkUserAvailability();
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
       try {
         //console.log("Checking availability for user:", user.id);
