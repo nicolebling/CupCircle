@@ -278,6 +278,13 @@ export default function MessageScreen() {
     try {
       if (!user?.id || !partnerId) return;
 
+      // Get matching data for initial message
+      const { data: matchingData } = await supabase
+        .from("matching")
+        .select("*")
+        .eq("match_id", id)
+        .single();
+
       const { data: messagesData, error: messagesError } = await supabase
         .from("message")
         .select("*")
@@ -294,17 +301,26 @@ export default function MessageScreen() {
             (msg.sender_id === partnerId && msg.receiver_id === user?.id),
         ) || [];
 
-      if (filteredMessages.length > messages.length) {
-        console.log(
-          `Found ${filteredMessages.length} messages, updating from polling`,
-        );
-        setMessages(filteredMessages);
-
-        // Mark unread messages as read
-        filteredMessages
-          .filter((msg) => msg.receiver_id === user?.id && !msg.read)
-          .forEach((msg) => markMessageAsRead(msg.id));
+      // Add initial message if it exists
+      const initialMessages = [...filteredMessages];
+      if (matchingData?.initial_message) {
+        initialMessages.unshift({
+          id: `initial-${id}`,
+          sender_id: matchingData.user1_id,
+          receiver_id: matchingData.user2_id,
+          content: matchingData.initial_message,
+          created_at: matchingData.created_at,
+          read: true
+        });
       }
+
+      console.log(`Found ${initialMessages.length} messages, updating from polling`);
+      setMessages(initialMessages);
+
+      // Mark unread messages as read
+      filteredMessages
+        .filter((msg) => msg.receiver_id === user?.id && !msg.read)
+        .forEach((msg) => markMessageAsRead(msg.id));
     } catch (error) {
       console.error("Error refreshing messages:", error);
     }
