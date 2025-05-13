@@ -392,57 +392,81 @@ export default function CircleChatsScreen() {
         </View>
       </View>
 
-      {filterChatsByStatus("confirmed").filter((chat) => {
-        if (showPastChats) {
-          // For past chats, only show confirmed chats where the date has passed
-          return new Date(chat.meeting_date) < new Date();
-        } else {
-          // For current chats, only show confirmed chats where the date hasn't passed
-          return new Date(chat.meeting_date) >= new Date();
-        }
-      }).length > 0 && (
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>
-            Confirmed Chats
+      {/* Check if there are any chats to display */}
+      {(!showPastChats && 
+        filterChatsByStatus("confirmed").filter(chat => new Date(chat.meeting_date) >= new Date()).length === 0 &&
+        filterChatsByStatus("pending_acceptance").filter(chat => chat.user2_id === user.id).length === 0 &&
+        filterChatsByStatus("pending").filter(chat => chat.user1_id === user.id).length === 0) || 
+       (showPastChats && 
+        filterChatsByStatus("confirmed").filter(chat => new Date(chat.meeting_date) < new Date()).length === 0) ? (
+        <View style={styles.emptyStateContainer}>
+          <Ionicons name="chatbubble-ellipses-outline" size={64} color={colors.secondaryText} />
+          <Text style={[styles.emptyStateText, { color: colors.text }]}>
+            {showPastChats ? "No past chats" : "No chats yet"}
           </Text>
-          {filterChatsByStatus("confirmed")
-            .filter((chat) => {
-              if (showPastChats) {
-                return new Date(chat.meeting_date) < new Date();
-              } else {
-                return new Date(chat.meeting_date) >= new Date();
-              }
-            })
-            .map(renderChatCard)}
+          <Text style={[styles.emptyStateDescription, { color: colors.secondaryText }]}>
+            {showPastChats 
+              ? "Your past conversations will appear here" 
+              : "Start matching to begin your coffee chats"}
+          </Text>
         </View>
-      )}
-
-      {!showPastChats && (
+      ) : (
         <>
-          {filterChatsByStatus("pending_acceptance").filter(
-            (chat) => chat.user2_id === user.id,
-          ).length > 0 && (
+          {/* Confirmed chats section */}
+          {filterChatsByStatus("confirmed").filter((chat) => {
+            if (showPastChats) {
+              // For past chats, only show confirmed chats where the date has passed
+              return new Date(chat.meeting_date) < new Date();
+            } else {
+              // For current chats, only show confirmed chats where the date hasn't passed
+              return new Date(chat.meeting_date) >= new Date();
+            }
+          }).length > 0 && (
             <View style={styles.section}>
               <Text style={[styles.sectionTitle, { color: colors.text }]}>
-                Pending Acceptance
+                Confirmed Chats
               </Text>
-              {filterChatsByStatus("pending_acceptance")
-                .filter((chat) => chat.user2_id === user.id)
+              {filterChatsByStatus("confirmed")
+                .filter((chat) => {
+                  if (showPastChats) {
+                    return new Date(chat.meeting_date) < new Date();
+                  } else {
+                    return new Date(chat.meeting_date) >= new Date();
+                  }
+                })
                 .map(renderChatCard)}
             </View>
           )}
 
-          {filterChatsByStatus("pending").filter(
-            (chat) => chat.user1_id === user.id,
-          ).length > 0 && (
-            <View style={styles.section}>
-              <Text style={[styles.sectionTitle, { color: colors.text }]}>
-                Pending
-              </Text>
-              {filterChatsByStatus("pending")
-                .filter((chat) => chat.user1_id === user.id)
-                .map(renderChatCard)}
-            </View>
+          {/* Only show pending sections for current chats */}
+          {!showPastChats && (
+            <>
+              {filterChatsByStatus("pending_acceptance").filter(
+                (chat) => chat.user2_id === user.id,
+              ).length > 0 && (
+                <View style={styles.section}>
+                  <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                    Pending Acceptance
+                  </Text>
+                  {filterChatsByStatus("pending_acceptance")
+                    .filter((chat) => chat.user2_id === user.id)
+                    .map(renderChatCard)}
+                </View>
+              )}
+
+              {filterChatsByStatus("pending").filter(
+                (chat) => chat.user1_id === user.id,
+              ).length > 0 && (
+                <View style={styles.section}>
+                  <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                    Pending
+                  </Text>
+                  {filterChatsByStatus("pending")
+                    .filter((chat) => chat.user1_id === user.id)
+                    .map(renderChatCard)}
+                </View>
+              )}
+            </>
           )}
         </>
       )}
@@ -481,6 +505,23 @@ const getStatusText = (status) => {
 };
 
 const styles = StyleSheet.create({
+  emptyStateContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 24,
+  },
+  emptyStateText: {
+    fontFamily: "K2D-SemiBold",
+    fontSize: 18,
+    marginTop: 16,
+  },
+  emptyStateDescription: {
+    fontFamily: "K2D-Regular",
+    fontSize: 14,
+    textAlign: "center",
+    marginTop: 8,
+  },
   container: { flex: 1 },
   header: {
     padding: 16,
