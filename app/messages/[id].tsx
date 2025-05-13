@@ -223,7 +223,7 @@ export default function MessageScreen() {
           sender_id: matchingData.user1_id,
           receiver_id: matchingData.user2_id,
           content: matchingData.initial_message,
-          created_at: matchingData.created_at || new Date().toISOString(), // Use matching timestamp
+          created_at: matchingData.created_at ? new Date(matchingData.created_at).toISOString() : new Date().toISOString(), // Parse and format matching timestamp
           read: true
         });
       }
