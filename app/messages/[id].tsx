@@ -492,7 +492,7 @@ export default function MessageScreen() {
         options={{
           headerShown: true,
           title: "",
-          headerBackTitle: "",
+          headerBackTitle: "Chats",
           headerStyle: {
             backgroundColor: colors.background,
           },
