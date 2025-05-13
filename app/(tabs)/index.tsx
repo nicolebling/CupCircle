@@ -4,7 +4,10 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
+  ScrollView,
+  Modal,
   Image,
+  Switch,
   Alert,
 } from "react-native";
 import Colors from "@/constants/Colors";
@@ -100,10 +103,10 @@ export default function CircleChatsScreen() {
               style: "destructive",
               onPress: () => {
                 setChats((prevChats) =>
-                  prevChats.filter((chat) => chat.match_id !== chatId)
+                  prevChats.filter((chat) => chat.match_id !== chatId),
                 );
-              }
-            }
+              },
+            },
           ],
           { cancelable: true },
         );
@@ -362,9 +365,9 @@ export default function CircleChatsScreen() {
               <ScrollView style={{ flex: 1 }}>
                 <View style={{ alignItems: "center" }}>
                   <ProfileCard
-                    profile = {{
+                    profile={{
                       ...selectedProfile,
-                      photo: selectedProfile.photo_url // Map photo_url to photo for ProfileCard
+                      photo: selectedProfile.photo_url, // Map photo_url to photo for ProfileCard
                     }}
                     userId={selectedProfile.id}
                     isNewUser={false}
@@ -390,20 +393,37 @@ export default function CircleChatsScreen() {
       </View>
 
       {/* Check if there are any chats to display */}
-      {(!showPastChats && 
-        filterChatsByStatus("confirmed").filter(chat => new Date(chat.meeting_date) >= new Date()).length === 0 &&
-        filterChatsByStatus("pending_acceptance").filter(chat => chat.user2_id === user.id).length === 0 &&
-        filterChatsByStatus("pending").filter(chat => chat.user1_id === user.id).length === 0) || 
-       (showPastChats && 
-        filterChatsByStatus("confirmed").filter(chat => new Date(chat.meeting_date) < new Date()).length === 0) ? (
+      {(!showPastChats &&
+        filterChatsByStatus("confirmed").filter(
+          (chat) => new Date(chat.meeting_date) >= new Date(),
+        ).length === 0 &&
+        filterChatsByStatus("pending_acceptance").filter(
+          (chat) => chat.user2_id === user.id,
+        ).length === 0 &&
+        filterChatsByStatus("pending").filter(
+          (chat) => chat.user1_id === user.id,
+        ).length === 0) ||
+      (showPastChats &&
+        filterChatsByStatus("confirmed").filter(
+          (chat) => new Date(chat.meeting_date) < new Date(),
+        ).length === 0) ? (
         <View style={styles.emptyStateContainer}>
-          <Ionicons name="chatbubble-ellipses-outline" size={64} color={colors.secondaryText} />
+          <Ionicons
+            name="chatbubble-ellipses-outline"
+            size={64}
+            color={colors.secondaryText}
+          />
           <Text style={[styles.emptyStateText, { color: colors.text }]}>
             {showPastChats ? "No past chats" : "No chats yet"}
           </Text>
-          <Text style={[styles.emptyStateDescription, { color: colors.secondaryText }]}>
-            {showPastChats 
-              ? "Your past conversations will appear here" 
+          <Text
+            style={[
+              styles.emptyStateDescription,
+              { color: colors.secondaryText },
+            ]}
+          >
+            {showPastChats
+              ? "Your past conversations will appear here"
               : "Start matching to begin your coffee chats"}
           </Text>
         </View>
@@ -436,28 +456,43 @@ export default function CircleChatsScreen() {
           )}
 
           {/* Only show Pending Acceptance section if there are chats to display */}
-          {!showPastChats && filterChatsByStatus("pending_acceptance").filter(chat => chat.user2_id === user.id).length > 0 && (
-            <View style={styles.section}>
-              <Text style={[styles.sectionTitle, { color: colors.text }]}>
-                Pending Acceptance
-              </Text>
-              {filterChatsByStatus("pending_acceptance")
-                .filter(chat => chat.user2_id === user.id)
-                .map(renderChatCard)}
-            </View>
-          )}
+          {!showPastChats &&
+            (() => {
+              const filtered = filterChatsByStatus("pending_acceptance").filter(
+                (chat) =>
+                  new Date(chat.meeting_date) >= new Date() &&
+                  chat.user2_id === user.id,
+              );
+              if (filtered.length === 0) return null;
 
-          {/* Only show Pending section if there are chats to display */}
-          {!showPastChats && filterChatsByStatus("pending").filter(chat => chat.user1_id === user.id).length > 0 && (
-            <View style={styles.section}>
-              <Text style={[styles.sectionTitle, { color: colors.text }]}>
-                Pending
-              </Text>
-              {filterChatsByStatus("pending")
-                .filter(chat => chat.user1_id === user.id)
-                .map(renderChatCard)}
-            </View>
-          )}
+              return (
+                <View style={styles.section}>
+                  <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                    Pending Acceptance
+                  </Text>
+                  {filtered.map(renderChatCard)}
+                </View>
+              );
+            })()}
+
+          {!showPastChats &&
+            (() => {
+              const filtered = filterChatsByStatus("pending").filter(
+                (chat) =>
+                  new Date(chat.meeting_date) >= new Date() &&
+                  chat.user1_id === user.id,
+              );
+              if (filtered.length === 0) return null;
+
+              return (
+                <View style={styles.section}>
+                  <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                    Pending
+                  </Text>
+                  {filtered.map(renderChatCard)}
+                </View>
+              );
+            })()}
         </>
       )}
     </ScrollView>
