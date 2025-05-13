@@ -101,7 +101,15 @@ export default function RootLayout() {
     <NetworkProvider>
       <AuthProvider>
         <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-          <RootLayoutNav />
+          <Stack
+            screenOptions={{
+              headerBackTitle: ' ',
+              headerBackTitleVisible: false,
+            }}>
+            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="+not-found" options={{ title: 'Not Found' }} />
+          </Stack>
           <StatusBar style="auto" />
         </ThemeProvider>
       </AuthProvider>
