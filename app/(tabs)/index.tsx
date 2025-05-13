@@ -284,6 +284,14 @@ export default function CircleChatsScreen() {
           {chat.status === "confirmed" && !showPastChats && (
             <>
               <TouchableOpacity
+                style={[styles.actionButton, styles.cancelButton]}
+                onPress={() => handleAction(chat.match_id, "cancel")}
+              >
+                <Text style={[styles.actionButtonText, { color: colors.text }]}>
+                  Cancel
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
                 style={[
                   styles.actionButton,
                   { backgroundColor: colors.primary },
@@ -292,14 +300,7 @@ export default function CircleChatsScreen() {
               >
                 <Text style={styles.actionButtonText}>Message</Text>
               </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.actionButton, styles.cancelButton]}
-                onPress={() => handleAction(chat.match_id, "cancel")}
-              >
-                <Text style={[styles.actionButtonText, { color: colors.text }]}>
-                  Cancel
-                </Text>
-              </TouchableOpacity>
+              
             </>
           )}
           {chat.user2_id === user.id && chat.status === "pending" && (
