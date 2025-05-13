@@ -313,14 +313,6 @@ export default function CircleChatsScreen() {
               >
                 <Text style={styles.actionButtonText}>Accept</Text>
               </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.actionButton, styles.cancelButton]}
-                onPress={() => handleAction(chat.match_id, "cancel")}
-              >
-                <Text style={[styles.actionButtonText, { color: colors.text }]}>
-                  Cancel
-                </Text>
-              </TouchableOpacity>
             </>
           )}
         </View>
