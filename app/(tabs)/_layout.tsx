@@ -97,10 +97,10 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
-        name="message"
+        name="message/[id]"
         options={{
           title: 'Message',
-          href: null, // This ensures the tab doesn't show in the tab bar
+          href: null,
         }}
       />
 
@@ -108,7 +108,7 @@ export default function TabLayout() {
         name="settings"
         options={{
           title: 'Settings',
-          href: null, // This ensures the tab doesn't show in the tab bar
+          href: null,
         }}
       />
     </Tabs>

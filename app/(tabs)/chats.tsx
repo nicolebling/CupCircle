@@ -176,7 +176,7 @@ export default function ChatsScreen() {
   const renderConversationItem = ({ item }: { item: Conversation }) => (
     <TouchableOpacity
       style={[styles.conversationItem, { borderBottomColor: colors.border }]}
-      onPress={() => router.push(`/(tabs)/message/${item.match_id}`)}
+      onPress={() => router.push(`/message/${item.match_id}`)}
     >
       <View style={styles.avatarContainer}>
         <Image source={{ uri: item.user.photo }} style={styles.avatar} />
