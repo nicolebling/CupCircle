@@ -488,17 +488,7 @@ export default function MessageScreen() {
     <SafeAreaView
       style={[styles.container, { backgroundColor: colors.background }]}
     >
-      <Stack.Screen
-        options={{
-          headerShown: true,
-          title: "",
-          headerBackTitle: "Chats",
-          headerStyle: {
-            backgroundColor: colors.background,
-          },
-          headerShadowVisible: false,
-        }}
-      />
+      
 
       {/* Header */}
       <View style={[styles.header, { borderBottomColor: colors.border }]}>

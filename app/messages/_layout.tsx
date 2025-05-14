@@ -21,6 +21,10 @@ export default function MessagesLayout() {
         options={{
           title: "test",
           headerBackTitle: "Chats",
+          headerStyle: {
+            backgroundColor: colors.background,
+          },
+          headerShadowVisible: false,
         }}
       />
     </Stack>
