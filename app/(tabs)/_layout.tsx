@@ -109,6 +109,7 @@ export default function TabLayout() {
         options={{
           title: 'Settings',
           href: null,
+           // This ensures the tab doesn't show in the tab bar
         }}
       />
     </Tabs>
