@@ -1,4 +1,3 @@
-
 import { Tabs } from 'expo-router';
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
@@ -103,6 +102,14 @@ export default function TabLayout() {
           href: null, // This ensures the tab doesn't show in the tab bar
         }}
       />
+           <Tabs.Screen
+        name="messages"
+        options={{
+          href: null,
+          headerShown: false,
+}}
+      />
     </Tabs>
   );
 }
+```

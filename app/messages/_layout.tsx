@@ -19,12 +19,8 @@ export default function MessagesLayout() {
       <Stack.Screen
         name="[id]"
         options={{
-          title: "test",
+          headerTitle: "Messages",
           headerBackTitle: "Chats",
-          headerStyle: {
-            backgroundColor: colors.background,
-          },
-          headerShadowVisible: false,
         }}
       />
     </Stack>
