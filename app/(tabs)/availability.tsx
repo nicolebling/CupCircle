@@ -468,12 +468,6 @@ export default function AvailabilityScreen() {
                       renderItem={({ item }) => {
                         const isSelectedTime = selectedTime === item;
 
-                        const isTimeTaken = timeSlots.some(
-                          (slot) =>
-                            slot.date.toDateString() === selectedDate.toDateString() &&
-                            slot.startTime === item,
-                        );
-
                         const now = new Date();
                         const [time, period] = item.split(" ");
                         const [hours, minutes] = time.split(":");
@@ -484,6 +478,18 @@ export default function AvailabilityScreen() {
                         const slotTime = new Date(selectedDate);
                         slotTime.setHours(hour, parseInt(minutes), 0, 0);
                         const isPastTime = slotTime < now;
+
+                        // Calculate start and end times for overlap check
+                        const newStart = new Date(`1970-01-01T${to24Hour(item)}:00`).getTime();
+                        const newEnd = new Date(`1970-01-01T${to24Hour(calculateEndTime(item))}:00`).getTime();
+
+                        const hasOverlap = timeSlots.some((slot) => {
+                          if (format(new Date(slot.date), "yyyy-MM-dd") !== format(selectedDate, "yyyy-MM-dd")) 
+                            return false;
+                          const slotStart = new Date(`1970-01-01T${to24Hour(slot.startTime)}:00`).getTime();
+                          const slotEnd = new Date(`1970-01-01T${to24Hour(slot.endTime)}:00`).getTime();
+                          return newStart < slotEnd && newEnd > slotStart;
+                        });
 
                         const isAlreadyAdded = timeSlots.some((slot) => {
                           const slotDateStr = format(
@@ -505,7 +511,10 @@ export default function AvailabilityScreen() {
                             style={[
                               styles.timeButton,
                               isSelectedTime && { backgroundColor: colors.primary },
-                              (isTimeTaken || isPastTime || isAlreadyAdded) && styles.disabledTime,
+                              (hasOverlap || isPastTime || isAlreadyAdded) && { 
+                                backgroundColor: colors.border,
+                                opacity: 0.5 
+                              },
                             ]}
                             onPress={() =>
                               !isTimeTaken &&
