@@ -612,8 +612,7 @@ export default function MatchingScreen() {
         Set Your Availability
       </Text>
       <Text style={[styles.emptyCardText, { color: colors.secondaryText }]}>
-        You need to add some available time slots before you can match with
-        others.
+        Add availability at least 24 hours in advance to connect with others.
       </Text>
       <TouchableOpacity
         style={[styles.emptyCardButton, { backgroundColor: colors.primary }]}
