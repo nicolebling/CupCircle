@@ -521,34 +521,31 @@ export default function AvailabilityScreen() {
                           return slotDateStr === selectedDateStr && slotTimeStr === itemTimeStr;
                         });
 
-                        const isDisabled = hasOverlap || isPastTime || isAlreadyAdded;
                         return (
-                          <View style={[
-                            styles.timeButton,
-                            isSelectedTime && { backgroundColor: colors.primary },
-                            isDisabled && { 
-                              backgroundColor: colors.border,
-                              opacity: 0.5 
-                            },
-                          ]}>
-                            <TouchableOpacity
-                              style={StyleSheet.absoluteFill}
-                              onPress={() => !isDisabled && setSelectedTime(item)}
-                              disabled={isDisabled}
+                          <TouchableOpacity
+                            style={[
+                              styles.timeButton,
+                              isSelectedTime && { backgroundColor: colors.primary },
+                              (hasOverlap || isPastTime || isAlreadyAdded) && styles.disabledTime
+                            ]}
+                            onPress={() =>
+                              
+                              !isPastTime &&
+                              !isAlreadyAdded &&
+                              setSelectedTime(item)
+                            }
+                            disabled={hasOverlap || isPastTime || isAlreadyAdded}
+                          >
+                            <Text
+                              style={[
+                                styles.timeText,
+                                { color: isSelectedTime ? "white" : colors.text },
+                                styles.disabledText,
+                              ]}
                             >
-                              <View style={styles.timeButtonContent}>
-                                <Text
-                                  style={[
-                                    styles.timeText,
-                                    { color: isSelectedTime ? "white" : colors.text },
-                                    styles.disabledText,
-                                  ]}
-                                >
-                                  {item}
-                                </Text>
-                              </View>
-                            </TouchableOpacity>
-                          </View>
+                              {item}
+                            </Text>
+                          </TouchableOpacity>
                         );
                       }}
                       keyExtractor={(item) => item}
@@ -842,10 +839,5 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     fontSize: 16,
     color: "white",
-  },
-  timeButtonContent: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
   },
 });
