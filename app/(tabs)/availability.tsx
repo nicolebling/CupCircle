@@ -137,7 +137,7 @@ export default function AvailabilityScreen() {
     });
 
     if (hasOverlap) {
-      Alert.alert("Duplicate Time Slots", "The time slot you chose is already existed.");
+      Alert.alert("Duplicate Time Slots", "The time slot you choose is already existed.");
       return;
     }
 
@@ -490,7 +490,6 @@ export default function AvailabilityScreen() {
                             new Date(slot.date instanceof Date ? slot.date : new Date(slot.date)),
                             "yyyy-MM-dd"
                           );
-                          
                           const selectedDateStr = format(selectedDate, "yyyy-MM-dd");
 
                           const slotTimeStr = (slot.startTime || slot.start_time || "")
@@ -506,7 +505,7 @@ export default function AvailabilityScreen() {
                             style={[
                               styles.timeButton,
                               isSelectedTime && { backgroundColor: colors.primary },
-                              (isTimeTaken || isPastTime || isAlreadyAdded ) && styles.disabledTime,
+                              (isTimeTaken || isPastTime || isAlreadyAdded) && styles.disabledTime,
                             ]}
                             onPress={() =>
                               !isTimeTaken &&

@@ -165,7 +165,6 @@ export default function MatchingScreen() {
 
       if (hasValidAvailability) {
         await fetchProfiles();
-        console.log("!!User has availability, fetching profiles...");
       }
     } catch (error) {
       console.error("Error checking availability:", error);
