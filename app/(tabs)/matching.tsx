@@ -142,12 +142,6 @@ export default function MatchingScreen() {
         throw error;
       }
 
-      // Ensure we wait for data to be returned
-      if (!data) {
-        return;
-      }
-      }
-
       const now = new Date();
 
       const futureAvailability = data?.filter((slot) => {
