@@ -486,18 +486,14 @@ export default function AvailabilityScreen() {
                         const isPastTime = slotTime < now;
 
                         const isAlreadyAdded = timeSlots.some((slot) => {
-                          const slotDateStr = format(
-                            new Date(slot.date instanceof Date ? slot.date : new Date(slot.date)),
-                            "yyyy-MM-dd"
-                          );
+                          const slotDate = new Date(slot.date instanceof Date ? slot.date : new Date(slot.date));
+                          const slotDateStr = format(slotDate, "yyyy-MM-dd");
                           const selectedDateStr = format(selectedDate, "yyyy-MM-dd");
 
-                          const slotTimeStr = (slot.startTime || slot.start_time || "")
-                            .trim()
-                            .replace(/\s+/g, " ");
-                          const itemTimeStr = item.trim().replace(/\s+/g, " ");
+                          const slotTime = (slot.startTime || slot.start_time || "").trim();
+                          const itemTime = item.trim();
 
-                          return slotDateStr === selectedDateStr && slotTimeStr === itemTimeStr;
+                          return slotDateStr === selectedDateStr && slotTime === itemTime;
                         });
 
                         return (
