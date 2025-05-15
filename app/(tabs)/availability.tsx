@@ -526,24 +526,21 @@ export default function AvailabilityScreen() {
                             style={[
                               styles.timeButton,
                               isSelectedTime && { backgroundColor: colors.primary },
-                              (hasOverlap || isPastTime || isAlreadyAdded) && { 
-                                backgroundColor: colors.border,
-                                opacity: 0.5 
-                              },
+                              (hasOverlap || isPastTime || isAlreadyAdded) && styles.disabledTime
                             ]}
                             onPress={() =>
-                              !isTimeTaken &&
+                              
                               !isPastTime &&
                               !isAlreadyAdded &&
                               setSelectedTime(item)
                             }
-                            disabled={isTimeTaken || isPastTime || isAlreadyAdded}
+                            disabled={hasOverlap || isPastTime || isAlreadyAdded}
                           >
                             <Text
                               style={[
                                 styles.timeText,
                                 { color: isSelectedTime ? "white" : colors.text },
-                                isTimeTaken && styles.disabledText,
+                                styles.disabledText,
                               ]}
                             >
                               {item}
