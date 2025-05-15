@@ -137,7 +137,7 @@ export default function AvailabilityScreen() {
     });
 
     if (hasOverlap) {
-      Alert.alert("Duplicate Time Slots", "The time slot you choose is already existed.");
+      Alert.alert("Duplicate Time Slots", "The time slot you chose is already existed.");
       return;
     }
 
