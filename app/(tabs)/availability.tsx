@@ -124,7 +124,22 @@ export default function AvailabilityScreen() {
       `1970-01-01T${to24Hour(calculateEndTime(selectedTime))}:00`,
     ).getTime();
 
-    
+    const hasOverlap = timeSlots.some((slot) => {
+      if (format(new Date(slot.date), "yyyy-MM-dd") !== selectedDateString)
+        return false;
+      const slotStart = new Date(
+        `1970-01-01T${to24Hour(slot.startTime)}:00`,
+      ).getTime();
+      const slotEnd = new Date(
+        `1970-01-01T${to24Hour(slot.endTime)}:00`,
+      ).getTime();
+      return newStart < slotEnd && newEnd > slotStart;
+    });
+
+    if (hasOverlap) {
+      Alert.alert("Duplicate Time Slots", "The time slot you chose is already existed.");
+      return;
+    }
 
     const endTime = calculateEndTime(selectedTime);
     const result = await createSlot(selectedDate, selectedTime, endTime);
@@ -490,13 +505,10 @@ export default function AvailabilityScreen() {
                             style={[
                               styles.timeButton,
                               isSelectedTime && { backgroundColor: colors.primary },
-                              (isTimeTaken || isPastTime || isAlreadyAdded) && { 
-                                backgroundColor: colors.border,
-                                opacity: 0.5 
-                              },
+                              (isTimeTaken || isPastTime || isAlreadyAdded) && styles.disabledTime,
                             ]}
                             onPress={() =>
-                              !isTimeTaken && !isAlreadyAdded &&
+                              !isTimeTaken &&
                               !isPastTime &&
                               !isAlreadyAdded &&
                               setSelectedTime(item)
