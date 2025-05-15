@@ -505,7 +505,10 @@ export default function AvailabilityScreen() {
                             style={[
                               styles.timeButton,
                               isSelectedTime && { backgroundColor: colors.primary },
-                              (isTimeTaken || isPastTime || isAlreadyAdded) && styles.disabledTime,
+                              (isTimeTaken || isPastTime || isAlreadyAdded) && {
+                                backgroundColor: colors.border,
+                                opacity: 0.5
+                              },
                             ]}
                             onPress={() =>
                               !isTimeTaken &&
