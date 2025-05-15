@@ -43,6 +43,21 @@ export default function AvailabilityScreen() {
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
   const [showAddSlot, setShowAddSlot] = useState(false); // Added state for toggle{/*  */}
 
+  // Helper function to convert 12-hour time to 24-hour format
+  const to24Hour = (time12h: string): string => {
+    const [time, modifier] = time12h.split(' ');
+    let [hours, minutes] = time.split(':');
+    let hour = parseInt(hours, 10);
+
+    if (hour === 12) {
+      hour = modifier === 'PM' ? 12 : 0;
+    } else if (modifier === 'PM') {
+      hour += 12;
+    }
+
+    return `${hour.toString().padStart(2, '0')}:${minutes}`;
+  };
+
   // const [year, month, day] = slot.date.split("-");
   // const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day), 12);
   // setSelectedDate(date);
