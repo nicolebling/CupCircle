@@ -345,7 +345,16 @@ export default function CircleChatsScreen() {
       // For all other statuses (like "confirmed"), just match the status directly
       return chat.status === status;
     });
-
+    useEffect(() => {
+      if (initialFetchDone && chats.length === 0) {
+        const delay = setTimeout(() => {
+          setIsExpired(true);
+        }, 2000); // wait 2 seconds before showing empty state
+        return () => clearTimeout(delay);
+      } else {
+        setIsExpired(false);
+      }
+    }, [chats, initialFetchDone]);
   return (
     <ScrollView
       style={[styles.container, { backgroundColor: colors.background }]}
@@ -399,19 +408,28 @@ export default function CircleChatsScreen() {
       </View>
 
       {/* Check if there are any chats to display */}
-      {!initialFetchDone ||
-      chats.every((chat) => new Date(chat.meeting_date) < new Date()) ? (
-        <View style={styles.emptyStateContainer}>
-          <Ionicons
-            name="chatbubble-ellipses-outline"
-            size={64}
-            color={colors.secondaryText}
-          />
-          <Text style={[styles.emptyStateText, { color: colors.text }]}>
-            Loading chats...
-          </Text>
-        </View>
+      {!initialFetchDone || isLoading ? (
+        <View><Text>Loading chats...</Text></View>
+      ) : isExpired ? (
+        <View><Text>No active chats</Text></View>
       ) : (!showPastChats &&
+              filterChatsByStatus("confirmed").filter(
+                (chat) => new Date(chat.meeting_date) >= new Date()
+              ).length === 0 &&
+              filterChatsByStatus("pending_acceptance").filter(
+                (chat) => chat.user2_id === user.id
+              ).length === 0 &&
+              filterChatsByStatus("pending").filter(
+                (chat) => chat.user1_id === user.id
+              ).length === 0) ||
+              (showPastChats &&
+                filterChatsByStatus("confirmed").filter(
+                  (chat) => new Date(chat.meeting_date) < new Date()
+                ).length === 0) ? (
+            // no chats message
+          ) : (
+            // chat list
+          )} (!showPastChats &&
           filterChatsByStatus("confirmed").filter(
             (chat) => new Date(chat.meeting_date) >= new Date(),
           ).length === 0 &&
