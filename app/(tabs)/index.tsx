@@ -81,19 +81,19 @@ export default function CircleChatsScreen() {
       headerRight: () => (
         <View style={{ flexDirection: 'row' }}>
           <TouchableOpacity
-            onPress={() => router.push("/settings")}
+            onPress={() => setShowPastChats(!showPastChats)}
             style={{ marginRight: 15 }}
           >
             <Ionicons
               name="time-outline"
               size={24}
-              color={colors.text}
+              color={showPastChats ? colors.primary : colors.text}
             />
           </TouchableOpacity>
         </View>
       ),
     });
-  }, [colors.text]);
+  }, [colors.text, showPastChats]);
 
   // Make refreshData function available globally
   useEffect(() => {
