@@ -399,7 +399,8 @@ export default function CircleChatsScreen() {
       </View>
 
       {/* Check if there are any chats to display */}
-      {!initialFetchDone ? (
+      {!initialFetchDone ||
+      chats.every((chat) => new Date(chat.meeting_date) < new Date()) ? (
         <View style={styles.emptyStateContainer}>
           <Ionicons
             name="chatbubble-ellipses-outline"
@@ -431,7 +432,8 @@ export default function CircleChatsScreen() {
             color={colors.secondaryText}
           />
           <Text style={[styles.emptyStateText, { color: colors.text }]}>
-            {showPastChats || isExpired
+            {showPastChats ||
+            chats.every((chat) => new Date(chat.meeting_date) < new Date())
               ? "No past chats"
               : "No active chats at the moment"}
           </Text>
