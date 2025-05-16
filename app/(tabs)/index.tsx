@@ -31,6 +31,7 @@ export default function CircleChatsScreen() {
   const [selectedProfile, setSelectedProfile] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [hasInitialFetch, setHasInitialFetch] = useState(false);
+  const [hasNoChats, setHasNoChats] = useState(false);
 
   const fetchChats = async () => {
     if (!user) return;
@@ -61,12 +62,19 @@ export default function CircleChatsScreen() {
       });
 
       setProfiles(profileMap);
-      setChats(matchesData);
-      if (!hasInitialFetch) setHasInitialFetch(true);
+      setChats(matchesData || []);
+      
+      const hasAnyChats = (matchesData || []).length > 0;
+      setHasNoChats(!hasAnyChats);
+      
+      if (!hasInitialFetch) {
+        setHasInitialFetch(true);
+        setIsLoading(false);
+      }
     } catch (error) {
       console.error("Error fetching chats:", error);
       setChats([]);
-    } finally {
+      setHasNoChats(true);
       if (!hasInitialFetch) setIsLoading(false);
     }
   };
@@ -408,7 +416,7 @@ export default function CircleChatsScreen() {
             Loading chats...
           </Text>
         </View>
-      ) : (!hasInitialFetch || (!showPastChats &&
+      ) : (hasNoChats || (!showPastChats &&
         filterChatsByStatus("confirmed").filter(
           (chat) => new Date(chat.meeting_date) >= new Date(),
         ).length === 0 &&
