@@ -29,10 +29,8 @@ export default function CircleChatsScreen() {
   const [profiles, setProfiles] = useState({});
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [selectedProfile, setSelectedProfile] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
 
   const fetchChats = async () => {
-    if (!isLoading) setIsLoading(true);
     try {
       const { data: matchesData, error: matchesError } = await supabase
         .from("matching")
@@ -63,8 +61,6 @@ export default function CircleChatsScreen() {
       setChats(matchesData);
     } catch (error) {
       setChats([]);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -415,11 +411,7 @@ export default function CircleChatsScreen() {
             color={colors.secondaryText}
           />
           <Text style={[styles.emptyStateText, { color: colors.text }]}>
-            {isLoading 
-              ? "Loading chats..." 
-              : showPastChats 
-                ? "No past chats" 
-                : "No active chats at the moment"}
+            {showPastChats ? "No past chats" : "No active chats at the moment"}
           </Text>
           <Text
             style={[
