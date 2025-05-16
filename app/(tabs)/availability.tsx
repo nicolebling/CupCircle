@@ -571,9 +571,9 @@ export default function AvailabilityScreen() {
               color={colors.secondaryText}
             />
             <Text
-              style={[styles.emptyStateText, { color: colors.secondaryText }]}
+              style={[styles.emptyStateText, { color: colors.text }]}
             >
-              You haven't set any available time slots yet
+              No available time slots yet
             </Text>
             <Text
               style={[
@@ -728,11 +728,12 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    padding: 24
   },
   emptyStateText: {
-    fontFamily: "K2D-Medium",
+    fontFamily: "K2D-SemiBold",
     fontWeight: "500",
-    fontSize: 16,
+    fontSize: 18,
     marginTop: 16,
     marginBottom: 8,
     textAlign: "center",

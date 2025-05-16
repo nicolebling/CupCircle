@@ -506,12 +506,12 @@ const styles = StyleSheet.create({
     fontFamily: "K2D-SemiBold",
     fontSize: 18,
     marginTop: 16,
+    marginBottom: 8,
   },
   emptyStateDescription: {
     fontFamily: "K2D-Regular",
     fontSize: 14,
     textAlign: "center",
-    marginTop: 8,
   },
   container: { flex: 1 },
   header: {

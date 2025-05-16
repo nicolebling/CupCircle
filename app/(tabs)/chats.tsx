@@ -247,7 +247,10 @@ export default function ChatsScreen() {
       <SafeAreaView
         style={[styles.container, { backgroundColor: colors.background }]}
       >
-        <View
+
+        {/* Search conversations implementation - Future implementation */}
+       
+        {/* <View
           style={[
             styles.searchContainer,
             { backgroundColor: colors.card, borderColor: colors.border },
@@ -270,7 +273,7 @@ export default function ChatsScreen() {
               />
             </TouchableOpacity>
           )}
-        </View>
+        </View> */}
 
         <FlatList
           data={filteredConversations}
@@ -378,18 +381,18 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: 32,
+    padding: 24,
   },
   emptyTitle: {
     fontFamily: "K2D-SemiBold",
-    fontSize: 20,
+    fontSize: 18,
     marginTop: 16,
     marginBottom: 8,
     textAlign: "center",
   },
   emptySubtitle: {
     fontFamily: "K2D-Regular",
-    fontSize: 16,
+    fontSize: 14,
     textAlign: "center",
   },
 });
