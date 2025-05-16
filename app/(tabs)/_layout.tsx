@@ -45,9 +45,9 @@ export default function TabLayout() {
                   matchingScreen.openFilterModal();
                 }
               }}
-              style={{ marginRight: 16 }}
+              style={{ marginRight: 23}}
             >
-              <Ionicons name="options" size={24} color={Colors.light.primary} />
+              <Ionicons name="filter" size={24} color={Colors.text} />
             </TouchableOpacity>
           ),
           tabBarIcon: ({ color, size }) => (
