@@ -63,6 +63,19 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="home" size={size} color={color} />
           ),
+          headerRight: () => {
+            const indexScreen = global.indexScreen;
+            return (
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 16 }}>
+                <Text style={{ color: Colors.light.text, marginRight: 8, fontFamily: 'K2D-Regular' }}>Past Chats</Text>
+                <Switch
+                  value={indexScreen?.showPastChats}
+                  onValueChange={(value) => indexScreen?.setShowPastChats(value)}
+                  trackColor={{ false: Colors.light.border, true: Colors.light.primary }}
+                />
+              </View>
+            );
+          },
         }}
       />
 
