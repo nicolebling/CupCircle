@@ -51,7 +51,7 @@ export default function TabLayout() {
             </TouchableOpacity>
           ),
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="people" size={size} color={color} />
+            <Ionicons name="ellipse" size={size} color={color} />
           ),
         }}
       />
@@ -61,7 +61,7 @@ export default function TabLayout() {
         options={{
           title: 'Circle Chats',
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="home" size={size} color={color} />
+            <Ionicons name="cafe" size={size} color={color} />
           ),
         }}
       />
@@ -71,7 +71,7 @@ export default function TabLayout() {
         options={{
           title: 'My Availability',
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="time" size={size} color={color} />
+            <Ionicons name="calendar-clear" size={size} color={color} />
           ),
         }}
       />
@@ -91,7 +91,7 @@ export default function TabLayout() {
         options={({ route }) => ({
           title: route.params?.isEditMode ? 'Edit Profile' : 'My Profile',
           tabBarIcon: ({ color, size }) => (
-            <FontAwesome5 name="user" size={size - 2} color={color} />
+            <Ionicons name="person" size={size} color={color} />
           ),
         })}
       />

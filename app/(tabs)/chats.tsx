@@ -221,7 +221,7 @@ export default function ChatsScreen() {
   const EmptyListComponent = () => (
     <View style={styles.emptyContainer}>
       <Ionicons
-        name="chatbubble-ellipses-outline"
+        name="chatbubbles-outline"
         size={64}
         color={colors.secondaryText}
       />

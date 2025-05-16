@@ -222,6 +222,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   presentButtonText: {
+    fontFamily: "K2D-SemiBold",
     fontWeight: '600',
   },
   container: {
@@ -238,11 +239,13 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   label: {
+    fontFamily: "K2D-Regular",
     fontSize: 12,
     fontWeight: '500',
     marginBottom: 4,
   },
   input: {
+    fontFamily: "K2D-Regular",
     borderWidth: 1,
     borderColor: '#ddd',
     borderRadius: 8,
@@ -279,6 +282,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   saveButtonText: {
+    fontFamily: "K2D-SemiBold",
     color: '#FFFFFF',
     fontWeight: '600',
   },
@@ -289,7 +293,6 @@ const styles = StyleSheet.create({
   },
   position: {
     fontSize: 16,
-    
     fontFamily: "K2D-Regular",
   },
   dateText: {

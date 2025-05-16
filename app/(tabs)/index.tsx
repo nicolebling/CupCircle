@@ -106,7 +106,7 @@ export default function CircleChatsScreen() {
         <View style={{ flexDirection: 'row' }}>
           <TouchableOpacity
             onPress={() => setShowPastChats(!showPastChats)}
-            style={{ marginRight: 15 }}
+            style={{ marginRight: 23 }}
           >
             <Ionicons
               name="time-outline"
@@ -388,7 +388,7 @@ export default function CircleChatsScreen() {
   const renderEmptyState = (title, description = null) => (
     <View style={styles.emptyStateContainer}>
       <Ionicons
-        name="chatbubble-ellipses-outline"
+        name="cafe-outline"
         size={64}
         color={colors.secondaryText}
       />
@@ -484,7 +484,7 @@ export default function CircleChatsScreen() {
               : null,
           showPastChats
             ? "Your past conversations will appear here"
-            : "Start matching to begin new coffee chats"
+            : "Start connecting to begin new coffee chats"
         )
       ) : null}
 

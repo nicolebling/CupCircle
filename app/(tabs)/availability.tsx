@@ -360,11 +360,11 @@ export default function AvailabilityScreen() {
               <Ionicons
                 name="add"
                 size={24}
-                color={colors.primary}
+                color={colors.text}
               />
             </TouchableOpacity>
           ),
-          title: "Set Your Availability",
+          title: "Availability",
         }}
       />
 
@@ -566,7 +566,7 @@ export default function AvailabilityScreen() {
         ) : flatListData.length === 0 ? (
           <View style={styles.emptyStateContainer}>
             <Ionicons
-              name="time-outline"
+              name="calendar-clear-outline"
               size={64}
               color={colors.secondaryText}
             />

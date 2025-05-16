@@ -619,7 +619,7 @@ export default function MatchingScreen() {
           router.push("/(tabs)/availability"); // Navigate to availability tab
         }}
       >
-        <Text style={styles.emptyCardButtonText}>Go to Availability</Text>
+        <Text style={styles.emptyCardButtonText}>Add availability</Text>
       </TouchableOpacity>
     </View>
     </View>
@@ -1428,14 +1428,14 @@ const styles = StyleSheet.create({
   },
   emptyCardTitle: {
     fontFamily: "K2D-SemiBold",
-    fontSize: 20,
+    fontSize: 16,
     textAlign: "center",
     marginTop: 16,
     marginBottom: 8,
   },
   emptyCardText: {
     fontFamily: "K2D-Regular",
-    fontSize: 16,
+    fontSize: 14,
     textAlign: "center",
     marginBottom: 24,
   },
@@ -1446,8 +1446,7 @@ const styles = StyleSheet.create({
   },
   emptyCardButtonText: {
     color: "white",
-    fontFamily: "K2D-Medium",
-    fontSize: 16,
+    fontFamily: "K2D-SemiBold"
   },
   noMoreCard: {
     width: "90%",
