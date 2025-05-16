@@ -231,7 +231,7 @@ export default function MessageScreen() {
           receiver_id: matchingData.user2_id,
           content: matchingData.initial_message,
           created_at: timestampData?.created_at || new Date().toISOString(),
-          read: true
+          read: true,
         });
       }
       setMessages(initialMessages);
@@ -310,11 +310,13 @@ export default function MessageScreen() {
           receiver_id: matchingData.user2_id,
           content: matchingData.initial_message,
           created_at: matchingData.created_at,
-          read: true
+          read: true,
         });
       }
 
-      console.log(`Found ${initialMessages.length} messages, updating from polling`);
+      console.log(
+        `Found ${initialMessages.length} messages, updating from polling`,
+      );
       setMessages(initialMessages);
 
       // Mark unread messages as read
@@ -490,7 +492,7 @@ export default function MessageScreen() {
     >
       <Stack.Screen
         options={{
-          headerShown: true,
+          headerShown: false,
           title: "",
           headerBackTitle: "Chats",
           headerStyle: {
@@ -513,7 +515,9 @@ export default function MessageScreen() {
           >
             <Image
               source={{
-                uri: partner.photo_url || "https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg",
+                uri:
+                  partner.photo_url ||
+                  "https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg",
               }}
               style={styles.profileImage}
             />
@@ -621,13 +625,12 @@ export default function MessageScreen() {
               <ScrollView style={{ flex: 1 }}>
                 <View style={{ alignItems: "center" }}>
                   <ProfileCard
-                    profile = {{
+                    profile={{
                       ...partnerProfile,
-                      photo: partnerProfile.photo_url // Map photo_url to photo for ProfileCard
+                      photo: partnerProfile.photo_url, // Map photo_url to photo for ProfileCard
                     }}
                     userId={partnerProfile.id}
                     isNewUser={false}
-
                   />
                 </View>
               </ScrollView>
@@ -669,7 +672,6 @@ const styles = StyleSheet.create({
   profileInfo: {
     flexDirection: "row",
     alignItems: "center",
-
   },
   profileImage: {
     width: 40,
