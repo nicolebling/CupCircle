@@ -394,18 +394,7 @@ export default function CircleChatsScreen() {
       </View>
 
       {/* Check if there are any chats to display */}
-      {isLoading ? (
-        <View style={styles.emptyStateContainer}>
-          <Ionicons
-            name="chatbubble-ellipses-outline"
-            size={64}
-            color={colors.secondaryText}
-          />
-          <Text style={[styles.emptyStateText, { color: colors.text }]}>
-            Loading chats...
-          </Text>
-        </View>
-      ) : (!showPastChats &&
+      {(!showPastChats &&
         filterChatsByStatus("confirmed").filter(
           (chat) => new Date(chat.meeting_date) >= new Date(),
         ).length === 0 &&
