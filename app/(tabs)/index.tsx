@@ -244,8 +244,7 @@ export default function CircleChatsScreen() {
               style={styles.detailIcon}
             />
             <Text style={[styles.detailText, { color: colors.text }]}>
-              {chat.start_time.split(":")[0]}:{chat.start_time.split(":")[1]} -{" "}
-              {chat.end_time.split(":")[0]}:{chat.end_time.split(":")[1]}
+              {`${chat.start_time.split(":")[0]}:${chat.start_time.split(":")[1]} - ${chat.end_time.split(":")[0]}:${chat.end_time.split(":")[1]}`}
             </Text>
           </View>
 
@@ -407,12 +406,40 @@ export default function CircleChatsScreen() {
         </View>
       </View>
 
+      
+
       {/* Check if there are any chats to display */}
-      {!initialFetchDone || isLoading ? (
-        <View><Text>Loading chats...</Text></View>
-      ) : isExpired ? (
-        <View><Text>No active chats</Text></View>
-      ) : (!showPastChats &&
+          {!initialFetchDone || isLoading ? (
+            <View style={styles.emptyStateContainer}>
+              <Ionicons
+                name="chatbubble-ellipses-outline"
+                size={64}
+                color={colors.secondaryText}
+              />
+              <Text style={[styles.emptyStateText, { color: colors.text }]}>
+                Loading chats...
+              </Text>
+            </View>
+          ) : isExpired ? (
+            <View style={styles.emptyStateContainer}>
+              <Ionicons
+                name="chatbubble-ellipses-outline"
+                size={64}
+                color={colors.secondaryText}
+              />
+              <Text style={[styles.emptyStateText, { color: colors.text }]}>
+                No active chats at the moment
+              </Text>
+              <Text
+                style={[
+                  styles.emptyStateDescription,
+                  { color: colors.secondaryText },
+                ]}
+              >
+                Start matching to begin new coffee chats
+              </Text>
+            </View>
+          ) : (!showPastChats &&
               filterChatsByStatus("confirmed").filter(
                 (chat) => new Date(chat.meeting_date) >= new Date()
               ).length === 0 &&
@@ -422,52 +449,56 @@ export default function CircleChatsScreen() {
               filterChatsByStatus("pending").filter(
                 (chat) => chat.user1_id === user.id
               ).length === 0) ||
-              (showPastChats &&
-                filterChatsByStatus("confirmed").filter(
-                  (chat) => new Date(chat.meeting_date) < new Date()
-                ).length === 0) ? (
-            // no chats message
-          ) : (
-            // chat list
-          )} (!showPastChats &&
-          filterChatsByStatus("confirmed").filter(
-            (chat) => new Date(chat.meeting_date) >= new Date(),
-          ).length === 0 &&
-          filterChatsByStatus("pending_acceptance").filter(
-            (chat) => chat.user2_id === user.id,
-          ).length === 0 &&
-          filterChatsByStatus("pending").filter(
-            (chat) => chat.user1_id === user.id,
-          ).length === 0) ||
-        (showPastChats &&
-          filterChatsByStatus("confirmed").filter(
-            (chat) => new Date(chat.meeting_date) < new Date(),
-          ).length === 0) ? (
-        <View style={styles.emptyStateContainer}>
-          <Ionicons
-            name="chatbubble-ellipses-outline"
-            size={64}
-            color={colors.secondaryText}
-          />
-          <Text style={[styles.emptyStateText, { color: colors.text }]}>
-            {showPastChats ||
-            chats.every((chat) => new Date(chat.meeting_date) < new Date())
-              ? "No past chats"
-              : "No active chats at the moment"}
-          </Text>
-          <Text
-            style={[
-              styles.emptyStateDescription,
-              { color: colors.secondaryText },
-            ]}
-          >
-            {showPastChats
-              ? "Your past conversations will appear here"
-              : "Start matching to begin new coffee chats"}
-          </Text>
-        </View>
-      ) : (
-        <>
+            (showPastChats &&
+              filterChatsByStatus("confirmed").filter(
+                (chat) => new Date(chat.meeting_date) < new Date()
+              ).length === 0) ? (
+            <View style={styles.emptyStateContainer}>
+              <Ionicons
+                name="chatbubble-ellipses-outline"
+                size={64}
+                color={colors.secondaryText}
+              />
+              <Text style={[styles.emptyStateText, { color: colors.text }]}>
+                {showPastChats
+                  ? "No past chats"
+                  : "No active chats at the moment"}
+              </Text>
+              <Text
+                style={[
+                  styles.emptyStateDescription,
+                  { color: colors.secondaryText },
+                ]}
+              >
+                {showPastChats
+                  ? "Your past conversations will appear here"
+                  : "Start matching to begin new coffee chats"}
+              </Text>
+            </View>
+          ) : ( !showPastChats ? (
+              <View style={styles.emptyStateContainer}>
+                <Ionicons
+                  name="chatbubble-ellipses-outline"
+                  size={64}
+                  color={colors.secondaryText}
+                />
+                <Text style={[styles.emptyStateText, { color: colors.text }]}>
+                  {showPastChats
+                    ? "No past chats"
+                    : "No active chats at the moment"}
+                </Text>
+                <Text
+                  style={[
+                    styles.emptyStateDescription,
+                    { color: colors.secondaryText },
+                  ]}
+                >
+                  {showPastChats
+                    ? "Your past conversations will appear here"
+                    : "Start matching to begin new coffee chats"}
+                </Text>
+              </View>) : null
+          )}
           {/* Confirmed chats section */}
           {filterChatsByStatus("confirmed").filter((chat) => {
             if (showPastChats) {
@@ -534,7 +565,7 @@ export default function CircleChatsScreen() {
                   .map(renderChatCard)}
               </View>
             )}
-        </>
+        
       )}
     </ScrollView>
   );
