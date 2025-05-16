@@ -13,7 +13,13 @@ import {
   ScrollView,
   Modal,
 } from "react-native";
-import { useLocalSearchParams, useRouter, Stack } from "expo-router";
+import {
+  useLocalSearchParams,
+  useRouter,
+  Stack,
+  useNavigation,
+} from "expo-router";
+
 import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "@/contexts/AuthContext";
 import { useColorScheme } from "@/hooks/useColorScheme";
@@ -43,6 +49,7 @@ export default function MessageScreen() {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const router = useRouter();
+  const navigation = useNavigation();
 
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
@@ -504,6 +511,13 @@ export default function MessageScreen() {
 
       {/* Header */}
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
+        <TouchableOpacity
+          onPress={() => router.push("/(tabs)/chats")}
+          style={{ marginLeft: 4 }}
+        >
+          <Ionicons name="chevron-back" size={24} color={colors.text} />
+        </TouchableOpacity>
+
         {partner ? (
           <TouchableOpacity
             style={styles.profileInfo}
@@ -548,7 +562,7 @@ export default function MessageScreen() {
       <KeyboardAvoidingView
         style={styles.content}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
       >
         {loading ? (
           <View style={styles.loadingContainer}>
@@ -666,6 +680,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
+    flexDirection: "row",
+    alignItems: "center",
     padding: 15,
     borderBottomWidth: 1,
   },
@@ -678,6 +694,7 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 20,
     marginRight: 10,
+    marginLeft: 10,
   },
   profileImagePlaceholder: {
     width: 40,
