@@ -30,6 +30,7 @@ export default function CircleChatsScreen() {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [selectedProfile, setSelectedProfile] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasInitialFetch, setHasInitialFetch] = useState(false);
 
   const fetchChats = async () => {
     if (!user) return;
@@ -60,12 +61,13 @@ export default function CircleChatsScreen() {
       });
 
       setProfiles(profileMap);
-      setChats(matchesData || []);
+      setChats(matchesData);
+      if (!hasInitialFetch) setHasInitialFetch(true);
     } catch (error) {
       console.error("Error fetching chats:", error);
       setChats([]);
     } finally {
-      setIsLoading(false);
+      if (!hasInitialFetch) setIsLoading(false);
     }
   };
 
@@ -305,7 +307,7 @@ export default function CircleChatsScreen() {
               >
                 <Text style={styles.actionButtonText}>Message</Text>
               </TouchableOpacity>
-              
+
             </>
           )}
           {chat.user2_id === user.id && chat.status === "pending" && (
@@ -406,7 +408,7 @@ export default function CircleChatsScreen() {
             Loading chats...
           </Text>
         </View>
-      ) : (!showPastChats &&
+      ) : (!hasInitialFetch || (!showPastChats &&
         filterChatsByStatus("confirmed").filter(
           (chat) => new Date(chat.meeting_date) >= new Date(),
         ).length === 0 &&
@@ -419,7 +421,7 @@ export default function CircleChatsScreen() {
       (showPastChats &&
         filterChatsByStatus("confirmed").filter(
           (chat) => new Date(chat.meeting_date) < new Date(),
-        ).length === 0) ? (
+        ).length === 0)) ? (
         <View style={styles.emptyStateContainer}>
           <Ionicons
             name="chatbubble-ellipses-outline"
