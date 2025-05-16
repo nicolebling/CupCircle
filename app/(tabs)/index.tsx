@@ -43,7 +43,17 @@ export default function CircleChatsScreen() {
         .select("*")
         .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`);
 
-      if (matchesError) throw matchesError;
+      if (matchesError) {
+        console.warn("Error fetching matches:", matchesError.message);
+        setChats([]);
+        return;
+      }
+
+      if (!matchesData || matchesData.length === 0) {
+        setChats([]);
+        setProfiles({});
+        return;
+      }
 
       const userIds = new Set();
       matchesData.forEach((match) => {
@@ -51,23 +61,37 @@ export default function CircleChatsScreen() {
         userIds.add(match.user2_id);
       });
 
+      if (userIds.size === 0) {
+        setChats([]);
+        setProfiles({});
+        return;
+      }
+
       const { data: profilesData, error: profilesError } = await supabase
         .from("profiles")
         .select("*")
         .in("id", Array.from(userIds));
 
-      if (profilesError) throw profilesError;
+      if (profilesError) {
+        console.warn("Error fetching profiles:", profilesError.message);
+        // Still set the chats but with empty profiles
+        setChats(matchesData);
+        setProfiles({});
+        return;
+      }
 
       const profileMap = {};
-      profilesData.forEach((profile) => {
+      profilesData?.forEach((profile) => {
         profileMap[profile.id] = profile;
       });
 
       setProfiles(profileMap);
-      setChats(matchesData || []);
+      setChats(matchesData);
     } catch (error) {
-      console.error("Error fetching chats:", error);
+      console.warn("Unexpected error in fetchChats:", error instanceof Error ? error.message : String(error));
+      // Set empty states but don't crash
       setChats([]);
+      setProfiles({});
     } finally {
       if (!initialFetchDone) {
         setIsLoading(false);
