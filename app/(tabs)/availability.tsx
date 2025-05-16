@@ -43,21 +43,6 @@ export default function AvailabilityScreen() {
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
   const [showAddSlot, setShowAddSlot] = useState(false); // Added state for toggle{/*  */}
 
-  // Helper function to convert 12-hour time to 24-hour format
-  const to24Hour = (time12h: string): string => {
-    const [time, modifier] = time12h.split(' ');
-    let [hours, minutes] = time.split(':');
-    let hour = parseInt(hours, 10);
-
-    if (hour === 12) {
-      hour = modifier === 'PM' ? 12 : 0;
-    } else if (modifier === 'PM') {
-      hour += 12;
-    }
-
-    return `${hour.toString().padStart(2, '0')}:${minutes}`;
-  };
-
   // const [year, month, day] = slot.date.split("-");
   // const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day), 12);
   // setSelectedDate(date);
@@ -483,6 +468,12 @@ export default function AvailabilityScreen() {
                       renderItem={({ item }) => {
                         const isSelectedTime = selectedTime === item;
 
+                        const isTimeTaken = timeSlots.some(
+                          (slot) =>
+                            slot.date.toDateString() === selectedDate.toDateString() &&
+                            slot.startTime === item,
+                        );
+
                         const now = new Date();
                         const [time, period] = item.split(" ");
                         const [hours, minutes] = time.split(":");
@@ -493,18 +484,6 @@ export default function AvailabilityScreen() {
                         const slotTime = new Date(selectedDate);
                         slotTime.setHours(hour, parseInt(minutes), 0, 0);
                         const isPastTime = slotTime < now;
-
-                        // Calculate start and end times for overlap check
-                        const newStart = new Date(`1970-01-01T${to24Hour(item)}:00`).getTime();
-                        const newEnd = new Date(`1970-01-01T${to24Hour(calculateEndTime(item))}:00`).getTime();
-
-                        const hasOverlap = timeSlots.some((slot) => {
-                          if (format(new Date(slot.date), "yyyy-MM-dd") !== format(selectedDate, "yyyy-MM-dd")) 
-                            return false;
-                          const slotStart = new Date(`1970-01-01T${to24Hour(slot.startTime)}:00`).getTime();
-                          const slotEnd = new Date(`1970-01-01T${to24Hour(slot.endTime)}:00`).getTime();
-                          return newStart < slotEnd && newEnd > slotStart;
-                        });
 
                         const isAlreadyAdded = timeSlots.some((slot) => {
                           const slotDateStr = format(
@@ -526,21 +505,21 @@ export default function AvailabilityScreen() {
                             style={[
                               styles.timeButton,
                               isSelectedTime && { backgroundColor: colors.primary },
-                              (hasOverlap || isPastTime || isAlreadyAdded) && styles.disabledTime
+                              (isTimeTaken || isPastTime || isAlreadyAdded) && styles.disabledTime,
                             ]}
                             onPress={() =>
-                              
+                              !isTimeTaken &&
                               !isPastTime &&
                               !isAlreadyAdded &&
                               setSelectedTime(item)
                             }
-                            disabled={hasOverlap || isPastTime || isAlreadyAdded}
+                            disabled={isTimeTaken || isPastTime || isAlreadyAdded}
                           >
                             <Text
                               style={[
                                 styles.timeText,
                                 { color: isSelectedTime ? "white" : colors.text },
-                                styles.disabledText,
+                                isTimeTaken && styles.disabledText,
                               ]}
                             >
                               {item}
