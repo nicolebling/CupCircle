@@ -424,18 +424,20 @@ export default function CircleChatsScreen() {
       </View>
 
       {/* Loading, expired, or empty states */}
-      {!initialFetchDone || isLoading
-        ? renderEmptyState("Loading chats...")
-        : isExpired
-          ? renderEmptyState("No active chats at the moment", "Start matching to begin new coffee chats")
-          : showEmptyState
-            ? renderEmptyState(
-                showPastChats ? "No past chats" : "No active chats at the moment",
-                showPastChats
-                  ? "Your past conversations will appear here"
-                  : "Start matching to begin new coffee chats"
-              )
-            : null}
+      {!initialFetchDone || isLoading ? (
+        renderEmptyState("Loading chats...")
+      ) : showEmptyState ? (
+        renderEmptyState(
+          showPastChats && pastConfirmed.length === 0
+            ? "No past chats"
+            : !showPastChats && upcomingConfirmed.length === 0 && pendingAcceptance.length === 0 && pending.length === 0
+              ? "No active chats at the moment"
+              : null,
+          showPastChats
+            ? "Your past conversations will appear here"
+            : "Start matching to begin new coffee chats"
+        )
+      ) : null}
 
       {/* Confirmed chats */}
       {(showPastChats ? pastConfirmed : upcomingConfirmed).length > 0 && (
