@@ -29,8 +29,10 @@ export default function CircleChatsScreen() {
   const [profiles, setProfiles] = useState({});
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [selectedProfile, setSelectedProfile] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const fetchChats = async () => {
+    if (!user) return;
     try {
       const { data: matchesData, error: matchesError } = await supabase
         .from("matching")
@@ -58,9 +60,12 @@ export default function CircleChatsScreen() {
       });
 
       setProfiles(profileMap);
-      setChats(matchesData);
+      setChats(matchesData || []);
     } catch (error) {
+      console.error("Error fetching chats:", error);
       setChats([]);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -390,7 +395,18 @@ export default function CircleChatsScreen() {
       </View>
 
       {/* Check if there are any chats to display */}
-      {(!showPastChats &&
+      {isLoading ? (
+        <View style={styles.emptyStateContainer}>
+          <Ionicons
+            name="chatbubble-ellipses-outline"
+            size={64}
+            color={colors.secondaryText}
+          />
+          <Text style={[styles.emptyStateText, { color: colors.text }]}>
+            Loading chats...
+          </Text>
+        </View>
+      ) : (!showPastChats &&
         filterChatsByStatus("confirmed").filter(
           (chat) => new Date(chat.meeting_date) >= new Date(),
         ).length === 0 &&
