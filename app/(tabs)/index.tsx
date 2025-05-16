@@ -25,17 +25,6 @@ export default function CircleChatsScreen() {
   const router = useRouter();
 
   const [showPastChats, setShowPastChats] = useState(false);
-  
-  // Expose the screen instance to global for header access
-  useEffect(() => {
-    global.indexScreen = {
-      showPastChats,
-      setShowPastChats
-    };
-    return () => {
-      global.indexScreen = undefined;
-    };
-  }, [showPastChats]);
   const [chats, setChats] = useState([]);
   const [profiles, setProfiles] = useState({});
   const [isExpired, setIsExpired] = useState(false);
@@ -425,7 +414,17 @@ export default function CircleChatsScreen() {
         </View>
       </Modal>
 
-      
+      {/* Toggle */}
+      <View style={styles.header}>
+        <View style={styles.toggleContainer}>
+          <Text style={[styles.toggleLabel, { color: colors.text }]}>Past Chats</Text>
+          <Switch
+            value={showPastChats}
+            onValueChange={setShowPastChats}
+            trackColor={{ false: colors.border, true: colors.primary }}
+          />
+        </View>
+      </View>
 
       {/* Loading, expired, or empty states */}
       {!initialFetchDone || isLoading ? (
