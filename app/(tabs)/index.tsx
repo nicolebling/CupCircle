@@ -385,7 +385,10 @@ export default function CircleChatsScreen() {
     (showPastChats && pastConfirmed.length === 0);
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
+    <ScrollView
+      style={[styles.container, { backgroundColor: colors.background }]}
+      contentContainerStyle={{ flexGrow: 1 }}
+    >
 
       {/* Profile Modal */}
       <Modal visible={showProfileModal} transparent animationType="slide" onRequestClose={() => setShowProfileModal(false)}>
