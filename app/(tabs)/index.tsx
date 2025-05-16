@@ -27,6 +27,7 @@ export default function CircleChatsScreen() {
   const [showPastChats, setShowPastChats] = useState(false);
   const [chats, setChats] = useState([]);
   const [profiles, setProfiles] = useState({});
+  const [isExpired, setIsExpired] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [selectedProfile, setSelectedProfile] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -309,7 +310,6 @@ export default function CircleChatsScreen() {
               >
                 <Text style={styles.actionButtonText}>Message</Text>
               </TouchableOpacity>
-              
             </>
           )}
           {chat.user2_id === user.id && chat.status === "pending" && (
@@ -411,19 +411,19 @@ export default function CircleChatsScreen() {
           </Text>
         </View>
       ) : (!showPastChats &&
-        filterChatsByStatus("confirmed").filter(
-          (chat) => new Date(chat.meeting_date) >= new Date(),
-        ).length === 0 &&
-        filterChatsByStatus("pending_acceptance").filter(
-          (chat) => chat.user2_id === user.id,
-        ).length === 0 &&
-        filterChatsByStatus("pending").filter(
-          (chat) => chat.user1_id === user.id,
-        ).length === 0) ||
-      (showPastChats &&
-        filterChatsByStatus("confirmed").filter(
-          (chat) => new Date(chat.meeting_date) < new Date(),
-        ).length === 0) ? (
+          filterChatsByStatus("confirmed").filter(
+            (chat) => new Date(chat.meeting_date) >= new Date(),
+          ).length === 0 &&
+          filterChatsByStatus("pending_acceptance").filter(
+            (chat) => chat.user2_id === user.id,
+          ).length === 0 &&
+          filterChatsByStatus("pending").filter(
+            (chat) => chat.user1_id === user.id,
+          ).length === 0) ||
+        (showPastChats &&
+          filterChatsByStatus("confirmed").filter(
+            (chat) => new Date(chat.meeting_date) < new Date(),
+          ).length === 0) ? (
         <View style={styles.emptyStateContainer}>
           <Ionicons
             name="chatbubble-ellipses-outline"
@@ -431,7 +431,9 @@ export default function CircleChatsScreen() {
             color={colors.secondaryText}
           />
           <Text style={[styles.emptyStateText, { color: colors.text }]}>
-            {showPastChats ? "No past chats" : "No active chats at the moment"}
+            {showPastChats || isExpired
+              ? "No past chats"
+              : "No active chats at the moment"}
           </Text>
           <Text
             style={[
