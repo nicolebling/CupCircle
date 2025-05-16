@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -15,14 +15,16 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
-import { useRouter } from "expo-router";
+import { useRouter, useNavigation } from "expo-router";
 import ProfileCard from "@/components/ProfileCard";
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 export default function CircleChatsScreen() {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const { user } = useAuth();
   const router = useRouter();
+  const navigation = useNavigation<NativeStackNavigationProp<any>>();
 
   const [showPastChats, setShowPastChats] = useState(false);
   const [chats, setChats] = useState([]);
@@ -73,6 +75,25 @@ export default function CircleChatsScreen() {
       }
     }
   };
+
+  React.useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <View style={{ flexDirection: 'row' }}>
+          <TouchableOpacity
+            onPress={() => router.push("/settings")}
+            style={{ marginRight: 15 }}
+          >
+            <Ionicons
+              name="time-outline"
+              size={24}
+              color={colors.text}
+            />
+          </TouchableOpacity>
+        </View>
+      ),
+    });
+  }, [colors.text]);
 
   // Make refreshData function available globally
   useEffect(() => {
