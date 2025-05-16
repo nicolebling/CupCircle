@@ -435,8 +435,9 @@ export default function CircleChatsScreen() {
         </View>
       </Modal>
 
-      {/* Toggle */}
-      <View style={styles.header}>
+      {/* Toggle - UI TESTING */ }
+      
+      {/* <View style={styles.header}>
         <View style={styles.toggleContainer}>
           <Text style={[styles.toggleLabel, { color: colors.text }]}>Past Chats</Text>
           <Switch
@@ -445,7 +446,7 @@ export default function CircleChatsScreen() {
             trackColor={{ false: colors.border, true: colors.primary }}
           />
         </View>
-      </View>
+      </View> */}
 
       {/* Loading, expired, or empty states */}
       {!initialFetchDone || isLoading ? (
