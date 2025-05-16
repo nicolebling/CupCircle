@@ -30,6 +30,7 @@ export default function CircleChatsScreen() {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [selectedProfile, setSelectedProfile] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [initialFetchDone, setInitialFetchDone] = useState(false);
 
   const fetchChats = async () => {
     if (!user) return;
@@ -65,7 +66,10 @@ export default function CircleChatsScreen() {
       console.error("Error fetching chats:", error);
       setChats([]);
     } finally {
-      setIsLoading(false);
+      if (!initialFetchDone) {
+        setIsLoading(false);
+        setInitialFetchDone(true);
+      }
     }
   };
 
@@ -395,7 +399,7 @@ export default function CircleChatsScreen() {
       </View>
 
       {/* Check if there are any chats to display */}
-      {isLoading ? (
+      {!initialFetchDone ? (
         <View style={styles.emptyStateContainer}>
           <Ionicons
             name="chatbubble-ellipses-outline"
