@@ -226,14 +226,14 @@ export default function ChatsScreen() {
         color={colors.secondaryText}
       />
       <Text style={[styles.emptyTitle, { color: colors.text }]}>
-        {loading ? "Loading chats..." : "No confirmed chats yet"}
+        {loading ? "Loading chats..." : "No messages yet"}
       </Text>
       <Text style={[styles.emptySubtitle, { color: colors.secondaryText }]}>
         {loading
           ? "Please wait while we load your chats"
           : searchQuery
             ? "No matches found for your search"
-            : "Confirm matches in Circle Chats to start conversations"}
+            : "Confirm a Coffee Chat in Circle Chats to begin chatting"}
       </Text>
     </View>
   );
@@ -247,9 +247,8 @@ export default function ChatsScreen() {
       <SafeAreaView
         style={[styles.container, { backgroundColor: colors.background }]}
       >
-
         {/* Search conversations implementation - Future implementation */}
-       
+
         {/* <View
           style={[
             styles.searchContainer,

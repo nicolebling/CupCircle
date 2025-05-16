@@ -417,7 +417,7 @@ export default function CircleChatsScreen() {
       {/* Toggle */}
       <View style={styles.header}>
         <View style={styles.toggleContainer}>
-          <Text style={[styles.toggleLabel, { color: colors.text }]}>Show Past Chats</Text>
+          <Text style={[styles.toggleLabel, { color: colors.text }]}>Past Chats</Text>
           <Switch
             value={showPastChats}
             onValueChange={setShowPastChats}
