@@ -60,7 +60,7 @@ export default function CircleChatsScreen() {
       setProfiles(profileMap);
       setChats(matchesData);
     } catch (error) {
-      console.error("Error fetching chats:", error);
+      setChats([]);
     }
   };
 
@@ -411,7 +411,7 @@ export default function CircleChatsScreen() {
             color={colors.secondaryText}
           />
           <Text style={[styles.emptyStateText, { color: colors.text }]}>
-            {showPastChats ? "No past chats" : "No chats yet"}
+            {showPastChats ? "No past chats" : "No active chats at the moment"}
           </Text>
           <Text
             style={[
@@ -421,7 +421,7 @@ export default function CircleChatsScreen() {
           >
             {showPastChats
               ? "Your past conversations will appear here"
-              : "Start matching to begin your coffee chats"}
+              : "Start matching to begin new coffee chats"}
           </Text>
         </View>
       ) : (
