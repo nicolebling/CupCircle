@@ -251,10 +251,10 @@ export default function CircleChatsScreen() {
               <Text style={[styles.partnerName, { color: colors.text }]}>
                 {partnerProfile.name || "Unknown"}
               </Text>
-              <Text
-                style={[styles.occupation, { color: colors.secondaryText }]}
-              >
-                {partnerProfile.occupation || "No occupation listed"}
+              <Text style={[styles.occupation, { color: colors.secondaryText }]}>
+                {(partnerProfile.occupation || "No occupation listed").length > 30 
+                  ? `${partnerProfile.occupation.substring(0, 30)}...` 
+                  : partnerProfile.occupation || "No occupation listed"}
               </Text>
             </View>
           </View>
@@ -460,7 +460,7 @@ export default function CircleChatsScreen() {
       </Modal>
 
       {/* Toggle - UI TESTING */ }
-      
+
       {/* <View style={styles.header}>
         <View style={styles.toggleContainer}>
           <Text style={[styles.toggleLabel, { color: colors.text }]}>Past Chats</Text>
