@@ -127,24 +127,6 @@ export default function ChatsScreen() {
         profileMap[profile.id] = profile;
       });
 
-      // Fetch unread message counts for each match
-      const { data: unreadCountsData, error: unreadCountsError } = await supabase
-        .from("message")
-        .select("match_id, count(*)")
-        .eq("receiver_id", user.id)
-        .eq("read", false)
-        .group_by("match_id");
-
-      if (unreadCountsError) {
-        console.error("Error fetching unread counts:", unreadCountsError);
-      }
-
-      // Create a map of match_id to unread count
-      const unreadCountMap: Record<string, number> = {};
-      unreadCountsData?.forEach((item: any) => {
-        unreadCountMap[item.match_id] = parseInt(item.count);
-      });
-
       // Build conversation objects
       const mappedConversations = matchesData.map((match) => {
         const partnerId =
@@ -166,7 +148,7 @@ export default function ChatsScreen() {
             timestamp: formatDate(match.created_at || new Date().toISOString()),
             isRead: true,
           },
-          unreadCount: unreadCountMap[match.match_id] || 0,
+          unreadCount: 0,
         };
       });
 
