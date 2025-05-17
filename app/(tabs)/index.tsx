@@ -124,8 +124,8 @@ export default function CircleChatsScreen() {
     if (user) {
       fetchChats();
 
-      // Set up polling every 5 seconds for more responsive updates
-      const pollInterval = setInterval(fetchChats, 5000);
+      // Set up polling every 3 seconds for more responsive updates
+      const pollInterval = setInterval(fetchChats, 3000);
 
       return () => {
         clearInterval(pollInterval);
@@ -315,7 +315,7 @@ export default function CircleChatsScreen() {
 
         {chat.initial_message?.length > 0 && (
           <>
-            <Text>Initial Message:</Text>
+            <Text>Message:</Text>
             <Text style={[styles.message, { color: colors.secondaryText }]}>
               "{chat.initial_message}"
             </Text>

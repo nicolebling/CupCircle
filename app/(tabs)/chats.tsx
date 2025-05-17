@@ -16,7 +16,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "@/contexts/AuthContext";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { supabase } from "@/lib/supabase";
-import { router } from "expo-router";
+import { router, useRouter, useNavigation  } from "expo-router";
 
 interface Conversation {
   id: string;
@@ -51,6 +51,7 @@ const MessageBadge = ({ count }: { count: number }) => {
 export default function ChatsScreen() {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
+  const navigation = useNavigation<NativeStackNavigationProp<any>>();
   const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -255,7 +256,7 @@ export default function ChatsScreen() {
         color={colors.secondaryText}
       />
       <Text style={[styles.emptyTitle, { color: colors.text }]}>
-        {loading ? "Loading chats..." : "Still waiting on that first sip of convo"}
+        {loading ? "Loading chats..." : "No messages yet"}
       </Text>
       <Text style={[styles.emptySubtitle, { color: colors.secondaryText }]}>
         {loading
