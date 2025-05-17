@@ -32,10 +32,23 @@ type TimeSlot = {
 };
 
 export default function AvailabilityScreen() {
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const [isLoading, setIsLoading] = useState(false);
+  const [showLoading, setShowLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
-  const { isLoading, error, createSlot, getSlots } = useAvailability();
+  const { isLoading: availabilityLoading, error, createSlot, getSlots } = useAvailability();
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (availabilityLoading) {
+      timer = setTimeout(() => {
+        setShowLoading(true);
+      }, 2000);
+    } else {
+      setShowLoading(false);
+    }
+    return () => clearTimeout(timer);
+  }, [availabilityLoading]);
 
   const [selectedDate, setSelectedDate] = useState(() => {
     const now = new Date();
@@ -558,7 +571,7 @@ export default function AvailabilityScreen() {
 
       {/* Time Slots List */}
       <View style={styles.slotsContainer}>
-        {isLoading ? (
+        {showLoading ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color={colors.primary} />
             <Text style={[styles.loadingText, { color: colors.secondaryText }]}>
