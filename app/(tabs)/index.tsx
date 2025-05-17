@@ -480,7 +480,7 @@ export default function CircleChatsScreen() {
           showPastChats && pastConfirmed.length === 0
             ? "No past chats"
             : !showPastChats && upcomingConfirmed.length === 0 && pendingAcceptance.length === 0 && pending.length === 0
-              ? "No active chats at the moment"
+              ? "Chat’s taking a coffee break"
               : null,
           showPastChats
             ? "Your past conversations will appear here"

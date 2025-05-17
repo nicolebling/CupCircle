@@ -57,16 +57,6 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Circle Chats',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="cafe" size={size} color={color} />
-          ),
-        }}
-      />
-
-      <Tabs.Screen
         name="availability"
         options={{
           title: 'My Availability',
@@ -76,6 +66,17 @@ export default function TabLayout() {
         }}
       />
 
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: 'Circle Chats',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="cafe" size={size} color={color} />
+          ),
+        }}
+      />
+
+    
       <Tabs.Screen
         name="chats"
         options={{

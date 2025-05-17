@@ -226,7 +226,7 @@ export default function ChatsScreen() {
         color={colors.secondaryText}
       />
       <Text style={[styles.emptyTitle, { color: colors.text }]}>
-        {loading ? "Loading chats..." : "No messages yet"}
+        {loading ? "Loading chats..." : "Still waiting on that first sip of convo"}
       </Text>
       <Text style={[styles.emptySubtitle, { color: colors.secondaryText }]}>
         {loading

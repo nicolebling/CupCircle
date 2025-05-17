@@ -573,7 +573,7 @@ export default function AvailabilityScreen() {
             <Text
               style={[styles.emptyStateText, { color: colors.text }]}
             >
-              No available time slots yet
+              No slots, no chats — help us fix that
             </Text>
             <Text
               style={[
