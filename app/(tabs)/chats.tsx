@@ -37,11 +37,34 @@ interface Conversation {
 
 const MessageBadge = ({ count }: { count: number }) => {
   const colors = Colors[useColorScheme()];
+  
+  // Add console logging to verify count
+  console.log('Unread message count:', count);
+  
   if (count === 0) return null;
   
   return (
-    <View style={[styles.badgeContainer, { backgroundColor: colors.primary }]}>
-      <Text style={styles.badgeText}>
+    <View style={[styles.badgeContainer, { 
+      backgroundColor: colors.primary,
+      position: 'absolute',
+      top: -5,
+      right: -5,
+      minWidth: 20,
+      height: 20,
+      borderRadius: 10,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingHorizontal: 6,
+      zIndex: 1,
+      borderWidth: 1.5,
+      borderColor: colors.background
+    }]}>
+      <Text style={[styles.badgeText, {
+        color: 'white',
+        fontSize: 12,
+        fontFamily: 'K2D-Bold',
+        textAlign: 'center'
+      }]}>
         {count > 99 ? '99+' : count}
       </Text>
     </View>
