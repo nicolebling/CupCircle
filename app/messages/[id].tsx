@@ -632,7 +632,7 @@ export default function MessageScreen() {
                 onPress={() => setShowProfileModal(false)}
                 style={styles.floatingCloseButton}
               >
-                <Ionicons name="close" size={24} color={colors.text} />
+                <Ionicons name="close" size={24} color="white" />
               </TouchableOpacity>
             </View>
             {partnerProfile && (

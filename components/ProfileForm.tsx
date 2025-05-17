@@ -447,8 +447,9 @@ export default function ProfileForm({
                 style={[styles.input, isDark && styles.inputDark]}
                 value={occupation}
                 onChangeText={setOccupation}
-                placeholder="Your job title"
+                placeholder="Headline (Max 25 characters)"
                 placeholderTextColor={isDark ? "#999" : "#777"}
+                maxLength={25}
               />
             </View>
 
