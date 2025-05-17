@@ -18,7 +18,6 @@ import { useFocusEffect } from "@react-navigation/native";
 import Colors from "@/constants/Colors";
 import ProfileCard from "@/components/ProfileCard";
 import { Ionicons } from "@expo/vector-icons";
-import LoadingLogoAnimation from "@/components/LoadingLogoAnimation";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,

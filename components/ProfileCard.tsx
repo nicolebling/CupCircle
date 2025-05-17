@@ -290,14 +290,14 @@ export default function ProfileCard({
         </View>
 
         {/* Match badge - Edit for later */}
-        {profile.matchedCafe && (
+        {/* {profile.matchedCafe && (
           <View
             style={[styles.matchBadge, { backgroundColor: colors.primary }]}
           >
             <Ionicons name="cafe" size={14} color="white" />
             <Text style={styles.matchBadgeText}>Café Match</Text>
           </View>
-        )}
+        )} */}
 
         <View style={styles.content}>
           <View style={styles.headerContainer}>
