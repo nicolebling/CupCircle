@@ -90,7 +90,9 @@ export default function ProfileScreen() {
             />
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => router.push("/settings")}
+            onPress={() => navigation.navigate("settings", {}, {
+              animation: 'slide_from_right'
+            })}
             style={{ marginRight: 23 }}
           >
             <Ionicons
