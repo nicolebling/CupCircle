@@ -350,7 +350,7 @@ export default function CircleChatsScreen() {
                   styles.actionButton,
                   { backgroundColor: colors.primary },
                 ]}
-                onPress={() => handleAction(chat.match_id, "message")}
+                onPress={() => router.push(`/messages/${chat.match_id}`)}
               >
                 <Text style={styles.actionButtonText}>Message</Text>
               </TouchableOpacity>
