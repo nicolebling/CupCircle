@@ -478,12 +478,12 @@ export default function ProfileForm({
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={[styles.label, isDark && styles.textDark]}>Everyone has a story, what's yours?</Text>
+              <Text style={[styles.label, isDark && styles.textDark]}>Bio</Text>
               <TextInput
                 style={[styles.textArea, isDark && styles.inputDark]}
                 value={bio}
                 onChangeText={setBio}
-                placeholder="Sample: I am a product designer at Apple who writes about design and tech. I love my dogs and enjoys playing basketball."
+                placeholder="Tell us about yourself..."
                 placeholderTextColor={isDark ? "#999" : "#777"}
                 multiline
                 numberOfLines={4}

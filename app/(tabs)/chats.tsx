@@ -58,20 +58,11 @@ export default function ChatsScreen() {
   const [filteredConversations, setFilteredConversations] = useState<
     Conversation[]
   >([]);
-  const [loading, setLoading] = useState(false);
-  const [showLoading, setShowLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (user) {
-      setLoading(true);
-      // Only show loading state if it takes more than 1 second
-      const timer = setTimeout(() => {
-        setShowLoading(true);
-      }, 1000);
-      
       fetchConfirmedChats();
-      
-      return () => clearTimeout(timer);
     }
   }, [user]);
 
@@ -243,8 +234,8 @@ export default function ChatsScreen() {
             style={[
               styles.messagePreview,
               {
-                color:
-                item.unreadCount > 0 ? colors.text : colors.secondaryText,
+                color: item.unreadCount > 0 ? colors.text : colors.secondaryText,
+                fontFamily: !item.lastMessage.isRead ? "K2D-Bold" : "K2D-Regular",
               },
               item.unreadCount > 0 && styles.unreadMessage,
             ]}
@@ -265,10 +256,10 @@ export default function ChatsScreen() {
         color={colors.secondaryText}
       />
       <Text style={[styles.emptyTitle, { color: colors.text }]}>
-        {loading && showLoading ? "Loading chats..." : "No messages yet"}
+        {loading ? "Loading chats..." : "No messages yet"}
       </Text>
       <Text style={[styles.emptySubtitle, { color: colors.secondaryText }]}>
-        {loading && showLoading
+        {loading
           ? "Please wait while we load your chats"
           : searchQuery
             ? "No matches found for your search"
