@@ -35,19 +35,6 @@ interface Conversation {
   unreadCount: number;
 }
 
-const MessageBadge = ({ count }: { count: number }) => {
-  const colors = Colors[useColorScheme()];
-  if (count === 0) return null;
-  
-  return (
-    <View style={[styles.badgeContainer, { backgroundColor: colors.primary }]}>
-      <Text style={styles.badgeText}>
-        {count > 99 ? '99+' : count}
-      </Text>
-    </View>
-  );
-};
-
 export default function ChatsScreen() {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
@@ -193,7 +180,13 @@ export default function ChatsScreen() {
     >
       <View style={styles.avatarContainer}>
         <Image source={{ uri: item.user.photo }} style={styles.avatar} />
-        <MessageBadge count={item.unreadCount} />
+        {item.unreadCount > 0 && (
+          <View
+            style={[styles.badgeContainer, { backgroundColor: colors.primary }]}
+          >
+            <Text style={styles.badgeText}>{item.unreadCount}</Text>
+          </View>
+        )}
       </View>
 
       <View style={styles.conversationContent}>
@@ -298,23 +291,6 @@ export default function ChatsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  badgeContainer: {
-    position: 'absolute',
-    top: -5,
-    right: -5,
-    minWidth: 20,
-    height: 20,
-    borderRadius: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 6,
-    zIndex: 1,
-  },
-  badgeText: {
-    color: 'white',
-    fontSize: 12,
-    fontFamily: 'K2D-Bold',
   },
   header: {
     padding: 16,
