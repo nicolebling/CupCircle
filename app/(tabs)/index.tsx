@@ -249,12 +249,12 @@ export default function CircleChatsScreen() {
             </TouchableOpacity>
             <View style={styles.profileInfo}>
               <Text style={[styles.partnerName, { color: colors.text }]}>
-                {partnerProfile.name || "Unknown"}
+                {partnerProfile.name || " "}
               </Text>
               <Text style={[styles.occupation, { color: colors.secondaryText }]}>
-                {(partnerProfile.occupation || "No occupation listed").length > 30 
+                {(partnerProfile.occupation || " ").length > 30 
                   ? `${partnerProfile.occupation.substring(0, 30)}...` 
-                  : partnerProfile.occupation || "No occupation listed"}
+                  : partnerProfile.occupation || " "}
               </Text>
             </View>
           </View>
