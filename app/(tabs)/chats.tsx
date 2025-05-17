@@ -138,7 +138,7 @@ export default function ChatsScreen() {
           const { data: lastMessageData } = await supabase
             .from("message")
             .select("*")
-            .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
+            .eq("match_id", match.id)
             .order("created_at", { ascending: false })
             .limit(1);
 
