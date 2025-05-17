@@ -37,9 +37,11 @@ export default function AvailabilityScreen() {
   const { user } = useAuth();
   const { isLoading, error, createSlot, getSlots } = useAvailability();
 
-  const [selectedDate, setSelectedDate] = useState(
-    new Date(new Date().toString()),
-  );
+  const [selectedDate, setSelectedDate] = useState(() => {
+    const now = new Date();
+    const isPast4PM = now.getHours() >= 16;
+    return isPast4PM ? addDays(now, 1) : now;
+  });
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
   const [showAddSlot, setShowAddSlot] = useState(false); // Added state for toggle{/*  */}
 
