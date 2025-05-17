@@ -128,10 +128,21 @@ export default function ChatsScreen() {
       });
 
       // Build conversation objects
-      const mappedConversations = matchesData.map((match) => {
+     
+        const mappedConversations = await Promise.all(matchesData.map(async (match) => {
         const partnerId =
           match.user1_id === user.id ? match.user2_id : match.user1_id;
         const partnerProfile = profileMap[partnerId] || {};
+
+          // Fetch last message for this chat
+          const { data: lastMessageData } = await supabase
+            .from("message")
+            .select("*")
+            .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
+            .order("created_at", { ascending: false })
+            .limit(1);
+
+          const lastMessage = lastMessageData && lastMessageData[0];
 
         return {
           id: match.id,
@@ -144,13 +155,13 @@ export default function ChatsScreen() {
             occupation: partnerProfile.occupation || "Professional",
           },
           lastMessage: {
-            text: match.initial_message || "Let's meet for coffee!",
-            timestamp: formatDate(match.created_at || new Date().toISOString()),
-            isRead: true,
+            text: lastMessage ? lastMessage.content : match.initial_message,
+            timestamp: formatDate((lastMessage ? lastMessage.created_at : match.created_at) || new Date().toISOString()),
+            isRead: lastMessage ? lastMessage.read : true,
           },
           unreadCount: 0,
         };
-      });
+      }));
 
       setConversations(mappedConversations);
     } catch (error) {
