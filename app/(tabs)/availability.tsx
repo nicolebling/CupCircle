@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -43,32 +43,7 @@ export default function AvailabilityScreen() {
     return isPast4PM ? addDays(now, 1) : now;
   });
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
-  const [showAddSlot, setShowAddSlot] = useState(false);
-  const [showLoading, setShowLoading] = useState(false);
-  const loadingTimerRef = useRef<NodeJS.Timeout>();
-  const hasDataRef = useRef(false);
-
-  // Add loading state delay with data check
-  useEffect(() => {
-    if (isLoading && !hasDataRef.current) {
-      loadingTimerRef.current = setTimeout(() => {
-        setShowLoading(true);
-      }, 2000);
-    } else {
-      setShowLoading(false);
-    }
-    
-    return () => {
-      if (loadingTimerRef.current) {
-        clearTimeout(loadingTimerRef.current);
-      }
-    };
-  }, [isLoading]);
-
-  // Update hasData ref when timeSlots change
-  useEffect(() => {
-    hasDataRef.current = timeSlots.length > 0;
-  }, [timeSlots]);
+  const [showAddSlot, setShowAddSlot] = useState(false); // Added state for toggle{/*  */}
 
   // const [year, month, day] = slot.date.split("-");
   // const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day), 12);
@@ -583,7 +558,7 @@ export default function AvailabilityScreen() {
 
       {/* Time Slots List */}
       <View style={styles.slotsContainer}>
-        {isLoading && showLoading ? (
+        {isLoading ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color={colors.primary} />
             <Text style={[styles.loadingText, { color: colors.secondaryText }]}>
