@@ -65,6 +65,17 @@ export default function ChatsScreen() {
     }
   }, [user]);
 
+  // Add focus event listener to refresh chats when returning to the screen
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      if (user) {
+        fetchConfirmedChats();
+      }
+    });
+
+    return unsubscribe;
+  }, [navigation, user]);
+
   useEffect(() => {
     // Filter conversations based on search query
     if (searchQuery.trim() === "") {
