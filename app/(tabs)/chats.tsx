@@ -69,6 +69,20 @@ export default function ChatsScreen() {
 
     try {
       setLoading(true);
+      
+      // Subscribe to new messages
+      const messageSubscription = supabase
+        .channel('unread_messages')
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'messages',
+          filter: `receiver_id=eq.${user.id}`,
+        }, () => {
+          // Refresh conversations when new messages arrive
+          fetchConfirmedChats();
+        })
+        .subscribe();
       // Fetch all confirmed matches with the current user
       const { data: matchesData, error: matchesError } = await supabase
         .from("matching")
@@ -114,6 +128,24 @@ export default function ChatsScreen() {
         profileMap[profile.id] = profile;
       });
 
+      // Fetch unread message counts
+      const { data: unreadCounts, error: countError } = await supabase
+        .from('messages')
+        .select('match_id, count(*)')
+        .eq('receiver_id', user.id)
+        .eq('read', false)
+        .group_by('match_id');
+
+      if (countError) {
+        console.error('Error fetching unread counts:', countError);
+      }
+
+      // Create map of match_id to unread count
+      const unreadCountMap: Record<string, number> = {};
+      unreadCounts?.forEach((item: any) => {
+        unreadCountMap[item.match_id] = parseInt(item.count);
+      });
+
       // Build conversation objects
       const mappedConversations = matchesData.map((match) => {
         const partnerId =
@@ -135,7 +167,7 @@ export default function ChatsScreen() {
             timestamp: formatDate(match.created_at || new Date().toISOString()),
             isRead: true,
           },
-          unreadCount: 0,
+          unreadCount: unreadCountMap[match.match_id] || 0,
         };
       });
 
