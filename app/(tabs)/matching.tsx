@@ -626,9 +626,12 @@ export default function MatchingScreen() {
   );
 
   return (
-    <SafeAreaView
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={[styles.container, { backgroundColor: colors.background }]}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
     >
+      <SafeAreaView style={{ flex: 1 }}>
       {!isLoading &&
         profiles.length > 0 &&
         hasAvailability &&
@@ -699,14 +702,13 @@ export default function MatchingScreen() {
         </View>
       ) : (
         <ScrollView
-          style={{ flex: 1, width: "100%", padding: 16 }}
+          style={{ width: "100%", padding: 16 }}
           contentContainerStyle={{
-            flexGrow: 1,
             paddingBottom: 20,
             justifyContent: "center",
             alignItems: "center",
           }}
-          nestedScrollEnabled={true}
+          keyboardShouldPersistTaps="handled"
         >
           <View style={[styles.cardsContainer, { width: "100%" }]}>
             {isLoading ? (
@@ -1335,6 +1337,7 @@ export default function MatchingScreen() {
         </View>
       </Modal> */}
     </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 }
 
