@@ -37,34 +37,11 @@ interface Conversation {
 
 const MessageBadge = ({ count }: { count: number }) => {
   const colors = Colors[useColorScheme()];
-  
-  // Add console logging to verify count
-  console.log('Unread message count:', count);
-  
   if (count === 0) return null;
   
   return (
-    <View style={[styles.badgeContainer, { 
-      backgroundColor: colors.primary,
-      position: 'absolute',
-      top: -5,
-      right: -5,
-      minWidth: 20,
-      height: 20,
-      borderRadius: 10,
-      justifyContent: 'center',
-      alignItems: 'center',
-      paddingHorizontal: 6,
-      zIndex: 1,
-      borderWidth: 1.5,
-      borderColor: colors.background
-    }]}>
-      <Text style={[styles.badgeText, {
-        color: 'white',
-        fontSize: 12,
-        fontFamily: 'K2D-Bold',
-        textAlign: 'center'
-      }]}>
+    <View style={[styles.badgeContainer, { backgroundColor: colors.primary }]}>
+      <Text style={styles.badgeText}>
         {count > 99 ? '99+' : count}
       </Text>
     </View>
@@ -169,25 +146,15 @@ export default function ChatsScreen() {
           match.user1_id === user.id ? match.user2_id : match.user1_id;
         const partnerProfile = profileMap[partnerId] || {};
 
-          // Fetch last message and count unread messages
-          const [lastMessageResponse, unreadCountResponse] = await Promise.all([
-            supabase
-              .from("message")
-              .select("*")
-              .or(`and(sender_id.eq.${user.id},receiver_id.eq.${partnerId}),and(sender_id.eq.${partnerId},receiver_id.eq.${user.id})`)
-              .order("created_at", { ascending: false })
-              .limit(1),
-            
-            supabase
-              .from("message")
-              .select("id", { count: 'exact' })
-              .eq("receiver_id", user.id)
-              .eq("sender_id", partnerId)
-              .eq("read", false)
-          ]);
+          // Fetch last message for this chat
+          const { data: lastMessageData } = await supabase
+            .from("message")
+            .select("*")
+            .or(`and(sender_id.eq.${user.id},receiver_id.eq.${partnerId}),and(sender_id.eq.${partnerId},receiver_id.eq.${user.id})`)
+            .order("created_at", { ascending: false })
+            .limit(1);
 
-          const lastMessage = lastMessageResponse.data?.[0];
-          const unreadCount = unreadCountResponse.count || 0;
+          const lastMessage = lastMessageData?.[0];
 
         return {
           id: match.id,
@@ -204,7 +171,7 @@ export default function ChatsScreen() {
             timestamp: formatDate((lastMessage ? lastMessage.created_at : match.created_at) || new Date().toISOString()),
             isRead: lastMessage ? lastMessage.read : true,
           },
-          unreadCount: unreadCount,
+          unreadCount: 0,
         };
       }));
 
@@ -267,8 +234,8 @@ export default function ChatsScreen() {
             style={[
               styles.messagePreview,
               {
-                color:
-                  item.unreadCount > 0 ? colors.text : colors.secondaryText,
+                color: item.unreadCount > 0 ? colors.text : colors.secondaryText,
+                fontFamily: !item.lastMessage.isRead ? "K2D-Bold" : "K2D-Regular",
               },
               item.unreadCount > 0 && styles.unreadMessage,
             ]}
