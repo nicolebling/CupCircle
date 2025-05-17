@@ -58,11 +58,20 @@ export default function ChatsScreen() {
   const [filteredConversations, setFilteredConversations] = useState<
     Conversation[]
   >([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [showLoading, setShowLoading] = useState(false);
 
   useEffect(() => {
     if (user) {
+      setLoading(true);
+      // Only show loading state if it takes more than 1 second
+      const timer = setTimeout(() => {
+        setShowLoading(true);
+      }, 1000);
+      
       fetchConfirmedChats();
+      
+      return () => clearTimeout(timer);
     }
   }, [user]);
 
@@ -256,10 +265,10 @@ export default function ChatsScreen() {
         color={colors.secondaryText}
       />
       <Text style={[styles.emptyTitle, { color: colors.text }]}>
-        {loading ? "Loading chats..." : "No messages yet"}
+        {loading && showLoading ? "Loading chats..." : "No messages yet"}
       </Text>
       <Text style={[styles.emptySubtitle, { color: colors.secondaryText }]}>
-        {loading
+        {loading && showLoading
           ? "Please wait while we load your chats"
           : searchQuery
             ? "No matches found for your search"
