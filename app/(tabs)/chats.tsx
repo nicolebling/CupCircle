@@ -35,6 +35,19 @@ interface Conversation {
   unreadCount: number;
 }
 
+const MessageBadge = ({ count }: { count: number }) => {
+  const colors = Colors[useColorScheme()];
+  if (count === 0) return null;
+  
+  return (
+    <View style={[styles.badgeContainer, { backgroundColor: colors.primary }]}>
+      <Text style={styles.badgeText}>
+        {count > 99 ? '99+' : count}
+      </Text>
+    </View>
+  );
+};
+
 export default function ChatsScreen() {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
@@ -69,20 +82,6 @@ export default function ChatsScreen() {
 
     try {
       setLoading(true);
-      
-      // Subscribe to new messages
-      const messageSubscription = supabase
-        .channel('unread_messages')
-        .on('postgres_changes', {
-          event: '*',
-          schema: 'public',
-          table: 'messages',
-          filter: `receiver_id=eq.${user.id}`,
-        }, () => {
-          // Refresh conversations when new messages arrive
-          fetchConfirmedChats();
-        })
-        .subscribe();
       // Fetch all confirmed matches with the current user
       const { data: matchesData, error: matchesError } = await supabase
         .from("matching")
@@ -128,24 +127,6 @@ export default function ChatsScreen() {
         profileMap[profile.id] = profile;
       });
 
-      // Fetch unread message counts
-      const { data: unreadCounts, error: countError } = await supabase
-        .from('messages')
-        .select('match_id, count(*)')
-        .eq('receiver_id', user.id)
-        .eq('read', false)
-        .group_by('match_id');
-
-      if (countError) {
-        console.error('Error fetching unread counts:', countError);
-      }
-
-      // Create map of match_id to unread count
-      const unreadCountMap: Record<string, number> = {};
-      unreadCounts?.forEach((item: any) => {
-        unreadCountMap[item.match_id] = parseInt(item.count);
-      });
-
       // Build conversation objects
       const mappedConversations = matchesData.map((match) => {
         const partnerId =
@@ -167,7 +148,7 @@ export default function ChatsScreen() {
             timestamp: formatDate(match.created_at || new Date().toISOString()),
             isRead: true,
           },
-          unreadCount: unreadCountMap[match.match_id] || 0,
+          unreadCount: 0,
         };
       });
 
@@ -212,13 +193,7 @@ export default function ChatsScreen() {
     >
       <View style={styles.avatarContainer}>
         <Image source={{ uri: item.user.photo }} style={styles.avatar} />
-        {item.unreadCount > 0 && (
-          <View
-            style={[styles.badgeContainer, { backgroundColor: colors.primary }]}
-          >
-            <Text style={styles.badgeText}>{item.unreadCount}</Text>
-          </View>
-        )}
+        <MessageBadge count={item.unreadCount} />
       </View>
 
       <View style={styles.conversationContent}>
@@ -323,6 +298,23 @@ export default function ChatsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  badgeContainer: {
+    position: 'absolute',
+    top: -5,
+    right: -5,
+    minWidth: 20,
+    height: 20,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 6,
+    zIndex: 1,
+  },
+  badgeText: {
+    color: 'white',
+    fontSize: 12,
+    fontFamily: 'K2D-Bold',
   },
   header: {
     padding: 16,
