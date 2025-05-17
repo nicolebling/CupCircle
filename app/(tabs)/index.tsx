@@ -124,8 +124,8 @@ export default function CircleChatsScreen() {
     if (user) {
       fetchChats();
 
-      // Set up polling every 30 seconds
-      const pollInterval = setInterval(fetchChats, 30000);
+      // Set up polling every 5 seconds for more responsive updates
+      const pollInterval = setInterval(fetchChats, 5000);
 
       return () => {
         clearInterval(pollInterval);
