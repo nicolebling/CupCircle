@@ -248,6 +248,20 @@ export default function ChatsScreen() {
     </TouchableOpacity>
   );
 
+  const [showLoading, setShowLoading] = useState(false);
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (loading) {
+      timer = setTimeout(() => {
+        setShowLoading(true);
+      }, 2000);
+    } else {
+      setShowLoading(false);
+    }
+    return () => clearTimeout(timer);
+  }, [loading]);
+
   const EmptyListComponent = () => (
     <View style={styles.emptyContainer}>
       <Ionicons
@@ -256,10 +270,10 @@ export default function ChatsScreen() {
         color={colors.secondaryText}
       />
       <Text style={[styles.emptyTitle, { color: colors.text }]}>
-        {loading ? "Loading chats..." : "No messages yet"}
+        {loading && showLoading ? "Loading chats..." : "No messages yet"}
       </Text>
       <Text style={[styles.emptySubtitle, { color: colors.secondaryText }]}>
-        {loading
+        {loading && showLoading
           ? "Please wait while we load your chats"
           : searchQuery
             ? "No matches found for your search"
