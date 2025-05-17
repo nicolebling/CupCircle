@@ -162,6 +162,13 @@ export default function MessageScreen() {
   const fetchChatDetails = async () => {
     try {
       setLoading(true);
+      
+      // Try to get cached messages first
+      const cachedMessages = await cacheService.getCachedMessages(user?.id, id);
+      if (cachedMessages) {
+        setMessages(cachedMessages);
+        setLoading(false);
+      }
 
       // Fetch the partner profile from the matching table
       const { data: matchingData, error: matchingError } = await supabase
