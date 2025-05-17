@@ -348,24 +348,6 @@ export default function AvailabilityScreen() {
     setSelectedDate(date);
   };
 
-  const [loading, setLoading] = useState(false);
-  const [showLoading, setShowLoading] = useState(false);
-  const [sending, setSending] = useState(false);
-  const [messages, setMessages] = useState<any[]>([]);
-
-  // Add loading state delay
-  useEffect(() => {
-    if (isLoading) {
-      const timer = setTimeout(() => {
-        setShowLoading(true);
-      }, 1000); // Delay of 1 second
-
-      return () => clearTimeout(timer); // Clear timeout if isLoading changes
-    } else {
-      setShowLoading(false);
-    }
-  }, [isLoading]);
-
   return (
     <SafeAreaView
       style={[styles.container, { backgroundColor: colors.background }]}
@@ -576,7 +558,7 @@ export default function AvailabilityScreen() {
 
       {/* Time Slots List */}
       <View style={styles.slotsContainer}>
-        {showLoading ? (
+        {isLoading ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color={colors.primary} />
             <Text style={[styles.loadingText, { color: colors.secondaryText }]}>
