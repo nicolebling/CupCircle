@@ -146,15 +146,25 @@ export default function ChatsScreen() {
           match.user1_id === user.id ? match.user2_id : match.user1_id;
         const partnerProfile = profileMap[partnerId] || {};
 
-          // Fetch last message for this chat
-          const { data: lastMessageData } = await supabase
-            .from("message")
-            .select("*")
-            .or(`and(sender_id.eq.${user.id},receiver_id.eq.${partnerId}),and(sender_id.eq.${partnerId},receiver_id.eq.${user.id})`)
-            .order("created_at", { ascending: false })
-            .limit(1);
+          // Fetch last message and count unread messages
+          const [lastMessageResponse, unreadCountResponse] = await Promise.all([
+            supabase
+              .from("message")
+              .select("*")
+              .or(`and(sender_id.eq.${user.id},receiver_id.eq.${partnerId}),and(sender_id.eq.${partnerId},receiver_id.eq.${user.id})`)
+              .order("created_at", { ascending: false })
+              .limit(1),
+            
+            supabase
+              .from("message")
+              .select("id", { count: 'exact' })
+              .eq("receiver_id", user.id)
+              .eq("sender_id", partnerId)
+              .eq("read", false)
+          ]);
 
-          const lastMessage = lastMessageData?.[0];
+          const lastMessage = lastMessageResponse.data?.[0];
+          const unreadCount = unreadCountResponse.count || 0;
 
         return {
           id: match.id,
@@ -171,7 +181,7 @@ export default function ChatsScreen() {
             timestamp: formatDate((lastMessage ? lastMessage.created_at : match.created_at) || new Date().toISOString()),
             isRead: lastMessage ? lastMessage.read : true,
           },
-          unreadCount: 0,
+          unreadCount: unreadCount,
         };
       }));
 
