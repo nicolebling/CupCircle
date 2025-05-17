@@ -45,19 +45,30 @@ export default function AvailabilityScreen() {
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
   const [showAddSlot, setShowAddSlot] = useState(false);
   const [showLoading, setShowLoading] = useState(false);
+  const loadingTimerRef = useRef<NodeJS.Timeout>();
+  const hasDataRef = useRef(false);
 
-  // Add loading state delay
+  // Add loading state delay with data check
   useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (isLoading) {
-      timer = setTimeout(() => {
+    if (isLoading && !hasDataRef.current) {
+      loadingTimerRef.current = setTimeout(() => {
         setShowLoading(true);
-      }, 2000); // 2 second delay before showing loading state
+      }, 2000);
     } else {
       setShowLoading(false);
     }
-    return () => clearTimeout(timer);
+    
+    return () => {
+      if (loadingTimerRef.current) {
+        clearTimeout(loadingTimerRef.current);
+      }
+    };
   }, [isLoading]);
+
+  // Update hasData ref when timeSlots change
+  useEffect(() => {
+    hasDataRef.current = timeSlots.length > 0;
+  }, [timeSlots]);
 
   // const [year, month, day] = slot.date.split("-");
   // const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day), 12);
