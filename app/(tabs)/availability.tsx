@@ -43,7 +43,21 @@ export default function AvailabilityScreen() {
     return isPast4PM ? addDays(now, 1) : now;
   });
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
-  const [showAddSlot, setShowAddSlot] = useState(false); // Added state for toggle{/*  */}
+  const [showAddSlot, setShowAddSlot] = useState(false);
+  const [showLoading, setShowLoading] = useState(false);
+
+  // Add loading state delay
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (isLoading) {
+      timer = setTimeout(() => {
+        setShowLoading(true);
+      }, 2000); // 2 second delay before showing loading state
+    } else {
+      setShowLoading(false);
+    }
+    return () => clearTimeout(timer);
+  }, [isLoading]);
 
   // const [year, month, day] = slot.date.split("-");
   // const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day), 12);
@@ -558,7 +572,7 @@ export default function AvailabilityScreen() {
 
       {/* Time Slots List */}
       <View style={styles.slotsContainer}>
-        {isLoading ? (
+        {isLoading && showLoading ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color={colors.primary} />
             <Text style={[styles.loadingText, { color: colors.secondaryText }]}>
