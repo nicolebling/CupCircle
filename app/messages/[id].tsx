@@ -27,6 +27,7 @@ import Colors from "@/constants/Colors";
 import { supabase } from "@/lib/supabase";
 import { Image } from "react-native";
 import ProfileCard from "@/components/ProfileCard";
+import { cacheService } from "@/services/cacheService";
 
 type Message = {
   id: string;
