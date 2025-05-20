@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { SafeAreaView, StyleSheet, View, TouchableOpacity, Alert } from "react-native";
 import { supabase } from "@/lib/supabase";
 import Colors from "@/constants/Colors";
@@ -9,7 +9,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { Stack, useRouter, useSegments, useNavigation } from "expo-router";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function ProfileScreen() {
   const colorScheme = useColorScheme();
@@ -19,10 +18,6 @@ export default function ProfileScreen() {
   const [profileData, setProfileData] = useState(null);
   const router = useRouter();
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
-  const [loading, setLoading] = useState(false);
-  const [sending, setSending] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([]);
-  const loadingTimeout = useRef<NodeJS.Timeout>();
 
   useEffect(() => {
     if (user) {
@@ -32,15 +27,6 @@ export default function ProfileScreen() {
 
   const fetchProfile = async () => {
     try {
-      // Start a timer to show loading state if fetch takes longer than 200ms
-      loadingTimeout.current = setTimeout(() => setLoading(true), 200);
-
-      // Try to get cached profile first
-      const cachedProfile = await AsyncStorage.getItem(`profile_${user.id}`);
-      if (cachedProfile) {
-        setProfileData(JSON.parse(cachedProfile));
-      }
-
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
@@ -48,18 +34,9 @@ export default function ProfileScreen() {
         .single();
 
       if (error) throw error;
-
-      // Cache the new profile data
-      await AsyncStorage.setItem(`profile_${user.id}`, JSON.stringify(data));
       setProfileData(data);
     } catch (error) {
       console.error("Error fetching profile:", error);
-    } finally {
-      // Clear the timeout and loading state
-      if (loadingTimeout.current) {
-        clearTimeout(loadingTimeout.current);
-      }
-      setLoading(false);
     }
   };
 

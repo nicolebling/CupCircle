@@ -565,7 +565,28 @@ export default function AvailabilityScreen() {
               Loading your availability...
             </Text>
           </View>
-        ) : flatListData.length > 0 ? (
+        ) : flatListData.length === 0 ? (
+          <View style={styles.emptyStateContainer}>
+            <Ionicons
+              name="calendar-clear-outline"
+              size={64}
+              color={colors.secondaryText}
+            />
+            <Text
+              style={[styles.emptyStateText, { color: colors.text }]}
+            >
+              No slots, no chats — help us fix that
+            </Text>
+            <Text
+              style={[
+                styles.emptyStateSubtext,
+                { color: colors.secondaryText },
+              ]}
+            >
+              Add your availability by tapping the + button
+            </Text>
+          </View>
+        ) : (
           <FlatList
             data={flatListData}
             renderItem={({ item }) => (
@@ -590,26 +611,7 @@ export default function AvailabilityScreen() {
             keyExtractor={(item) => item.date.toISOString()}
             contentContainerStyle={styles.slotsList}
           />
-        ) : !isLoading ? (
-          <View style={styles.emptyStateContainer}>
-            <Ionicons
-              name="calendar-clear-outline"
-              size={64}
-              color={colors.secondaryText}
-            />
-            <Text style={[styles.emptyStateText, { color: colors.text }]}>
-              Set your availability to get started
-            </Text>
-            <Text
-              style={[
-                styles.emptyStateSubtext,
-                { color: colors.secondaryText },
-              ]}
-            >
-              Add your availability by tapping the + button
-            </Text>
-          </View>
-        ) : null}
+        )}
       </View>
     </SafeAreaView>
   );

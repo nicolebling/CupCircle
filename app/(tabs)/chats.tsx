@@ -277,7 +277,7 @@ export default function ChatsScreen() {
           ? "Please wait while we load your chats"
           : searchQuery
             ? "No matches found for your search"
-            : "Start chatting after a confirmed meetup!"}
+            : "Confirm a Coffee Chat in Circle Chats to begin chatting"}
       </Text>
     </View>
   );
