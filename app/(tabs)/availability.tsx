@@ -590,7 +590,7 @@ export default function AvailabilityScreen() {
             keyExtractor={(item) => item.date.toISOString()}
             contentContainerStyle={styles.slotsList}
           />
-        ) : (
+        ) : !isLoading ? (
           <View style={styles.emptyStateContainer}>
             <Ionicons
               name="calendar-clear-outline"
@@ -609,7 +609,7 @@ export default function AvailabilityScreen() {
               Add your availability by tapping the + button
             </Text>
           </View>
-        )}
+        ) : null}
       </View>
     </SafeAreaView>
   );
