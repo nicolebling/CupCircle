@@ -11,13 +11,13 @@ export function useAvailability() {
   const [error, setError] = useState<string | null>(null);
   const [isConnected, setIsConnected] = useState(true);
   const { user } = useAuth();
-  
+
   // Initialize network listener
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener(state => {
       setIsConnected(state.isConnected ?? true);
     });
-    
+
     return () => unsubscribe();
   }, []);
 
@@ -48,19 +48,22 @@ export function useAvailability() {
         is_available: true,
         timezone: timeZone,
       });
-      
+
       // Update cache after creating a new slot
       if (result) {
         await cacheService.cacheAvailability(user.id);
       }
-      
+
       return result;
     } catch (err) {
       setError("Failed to create availability slot");
       console.error(err);
       return null;
     } finally {
-      setIsLoading(false);
+      // Add a small delay before removing loading state
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 300);
     }
   };
 
@@ -74,13 +77,13 @@ export function useAvailability() {
       if (isConnected) {
         // Try to get from server
         const slots = await availabilityService.getUserAvailability(user.id);
-        
+
         // Cache the results
         if (slots && slots.length > 0) {
           await AsyncStorage.setItem(`cached_availability_${user.id}`, JSON.stringify(slots));
           await AsyncStorage.setItem(`availability_cache_time_${user.id}`, Date.now().toString());
         }
-        
+
         return slots;
       } else {
         // We're offline, get from cache
@@ -91,18 +94,21 @@ export function useAvailability() {
     } catch (err) {
       console.error("Error getting slots:", err);
       setError("Failed to fetch availability slots");
-      
+
       // Try to get from cache if server request failed
       const cachedSlots = await cacheService.getCachedAvailability(user.id);
       return cachedSlots || [];
     } finally {
-      setIsLoading(false);
+      // Add a small delay before removing loading state
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 300);
     }
   };
-  
+
   const syncAvailability = async () => {
     if (!user?.id || !isConnected) return false;
-    
+
     try {
       setIsLoading(true);
       await cacheService.cacheAvailability(user.id);
@@ -111,10 +117,13 @@ export function useAvailability() {
       console.error("Failed to sync availability:", error);
       return false;
     } finally {
-      setIsLoading(false);
+      // Add a small delay before removing loading state
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 300);
     }
   };
-  
+
   const clearCache = async () => {
     try {
       setIsLoading(true);
@@ -124,7 +133,10 @@ export function useAvailability() {
       console.error("Failed to clear cache:", error);
       return false;
     } finally {
-      setIsLoading(false);
+      // Add a small delay before removing loading state
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 300);
     }
   };
 

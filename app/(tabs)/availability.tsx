@@ -558,14 +558,15 @@ export default function AvailabilityScreen() {
 
       {/* Time Slots List */}
       <View style={styles.slotsContainer}>
-        {isLoading ? (
-          <View style={styles.loadingContainer}>
+        {(isLoading || flatListData.length > 0) ? (
+          <View style={[styles.loadingContainer, !isLoading && { display: 'none' }]}>
             <ActivityIndicator size="large" color={colors.primary} />
             <Text style={[styles.loadingText, { color: colors.secondaryText }]}>
               Loading your availability...
             </Text>
           </View>
-        ) : flatListData.length > 0 ? (
+        ) : null}
+        {!isLoading && flatListData.length > 0 ? (
           <FlatList
             data={flatListData}
             renderItem={({ item }) => (
