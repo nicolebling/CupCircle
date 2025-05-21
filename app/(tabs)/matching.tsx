@@ -240,16 +240,8 @@ export default function MatchingScreen() {
 
         // For today, only keep future time slots
         if (slot.date === today) {
-          // Convert times to 24h format for reliable comparison
-          const [slotTime, period] = slot.start_time.split(" ");
-          let [slotHours, slotMinutes] = slotTime.split(":").map(Number);
-          if (period === "PM" && slotHours !== 12) slotHours += 12;
-          if (period === "AM" && slotHours === 12) slotHours = 0;
-
-          const nowHours = now.getHours();
-          const nowMinutes = now.getMinutes();
-
-          return (slotHours > nowHours) || (slotHours === nowHours && slotMinutes > nowMinutes);
+          selectedTimeSlot && { backgroundColor: colors.primary };
+          return slot.start_time > currentTime;
         }
 
         return false;
