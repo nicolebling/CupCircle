@@ -235,7 +235,7 @@ export default function ChatsScreen() {
               styles.messagePreview,
               {
                 color: item.unreadCount > 0 ? colors.text : colors.secondaryText,
-                fontFamily: !item.lastMessage.isRead ? "K2D-Bold" : "K2D-Regular",
+                fontFamily: !item.lastMessage.isRead ? "K2D-Regular" : "K2D-Regular",
               },
               item.unreadCount > 0 && styles.unreadMessage,
             ]}

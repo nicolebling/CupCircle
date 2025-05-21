@@ -176,7 +176,7 @@ export default function MatchingScreen() {
   useFocusEffect(
     useCallback(() => {
       checkUserAvailability();
-    }, [checkUserAvailability])
+    }, [checkUserAvailability]),
   );
 
   const fetchProfiles = async () => {
@@ -199,14 +199,14 @@ export default function MatchingScreen() {
 
       // Extract user IDs that the current user has active chats with or has already met
       const excludedUserIds = new Set();
-      allMeetings?.forEach(meeting => {
+      allMeetings?.forEach((meeting) => {
         if (meeting.user1_id === user?.id) {
           excludedUserIds.add(meeting.user2_id);
         } else {
           excludedUserIds.add(meeting.user1_id);
         }
       });
-      
+
       //console.log("Users with active or past meetings:", Array.from(excludedUserIds));
 
       // Get users with availability
@@ -257,8 +257,9 @@ export default function MatchingScreen() {
       }
 
       // Get unique user IDs and filter out users that have active or past chats
-      let userIds = [...new Set(availabilityData.map((item) => item.id))]
-        .filter(id => !excludedUserIds.has(id));
+      let userIds = [
+        ...new Set(availabilityData.map((item) => item.id)),
+      ].filter((id) => !excludedUserIds.has(id));
       // console.log("Unique user IDs with availability (excluding active and past meetings):", userIds);
 
       if (userIds.length === 0) {
@@ -282,7 +283,6 @@ export default function MatchingScreen() {
       //console.log("Retrieved profiles data:", profilesData);
 
       if (!profilesData || profilesData.length === 0) {
-        
         setProfiles([]);
         setIsLoading(false);
         return;
@@ -319,7 +319,7 @@ export default function MatchingScreen() {
             // For slots today, check if time is in the future
             if (slot.date === todayStr) {
               const currentTime = now.toLocaleTimeString("en-US", {
-                hour12: true,
+                hour12: false,
               });
               return slot.start_time > currentTime;
             }
@@ -605,22 +605,22 @@ export default function MatchingScreen() {
           { backgroundColor: colors.card, borderColor: colors.border },
         ]}
       >
-      <Ionicons name="calendar-outline" size={48} color={colors.primary} />
-      <Text style={[styles.emptyCardTitle, { color: colors.text }]}>
-        Set Your Availability
-      </Text>
-      <Text style={[styles.emptyCardText, { color: colors.secondaryText }]}>
-        Add availability at least 24 hours in advance to connect with others.
-      </Text>
-      <TouchableOpacity
-        style={[styles.emptyCardButton, { backgroundColor: colors.primary }]}
-        onPress={() => {
-          router.push("/(tabs)/availability"); // Navigate to availability tab
-        }}
-      >
-        <Text style={styles.emptyCardButtonText}>Add availability</Text>
-      </TouchableOpacity>
-    </View>
+        <Ionicons name="calendar-outline" size={48} color={colors.primary} />
+        <Text style={[styles.emptyCardTitle, { color: colors.text }]}>
+          Set Your Availability
+        </Text>
+        <Text style={[styles.emptyCardText, { color: colors.secondaryText }]}>
+          Add availability at least 24 hours in advance to connect with others.
+        </Text>
+        <TouchableOpacity
+          style={[styles.emptyCardButton, { backgroundColor: colors.primary }]}
+          onPress={() => {
+            router.push("/(tabs)/availability"); // Navigate to availability tab
+          }}
+        >
+          <Text style={styles.emptyCardButtonText}>Add availability</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 
@@ -1063,12 +1063,15 @@ export default function MatchingScreen() {
                         setSelectedCafe("");
                         setSelectedTimeSlot(null);
                         setMessageText("");
-                        
+
                         // Refresh index.tsx chats data if function is available
-                        if (global.circleChatsScreen && global.circleChatsScreen.refreshData) {
+                        if (
+                          global.circleChatsScreen &&
+                          global.circleChatsScreen.refreshData
+                        ) {
                           global.circleChatsScreen.refreshData();
                         }
-                        
+
                         // Move to next profile
                         if (currentIndex < profiles.length - 1) {
                           setCurrentIndex(currentIndex + 1);
@@ -1445,7 +1448,7 @@ const styles = StyleSheet.create({
   },
   emptyCardButtonText: {
     color: "white",
-    fontFamily: "K2D-SemiBold"
+    fontFamily: "K2D-SemiBold",
   },
   noMoreCard: {
     width: "90%",
@@ -1763,5 +1766,5 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     fontSize: 12,
     fontFamily: "K2D-Regular",
-  }
+  },
 });

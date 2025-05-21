@@ -413,6 +413,7 @@ export default function CafeSelector({
                               >
                                 <Text
                                   style={{
+                                    fontFamily: 'K2D-Medium',
                                     color: "white",
                                     textAlign: "center",
                                   }}

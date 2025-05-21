@@ -568,14 +568,14 @@ export default function AvailabilityScreen() {
         ) : flatListData.length === 0 ? (
           <View style={styles.emptyStateContainer}>
             <Ionicons
-              name="calendar-clear-outline"
+              name="calendar-number-outline"
               size={64}
               color={colors.secondaryText}
             />
             <Text
               style={[styles.emptyStateText, { color: colors.text }]}
             >
-              No slots, no chats — help us fix that
+              Set your availability to get started
             </Text>
             <Text
               style={[
