@@ -257,7 +257,9 @@ export default function ChatsScreen() {
             <Text style={[styles.timestamp, { color: colors.secondaryText }]}>
               {item.lastMessage.displayTimestamp}
             </Text>
-            {item.unreadCount > 0 && <MessageBadge count={item.unreadCount} />}
+            <View style={styles.badgeRow}>
+              {item.unreadCount > 0 && <MessageBadge count={item.unreadCount} />}
+            </View>
           </View>
         </View>
 
@@ -497,4 +499,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: "center",
   },
+  badgeRow: {
+    flexDirection: "row",
+  }
 });
