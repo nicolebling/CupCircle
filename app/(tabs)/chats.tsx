@@ -162,9 +162,9 @@ export default function ChatsScreen() {
             .eq("receiver_id", user.id)
             .eq("sender_id", partnerId)
             .eq("read", false);
-            
+
           const unreadCount = unreadMessages?.length || 0;
-          
+
           if (unreadError) {
             console.error("Error fetching unread count:", unreadError);
           }
@@ -184,9 +184,10 @@ export default function ChatsScreen() {
             },
             lastMessage: {
               text: lastMessage ? lastMessage.content : match.initial_message,
-              timestamp: (lastMessage ? lastMessage.created_at : match.created_at) ||
-              new Date().toISOString(),
-            displayTimestamp: formatDate(
+              timestamp:
+                (lastMessage ? lastMessage.created_at : match.created_at) ||
+                new Date().toISOString(),
+              displayTimestamp: formatDate(
                 (lastMessage ? lastMessage.created_at : match.created_at) ||
                   new Date().toISOString(),
               ),
@@ -371,7 +372,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   timestampContainer: {
-    alignItems: 'flex-end',
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    alignSelf: "center",
   },
   badgeContainer: {
     minWidth: 20,
