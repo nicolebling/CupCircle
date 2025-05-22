@@ -192,6 +192,7 @@ export default function ChatsScreen() {
                   new Date().toISOString(),
               ),
               isRead: lastMessage ? lastMessage.read : true,
+              receiverId: lastMessage ? lastMessage.receiver_id : null,
             },
             unreadCount: unreadCount,
           };
@@ -266,11 +267,12 @@ export default function ChatsScreen() {
                 {
                   color:
                     item.unreadCount > 0 ? colors.text : colors.secondaryText,
-                  fontFamily: !item.lastMessage.isRead
-                    ? "K2D-Bold"
-                    : "K2D-Regular",
+                  // Only use bold font when message is unread AND user is the receiver
+                  fontFamily: 
+                    !item.lastMessage.isRead && user?.id === item.lastMessage.receiverId
+                      ? "K2D-Bold"
+                      : "K2D-Regular",
                 },
-                item.unreadCount > 0 && styles.unreadMessage,
               ]}
               numberOfLines={1}
             >
