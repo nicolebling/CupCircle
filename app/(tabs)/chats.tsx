@@ -245,7 +245,6 @@ export default function ChatsScreen() {
     >
       <View style={styles.avatarContainer}>
         <Image source={{ uri: item.user.photo }} style={styles.avatar} />
-        {item.unreadCount > 0 && <MessageBadge count={item.unreadCount} />}
       </View>
 
       <View style={styles.conversationContent}>
@@ -253,9 +252,12 @@ export default function ChatsScreen() {
           <Text style={[styles.userName, { color: colors.text }]}>
             {item.user.name}
           </Text>
-          <Text style={[styles.timestamp, { color: colors.secondaryText }]}>
-            {item.lastMessage.displayTimestamp}
-          </Text>
+          <View style={styles.timestampContainer}>
+            <Text style={[styles.timestamp, { color: colors.secondaryText }]}>
+              {item.lastMessage.displayTimestamp}
+            </Text>
+            {item.unreadCount > 0 && <MessageBadge count={item.unreadCount} />}
+          </View>
         </View>
 
         <View style={styles.messagePreviewContainer}>
@@ -368,17 +370,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  timestampContainer: {
+    alignItems: 'flex-end',
+  },
   badgeContainer: {
-    position: "absolute",
-    top: -5,
-    right: -5,
     minWidth: 20,
     height: 20,
     borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 6,
-    zIndex: 1,
+    marginTop: 4,
   },
   badgeText: {
     color: "white",
