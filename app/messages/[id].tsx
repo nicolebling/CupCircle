@@ -131,10 +131,8 @@ export default function MessageScreen() {
                 return [...prev, newMsg];
               });
 
-              // Mark as read if received by this user
-              if (newMsg.receiver_id === user.id) {
-                markMessageAsRead(newMsg.id);
-              }
+              // We don't automatically mark messages as read anymore
+              // Messages will be marked as read when user views the chat
 
               // Scroll to bottom when new message arrives
               setTimeout(() => {
@@ -250,15 +248,8 @@ export default function MessageScreen() {
         });
       }
       setMessages(initialMessages);
-      // Mark all unread messages as read
-      const unreadMessages =
-        messagesData?.filter(
-          (msg) => msg.receiver_id === user?.id && !msg.read,
-        ) || [];
-
-      for (const msg of unreadMessages) {
-        markMessageAsRead(msg.id);
-      }
+      // We don't automatically mark messages as read when fetched
+      // They'll be marked as read by the useEffect when viewed
     } catch (error) {
       console.error("Error fetching messages:", error);
     } finally {
@@ -273,6 +264,26 @@ export default function MessageScreen() {
       console.error("Error marking message as read:", error);
     }
   };
+
+  // Effect to mark messages as read when they are viewed
+  useEffect(() => {
+    if (!user?.id || !id || !partner?.id || messages.length === 0) return;
+    
+    // Find all unread messages received by current user
+    const unreadMessages = messages.filter(
+      msg => msg.receiver_id === user.id && !msg.read
+    );
+    
+    // Mark all unread messages as read when the chat is viewed
+    if (unreadMessages.length > 0) {
+      unreadMessages.forEach(msg => {
+        // Skip the initial message (it has a special ID format)
+        if (!msg.id.startsWith('initial-')) {
+          markMessageAsRead(msg.id);
+        }
+      });
+    }
+  }, [messages, user?.id, partner?.id]);
 
   // Add polling mechanism to fetch messages periodically as a fallback
   useEffect(() => {
