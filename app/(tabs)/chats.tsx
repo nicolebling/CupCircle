@@ -253,35 +253,33 @@ export default function ChatsScreen() {
           <Text style={[styles.userName, { color: colors.text }]}>
             {item.user.name}
           </Text>
-          <View style={styles.timestampContainer}>
-            <Text style={[styles.timestamp, { color: colors.secondaryText }]}>
-              {item.lastMessage.displayTimestamp}
-            </Text>
-            <View style={styles.badgeRow}>
-              {item.unreadCount > 0 && (
-                <MessageBadge count={item.unreadCount} />
-              )}
-            </View>
-          </View>
+          <Text style={[styles.timestamp, { color: colors.secondaryText }]}>
+            {item.lastMessage.displayTimestamp}
+          </Text>
         </View>
 
         <View style={styles.messagePreviewContainer}>
-          <Text
-            style={[
-              styles.messagePreview,
-              {
-                color:
-                  item.unreadCount > 0 ? colors.text : colors.secondaryText,
-                fontFamily: !item.lastMessage.isRead
-                  ? "K2D-Bold"
-                  : "K2D-Regular",
-              },
-              item.unreadCount > 0 && styles.unreadMessage,
-            ]}
-            numberOfLines={1}
-          >
-            {item.lastMessage.text}
-          </Text>
+          <View style={styles.messageContainer}>
+            <Text
+              style={[
+                styles.messagePreview,
+                {
+                  color:
+                    item.unreadCount > 0 ? colors.text : colors.secondaryText,
+                  fontFamily: !item.lastMessage.isRead
+                    ? "K2D-Bold"
+                    : "K2D-Regular",
+                },
+                item.unreadCount > 0 && styles.unreadMessage,
+              ]}
+              numberOfLines={1}
+            >
+              {item.lastMessage.text}
+            </Text>
+            {item.unreadCount > 0 && (
+              <MessageBadge count={item.unreadCount} />
+            )}
+          </View>
         </View>
       </View>
     </TouchableOpacity>
@@ -499,6 +497,10 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   badgeRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  messageContainer: {
     flexDirection: "row",
     alignItems: "center",
   },
