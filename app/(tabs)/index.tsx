@@ -17,7 +17,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
 import { useRouter, useNavigation } from "expo-router";
 import ProfileCard from "@/components/ProfileCard";
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { format, addDays, isPast, isToday, parseISO } from "date-fns";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 export default function CircleChatsScreen() {
   const colorScheme = useColorScheme();
@@ -88,7 +89,10 @@ export default function CircleChatsScreen() {
       setProfiles(profileMap);
       setChats(matchesData);
     } catch (error) {
-      console.warn("Unexpected error in fetchChats:", error instanceof Error ? error.message : String(error));
+      console.warn(
+        "Unexpected error in fetchChats:",
+        error instanceof Error ? error.message : String(error),
+      );
       // Set empty states but don't crash
       setChats([]);
       setProfiles({});
@@ -103,7 +107,7 @@ export default function CircleChatsScreen() {
   React.useEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <View style={{ flexDirection: 'row' }}>
+        <View style={{ flexDirection: "row" }}>
           <TouchableOpacity
             onPress={() => setShowPastChats(!showPastChats)}
             style={{ marginRight: 23 }}
@@ -251,9 +255,11 @@ export default function CircleChatsScreen() {
               <Text style={[styles.partnerName, { color: colors.text }]}>
                 {partnerProfile.name || " "}
               </Text>
-              <Text style={[styles.occupation, { color: colors.secondaryText }]}>
-                {(partnerProfile.occupation || " ").length > 30 
-                  ? `${partnerProfile.occupation.substring(0, 30)}...` 
+              <Text
+                style={[styles.occupation, { color: colors.secondaryText }]}
+              >
+                {(partnerProfile.occupation || " ").length > 30
+                  ? `${partnerProfile.occupation.substring(0, 30)}...`
                   : partnerProfile.occupation || " "}
               </Text>
             </View>
@@ -277,7 +283,7 @@ export default function CircleChatsScreen() {
               style={styles.detailIcon}
             />
             <Text style={[styles.detailText, { color: colors.text }]}>
-              {chat.meeting_date}
+              {format(chat.meeting_date, "EEEE, MMMM d")}
             </Text>
           </View>
 
@@ -387,16 +393,17 @@ export default function CircleChatsScreen() {
 
   const renderEmptyState = (title, description = null) => (
     <View style={styles.emptyStateContainer}>
-      <Ionicons
-        name="cafe-outline"
-        size={64}
-        color={colors.secondaryText}
-      />
+      <Ionicons name="cafe-outline" size={64} color={colors.secondaryText} />
       <Text style={[styles.emptyStateText, { color: colors.text }]}>
         {title}
       </Text>
       {description && (
-        <Text style={[styles.emptyStateDescription, { color: colors.secondaryText }]}>
+        <Text
+          style={[
+            styles.emptyStateDescription,
+            { color: colors.secondaryText },
+          ]}
+        >
           {description}
         </Text>
       )}
@@ -414,19 +421,26 @@ export default function CircleChatsScreen() {
 
   // Pre-filtered chat groups
   const confirmedChats = filterChatsByStatus("confirmed");
-  const pastConfirmed = confirmedChats.filter(chat => new Date(chat.meeting_date) < new Date());
-  const upcomingConfirmed = confirmedChats.filter(chat => new Date(chat.meeting_date) >= new Date());
+  const pastConfirmed = confirmedChats.filter(
+    (chat) => new Date(chat.meeting_date) < new Date(),
+  );
+  const upcomingConfirmed = confirmedChats.filter(
+    (chat) => new Date(chat.meeting_date) >= new Date(),
+  );
 
   const pendingAcceptance = filterChatsByStatus("pending_acceptance").filter(
-    chat => new Date(chat.meeting_date) >= new Date()
+    (chat) => new Date(chat.meeting_date) >= new Date(),
   );
 
   const pending = filterChatsByStatus("pending").filter(
-    chat => new Date(chat.meeting_date) >= new Date()
+    (chat) => new Date(chat.meeting_date) >= new Date(),
   );
 
   const showEmptyState =
-    (!showPastChats && upcomingConfirmed.length === 0 && pendingAcceptance.length === 0 && pending.length === 0) ||
+    (!showPastChats &&
+      upcomingConfirmed.length === 0 &&
+      pendingAcceptance.length === 0 &&
+      pending.length === 0) ||
     (showPastChats && pastConfirmed.length === 0);
 
   return (
@@ -434,13 +448,20 @@ export default function CircleChatsScreen() {
       style={[styles.container, { backgroundColor: colors.background }]}
       contentContainerStyle={{ flexGrow: 1 }}
     >
-
       {/* Profile Modal */}
-      <Modal visible={showProfileModal} transparent animationType="slide" onRequestClose={() => setShowProfileModal(false)}>
+      <Modal
+        visible={showProfileModal}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowProfileModal(false)}
+      >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <TouchableOpacity onPress={() => setShowProfileModal(false)} style={styles.floatingCloseButton}>
+              <TouchableOpacity
+                onPress={() => setShowProfileModal(false)}
+                style={styles.floatingCloseButton}
+              >
                 <Ionicons name="close" size={24} color={colors.text} />
               </TouchableOpacity>
             </View>
@@ -448,7 +469,10 @@ export default function CircleChatsScreen() {
               <ScrollView style={{ flex: 1 }}>
                 <View style={{ alignItems: "center" }}>
                   <ProfileCard
-                    profile={{ ...selectedProfile, photo: selectedProfile.photo_url }}
+                    profile={{
+                      ...selectedProfile,
+                      photo: selectedProfile.photo_url,
+                    }}
                     userId={selectedProfile.id}
                     isNewUser={false}
                   />
@@ -459,7 +483,7 @@ export default function CircleChatsScreen() {
         </View>
       </Modal>
 
-      {/* Toggle - UI TESTING */ }
+      {/* Toggle - UI TESTING */}
 
       {/* <View style={styles.header}>
         <View style={styles.toggleContainer}>
@@ -473,33 +497,42 @@ export default function CircleChatsScreen() {
       </View> */}
 
       {/* Loading, expired, or empty states */}
-      {!initialFetchDone || isLoading ? (
-        renderEmptyState("Loading chats...")
-      ) : showEmptyState ? (
-        renderEmptyState(
-          showPastChats && pastConfirmed.length === 0
-            ? "No past chats"
-            : !showPastChats && upcomingConfirmed.length === 0 && pendingAcceptance.length === 0 && pending.length === 0
-              ? "Chat’s taking a coffee break"
-              : null,
-          showPastChats
-            ? "Your past conversations will appear here"
-            : "Start connecting to begin new coffee chats"
-        )
-      ) : null}
+      {!initialFetchDone || isLoading
+        ? renderEmptyState("Loading chats...")
+        : showEmptyState
+          ? renderEmptyState(
+              showPastChats && pastConfirmed.length === 0
+                ? "No past chats"
+                : !showPastChats &&
+                    upcomingConfirmed.length === 0 &&
+                    pendingAcceptance.length === 0 &&
+                    pending.length === 0
+                  ? "Chat’s taking a coffee break"
+                  : null,
+              showPastChats
+                ? "Your past conversations will appear here"
+                : "Start connecting to begin new coffee chats",
+            )
+          : null}
 
       {/* Confirmed chats */}
       {(showPastChats ? pastConfirmed : upcomingConfirmed).length > 0 && (
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>Confirmed Chats</Text>
-          {(showPastChats ? pastConfirmed : upcomingConfirmed).map(renderChatCard)}
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>
+            Confirmed Chats
+          </Text>
+          {(showPastChats ? pastConfirmed : upcomingConfirmed).map(
+            renderChatCard,
+          )}
         </View>
       )}
 
       {/* Pending Acceptance */}
       {!showPastChats && pendingAcceptance.length > 0 && (
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>Pending Acceptance</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>
+            Pending Acceptance
+          </Text>
           {pendingAcceptance.map(renderChatCard)}
         </View>
       )}
@@ -507,13 +540,14 @@ export default function CircleChatsScreen() {
       {/* Pending */}
       {!showPastChats && pending.length > 0 && (
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>Pending</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>
+            Pending
+          </Text>
           {pending.map(renderChatCard)}
         </View>
       )}
     </ScrollView>
   );
-
 }
 
 const getBadgeColor = (status, colors) => {

@@ -229,14 +229,21 @@ export default function MatchingScreen() {
       // console.log("Retrieved availability data:", availabilityData);
 
       // Filter out expired time slots for today
+      function formatLocalDate(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-based
+        const day = String(date.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+      }
       const now = new Date();
-      const currentTime = now.toLocaleTimeString("en-US", { hour12: true });
+      const todayLocal = formatLocalDate(now);
+      console.log("Local date:", todayLocal);
 
       const validAvailability = availabilityData?.filter((slot) => {
         if (!slot) return false;
 
         // For future dates, keep all slots
-        if (slot.date > today) return true;
+        if (slot.date >= today) return true;
 
         // For today, only keep future time slots
         if (slot.date === today) {
