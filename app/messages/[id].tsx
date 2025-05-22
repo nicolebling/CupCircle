@@ -278,7 +278,7 @@ export default function MessageScreen() {
     if (unreadMessages.length > 0) {
       unreadMessages.forEach(msg => {
         // Skip the initial message (it has a special ID format)
-        if (!msg.id.startsWith('initial-')) {
+        if (msg.id && !msg.id.startsWith('initial-')) {
           markMessageAsRead(msg.id);
         }
       });
