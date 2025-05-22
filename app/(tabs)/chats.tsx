@@ -16,7 +16,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "@/contexts/AuthContext";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { supabase } from "@/lib/supabase";
-import { router, useRouter, useNavigation  } from "expo-router";
+import { router, useRouter, useNavigation } from "expo-router";
 
 interface Conversation {
   id: string;
@@ -38,12 +38,10 @@ interface Conversation {
 const MessageBadge = ({ count }: { count: number }) => {
   const colors = Colors[useColorScheme()];
   if (count === 0) return null;
-  
+
   return (
     <View style={[styles.badgeContainer, { backgroundColor: colors.primary }]}>
-      <Text style={styles.badgeText}>
-        {count > 99 ? '99+' : count}
-      </Text>
+      <Text style={styles.badgeText}>{count > 99 ? "99+" : count}</Text>
     </View>
   );
 };
@@ -68,7 +66,7 @@ export default function ChatsScreen() {
 
   // Add focus event listener to refresh chats when returning to the screen
   useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
+    const unsubscribe = navigation.addListener("focus", () => {
       if (user) {
         fetchConfirmedChats();
       }
@@ -140,40 +138,47 @@ export default function ChatsScreen() {
       });
 
       // Build conversation objects
-     
-        const mappedConversations = await Promise.all(matchesData.map(async (match) => {
-        const partnerId =
-          match.user1_id === user.id ? match.user2_id : match.user1_id;
-        const partnerProfile = profileMap[partnerId] || {};
+
+      const mappedConversations = await Promise.all(
+        matchesData.map(async (match) => {
+          const partnerId =
+            match.user1_id === user.id ? match.user2_id : match.user1_id;
+          const partnerProfile = profileMap[partnerId] || {};
 
           // Fetch last message for this chat
           const { data: lastMessageData } = await supabase
             .from("message")
             .select("*")
-            .or(`and(sender_id.eq.${user.id},receiver_id.eq.${partnerId}),and(sender_id.eq.${partnerId},receiver_id.eq.${user.id})`)
+            .or(
+              `and(sender_id.eq.${user.id},receiver_id.eq.${partnerId}),and(sender_id.eq.${partnerId},receiver_id.eq.${user.id})`,
+            )
             .order("created_at", { ascending: false })
             .limit(1);
 
           const lastMessage = lastMessageData?.[0];
 
-        return {
-          id: match.id,
-          match_id: match.match_id || match.id,
-          user: {
-            id: partnerId,
-            name: partnerProfile.name || "User",
-            photo:
-              partnerProfile.photo_url || "https://via.placeholder.com/100",
-            occupation: partnerProfile.occupation || "Professional",
-          },
-          lastMessage: {
-            text: lastMessage ? lastMessage.content : match.initial_message,
-            timestamp: formatDate((lastMessage ? lastMessage.created_at : match.created_at) || new Date().toISOString()),
-            isRead: lastMessage ? lastMessage.read : true,
-          },
-          unreadCount: 0,
-        };
-      }));
+          return {
+            id: match.id,
+            match_id: match.match_id || match.id,
+            user: {
+              id: partnerId,
+              name: partnerProfile.name || "User",
+              photo:
+                partnerProfile.photo_url || "https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg",
+              occupation: partnerProfile.occupation || "Professional",
+            },
+            lastMessage: {
+              text: lastMessage ? lastMessage.content : match.initial_message,
+              timestamp: formatDate(
+                (lastMessage ? lastMessage.created_at : match.created_at) ||
+                  new Date().toISOString(),
+              ),
+              isRead: lastMessage ? lastMessage.read : true,
+            },
+            unreadCount: 0,
+          };
+        }),
+      );
 
       setConversations(mappedConversations);
     } catch (error) {
@@ -234,8 +239,11 @@ export default function ChatsScreen() {
             style={[
               styles.messagePreview,
               {
-                color: item.unreadCount > 0 ? colors.text : colors.secondaryText,
-                fontFamily: !item.lastMessage.isRead ? "K2D-Regular" : "K2D-Regular",
+                color:
+                  item.unreadCount > 0 ? colors.text : colors.secondaryText,
+                fontFamily: !item.lastMessage.isRead
+                  ? "K2D-Regular"
+                  : "K2D-Regular",
               },
               item.unreadCount > 0 && styles.unreadMessage,
             ]}
@@ -337,21 +345,21 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   badgeContainer: {
-    position: 'absolute',
+    position: "absolute",
     top: -5,
     right: -5,
     minWidth: 20,
     height: 20,
     borderRadius: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     paddingHorizontal: 6,
     zIndex: 1,
   },
   badgeText: {
-    color: 'white',
+    color: "white",
     fontSize: 12,
-    fontFamily: 'K2D-Bold',
+    fontFamily: "K2D-Bold",
   },
   header: {
     padding: 16,
