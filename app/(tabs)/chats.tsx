@@ -258,7 +258,9 @@ export default function ChatsScreen() {
               {item.lastMessage.displayTimestamp}
             </Text>
             <View style={styles.badgeRow}>
-              {item.unreadCount > 0 && <MessageBadge count={item.unreadCount} />}
+              {item.unreadCount > 0 && (
+                <MessageBadge count={item.unreadCount} />
+              )}
             </View>
           </View>
         </View>
@@ -374,10 +376,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   timestampContainer: {
-    display: "flex",
     alignItems: "center",
-    justifyContent: "center",
-    alignSelf: "center",
   },
   badgeContainer: {
     minWidth: 20,
@@ -501,5 +500,6 @@ const styles = StyleSheet.create({
   },
   badgeRow: {
     flexDirection: "row",
-  }
+    alignItems: "center",
+  },
 });
