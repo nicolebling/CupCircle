@@ -164,7 +164,8 @@ export default function ChatsScreen() {
               id: partnerId,
               name: partnerProfile.name || "User",
               photo:
-                partnerProfile.photo_url || "https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg",
+                partnerProfile.photo_url ||
+                "https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg",
               occupation: partnerProfile.occupation || "Professional",
             },
             lastMessage: {
@@ -242,7 +243,7 @@ export default function ChatsScreen() {
                 color:
                   item.unreadCount > 0 ? colors.text : colors.secondaryText,
                 fontFamily: !item.lastMessage.isRead
-                  ? "K2D-Regular"
+                  ? "K2D-Bold"
                   : "K2D-Regular",
               },
               item.unreadCount > 0 && styles.unreadMessage,
@@ -443,7 +444,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   unreadMessage: {
-    fontFamily: "K2D-Medium",
+    fontFamily: "K2D-Bold",
+    fontWeight: "900",
   },
   emptyContainer: {
     flex: 1,
