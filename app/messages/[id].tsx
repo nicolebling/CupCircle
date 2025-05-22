@@ -318,9 +318,7 @@ export default function MessageScreen() {
       const markMessagesAsRead = async () => {
         for (const msg of unreadMessages) {
           // Skip the initial message (it has a special ID format)
-          if (
-            msg.chat_id
-          ) {
+          if (msg.chat_id) {
             try {
               console.log(`Marking message ${msg.id} as read`);
               await markMessageAsRead(msg.chat_id, setMessages);

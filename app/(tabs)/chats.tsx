@@ -158,7 +158,7 @@ export default function ChatsScreen() {
           // Count unread messages for this conversation
           const { data: unreadMessages, error: unreadError } = await supabase
             .from("message")
-            .select("id")
+            .select("chat_id")
             .eq("receiver_id", user.id)
             .eq("sender_id", partnerId)
             .eq("read", false);
