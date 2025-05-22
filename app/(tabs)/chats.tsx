@@ -372,7 +372,6 @@ const styles = StyleSheet.create({
   },
   timestampContainer: {
     alignItems: 'flex-end',
-    minWidth: 65, // Ensure consistent width for timestamp container
   },
   badgeContainer: {
     minWidth: 20,
@@ -382,7 +381,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 6,
     marginTop: 4,
-    alignSelf: 'flex-end', // Align badge to the right
   },
   badgeText: {
     color: "white",
