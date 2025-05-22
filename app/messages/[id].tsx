@@ -259,7 +259,43 @@ export default function MessageScreen() {
 
   const markMessageAsRead = async (messageId: string) => {
     try {
-      await supabase.from("message").update({ read: true }).eq("id", messageId);
+      // First verify the message exists and needs updating
+      const { data: checkData, error: checkError } = await supabase
+        .from("message")
+        .select("id, read")
+        .eq("id", messageId)
+        .single();
+      
+      if (checkError) {
+        console.error("Error checking message status:", checkError);
+        return;
+      }
+      
+      if (!checkData || checkData.read) {
+        // Message already read or doesn't exist
+        return;
+      }
+      
+      // Update the message as read
+      const { data, error } = await supabase
+        .from("message")
+        .update({ read: true })
+        .eq("id", messageId)
+        .select();
+      
+      if (error) {
+        console.error("Error marking message as read:", error);
+        return;
+      }
+      
+      console.log(`Successfully marked message ${messageId} as read`, data);
+      
+      // Update local state to reflect the change
+      setMessages(prevMessages => 
+        prevMessages.map(msg => 
+          msg.id === messageId ? { ...msg, read: true } : msg
+        )
+      );
     } catch (error) {
       console.error("Error marking message as read:", error);
     }
@@ -276,12 +312,24 @@ export default function MessageScreen() {
     
     // Mark all unread messages as read when the chat is viewed
     if (unreadMessages.length > 0) {
-      unreadMessages.forEach(msg => {
-        // Skip the initial message (it has a special ID format)
-        if (msg.id && !msg.id.startsWith('initial-')) {
-          markMessageAsRead(msg.id);
+      console.log(`Marking ${unreadMessages.length} messages as read`);
+      
+      // Mark messages as read one by one
+      const markMessagesAsRead = async () => {
+        for (const msg of unreadMessages) {
+          // Skip the initial message (it has a special ID format)
+          if (msg.id && typeof msg.id === 'string' && !msg.id.startsWith('initial-')) {
+            try {
+              console.log(`Marking message ${msg.id} as read`);
+              await markMessageAsRead(msg.id);
+            } catch (error) {
+              console.error(`Failed to mark message ${msg.id} as read:`, error);
+            }
+          }
         }
-      });
+      };
+      
+      markMessagesAsRead();
     }
   }, [messages, user?.id, partner?.id]);
 
