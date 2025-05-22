@@ -184,7 +184,9 @@ export default function ChatsScreen() {
             },
             lastMessage: {
               text: lastMessage ? lastMessage.content : match.initial_message,
-              timestamp: formatDate(
+              timestamp: (lastMessage ? lastMessage.created_at : match.created_at) ||
+              new Date().toISOString(),
+            displayTimestamp: formatDate(
                 (lastMessage ? lastMessage.created_at : match.created_at) ||
                   new Date().toISOString(),
               ),
@@ -195,7 +197,14 @@ export default function ChatsScreen() {
         }),
       );
 
-      setConversations(mappedConversations);
+      // Sort conversations by latest message timestamp
+      const sortedConversations = mappedConversations.sort((a, b) => {
+        const timestampA = new Date(a.lastMessage.timestamp).getTime();
+        const timestampB = new Date(b.lastMessage.timestamp).getTime();
+        return timestampB - timestampA; // Most recent first
+      });
+
+      setConversations(sortedConversations);
     } catch (error) {
       console.error("Error in fetchConfirmedChats:", error);
     } finally {
@@ -245,7 +254,7 @@ export default function ChatsScreen() {
             {item.user.name}
           </Text>
           <Text style={[styles.timestamp, { color: colors.secondaryText }]}>
-            {item.lastMessage.timestamp}
+            {item.lastMessage.displayTimestamp}
           </Text>
         </View>
 
