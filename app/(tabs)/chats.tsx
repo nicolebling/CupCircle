@@ -155,6 +155,20 @@ export default function ChatsScreen() {
             .order("created_at", { ascending: false })
             .limit(1);
 
+          // Count unread messages for this conversation
+          const { data: unreadMessages, error: unreadError } = await supabase
+            .from("message")
+            .select("id")
+            .eq("receiver_id", user.id)
+            .eq("sender_id", partnerId)
+            .eq("read", false);
+            
+          const unreadCount = unreadMessages?.length || 0;
+          
+          if (unreadError) {
+            console.error("Error fetching unread count:", unreadError);
+          }
+
           const lastMessage = lastMessageData?.[0];
 
           return {
@@ -176,7 +190,7 @@ export default function ChatsScreen() {
               ),
               isRead: lastMessage ? lastMessage.read : true,
             },
-            unreadCount: 0,
+            unreadCount: unreadCount,
           };
         }),
       );
@@ -222,7 +236,7 @@ export default function ChatsScreen() {
     >
       <View style={styles.avatarContainer}>
         <Image source={{ uri: item.user.photo }} style={styles.avatar} />
-        <MessageBadge count={item.unreadCount} />
+        {item.unreadCount > 0 && <MessageBadge count={item.unreadCount} />}
       </View>
 
       <View style={styles.conversationContent}>
@@ -404,12 +418,15 @@ const styles = StyleSheet.create({
   badgeContainer: {
     position: "absolute",
     top: 0,
-    right: 0,
-    width: 20,
+    right: -3,
+    minWidth: 20,
     height: 20,
     borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
+    paddingHorizontal: 4,
+    borderWidth: 1.5,
+    borderColor: "white",
   },
   badgeText: {
     color: "white",
