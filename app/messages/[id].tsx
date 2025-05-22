@@ -161,7 +161,7 @@ export default function MessageScreen() {
   const fetchChatDetails = async () => {
     try {
       setLoading(true);
-      
+
       // Try to get cached messages first
       const cachedMessages = await cacheService.getCachedMessages(user?.id, id);
       if (cachedMessages) {
@@ -257,44 +257,44 @@ export default function MessageScreen() {
     }
   };
 
-  const markMessageAsRead = async (messageId: string) => {
+  const markMessageAsRead = async (chatId: number, setMessages: any) => {
     try {
       // First verify the message exists and needs updating
       const { data: checkData, error: checkError } = await supabase
         .from("message")
-        .select("id, read")
-        .eq("id", messageId)
+        .select("chat_id, read")
+        .eq("chat_id", chatId)
         .single();
-      
+
       if (checkError) {
         console.error("Error checking message status:", checkError);
         return;
       }
-      
+
       if (!checkData || checkData.read) {
         // Message already read or doesn't exist
         return;
       }
-      
+
       // Update the message as read
       const { data, error } = await supabase
         .from("message")
         .update({ read: true })
-        .eq("id", messageId)
+        .eq("chat_id", chatId)
         .select();
-      
+
       if (error) {
         console.error("Error marking message as read:", error);
         return;
       }
-      
-      console.log(`Successfully marked message ${messageId} as read`, data);
-      
+
+      console.log(`Successfully marked message ${chatId} as read`, data);
+
       // Update local state to reflect the change
-      setMessages(prevMessages => 
-        prevMessages.map(msg => 
-          msg.id === messageId ? { ...msg, read: true } : msg
-        )
+      setMessages((prevMessages) =>
+        prevMessages.map((msg) =>
+          msg.chat_id === chatId ? { ...msg, read: true } : msg,
+        ),
       );
     } catch (error) {
       console.error("Error marking message as read:", error);
@@ -304,31 +304,33 @@ export default function MessageScreen() {
   // Effect to mark messages as read when they are viewed
   useEffect(() => {
     if (!user?.id || !id || !partner?.id || messages.length === 0) return;
-    
+
     // Find all unread messages received by current user
     const unreadMessages = messages.filter(
-      msg => msg.receiver_id === user.id && !msg.read
+      (msg) => msg.receiver_id === user.id && !msg.read,
     );
-    
+
     // Mark all unread messages as read when the chat is viewed
     if (unreadMessages.length > 0) {
       console.log(`Marking ${unreadMessages.length} messages as read`);
-      
+
       // Mark messages as read one by one
       const markMessagesAsRead = async () => {
         for (const msg of unreadMessages) {
           // Skip the initial message (it has a special ID format)
-          if (msg.id && typeof msg.id === 'string' && !msg.id.startsWith('initial-')) {
+          if (
+            msg.chat_id
+          ) {
             try {
               console.log(`Marking message ${msg.id} as read`);
-              await markMessageAsRead(msg.id);
+              await markMessageAsRead(msg.chat_id, setMessages);
             } catch (error) {
               console.error(`Failed to mark message ${msg.id} as read:`, error);
             }
           }
         }
       };
-      
+
       markMessagesAsRead();
     }
   }, [messages, user?.id, partner?.id]);
