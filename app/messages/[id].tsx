@@ -131,8 +131,10 @@ export default function MessageScreen() {
                 return [...prev, newMsg];
               });
 
-              // Don't automatically mark as read - will be marked as read when viewed
-              // Messages will remain unread until user sees them
+              // Mark as read if received by this user
+              if (newMsg.receiver_id === user.id) {
+                markMessageAsRead(newMsg.id);
+              }
 
               // Scroll to bottom when new message arrives
               setTimeout(() => {
@@ -273,25 +275,6 @@ export default function MessageScreen() {
   };
 
   // Add polling mechanism to fetch messages periodically as a fallback
-  // Add a new effect to mark messages as read when viewed
-  useEffect(() => {
-    if (!user?.id || !id || !partner?.id || messages.length === 0) return;
-    
-    // Mark unread messages as read when the chat is viewed
-    const unreadMessages = messages.filter(
-      msg => msg.receiver_id === user.id && !msg.read
-    );
-    
-    if (unreadMessages.length > 0) {
-      unreadMessages.forEach(msg => {
-        // Don't try to mark the initial message as read (it has a special ID format)
-        if (!msg.id.startsWith('initial-')) {
-          markMessageAsRead(msg.id);
-        }
-      });
-    }
-  }, [messages, user?.id, partner?.id]);
-
   useEffect(() => {
     if (!user?.id || !id || !partner?.id) return;
 
