@@ -13,6 +13,7 @@ import { useNavigation } from "expo-router";
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { useAuth } from "@/contexts/AuthContext";
+import { ExternalLink } from "@/components/ExternalLink";
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -182,41 +183,45 @@ export default function SettingsScreen() {
             />
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[styles.settingItem, { borderColor: colors.border }]}
-          >
-            <View style={styles.settingContent}>
+          <ExternalLink href="https://www.cupcircle.co/terms-of-service">
+            <TouchableOpacity
+              style={[styles.settingItem, { borderColor: colors.border }]}
+            >
+              <View style={styles.settingContent}>
+                <Ionicons
+                  name="document-text-outline"
+                  size={22}
+                  color={colors.text}
+                />
+                <Text style={[styles.settingText, { color: colors.text }]}>
+                  Terms of Service
+                </Text>
+              </View>
               <Ionicons
-                name="document-text-outline"
-                size={22}
-                color={colors.text}
+                name="chevron-forward"
+                size={20}
+                color={colors.secondaryText}
               />
-              <Text style={[styles.settingText, { color: colors.text }]}>
-                Terms of Service
-              </Text>
-            </View>
-            <Ionicons
-              name="chevron-forward"
-              size={20}
-              color={colors.secondaryText}
-            />
-          </TouchableOpacity>
+            </TouchableOpacity>
+          </ExternalLink>
 
-          <TouchableOpacity
-            style={[styles.settingItem, { borderColor: colors.border }]}
-          >
-            <View style={styles.settingContent}>
-              <Ionicons name="shield-outline" size={22} color={colors.text} />
-              <Text style={[styles.settingText, { color: colors.text }]}>
-                Privacy Policy
-              </Text>
-            </View>
-            <Ionicons
-              name="chevron-forward"
-              size={20}
-              color={colors.secondaryText}
-            />
-          </TouchableOpacity>
+          <ExternalLink href="https://www.cupcircle.co/privacy-policy">
+            <TouchableOpacity
+              style={[styles.settingItem, { borderColor: colors.border }]}
+            >
+              <View style={styles.settingContent}>
+                <Ionicons name="shield-outline" size={22} color={colors.text} />
+                <Text style={[styles.settingText, { color: colors.text }]}>
+                  Privacy Policy
+                </Text>
+              </View>
+              <Ionicons
+                name="chevron-forward"
+                size={20}
+                color={colors.secondaryText}
+              />
+            </TouchableOpacity>
+          </ExternalLink>
         </View>
 
         <TouchableOpacity
