@@ -131,7 +131,8 @@ export default function SettingsScreen() {
             </TouchableOpacity>
           </View>
 
-          <View style={[styles.settingItem, { borderColor: colors.border }]}>
+          {/* Dark mode - future implementation */}
+          {/* <View style={[styles.settingItem, { borderColor: colors.border }]}>
             <View style={styles.settingContent}>
               <Ionicons name="moon-outline" size={22} color={colors.text} />
               <Text style={[styles.settingText, { color: colors.text }]}>
@@ -155,7 +156,8 @@ export default function SettingsScreen() {
                 ]}
               />
             </TouchableOpacity>
-          </View>
+          </View> */}
+          
         </View>
 
         <View style={styles.section}>
