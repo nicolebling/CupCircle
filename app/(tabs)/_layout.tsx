@@ -82,7 +82,22 @@ export default function TabLayout() {
         options={{
           title: 'Inbox',
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="chatbubbles" size={size} color={color} />
+            <View style={{ width: size, height: size }}>
+              <Ionicons name="chatbubbles" size={size} color={color} />
+              {global.unreadMessageCount > 0 && (
+                <View style={{
+                  position: 'absolute',
+                  right: -6,
+                  top: -3,
+                  backgroundColor: '#FF3B30',
+                  width: 12,
+                  height: 12,
+                  borderRadius: 6,
+                  borderWidth: 1,
+                  borderColor: '#F97415',
+                }} />
+              )}
+            </View>
           ),
         }}
       />

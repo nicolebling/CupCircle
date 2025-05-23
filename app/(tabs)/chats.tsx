@@ -206,6 +206,10 @@ export default function ChatsScreen() {
         return timestampB - timestampA; // Most recent first
       });
 
+      // Update global unread count
+      const totalUnread = sortedConversations.reduce((sum, conv) => sum + conv.unreadCount, 0);
+      global.unreadMessageCount = totalUnread;
+      
       setConversations(sortedConversations);
     } catch (error) {
       console.error("Error in fetchConfirmedChats:", error);
