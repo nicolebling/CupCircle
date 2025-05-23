@@ -2,7 +2,7 @@
 import { Tabs } from 'expo-router';
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
-import { TouchableOpacity } from "react-native";
+import { View, TouchableOpacity } from "react-native";
 
 export default function TabLayout() {
   const colors = Colors.light;
@@ -89,7 +89,7 @@ export default function TabLayout() {
                   position: 'absolute',
                   right: -6,
                   top: -3,
-                  backgroundColor: '#FF3B30',
+                  backgroundColor: '#FB1429',
                   width: 12,
                   height: 12,
                   borderRadius: 6,
