@@ -199,14 +199,14 @@ export default function CafeSelector({
               latitudeDelta: 0.05,
               longitudeDelta: 0.05,
             });
+            // Only set region on initial load
+            setRegion({
+              latitude: userLocation.coords.latitude,
+              longitude: userLocation.coords.longitude,
+              latitudeDelta: 0.05,
+              longitudeDelta: 0.05,
+            });
           }
-          // Set region to current user location
-          setRegion({
-            latitude: userLocation.coords.latitude,
-            longitude: userLocation.coords.longitude,
-            latitudeDelta: 0.05,
-            longitudeDelta: 0.05,
-          });
           fetchCafes(
             userLocation.coords.latitude,
             userLocation.coords.longitude,
@@ -248,6 +248,17 @@ export default function CafeSelector({
       );
       const data = await response.json();
       setCafes(data.results);
+      
+      // Only update region if specifically requested (like on initial load)
+      if (shouldUpdateRegion) {
+        setRegion({
+          latitude: lat,
+          longitude: lng,
+          latitudeDelta: 0.05,
+          longitudeDelta: 0.05,
+        });
+      }
+      
       setIsLoading(false);
     } catch (error) {
       console.error("Error fetching cafes:", error);
