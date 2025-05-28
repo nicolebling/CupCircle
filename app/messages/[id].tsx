@@ -28,6 +28,7 @@ import { supabase } from "@/lib/supabase";
 import { Image } from "react-native";
 import ProfileCard from "@/components/ProfileCard";
 import { cacheService } from "@/services/cacheService";
+import LogoAnimation from "@/components/LogoAnimation";
 
 type Message = {
   id: string;
@@ -633,7 +634,7 @@ export default function MessageScreen() {
       >
         {loading ? (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color={colors.primary} />
+            <LogoAnimation size={64} />
           </View>
         ) : (
           <FlatList
