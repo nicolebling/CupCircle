@@ -134,9 +134,11 @@ export default function MessageScreen() {
               // We don't automatically mark messages as read anymore
               // Messages will be marked as read when user views the chat
 
-              // Scroll to bottom when new message arrives
+              // Jump to bottom when new message arrives without any scroll animation
               setTimeout(() => {
-                flatListRef.current?.scrollToEnd({ animated: false });
+                if (flatListRef.current) {
+                  flatListRef.current.scrollToOffset({ offset: 999999, animated: false });
+                }
               }, 100);
             }
           },
@@ -424,9 +426,11 @@ export default function MessageScreen() {
       // Update UI immediately with optimistic message
       setMessages((prevMessages) => [...prevMessages, optimisticMessage]);
 
-      // Scroll to bottom
+      // Jump to bottom without any scroll animation
       setTimeout(() => {
-        flatListRef.current?.scrollToEnd({ animated: false });
+        if (flatListRef.current) {
+          flatListRef.current.scrollToOffset({ offset: 999999, animated: false });
+        }
       }, 50);
 
       // Clear input field immediately for better UX
@@ -645,13 +649,13 @@ export default function MessageScreen() {
             }
             contentContainerStyle={styles.messagesList}
             onContentSizeChange={() => {
-              if (messages.length > 0) {
-                flatListRef.current?.scrollToEnd({ animated: false });
+              if (messages.length > 0 && flatListRef.current) {
+                flatListRef.current.scrollToOffset({ offset: 999999, animated: false });
               }
             }}
             onLayout={() => {
-              if (messages.length > 0) {
-                flatListRef.current?.scrollToEnd({ animated: false });
+              if (messages.length > 0 && flatListRef.current) {
+                flatListRef.current.scrollToOffset({ offset: 999999, animated: false });
               }
             }}
           />
