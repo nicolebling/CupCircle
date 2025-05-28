@@ -13,7 +13,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import MapView, { Marker, Callout, PROVIDER_GOOGLE } from "react-native-maps";
+import MapView, { Marker, Callout } from "react-native-maps";
 import * as Location from "expo-location";
 import LogoAnimation from "@/components/LogoAnimation";
 
@@ -24,131 +24,79 @@ interface CafeSelectorProps {
   isDark?: boolean;
 }
 
-const customMapStyle = [
-  // Light cream background for all land areas (like coffee with milk)
-  { elementType: "geometry", stylers: [{ color: "#F7F3E9" }] },
-  
-  // Dark coffee-colored text labels
-  { elementType: "labels.text.fill", stylers: [{ color: "#4A3429" }] },
-  { elementType: "labels.text.stroke", stylers: [{ color: "#F7F3E9" }] },
-  
-  // Roads in warm coffee tones
+const retroMapStyle = [
+  { elementType: "geometry", stylers: [{ color: "#f5f5f5" }] },
+  { elementType: "labels.text.fill", stylers: [{ color: "#616161" }] },
+  { elementType: "labels.text.stroke", stylers: [{ color: "#f5f5f5" }] },
+  {
+    featureType: "administrative.land_parcel",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#bdbdbd" }],
+  },
+  {
+    featureType: "poi",
+    elementType: "geometry",
+    stylers: [{ color: "#eeeeee" }],
+  },
+  {
+    featureType: "poi",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#757575" }],
+  },
+  {
+    featureType: "poi.park",
+    elementType: "geometry",
+    stylers: [{ color: "#e5e5e5" }],
+  },
+  {
+    featureType: "poi.park",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#9e9e9e" }],
+  },
   {
     featureType: "road",
     elementType: "geometry",
-    stylers: [{ color: "#E8D5B7" }],
+    stylers: [{ color: "#ffffff" }],
+  },
+  {
+    featureType: "road.arterial",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#757575" }],
   },
   {
     featureType: "road.highway",
     elementType: "geometry",
-    stylers: [{ color: "#D4A574" }],
+    stylers: [{ color: "#dadada" }],
   },
   {
-    featureType: "road.arterial",
-    elementType: "geometry",
-    stylers: [{ color: "#E8D5B7" }],
+    featureType: "road.highway",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#616161" }],
   },
   {
     featureType: "road.local",
-    elementType: "geometry",
-    stylers: [{ color: "#F0E6D2" }],
-  },
-  
-  // Road labels in darker coffee
-  {
-    featureType: "road",
     elementType: "labels.text.fill",
-    stylers: [{ color: "#6B4E3D" }],
+    stylers: [{ color: "#9e9e9e" }],
   },
-  
-  // Water in soft blue-gray (like coffee shop atmosphere)
-  {
-    featureType: "water",
-    elementType: "geometry",
-    stylers: [{ color: "#B8C5D1" }],
-  },
-  {
-    featureType: "water",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#4A3429" }],
-  },
-  
-  // Parks and green spaces in soft sage green
-  {
-    featureType: "poi.park",
-    elementType: "geometry",
-    stylers: [{ color: "#C8D5B9" }],
-  },
-  {
-    featureType: "landscape.natural",
-    elementType: "geometry",
-    stylers: [{ color: "#D4E0C1" }],
-  },
-  
-  // Points of interest in warm beige
-  {
-    featureType: "poi",
-    elementType: "geometry",
-    stylers: [{ color: "#F0E6D2" }],
-  },
-  {
-    featureType: "poi",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#6B4E3D" }],
-  },
-  
-  // Buildings in light coffee tone
-  {
-    featureType: "poi.business",
-    elementType: "geometry",
-    stylers: [{ color: "#E8D5B7" }],
-  },
-  
-  // Transit lines in coffee accent
   {
     featureType: "transit.line",
     elementType: "geometry",
-    stylers: [{ color: "#C49B61" }],
+    stylers: [{ color: "#e5e5e5" }],
   },
   {
     featureType: "transit.station",
     elementType: "geometry",
-    stylers: [{ color: "#D4A574" }],
+    stylers: [{ color: "#eeeeee" }],
   },
-  
-  // Administrative boundaries in subtle coffee
   {
-    featureType: "administrative",
-    elementType: "geometry.stroke",
-    stylers: [{ color: "#B8956F" }],
-  },
-  
-  // Landscape features in warm cream
-  {
-    featureType: "landscape",
+    featureType: "water",
     elementType: "geometry",
-    stylers: [{ color: "#F5F1E8" }],
+    stylers: [{ color: "#c9c9c9" }],
   },
-  
-  // Make poi labels more subtle
   {
-    featureType: "poi.business",
-    elementType: "labels",
-    stylers: [{ visibility: "simplified" }],
-  },
-  
-  // Soften highway labels
-  {
-    featureType: "road.highway",
+    featureType: "water",
     elementType: "labels.text.fill",
-    stylers: [{ color: "#8B6914" }],
-  },
-  
-  // Transit labels in coffee tone
-  {
-    featureType: "transit",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#6B4E3D" }],
+    stylers: [{ color: "#9e9e9e" }],
   },
 ];
 
@@ -199,18 +147,17 @@ export default function CafeSelector({
               latitudeDelta: 0.05,
               longitudeDelta: 0.05,
             });
-            // Only set region on initial load
-            setRegion({
-              latitude: userLocation.coords.latitude,
-              longitude: userLocation.coords.longitude,
-              latitudeDelta: 0.05,
-              longitudeDelta: 0.05,
-            });
           }
+          // Set region to current user location
+          setRegion({
+            latitude: userLocation.coords.latitude,
+            longitude: userLocation.coords.longitude,
+            latitudeDelta: 0.05,
+            longitudeDelta: 0.05,
+          });
           fetchCafes(
             userLocation.coords.latitude,
             userLocation.coords.longitude,
-            true
           );
         } else {
           setErrorMsg("Could not fetch location. Please try again.");
@@ -241,24 +188,13 @@ export default function CafeSelector({
     }
   };
 
-  const fetchCafes = async (lat, lng, shouldUpdateRegion = false) => {
+  const fetchCafes = async (lat, lng) => {
     try {
       const response = await fetch(
         `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=2000&type=cafe&keyword=coffee&key=${process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY}`,
       );
       const data = await response.json();
       setCafes(data.results);
-      
-      // Only update region if specifically requested (like on initial load)
-      if (shouldUpdateRegion) {
-        setRegion({
-          latitude: lat,
-          longitude: lng,
-          latitudeDelta: 0.05,
-          longitudeDelta: 0.05,
-        });
-      }
-      
       setIsLoading(false);
     } catch (error) {
       console.error("Error fetching cafes:", error);
@@ -274,7 +210,7 @@ export default function CafeSelector({
   const fetchCafesInRegion = () => {
     if (region) {
       setIsLoading(true);
-      fetchCafes(region.latitude, region.longitude, false); // Fetch cafes based on the current region without updating map center
+      fetchCafes(region.latitude, region.longitude); // Fetch cafes based on the saved region
     }
   };
 
@@ -371,9 +307,7 @@ export default function CafeSelector({
               ) : region ? (
                 <MapView
                   style={styles.map}
-                  provider={PROVIDER_GOOGLE} // Force Google Maps provider
-                  mapType="standard" // Ensure standard map type
-                  customMapStyle={customMapStyle} // Apply custom map style here
+                  customMapStyle={retroMapStyle} // Apply custom map style here
                   region={region} // Bind the region state to the MapView
                   initialRegion={initialRegion} // Set the initial region only once
                   onRegionChangeComplete={setRegion} // Update region on map change
