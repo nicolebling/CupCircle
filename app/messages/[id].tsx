@@ -634,7 +634,7 @@ export default function MessageScreen() {
       >
         {loading ? (
           <View style={styles.loadingContainer}>
-            <LogoAnimation size={64} />
+            <LogoAnimation size={120} />
           </View>
         ) : (
           <FlatList

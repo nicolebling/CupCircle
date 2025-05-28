@@ -369,7 +369,7 @@ export default function AvailabilityScreen() {
 
   const SkeletonAvailabilityItem = () => (
     <View style={styles.dateGroup}>
-      <SkeletonLoader width="40%" height={16} style={{ marginBottom: 8 }} />
+      <SkeletonLoader width="40%" height={16} style={{ marginBottom: 20, left: 20, top: 20 }} />
       <View style={[styles.skeletonCard, { borderColor: colors.border }]}>
         <View style={styles.skeletonCardContent}>
           <SkeletonLoader width="30%" height={14} />
