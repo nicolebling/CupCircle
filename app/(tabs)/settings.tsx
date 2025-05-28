@@ -46,7 +46,7 @@ export default function SettingsScreen() {
     navigation.setOptions({
       headerLeft: () => (
         <TouchableOpacity
-          onPress={() => router.push("/(tabs)/profile")}
+          onPress={() => router.back()}
           style={{ marginLeft: 16 }}
         >
           <Ionicons name="chevron-back" size={24} color={colors.text} />

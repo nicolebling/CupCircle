@@ -71,6 +71,7 @@ function RootLayoutNav() {
         headerTitleStyle: {
           fontFamily: "K2D-SemiBold",
         },
+        animation: 'slide_from_right',
       }}
     >
       <Stack.Screen name="(auth)" options={{ headerShown: false }} />
