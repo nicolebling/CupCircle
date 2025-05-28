@@ -210,6 +210,7 @@ export default function CafeSelector({
           fetchCafes(
             userLocation.coords.latitude,
             userLocation.coords.longitude,
+            true
           );
         } else {
           setErrorMsg("Could not fetch location. Please try again.");
@@ -240,7 +241,7 @@ export default function CafeSelector({
     }
   };
 
-  const fetchCafes = async (lat, lng) => {
+  const fetchCafes = async (lat, lng, shouldUpdateRegion = false) => {
     try {
       const response = await fetch(
         `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=2000&type=cafe&keyword=coffee&key=${process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY}`,
@@ -262,7 +263,7 @@ export default function CafeSelector({
   const fetchCafesInRegion = () => {
     if (region) {
       setIsLoading(true);
-      fetchCafes(region.latitude, region.longitude); // Fetch cafes based on the saved region
+      fetchCafes(region.latitude, region.longitude, false); // Fetch cafes based on the current region without updating map center
     }
   };
 
