@@ -25,102 +25,130 @@ interface CafeSelectorProps {
 }
 
 const customMapStyle = [
-  // Dark background for all land areas
-  { elementType: "geometry", stylers: [{ color: "#1a1a1a" }] },
+  // Light cream background for all land areas (like coffee with milk)
+  { elementType: "geometry", stylers: [{ color: "#F7F3E9" }] },
   
-  // Light text labels
-  { elementType: "labels.text.fill", stylers: [{ color: "#ffffff" }] },
-  { elementType: "labels.text.stroke", stylers: [{ color: "#1a1a1a" }] },
+  // Dark coffee-colored text labels
+  { elementType: "labels.text.fill", stylers: [{ color: "#4A3429" }] },
+  { elementType: "labels.text.stroke", stylers: [{ color: "#F7F3E9" }] },
   
-  // Roads in orange (matching your primary color)
+  // Roads in warm coffee tones
   {
     featureType: "road",
     elementType: "geometry",
-    stylers: [{ color: "#F97415" }],
+    stylers: [{ color: "#E8D5B7" }],
   },
   {
     featureType: "road.highway",
     elementType: "geometry",
-    stylers: [{ color: "#FF8C42" }],
+    stylers: [{ color: "#D4A574" }],
   },
   {
     featureType: "road.arterial",
     elementType: "geometry",
-    stylers: [{ color: "#F97415" }],
+    stylers: [{ color: "#E8D5B7" }],
   },
   {
     featureType: "road.local",
     elementType: "geometry",
-    stylers: [{ color: "#CC5500" }],
+    stylers: [{ color: "#F0E6D2" }],
   },
   
-  // Water in dark blue
+  // Road labels in darker coffee
+  {
+    featureType: "road",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#6B4E3D" }],
+  },
+  
+  // Water in soft blue-gray (like coffee shop atmosphere)
   {
     featureType: "water",
     elementType: "geometry",
-    stylers: [{ color: "#0f2027" }],
+    stylers: [{ color: "#B8C5D1" }],
   },
   {
     featureType: "water",
     elementType: "labels.text.fill",
-    stylers: [{ color: "#ffffff" }],
+    stylers: [{ color: "#4A3429" }],
   },
   
-  // Parks and green spaces in dark green
+  // Parks and green spaces in soft sage green
   {
     featureType: "poi.park",
     elementType: "geometry",
-    stylers: [{ color: "#1a3a1a" }],
+    stylers: [{ color: "#C8D5B9" }],
   },
   {
     featureType: "landscape.natural",
     elementType: "geometry",
-    stylers: [{ color: "#1a3a1a" }],
+    stylers: [{ color: "#D4E0C1" }],
   },
   
-  // Points of interest (cafes, restaurants, etc.) in darker gray
+  // Points of interest in warm beige
   {
     featureType: "poi",
     elementType: "geometry",
-    stylers: [{ color: "#2a2a2a" }],
+    stylers: [{ color: "#F0E6D2" }],
   },
   {
     featureType: "poi",
     elementType: "labels.text.fill",
-    stylers: [{ color: "#ffffff" }],
+    stylers: [{ color: "#6B4E3D" }],
   },
   
-  // Buildings in gray
+  // Buildings in light coffee tone
   {
     featureType: "poi.business",
     elementType: "geometry",
-    stylers: [{ color: "#333333" }],
+    stylers: [{ color: "#E8D5B7" }],
   },
   
-  // Transit lines in lighter orange
+  // Transit lines in coffee accent
   {
     featureType: "transit.line",
     elementType: "geometry",
-    stylers: [{ color: "#FF8C42" }],
+    stylers: [{ color: "#C49B61" }],
   },
   {
     featureType: "transit.station",
     elementType: "geometry",
-    stylers: [{ color: "#444444" }],
+    stylers: [{ color: "#D4A574" }],
   },
   
-  // Administrative boundaries
+  // Administrative boundaries in subtle coffee
   {
     featureType: "administrative",
     elementType: "geometry.stroke",
-    stylers: [{ color: "#F97415" }],
+    stylers: [{ color: "#B8956F" }],
   },
   
-  // Hide some less important labels for cleaner look
+  // Landscape features in warm cream
+  {
+    featureType: "landscape",
+    elementType: "geometry",
+    stylers: [{ color: "#F5F1E8" }],
+  },
+  
+  // Make poi labels more subtle
   {
     featureType: "poi.business",
     elementType: "labels",
-    stylers: [{ visibility: "off" }],
+    stylers: [{ visibility: "simplified" }],
+  },
+  
+  // Soften highway labels
+  {
+    featureType: "road.highway",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#8B6914" }],
+  },
+  
+  // Transit labels in coffee tone
+  {
+    featureType: "transit",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#6B4E3D" }],
   },
 ];
 
