@@ -306,7 +306,7 @@ export default function ChatsScreen() {
   );
 
   const SkeletonChatItem = () => (
-    <View style={styles.conversationItem}>
+    <View style={[styles.conversationItem, { borderBottomColor: colors.border }]} >
       <View style={styles.avatarContainer}>
         <SkeletonLoader width={54} height={54} borderRadius={27} />
       </View>
@@ -459,7 +459,8 @@ const styles = StyleSheet.create({
   conversationItem: {
     flexDirection: "row",
     padding: 16,
-    borderBottomWidth: 1,
+    borderBottomWidth: 0.5,
+    
   },
   avatarContainer: {
     position: "relative",
