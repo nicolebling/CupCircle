@@ -13,7 +13,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import MapView, { Marker, Callout } from "react-native-maps";
+import MapView, { Marker, Callout, PROVIDER_GOOGLE } from "react-native-maps";
 import * as Location from "expo-location";
 import LogoAnimation from "@/components/LogoAnimation";
 
@@ -331,6 +331,8 @@ export default function CafeSelector({
               ) : region ? (
                 <MapView
                   style={styles.map}
+                  provider={PROVIDER_GOOGLE} // Force Google Maps provider
+                  mapType="standard" // Ensure standard map type
                   customMapStyle={customMapStyle} // Apply custom map style here
                   region={region} // Bind the region state to the MapView
                   initialRegion={initialRegion} // Set the initial region only once
