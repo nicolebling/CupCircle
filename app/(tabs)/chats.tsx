@@ -17,9 +17,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { supabase } from "@/lib/supabase";
 import { router, useRouter, useNavigation } from "expo-router";
-import Animated, { useSharedValue, useAnimatedStyle, withTiming, withDelay } from "react-native-reanimated";
-import SkeletonLoader from "@/components/SkeletonLoader";
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 interface Conversation {
   id: string;
@@ -34,7 +31,6 @@ interface Conversation {
     text: string;
     timestamp: string;
     isRead: boolean;
-    receiverId: string | null;
   };
   unreadCount: number;
 }
@@ -61,9 +57,6 @@ export default function ChatsScreen() {
     Conversation[]
   >([]);
   const [loading, setLoading] = useState(true);
-
-  // Animated value for the loading message fade-in
-  const loadingOpacity = useSharedValue(0);
 
   useEffect(() => {
     if (user) {
@@ -99,7 +92,6 @@ export default function ChatsScreen() {
 
     try {
       setLoading(true);
-      loadingOpacity.value = 0; // Reset opacity when loading starts
       // Fetch all confirmed matches with the current user
       const { data: matchesData, error: matchesError } = await supabase
         .from("matching")
@@ -217,14 +209,12 @@ export default function ChatsScreen() {
       // Update global unread count
       const totalUnread = sortedConversations.reduce((sum, conv) => sum + conv.unreadCount, 0);
       global.unreadMessageCount = totalUnread;
-
+      
       setConversations(sortedConversations);
     } catch (error) {
       console.error("Error in fetchConfirmedChats:", error);
     } finally {
       setLoading(false);
-      // Start fade-in animation with a delay
-      loadingOpacity.value = withDelay(500, withTiming(1, { duration: 500 }));
     }
   };
 
@@ -282,7 +272,7 @@ export default function ChatsScreen() {
                   color:
                     item.unreadCount > 0 ? colors.text : colors.secondaryText,
                   // Only use bold font when message is unread AND user is the receiver
-                  fontFamily:
+                  fontFamily: 
                     !item.lastMessage.isRead && user?.id === item.lastMessage.receiverId
                       ? "K2D-Bold"
                       : "K2D-Regular",
@@ -301,11 +291,19 @@ export default function ChatsScreen() {
     </TouchableOpacity>
   );
 
-  const animatedLoadingStyle = useAnimatedStyle(() => {
-    return {
-      opacity: loadingOpacity.value,
-    };
-  });
+  const [showLoading, setShowLoading] = useState(false);
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (loading) {
+      timer = setTimeout(() => {
+        setShowLoading(true);
+      }, 2000);
+    } else {
+      setShowLoading(false);
+    }
+    return () => clearTimeout(timer);
+  }, [loading]);
 
   const EmptyListComponent = () => (
     <View style={styles.emptyContainer}>
@@ -314,27 +312,16 @@ export default function ChatsScreen() {
         size={64}
         color={colors.secondaryText}
       />
-      {loading ? (
-        <Animated.View style={[animatedLoadingStyle, styles.loadingContainer]}>
-          <Text style={[styles.emptyTitle, { color: colors.text }]}>
-            Loading chats...
-          </Text>
-          <Text style={[styles.emptySubtitle, { color: colors.secondaryText }]}>
-            Please wait while we load your chats
-          </Text>
-        </Animated.View>
-      ) : (
-        <>
-          <Text style={[styles.emptyTitle, { color: colors.text }]}>
-            No messages yet
-          </Text>
-          <Text style={[styles.emptySubtitle, { color: colors.secondaryText }]}>
-            {searchQuery
-              ? "No matches found for your search"
-              : "Confirm a Coffee Chat in Circle Chats to begin chatting"}
-          </Text>
-        </>
-      )}
+      <Text style={[styles.emptyTitle, { color: colors.text }]}>
+        {loading && showLoading ? "Loading chats..." : "No messages yet"}
+      </Text>
+      <Text style={[styles.emptySubtitle, { color: colors.secondaryText }]}>
+        {loading && showLoading
+          ? "Please wait while we load your chats"
+          : searchQuery
+            ? "No matches found for your search"
+            : "Confirm a Coffee Chat in Circle Chats to begin chatting"}
+      </Text>
     </View>
   );
 
@@ -521,9 +508,6 @@ const styles = StyleSheet.create({
   },
   messageContainer: {
     flexDirection: "row",
-    alignItems: "center",
-  },
-  loadingContainer: {
     alignItems: "center",
   },
 });
