@@ -294,14 +294,6 @@ export default function CafeSelector({
               </TouchableOpacity>
             </View>
 
-            {/* Button to trigger fetching cafes in the current map region */}
-            <TouchableOpacity
-              style={styles.searchButton}
-              onPress={fetchCafesInRegion}
-            >
-              <Text style={styles.searchButtonText}>Search this area</Text>
-            </TouchableOpacity>
-
             <View style={styles.container}>
               {isLoading ? (
                 <ActivityIndicator size="large" color={colors.primary} />
@@ -327,6 +319,14 @@ export default function CafeSelector({
                   />
 
                   {/* Markers for cafes */}
+                  {/* Floating Search Button */}
+                  <TouchableOpacity
+                    style={styles.floatingSearchButton}
+                    onPress={fetchCafesInRegion}
+                  >
+                    <Text style={styles.floatingSearchButtonText}>Search this area</Text>
+                  </TouchableOpacity>
+
                   {cafes.map((cafe) => (
                     <Marker
                       key={cafe.place_id}
@@ -638,17 +638,32 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: "#fff",
   },
-  searchButton: {
-    backgroundColor: "#F97415", // Green color for the button
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 10,
+  floatingSearchButton: {
+    position: "absolute",
+    top: 20,
+    left: 20,
+    right: 20,
+    backgroundColor: "#F97415",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 20,
     alignItems: "center",
+    zIndex: 1000,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    maxWidth: 200,
+    alignSelf: "center",
   },
-  searchButtonText: {
+  floatingSearchButtonText: {
     fontFamily: 'K2D-Medium',
     color: "white",
     fontWeight: "bold",
-    fontSize: 16,
+    fontSize: 14,
   },
 });
