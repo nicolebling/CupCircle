@@ -641,8 +641,6 @@ const styles = StyleSheet.create({
   floatingSearchButton: {
     position: "absolute",
     top: 20,
-    left: 20,
-    right: 20,
     backgroundColor: "#F97415",
     paddingVertical: 8,
     paddingHorizontal: 16,
@@ -659,6 +657,8 @@ const styles = StyleSheet.create({
     elevation: 5,
     maxWidth: 200,
     alignSelf: "center",
+    left: "50%",
+    marginLeft: -100,
   },
   floatingSearchButtonText: {
     fontFamily: 'K2D-Medium',
