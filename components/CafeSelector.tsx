@@ -629,6 +629,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   cafeText: {
+    fontFamily: 'K2D-Regular',
     color: "black",
     fontSize: 16,
     flex: 1,
@@ -637,7 +638,7 @@ const styles = StyleSheet.create({
   map: {
     width: "100%",
     height: "100%",
-    borderRadius: 40,
+    borderRadius: 20,
   },
   cafeImage: {
     width: 60,
