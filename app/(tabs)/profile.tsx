@@ -92,6 +92,12 @@ export default function ProfileScreen() {
     const newEditMode = !isEditMode;
     setIsEditMode(newEditMode);
     navigation.setParams({ isEditMode: newEditMode });
+    
+    // Reset and trigger animation for edit mode transition
+    opacity.value = 0;
+    translateY.value = 20;
+    opacity.value = withDelay(100, withTiming(1, { duration: 400 }));
+    translateY.value = withDelay(100, withTiming(0, { duration: 400 }));
   };
 
 
@@ -141,13 +147,15 @@ export default function ProfileScreen() {
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       {isEditMode ? (
-        <ProfileForm
-          userId={user.id}
-          isNewUser={false}
-          initialData={profileData}
-          onSave={handleProfileSave}
-          onCancel={() => setIsEditMode(false)}
-        />
+        <Animated.View style={[{ flex: 1 }, animatedStyle]}>
+          <ProfileForm
+            userId={user.id}
+            isNewUser={false}
+            initialData={profileData}
+            onSave={handleProfileSave}
+            onCancel={() => setIsEditMode(false)}
+          />
+        </Animated.View>
       ) : (
         <Animated.View style={[{ flex: 1 }, animatedStyle]}>
           <UserProfileCard
