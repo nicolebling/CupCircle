@@ -17,6 +17,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { supabase } from "@/lib/supabase";
 import { router, useRouter, useNavigation } from "expo-router";
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, withDelay } from "react-native-reanimated";
+import SkeletonLoader from "@/components/SkeletonLoader";
 
 interface Conversation {
   id: string;
@@ -57,6 +59,10 @@ export default function ChatsScreen() {
     Conversation[]
   >([]);
   const [loading, setLoading] = useState(true);
+
+  // Animation values
+  const opacity = useSharedValue(0);
+  const translateY = useSharedValue(30);
 
   useEffect(() => {
     if (user) {
@@ -211,10 +217,18 @@ export default function ChatsScreen() {
       global.unreadMessageCount = totalUnread;
       
       setConversations(sortedConversations);
+      
+      // Trigger smooth fade-in animation
+      opacity.value = withDelay(100, withTiming(1, { duration: 600 }));
+      translateY.value = withDelay(100, withTiming(0, { duration: 600 }));
     } catch (error) {
       console.error("Error in fetchConfirmedChats:", error);
+      // Still show animation even on error
+      opacity.value = withDelay(100, withTiming(1, { duration: 600 }));
+      translateY.value = withDelay(100, withTiming(0, { duration: 600 }));
     } finally {
-      setLoading(false);
+      // Small delay to ensure smooth transition
+      setTimeout(() => setLoading(false), 200);
     }
   };
 
@@ -291,19 +305,22 @@ export default function ChatsScreen() {
     </TouchableOpacity>
   );
 
-  const [showLoading, setShowLoading] = useState(false);
-
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (loading) {
-      timer = setTimeout(() => {
-        setShowLoading(true);
-      }, 2000);
-    } else {
-      setShowLoading(false);
-    }
-    return () => clearTimeout(timer);
-  }, [loading]);
+  const SkeletonChatItem = () => (
+    <View style={styles.conversationItem}>
+      <View style={styles.avatarContainer}>
+        <SkeletonLoader width={54} height={54} borderRadius={27} />
+      </View>
+      <View style={styles.conversationContent}>
+        <View style={styles.conversationHeader}>
+          <SkeletonLoader width="60%" height={16} />
+          <SkeletonLoader width={60} height={12} />
+        </View>
+        <View style={styles.messagePreviewContainer}>
+          <SkeletonLoader width="80%" height={14} style={{ marginTop: 4 }} />
+        </View>
+      </View>
+    </View>
+  );
 
   const EmptyListComponent = () => (
     <View style={styles.emptyContainer}>
@@ -313,17 +330,23 @@ export default function ChatsScreen() {
         color={colors.secondaryText}
       />
       <Text style={[styles.emptyTitle, { color: colors.text }]}>
-        {loading && showLoading ? "Loading chats..." : "No messages yet"}
+        No messages yet
       </Text>
       <Text style={[styles.emptySubtitle, { color: colors.secondaryText }]}>
-        {loading && showLoading
-          ? "Please wait while we load your chats"
-          : searchQuery
-            ? "No matches found for your search"
-            : "Confirm a Coffee Chat in Circle Chats to begin chatting"}
+        {searchQuery
+          ? "No matches found for your search"
+          : "Confirm a Coffee Chat in Circle Chats to begin chatting"}
       </Text>
     </View>
   );
+
+  // Animated style
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: opacity.value,
+      transform: [{ translateY: translateY.value }],
+    };
+  });
 
   return (
     <KeyboardAvoidingView
@@ -361,15 +384,27 @@ export default function ChatsScreen() {
           )}
         </View> */}
 
-        <FlatList
-          data={filteredConversations}
-          keyExtractor={(item) => item.match_id || item.id}
-          renderItem={renderConversationItem}
-          contentContainerStyle={
-            filteredConversations.length === 0 ? { flex: 1 } : null
-          }
-          ListEmptyComponent={EmptyListComponent}
-        />
+        {loading ? (
+          <View style={{ flex: 1 }}>
+            {/* Show 3-4 skeleton chat items while loading */}
+            <SkeletonChatItem />
+            <SkeletonChatItem />
+            <SkeletonChatItem />
+            <SkeletonChatItem />
+          </View>
+        ) : (
+          <Animated.View style={[{ flex: 1 }, animatedStyle]}>
+            <FlatList
+              data={filteredConversations}
+              keyExtractor={(item) => item.match_id || item.id}
+              renderItem={renderConversationItem}
+              contentContainerStyle={
+                filteredConversations.length === 0 ? { flex: 1 } : null
+              }
+              ListEmptyComponent={EmptyListComponent}
+            />
+          </Animated.View>
+        )}
       </SafeAreaView>
     </KeyboardAvoidingView>
   );
