@@ -14,6 +14,7 @@ import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { useAuth } from "@/contexts/AuthContext";
 import { openBrowserAsync } from 'expo-web-browser';
+import Animated, { useAnimatedStyle, useSharedValue, withTiming, withDelay } from 'react-native-reanimated';
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -42,6 +43,24 @@ export default function SettingsScreen() {
     }
   };
 
+  // Animation values
+  const opacity = useSharedValue(0);
+  const translateX = useSharedValue(-20);
+
+  React.useEffect(() => {
+    // Trigger smooth slide-in animation from left
+    opacity.value = withDelay(100, withTiming(1, { duration: 400 }));
+    translateX.value = withDelay(100, withTiming(0, { duration: 400 }));
+  }, []);
+
+  // Animated style
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: opacity.value,
+      transform: [{ translateX: translateX.value }],
+    };
+  });
+
   React.useEffect(() => {
     navigation.setOptions({
       headerLeft: () => (
@@ -59,7 +78,8 @@ export default function SettingsScreen() {
     <SafeAreaView
       style={[styles.container, { backgroundColor: colors.background }]}
     >
-      <ScrollView style={styles.content}>
+      <Animated.View style={[{ flex: 1 }, animatedStyle]}>
+        <ScrollView style={styles.content}>
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.text, marginTop: 32 }]}>
             Account
@@ -234,6 +254,7 @@ export default function SettingsScreen() {
           <Text style={styles.logoutText}>Log Out</Text>
         </TouchableOpacity>
       </ScrollView>
+      </Animated.View>
     </SafeAreaView>
   );
 }
