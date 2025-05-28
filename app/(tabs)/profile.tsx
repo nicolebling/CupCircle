@@ -81,7 +81,7 @@ export default function ProfileScreen() {
         <View style={{ flexDirection: 'row' }}>
           <TouchableOpacity
             onPress={handleEdit}
-            style={{ marginRight: 15 }}
+            style={{ marginRight: isEditMode ? 23 : 15 }}
           >
             <Ionicons
               name={isEditMode ? "close" : "create-outline"}
@@ -89,16 +89,18 @@ export default function ProfileScreen() {
               color={colors.text}
             />
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => router.push("/settings")}
-            style={{ marginRight: 23 }}
-          >
-            <Ionicons
-              name="settings-outline"
-              size={24}
-              color={colors.text}
-            />
-          </TouchableOpacity>
+          {!isEditMode && (
+            <TouchableOpacity
+              onPress={() => router.push("/settings")}
+              style={{ marginRight: 23 }}
+            >
+              <Ionicons
+                name="settings-outline"
+                size={24}
+                color={colors.text}
+              />
+            </TouchableOpacity>
+          )}
         </View>
       ),
     });
