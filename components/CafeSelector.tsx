@@ -341,14 +341,26 @@ export default function CafeSelector({
                       {/* Callout content */}
                       <Callout onPress={() => handleSelect(cafe)}>
                         <TouchableWithoutFeedback>
-                          <View style={{ padding: 10, width: 200 }}>
+                          <View style={{ 
+                            padding: 10, 
+                            width: 200, 
+                            alignItems: "center" 
+                          }}>
                             <Text
-                              style={{ fontWeight: "bold", marginBottom: 5 }}
+                              style={{ 
+                                fontWeight: "bold", 
+                                marginBottom: 5,
+                                textAlign: "center"
+                              }}
                             >
                               {cafe.name}
                             </Text>
                             <Text
-                              style={{ fontWeight: "300", marginBottom: 5 }}
+                              style={{ 
+                                fontWeight: "300", 
+                                marginBottom: 5,
+                                textAlign: "center"
+                              }}
                             >
                               {cafe.vicinity}
                             </Text>
@@ -359,6 +371,8 @@ export default function CafeSelector({
                                 style={{
                                   flexDirection: "row",
                                   marginBottom: 5,
+                                  justifyContent: "center",
+                                  alignItems: "center"
                                 }}
                               >
                                 {Array.from({ length: 5 }, (_, index) => {
@@ -390,6 +404,13 @@ export default function CafeSelector({
                                     />
                                   );
                                 })}
+                                <Text style={{ 
+                                  marginLeft: 5, 
+                                  fontSize: 12, 
+                                  fontWeight: "600" 
+                                }}>
+                                  {cafe.rating.toFixed(1)}
+                                </Text>
                               </View>
                             )}
 
@@ -404,20 +425,24 @@ export default function CafeSelector({
                                   width: 120,
                                   height: 120,
                                   borderRadius: 10,
+                                  alignSelf: "center"
                                 }}
                                 resizeMode="cover"
                               />
                             ) : (
-                              <Text>No image available</Text>
+                              <Text style={{ textAlign: "center" }}>
+                                No image available
+                              </Text>
                             )}
 
-                            <View pointerEvents="box-none">
+                            <View pointerEvents="box-none" style={{ width: "100%" }}>
                               <TouchableOpacity
                                 style={{
                                   backgroundColor: Colors.light.primary,
                                   padding: 10,
                                   borderRadius: 5,
                                   marginTop: 10,
+                                  alignItems: "center"
                                 }}
                               >
                                 <Text
