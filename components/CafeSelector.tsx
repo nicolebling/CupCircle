@@ -24,79 +24,103 @@ interface CafeSelectorProps {
   isDark?: boolean;
 }
 
-const retroMapStyle = [
-  { elementType: "geometry", stylers: [{ color: "#f5f5f5" }] },
-  { elementType: "labels.text.fill", stylers: [{ color: "#616161" }] },
-  { elementType: "labels.text.stroke", stylers: [{ color: "#f5f5f5" }] },
-  {
-    featureType: "administrative.land_parcel",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#bdbdbd" }],
-  },
-  {
-    featureType: "poi",
-    elementType: "geometry",
-    stylers: [{ color: "#eeeeee" }],
-  },
-  {
-    featureType: "poi",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#757575" }],
-  },
-  {
-    featureType: "poi.park",
-    elementType: "geometry",
-    stylers: [{ color: "#e5e5e5" }],
-  },
-  {
-    featureType: "poi.park",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#9e9e9e" }],
-  },
+const customMapStyle = [
+  // Dark background for all land areas
+  { elementType: "geometry", stylers: [{ color: "#1a1a1a" }] },
+  
+  // Light text labels
+  { elementType: "labels.text.fill", stylers: [{ color: "#ffffff" }] },
+  { elementType: "labels.text.stroke", stylers: [{ color: "#1a1a1a" }] },
+  
+  // Roads in orange (matching your primary color)
   {
     featureType: "road",
     elementType: "geometry",
-    stylers: [{ color: "#ffffff" }],
+    stylers: [{ color: "#F97415" }],
+  },
+  {
+    featureType: "road.highway",
+    elementType: "geometry",
+    stylers: [{ color: "#FF8C42" }],
   },
   {
     featureType: "road.arterial",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#757575" }],
-  },
-  {
-    featureType: "road.highway",
     elementType: "geometry",
-    stylers: [{ color: "#dadada" }],
-  },
-  {
-    featureType: "road.highway",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#616161" }],
+    stylers: [{ color: "#F97415" }],
   },
   {
     featureType: "road.local",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#9e9e9e" }],
+    elementType: "geometry",
+    stylers: [{ color: "#CC5500" }],
   },
+  
+  // Water in dark blue
+  {
+    featureType: "water",
+    elementType: "geometry",
+    stylers: [{ color: "#0f2027" }],
+  },
+  {
+    featureType: "water",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#ffffff" }],
+  },
+  
+  // Parks and green spaces in dark green
+  {
+    featureType: "poi.park",
+    elementType: "geometry",
+    stylers: [{ color: "#1a3a1a" }],
+  },
+  {
+    featureType: "landscape.natural",
+    elementType: "geometry",
+    stylers: [{ color: "#1a3a1a" }],
+  },
+  
+  // Points of interest (cafes, restaurants, etc.) in darker gray
+  {
+    featureType: "poi",
+    elementType: "geometry",
+    stylers: [{ color: "#2a2a2a" }],
+  },
+  {
+    featureType: "poi",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#ffffff" }],
+  },
+  
+  // Buildings in gray
+  {
+    featureType: "poi.business",
+    elementType: "geometry",
+    stylers: [{ color: "#333333" }],
+  },
+  
+  // Transit lines in lighter orange
   {
     featureType: "transit.line",
     elementType: "geometry",
-    stylers: [{ color: "#e5e5e5" }],
+    stylers: [{ color: "#FF8C42" }],
   },
   {
     featureType: "transit.station",
     elementType: "geometry",
-    stylers: [{ color: "#eeeeee" }],
+    stylers: [{ color: "#444444" }],
   },
+  
+  // Administrative boundaries
   {
-    featureType: "water",
-    elementType: "geometry",
-    stylers: [{ color: "#c9c9c9" }],
+    featureType: "administrative",
+    elementType: "geometry.stroke",
+    stylers: [{ color: "#F97415" }],
   },
+  
+  // Hide some less important labels for cleaner look
   {
-    featureType: "water",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#9e9e9e" }],
+    featureType: "poi.business",
+    elementType: "labels",
+    stylers: [{ visibility: "off" }],
   },
 ];
 
@@ -307,7 +331,7 @@ export default function CafeSelector({
               ) : region ? (
                 <MapView
                   style={styles.map}
-                  customMapStyle={retroMapStyle} // Apply custom map style here
+                  customMapStyle={customMapStyle} // Apply custom map style here
                   region={region} // Bind the region state to the MapView
                   initialRegion={initialRegion} // Set the initial region only once
                   onRegionChangeComplete={setRegion} // Update region on map change
