@@ -20,6 +20,8 @@ import AvailabilityCard from "@/components/AvailabilityCard";
 import { format, addDays, isPast, isToday, parseISO } from "date-fns";
 import { useAvailability } from "../../hooks/useAvailability";
 import { supabase } from "../../lib/supabase";
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, withDelay } from "react-native-reanimated";
+import SkeletonLoader from "@/components/SkeletonLoader";
 
 // Type definitions
 type TimeSlot = {
@@ -44,6 +46,10 @@ export default function AvailabilityScreen() {
   });
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
   const [showAddSlot, setShowAddSlot] = useState(false); // Added state for toggle{/*  */}
+
+  // Animation values
+  const opacity = useSharedValue(0);
+  const translateY = useSharedValue(30);
 
   // const [year, month, day] = slot.date.split("-");
   // const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day), 12);
@@ -93,8 +99,15 @@ export default function AvailabilityScreen() {
       });
 
       setTimeSlots(sortedData);
+      
+      // Trigger smooth fade-in animation
+      opacity.value = withDelay(100, withTiming(1, { duration: 600 }));
+      translateY.value = withDelay(100, withTiming(0, { duration: 600 }));
     } catch (error) {
       console.error("Error fetching availability:", error);
+      // Still show animation even on error
+      opacity.value = withDelay(100, withTiming(1, { duration: 600 }));
+      translateY.value = withDelay(100, withTiming(0, { duration: 600 }));
     }
   };
 
@@ -348,6 +361,27 @@ export default function AvailabilityScreen() {
     setSelectedDate(date);
   };
 
+  const SkeletonAvailabilityItem = () => (
+    <View style={styles.dateGroup}>
+      <SkeletonLoader width="40%" height={16} style={{ marginBottom: 8 }} />
+      <View style={[styles.skeletonCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+        <View style={styles.skeletonCardContent}>
+          <SkeletonLoader width="30%" height={14} />
+          <SkeletonLoader width="20%" height={12} style={{ marginTop: 4 }} />
+        </View>
+        <SkeletonLoader width={24} height={24} borderRadius={12} />
+      </View>
+    </View>
+  );
+
+  // Animated style
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: opacity.value,
+      transform: [{ translateY: translateY.value }],
+    };
+  });
+
   return (
     <SafeAreaView
       style={[styles.container, { backgroundColor: colors.background }]}
@@ -559,11 +593,11 @@ export default function AvailabilityScreen() {
       {/* Time Slots List */}
       <View style={styles.slotsContainer}>
         {isLoading ? (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color={colors.primary} />
-            <Text style={[styles.loadingText, { color: colors.secondaryText }]}>
-              Loading your availability...
-            </Text>
+          <View style={{ flex: 1 }}>
+            {/* Show 2-3 skeleton availability items while loading */}
+            <SkeletonAvailabilityItem />
+            <SkeletonAvailabilityItem />
+            <SkeletonAvailabilityItem />
           </View>
         ) : flatListData.length === 0 ? (
           <View style={styles.emptyStateContainer}>
@@ -587,30 +621,32 @@ export default function AvailabilityScreen() {
             </Text>
           </View>
         ) : (
-          <FlatList
-            data={flatListData}
-            renderItem={({ item }) => (
-              <View style={styles.dateGroup}>
-                <Text
-                  style={[
-                    styles.dateGroupTitle,
-                    { color: colors.secondaryText },
-                  ]}
-                >
-                  {format(item.date, "EEEE, MMMM d")}
-                </Text>
-                {item.slots.map((slot) => (
-                  <AvailabilityCard
-                    key={slot.avail_id}
-                    timeSlot={slot}
-                    onDelete={() => handleDeleteTimeSlot(slot.avail_id)}
-                  />
-                ))}
-              </View>
-            )}
-            keyExtractor={(item) => item.date.toISOString()}
-            contentContainerStyle={styles.slotsList}
-          />
+          <Animated.View style={[{ flex: 1 }, animatedStyle]}>
+            <FlatList
+              data={flatListData}
+              renderItem={({ item }) => (
+                <View style={styles.dateGroup}>
+                  <Text
+                    style={[
+                      styles.dateGroupTitle,
+                      { color: colors.secondaryText },
+                    ]}
+                  >
+                    {format(item.date, "EEEE, MMMM d")}
+                  </Text>
+                  {item.slots.map((slot) => (
+                    <AvailabilityCard
+                      key={slot.avail_id}
+                      timeSlot={slot}
+                      onDelete={() => handleDeleteTimeSlot(slot.avail_id)}
+                    />
+                  ))}
+                </View>
+              )}
+              keyExtractor={(item) => item.date.toISOString()}
+              contentContainerStyle={styles.slotsList}
+            />
+          </Animated.View>
         )}
       </View>
     </SafeAreaView>
@@ -821,5 +857,17 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     fontSize: 16,
     color: "white",
+  },
+  skeletonCard: {
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  skeletonCardContent: {
+    flex: 1,
   },
 });
