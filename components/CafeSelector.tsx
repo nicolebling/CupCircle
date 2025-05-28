@@ -297,7 +297,9 @@ export default function CafeSelector({
 
             <View style={styles.container}>
               {isLoading ? (
-                <LogoAnimation size={64} />
+                <View style={styles.loadingContainer}>
+                  <LogoAnimation size={64} />
+                </View>
               ) : errorMsg ? (
                 <Text style={[styles.errorText, { color: colors.text }]}>
                   {errorMsg}
@@ -575,6 +577,11 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   selector: {
     height: 48,
