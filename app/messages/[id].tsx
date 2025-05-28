@@ -136,7 +136,7 @@ export default function MessageScreen() {
 
               // Scroll to bottom when new message arrives
               setTimeout(() => {
-                flatListRef.current?.scrollToEnd({ animated: true });
+                flatListRef.current?.scrollToEnd({ animated: false });
               }, 100);
             }
           },
@@ -426,7 +426,7 @@ export default function MessageScreen() {
 
       // Scroll to bottom
       setTimeout(() => {
-        flatListRef.current?.scrollToEnd({ animated: true });
+        flatListRef.current?.scrollToEnd({ animated: false });
       }, 50);
 
       // Clear input field immediately for better UX
@@ -646,12 +646,12 @@ export default function MessageScreen() {
             contentContainerStyle={styles.messagesList}
             onContentSizeChange={() => {
               if (messages.length > 0) {
-                flatListRef.current?.scrollToEnd({ animated: true });
+                flatListRef.current?.scrollToEnd({ animated: false });
               }
             }}
             onLayout={() => {
               if (messages.length > 0) {
-                flatListRef.current?.scrollToEnd({ animated: true });
+                flatListRef.current?.scrollToEnd({ animated: false });
               }
             }}
           />
