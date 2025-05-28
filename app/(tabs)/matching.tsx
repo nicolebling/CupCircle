@@ -689,8 +689,8 @@ export default function MatchingScreen() {
             <Text
               style={[styles.checkBackText, { color: colors.secondaryText }]}
             >
-              We couldn't find any users with availability in the next 7 days.
-              Check back later as more users add their availability!
+              A quiet week on the circle. Check back as new coffee times fill
+              in!
             </Text>
             <TouchableOpacity
               style={[
@@ -741,8 +741,8 @@ export default function MatchingScreen() {
                     { color: colors.secondaryText },
                   ]}
                 >
-                  We couldn't find any users with availability in the next 7
-                  days. Check back later as more users add their availability!
+                  A quiet week on the circle. Check back as new coffee times
+                  fill in!
                 </Text>
                 <TouchableOpacity
                   style={[

@@ -299,6 +299,7 @@ export default function CafeSelector({
               {isLoading ? (
                 <View style={styles.loadingContainer}>
                   <LogoAnimation size={120} />
+                  <Text> Warming up the café pins...</Text>
                 </View>
               ) : errorMsg ? (
                 <Text style={[styles.errorText, { color: colors.text }]}>
