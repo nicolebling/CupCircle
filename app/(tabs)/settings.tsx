@@ -14,6 +14,7 @@ import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { useAuth } from "@/contexts/AuthContext";
 import { openBrowserAsync } from 'expo-web-browser';
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -42,6 +43,14 @@ export default function SettingsScreen() {
     }
   };
 
+  const opacity = useSharedValue(0);
+  const translateY = useSharedValue(20);
+
+  React.useEffect(() => {
+    opacity.value = withTiming(1, { duration: 300 });
+    translateY.value = withTiming(0, { duration: 300 });
+  }, []);
+
   React.useEffect(() => {
     navigation.setOptions({
       headerLeft: () => (
@@ -53,13 +62,22 @@ export default function SettingsScreen() {
         </TouchableOpacity>
       ),
     });
-  }, [colors.text]);
+  }, []);
+
+  // Animated style
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: opacity.value,
+      transform: [{ translateY: translateY.value }],
+    };
+  });
 
   return (
     <SafeAreaView
       style={[styles.container, { backgroundColor: colors.background }]}
     >
-      <ScrollView style={styles.content}>
+      <Animated.View style={[{ flex: 1 }, animatedStyle]}>
+        <ScrollView style={styles.content}>
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.text, marginTop: 32 }]}>
             Account
@@ -157,7 +175,7 @@ export default function SettingsScreen() {
               />
             </TouchableOpacity>
           </View> */}
-          
+
         </View>
 
         <View style={styles.section}>
@@ -169,7 +187,7 @@ export default function SettingsScreen() {
             style={[styles.settingItem, { borderColor: colors.border }]}
             onPress={() => openBrowserAsync('https://www.cupcircle.co/support')}
             >
-          
+
             <View style={styles.settingContent}>
               <Ionicons
                 name="help-circle-outline"
@@ -234,6 +252,7 @@ export default function SettingsScreen() {
           <Text style={styles.logoutText}>Log Out</Text>
         </TouchableOpacity>
       </ScrollView>
+      </Animated.View>
     </SafeAreaView>
   );
 }
