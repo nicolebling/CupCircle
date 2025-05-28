@@ -351,7 +351,7 @@ export default function CafeSelector({
                           }}>
                             <Text
                               style={{ 
-                                fontWeight: "bold", 
+                                fontFamily: "K2D-SemiBold", 
                                 marginBottom: 5,
                                 textAlign: "center"
                               }}
@@ -360,7 +360,7 @@ export default function CafeSelector({
                             </Text>
                             <Text
                               style={{ 
-                                fontWeight: "300", 
+                                fontFamily: "K2D-Regular", 
                                 marginBottom: 5,
                                 textAlign: "center"
                               }}
@@ -410,7 +410,7 @@ export default function CafeSelector({
                                 <Text style={{ 
                                   marginLeft: 5, 
                                   fontSize: 12, 
-                                  fontWeight: "600" 
+                                  fontFamily: "K2D-SemiBold"
                                 }}>
                                   {cafe.rating.toFixed(1)}
                                 </Text>
