@@ -17,9 +17,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { supabase } from "@/lib/supabase";
 import { router, useRouter, useNavigation } from "expo-router";
-import Animated, { useSharedValue, useAnimatedStyle, withTiming, withDelay } from "react-native-reanimated";
-import SkeletonLoader from "@/components/SkeletonLoader";
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 interface Conversation {
   id: string;
@@ -60,11 +57,6 @@ export default function ChatsScreen() {
     Conversation[]
   >([]);
   const [loading, setLoading] = useState(true);
-  const [initialFetchDone, setInitialFetchDone] = useState(false);
-
-  // Animation values
-  const opacity = useSharedValue(0);
-  const translateY = useSharedValue(30);
 
   useEffect(() => {
     if (user) {
@@ -99,9 +91,7 @@ export default function ChatsScreen() {
     if (!user?.id) return;
 
     try {
-      if (!initialFetchDone) {
-        setLoading(true);
-      }
+      setLoading(true);
       // Fetch all confirmed matches with the current user
       const { data: matchesData, error: matchesError } = await supabase
         .from("matching")
@@ -221,27 +211,10 @@ export default function ChatsScreen() {
       global.unreadMessageCount = totalUnread;
       
       setConversations(sortedConversations);
-
-      // Trigger smooth fade-in animation
-      if (!initialFetchDone) {
-        opacity.value = withDelay(100, withTiming(1, { duration: 600 }));
-        translateY.value = withDelay(100, withTiming(0, { duration: 600 }));
-      }
     } catch (error) {
       console.error("Error in fetchConfirmedChats:", error);
-      // Still show animation even on error
-      if (!initialFetchDone) {
-        opacity.value = withDelay(100, withTiming(1, { duration: 600 }));
-        translateY.value = withDelay(100, withTiming(0, { duration: 600 }));
-      }
     } finally {
-      if (!initialFetchDone) {
-        // Small delay to ensure smooth transition
-        setTimeout(() => {
-          setLoading(false);
-          setInitialFetchDone(true);
-        }, 200);
-      }
+      setLoading(false);
     }
   };
 
@@ -332,65 +305,25 @@ export default function ChatsScreen() {
     return () => clearTimeout(timer);
   }, [loading]);
 
-  // Skeleton loader for chat items
-  const ChatItemSkeleton = () => (
-    <View style={[styles.conversationItem, { borderBottomColor: colors.border }]}>
-      <View style={styles.avatarContainer}>
-        <SkeletonLoader width={54} height={54} borderRadius={27} />
-      </View>
-      <View style={styles.conversationContent}>
-        <View style={styles.conversationHeader}>
-          <SkeletonLoader width="40%" height={16} />
-          <SkeletonLoader width="25%" height={12} />
-        </View>
-        <View style={styles.messagePreviewContainer}>
-          <SkeletonLoader width="75%" height={14} style={{ marginTop: 4 }} />
-        </View>
-      </View>
+  const EmptyListComponent = () => (
+    <View style={styles.emptyContainer}>
+      <Ionicons
+        name="chatbubbles-outline"
+        size={64}
+        color={colors.secondaryText}
+      />
+      <Text style={[styles.emptyTitle, { color: colors.text }]}>
+        {loading && showLoading ? "Loading chats..." : "No messages yet"}
+      </Text>
+      <Text style={[styles.emptySubtitle, { color: colors.secondaryText }]}>
+        {loading && showLoading
+          ? "Please wait while we load your chats"
+          : searchQuery
+            ? "No matches found for your search"
+            : "Confirm a Coffee Chat in Circle Chats to begin chatting"}
+      </Text>
     </View>
   );
-
-  const LoadingSkeleton = () => (
-    <View style={{ flex: 1 }}>
-      {Array.from({ length: 6 }).map((_, index) => (
-        <ChatItemSkeleton key={`skeleton-${index}`} />
-      ))}
-    </View>
-  );
-
-  const EmptyListComponent = () => {
-    if (loading && !initialFetchDone) {
-      return <LoadingSkeleton />;
-    }
-    
-    return (
-      <View style={styles.emptyContainer}>
-        <Ionicons
-          name="chatbubbles-outline"
-          size={64}
-          color={colors.secondaryText}
-        />
-        <Text style={[styles.emptyTitle, { color: colors.text }]}>
-          {loading && showLoading ? "Loading chats..." : "No messages yet"}
-        </Text>
-        <Text style={[styles.emptySubtitle, { color: colors.secondaryText }]}>
-          {loading && showLoading
-            ? "Please wait while we load your chats"
-            : searchQuery
-              ? "No matches found for your search"
-              : "Confirm a Coffee Chat in Circle Chats to begin chatting"}
-        </Text>
-      </View>
-    );
-  };
-
-  // Animated style
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      opacity: opacity.value,
-      transform: [{ translateY: translateY.value }],
-    };
-  });
 
   return (
     <KeyboardAvoidingView
@@ -428,21 +361,15 @@ export default function ChatsScreen() {
           )}
         </View> */}
 
-        {loading && !initialFetchDone ? (
-          <LoadingSkeleton />
-        ) : (
-          <Animated.View style={[{ flex: 1 }, animatedStyle]}>
-            <FlatList
-              data={filteredConversations}
-              keyExtractor={(item) => item.match_id || item.id}
-              renderItem={renderConversationItem}
-              contentContainerStyle={
-                filteredConversations.length === 0 ? { flex: 1 } : null
-              }
-              ListEmptyComponent={EmptyListComponent}
-            />
-          </Animated.View>
-        )}
+        <FlatList
+          data={filteredConversations}
+          keyExtractor={(item) => item.match_id || item.id}
+          renderItem={renderConversationItem}
+          contentContainerStyle={
+            filteredConversations.length === 0 ? { flex: 1 } : null
+          }
+          ListEmptyComponent={EmptyListComponent}
+        />
       </SafeAreaView>
     </KeyboardAvoidingView>
   );
