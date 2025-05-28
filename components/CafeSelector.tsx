@@ -15,6 +15,7 @@ import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import MapView, { Marker, Callout } from "react-native-maps";
 import * as Location from "expo-location";
+import LogoAnimation from "@/components/LogoAnimation";
 
 interface CafeSelectorProps {
   selected: string[];
@@ -296,7 +297,7 @@ export default function CafeSelector({
 
             <View style={styles.container}>
               {isLoading ? (
-                <ActivityIndicator size="large" color={colors.primary} />
+                <LogoAnimation size={64} />
               ) : errorMsg ? (
                 <Text style={[styles.errorText, { color: colors.text }]}>
                   {errorMsg}
