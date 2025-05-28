@@ -77,6 +77,14 @@ function RootLayoutNav() {
       <Stack.Screen name="(auth)" options={{ headerShown: false }} />
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="messages" options={{ headerShown: false }} />
+      <Stack.Screen 
+        name="settings" 
+        options={{ 
+          title: "Settings",
+          headerShown: true,
+          animation: 'slide_from_right'
+        }} 
+      />
       <Stack.Screen name="+not-found" options={{ title: "Not Found" }} />
     </Stack>
   );

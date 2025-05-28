@@ -34,7 +34,7 @@ export default function ProfileScreen() {
   const fetchProfile = async () => {
     try {
       setIsLoading(true);
-      
+
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
@@ -43,7 +43,7 @@ export default function ProfileScreen() {
 
       if (error) throw error;
       setProfileData(data);
-      
+
       // Trigger smooth fade-in animation
       opacity.value = withDelay(100, withTiming(1, { duration: 600 }));
       translateY.value = withDelay(100, withTiming(0, { duration: 600 }));
@@ -92,7 +92,7 @@ export default function ProfileScreen() {
     const newEditMode = !isEditMode;
     setIsEditMode(newEditMode);
     navigation.setParams({ isEditMode: newEditMode });
-    
+
     // Reset and trigger animation for edit mode transition
     opacity.value = 0;
     translateY.value = 20;
@@ -191,3 +191,4 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
 });
+```
