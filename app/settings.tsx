@@ -47,7 +47,7 @@ export default function SettingsScreen() {
       headerLeft: () => (
         <TouchableOpacity
           onPress={() => router.back()}
-          style={{ marginLeft: 16 }}
+          
         >
           <Ionicons name="chevron-back" size={24} color={colors.text} />
         </TouchableOpacity>
