@@ -657,8 +657,6 @@ const styles = StyleSheet.create({
     elevation: 5,
     maxWidth: 200,
     alignSelf: "center",
-    left: "50%",
-    marginLeft: -100,
   },
   floatingSearchButtonText: {
     fontFamily: 'K2D-Medium',
