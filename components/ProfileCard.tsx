@@ -2,23 +2,32 @@ import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
-  Image,
   StyleSheet,
-  Dimensions,
-  KeyboardAvoidingView,
-  Platform,
-  Alert,
+  Image,
   TouchableOpacity,
   ScrollView,
-  ActivityIndicator,
+  Alert,
+  Modal,
+  TextInput,
   SafeAreaView,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import InterestSelector from "./InterestSelector";
+import IndustrySelector from "./IndustrySelector";
+import ExperienceLevelSelector from "./ExperienceLevelSelector";
 import { supabase } from "@/lib/supabase";
-import { Ionicons } from "@expo/vector-icons";
-import { useAuth } from "@/contexts/AuthContext";
-import ProfileForm from "@/components/ProfileForm";
+import * as ImagePicker from "expo-image-picker";
+import { decode } from "base64-arraybuffer";
+import NeighborhoodSelector from "./NeighborhoodSelector";
+import CafeSelector from "./CafeSelector";
+import EmploymentHistoryEntry from "./EmploymentHistoryEntry";
+import CareerTransitionEntry from "./CareerTransitionEntry";
+import SkeletonLoader from "./SkeletonLoader";
+import {
+  ActivityIndicator,
+} from "react-native";
 
 const { width } = Dimensions.get("window");
 
@@ -168,8 +177,8 @@ export default function ProfileCard({
       }
 
       if (data) {
-       
-       
+
+
         if (data.employment) {
           try {
             let employmentData = [];
@@ -181,7 +190,7 @@ export default function ProfileCard({
             } else {
               employmentData = [JSON.parse(data.employment)];
             }
-            
+
           } catch (e) {
             console.error("Error parsing employment data:", e);
 
@@ -242,7 +251,7 @@ export default function ProfileCard({
       setProfileData(data);
       setIsEditMode(false);
     } catch (error) {
-      
+
       Alert.alert("Error", "Failed to save profile changes");
     }
   };
@@ -1476,7 +1485,7 @@ const styles = StyleSheet.create({
   positionContainer: {
     flexDirection: "row",
     alignItems: "center",
-    
+
     marginTop: 8,
   },
   position: {
