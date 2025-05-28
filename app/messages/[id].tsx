@@ -573,7 +573,6 @@ export default function MessageScreen() {
             backgroundColor: colors.background,
           },
           headerShadowVisible: false,
-          animation: 'none',
         }}
       />
 
@@ -655,10 +654,6 @@ export default function MessageScreen() {
                 flatListRef.current?.scrollToEnd({ animated: false });
               }
             }}
-            scrollEventThrottle={16}
-            removeClippedSubviews={false}
-            initialScrollIndex={messages.length > 0 ? messages.length - 1 : undefined}
-            getItemLayout={undefined}
           />
         )}
 
