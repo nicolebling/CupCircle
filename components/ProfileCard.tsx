@@ -15,6 +15,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { useAuth } from "@/contexts/AuthContext";
 import InterestSelector from "./InterestSelector";
 import IndustrySelector from "./IndustrySelector";
 import ExperienceLevelSelector from "./ExperienceLevelSelector";
