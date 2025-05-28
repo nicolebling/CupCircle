@@ -37,7 +37,7 @@ export default function AvailabilityScreen() {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const { user } = useAuth();
-  const { isLoading, error, createSlot, getSlots } = useAvailability();
+  const { isLoading: apiLoading, error, createSlot, getSlots } = useAvailability();
 
   const [selectedDate, setSelectedDate] = useState(() => {
     const now = new Date();
@@ -45,7 +45,8 @@ export default function AvailabilityScreen() {
     return isPast4PM ? addDays(now, 1) : now;
   });
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
-  const [showAddSlot, setShowAddSlot] = useState(false); // Added state for toggle{/*  */}
+  const [showAddSlot, setShowAddSlot] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Animation values
   const opacity = useSharedValue(0);
@@ -63,6 +64,8 @@ export default function AvailabilityScreen() {
 
   const getUserAvailability = async () => {
     try {
+      setIsLoading(true);
+      
       const { data, error } = await supabase
         .from("availability")
         .select("*")
@@ -108,6 +111,9 @@ export default function AvailabilityScreen() {
       // Still show animation even on error
       opacity.value = withDelay(100, withTiming(1, { duration: 600 }));
       translateY.value = withDelay(100, withTiming(0, { duration: 600 }));
+    } finally {
+      // Small delay to ensure smooth transition
+      setTimeout(() => setIsLoading(false), 200);
     }
   };
 
