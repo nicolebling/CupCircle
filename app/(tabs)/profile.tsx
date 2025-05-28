@@ -4,7 +4,7 @@ import { supabase } from "@/lib/supabase";
 import Colors from "@/constants/Colors";
 import ProfileForm from "@/components/ProfileForm";
 import UserProfileCard from "@/components/UserProfileCard";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "../../contexts/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
 import { Stack, useRouter, useSegments, useNavigation } from "expo-router";
 import { useColorScheme } from "@/hooks/useColorScheme";
