@@ -428,7 +428,7 @@ export default function ProfileForm({
           <View style={[styles.section, { marginTop: 24 }]}>
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isDark && styles.textDark]}>
-                Name*
+                Name
               </Text>
               <TextInput
                 style={[styles.input, isDark && styles.inputDark]}

@@ -287,7 +287,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   companyName: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
     fontFamily: "K2D-SemiBold",
   },

@@ -182,7 +182,7 @@ export default function CafeSelector({
         Alert.alert(
           "Maximum cafes selected",
           "You've already added 3 cafes. Please remove one to add another.",
-          [{ text: "OK" }]
+          [{ text: "OK" }],
         );
       }
     }
@@ -234,36 +234,60 @@ export default function CafeSelector({
               ? `${selected.length} cafe${selected.length === 1 ? "" : "s"} selected`
               : "Select top 3 cafes"}
           </Text>
-          <Ionicons name="chevron-down" size={20} color={colors.secondaryText} />
+          <Ionicons
+            name="chevron-down"
+            size={20}
+            color={colors.secondaryText}
+          />
         </TouchableOpacity>
 
         {selected.length > 0 && (
           <View style={styles.selectedTagsContainer}>
             {selected.map((cafe, index) => {
-              const [cafeName, cafeAddress] = cafe.split('|||');
+              const [cafeName, cafeAddress] = cafe.split("|||");
               return (
                 <View
                   key={index}
                   style={[
                     styles.selectedTag,
-                    { backgroundColor: "transparent", borderWidth: 1, borderColor: colors.primary },
+                    {
+                      backgroundColor: "transparent",
+                      borderWidth: 1,
+                      borderColor: colors.primary,
+                    },
                   ]}
                 >
                   <View style={styles.tagContent}>
-                    <Ionicons name="cafe" size={12} color={colors.primary} style={styles.tagIcon} />
+                    <Ionicons
+                      name="cafe"
+                      size={12}
+                      color={colors.primary}
+                      style={styles.tagIcon}
+                    />
                     <View>
                       <Text style={[styles.tagName, { color: colors.primary }]}>
                         {cafeName}
                       </Text>
-                      <Text style={[styles.tagAddress, { color: colors.secondaryText }]}>
+                      <Text
+                        style={[
+                          styles.tagAddress,
+                          { color: colors.secondaryText },
+                        ]}
+                      >
                         {cafeAddress}
                       </Text>
                     </View>
-                    <TouchableOpacity 
-                      onPress={() => onChange(selected.filter((_, i) => i !== index))}
+                    <TouchableOpacity
+                      onPress={() =>
+                        onChange(selected.filter((_, i) => i !== index))
+                      }
                       style={styles.removeButton}
                     >
-                      <Ionicons name="close-circle" size={16} color={colors.primary} />
+                      <Ionicons
+                        name="close-circle"
+                        size={16}
+                        color={colors.primary}
+                      />
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -299,7 +323,13 @@ export default function CafeSelector({
               {isLoading ? (
                 <View style={styles.loadingContainer}>
                   <LogoAnimation size={120} />
-                  <Text> Warming up the café pins...</Text>
+                  <Text
+                    style={{
+                      fontFamily: "K2D-Regular",
+                    }}
+                  >
+                    Warming up the café pins...
+                  </Text>
                 </View>
               ) : errorMsg ? (
                 <Text style={[styles.errorText, { color: colors.text }]}>
@@ -328,7 +358,9 @@ export default function CafeSelector({
                     style={styles.floatingSearchButton}
                     onPress={fetchCafesInRegion}
                   >
-                    <Text style={styles.floatingSearchButtonText}>Search this area</Text>
+                    <Text style={styles.floatingSearchButtonText}>
+                      Search this area
+                    </Text>
                   </TouchableOpacity>
 
                   {cafes.map((cafe) => (
@@ -345,25 +377,27 @@ export default function CafeSelector({
                       {/* Callout content */}
                       <Callout onPress={() => handleSelect(cafe)}>
                         <TouchableWithoutFeedback>
-                          <View style={{ 
-                            padding: 10, 
-                            width: 200, 
-                            alignItems: "center" 
-                          }}>
+                          <View
+                            style={{
+                              padding: 10,
+                              width: 200,
+                              alignItems: "center",
+                            }}
+                          >
                             <Text
-                              style={{ 
-                                fontFamily: "K2D-SemiBold", 
+                              style={{
+                                fontFamily: "K2D-SemiBold",
                                 marginBottom: 5,
-                                textAlign: "center"
+                                textAlign: "center",
                               }}
                             >
                               {cafe.name}
                             </Text>
                             <Text
-                              style={{ 
-                                fontFamily: "K2D-Regular", 
+                              style={{
+                                fontFamily: "K2D-Regular",
                                 marginBottom: 5,
-                                textAlign: "center"
+                                textAlign: "center",
                               }}
                             >
                               {cafe.vicinity}
@@ -376,7 +410,7 @@ export default function CafeSelector({
                                   flexDirection: "row",
                                   marginBottom: 5,
                                   justifyContent: "center",
-                                  alignItems: "center"
+                                  alignItems: "center",
                                 }}
                               >
                                 {Array.from({ length: 5 }, (_, index) => {
@@ -408,11 +442,13 @@ export default function CafeSelector({
                                     />
                                   );
                                 })}
-                                <Text style={{ 
-                                  marginLeft: 5, 
-                                  fontSize: 12, 
-                                  fontFamily: "K2D-SemiBold"
-                                }}>
+                                <Text
+                                  style={{
+                                    marginLeft: 5,
+                                    fontSize: 12,
+                                    fontFamily: "K2D-SemiBold",
+                                  }}
+                                >
                                   {cafe.rating.toFixed(1)}
                                 </Text>
                               </View>
@@ -429,7 +465,7 @@ export default function CafeSelector({
                                   width: 120,
                                   height: 120,
                                   borderRadius: 10,
-                                  alignSelf: "center"
+                                  alignSelf: "center",
                                 }}
                                 resizeMode="cover"
                               />
@@ -439,19 +475,22 @@ export default function CafeSelector({
                               </Text>
                             )}
 
-                            <View pointerEvents="box-none" style={{ width: "100%" }}>
+                            <View
+                              pointerEvents="box-none"
+                              style={{ width: "100%" }}
+                            >
                               <TouchableOpacity
                                 style={{
                                   backgroundColor: Colors.light.primary,
                                   padding: 10,
                                   borderRadius: 5,
                                   marginTop: 10,
-                                  alignItems: "center"
+                                  alignItems: "center",
                                 }}
                               >
                                 <Text
                                   style={{
-                                    fontFamily: 'K2D-Medium',
+                                    fontFamily: "K2D-Medium",
                                     color: "white",
                                     textAlign: "center",
                                   }}
@@ -471,7 +510,9 @@ export default function CafeSelector({
 
             <View style={styles.selectedCafes}>
               {selected.map((cafe, index) => {
-                const [cafeName, cafeAddress] = cafe ? cafe.split('|||') : ['', ''];
+                const [cafeName, cafeAddress] = cafe
+                  ? cafe.split("|||")
+                  : ["", ""];
                 return (
                   <View
                     key={index}
@@ -494,18 +535,31 @@ export default function CafeSelector({
                         style={{ marginRight: 8 }}
                       />
                       <View>
-                        <Text style={[styles.tagName, { color: colors.primary }]}>
+                        <Text
+                          style={[styles.tagName, { color: colors.primary }]}
+                        >
                           {cafeName}
                         </Text>
-                        <Text style={[styles.tagAddress, { color: colors.secondaryText }]}>
+                        <Text
+                          style={[
+                            styles.tagAddress,
+                            { color: colors.secondaryText },
+                          ]}
+                        >
                           {cafeAddress}
                         </Text>
                       </View>
                       <TouchableOpacity
-                        onPress={() => onChange(selected.filter((_, i) => i !== index))}
+                        onPress={() =>
+                          onChange(selected.filter((_, i) => i !== index))
+                        }
                         style={styles.removeButton}
                       >
-                        <Ionicons name="close-circle" size={16} color={colors.primary} />
+                        <Ionicons
+                          name="close-circle"
+                          size={16}
+                          color={colors.primary}
+                        />
                       </TouchableOpacity>
                     </View>
                   </View>
@@ -530,20 +584,20 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   tagContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   tagName: {
     fontSize: 14,
-    fontFamily: 'K2D-Medium',
+    fontFamily: "K2D-Medium",
   },
   tagAddress: {
     fontSize: 12,
-    fontFamily: 'K2D-Regular',
+    fontFamily: "K2D-Regular",
     marginTop: 2,
   },
   removeButton: {
-    marginLeft: 'auto',
+    marginLeft: "auto",
   },
   selectedTagsContainer: {
     marginTop: 8,
@@ -554,22 +608,22 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   tagContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   tagIcon: {
     marginRight: 8,
   },
   tagName: {
     fontSize: 14,
-    fontFamily: 'K2D-Medium',
+    fontFamily: "K2D-Medium",
   },
   tagAddress: {
     fontSize: 12,
     marginTop: 2,
   },
   removeButton: {
-    marginLeft: 'auto',
+    marginLeft: "auto",
   },
   errorText: {
     textAlign: "center",
@@ -581,8 +635,8 @@ const styles = StyleSheet.create({
   },
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   selector: {
     height: 48,
@@ -595,7 +649,7 @@ const styles = StyleSheet.create({
   },
   selectorText: {
     fontSize: 16,
-    fontFamily: 'K2D-Regular',
+    fontFamily: "K2D-Regular",
   },
   modalOverlay: {
     flex: 1,
@@ -616,7 +670,7 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: 20,
-    fontFamily: 'K2D-Bold',
+    fontFamily: "K2D-Bold",
   },
   selectedCafes: {
     marginTop: 20,
@@ -630,7 +684,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   cafeText: {
-    fontFamily: 'K2D-Regular',
+    fontFamily: "K2D-Regular",
     color: "black",
     fontSize: 16,
     flex: 1,
@@ -670,7 +724,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   floatingSearchButtonText: {
-    fontFamily: 'K2D-Medium',
+    fontFamily: "K2D-Medium",
     color: "white",
     fontWeight: "bold",
     fontSize: 14,

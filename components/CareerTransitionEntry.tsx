@@ -150,6 +150,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   label: {
+    fontFamily: 'K2D-Regular',
     fontSize: 12,
     fontWeight: '500',
     marginBottom: 4,
