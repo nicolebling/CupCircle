@@ -8,6 +8,7 @@ import {
   Modal,
   Image,
   TouchableWithoutFeedback,
+  Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
@@ -171,10 +172,18 @@ export default function CafeSelector({
   }, [initialRegion]);
 
   const handleSelect = (place: any) => {
-    if (!selected.includes(place) && selected.length < maxSelections) {
-      const cafeString = `${place.name}|||${place.vicinity}`;
-      const updatedSelection = [...selected, cafeString];
-      onChange(updatedSelection);
+    if (!selected.includes(place)) {
+      if (selected.length < maxSelections) {
+        const cafeString = `${place.name}|||${place.vicinity}`;
+        const updatedSelection = [...selected, cafeString];
+        onChange(updatedSelection);
+      } else {
+        Alert.alert(
+          "Maximum cafes selected",
+          "You've already added 3 cafes. Please remove one to add another.",
+          [{ text: "OK" }]
+        );
+      }
     }
   };
 
