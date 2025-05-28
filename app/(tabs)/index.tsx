@@ -104,24 +104,25 @@ export default function CircleChatsScreen() {
     }
   };
 
-  React.useEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <View style={{ flexDirection: "row" }}>
-          <TouchableOpacity
-            onPress={() => setShowPastChats(!showPastChats)}
-            style={{ marginRight: 23 }}
-          >
-            <Ionicons
-              name="time-outline"
-              size={24}
-              color={showPastChats ? colors.primary : colors.text}
-            />
-          </TouchableOpacity>
-        </View>
-      ),
-    });
-  }, [colors.text, showPastChats]);
+  // UI Testing - VS Toggle for past chats
+  // React.useEffect(() => {
+  //   navigation.setOptions({
+  //     headerRight: () => (
+  //       <View style={{ flexDirection: "row" }}>
+  //         <TouchableOpacity
+  //           onPress={() => setShowPastChats(!showPastChats)}
+  //           style={{ marginRight: 23 }}
+  //         >
+  //           <Ionicons
+  //             name="time-outline"
+  //             size={24}
+  //             color={showPastChats ? colors.primary : colors.text}
+  //           />
+  //         </TouchableOpacity>
+  //       </View>
+  //     ),
+  //   });
+  // }, [colors.text, showPastChats]);
 
   // Make refreshData function available globally
   useEffect(() => {
@@ -485,7 +486,7 @@ export default function CircleChatsScreen() {
 
       {/* Toggle - UI TESTING */}
 
-      {/* <View style={styles.header}>
+      <View style={styles.header}>
         <View style={styles.toggleContainer}>
           <Text style={[styles.toggleLabel, { color: colors.text }]}>Past Chats</Text>
           <Switch
@@ -494,7 +495,7 @@ export default function CircleChatsScreen() {
             trackColor={{ false: colors.border, true: colors.primary }}
           />
         </View>
-      </View> */}
+      </View>
 
       {/* Loading, expired, or empty states */}
       {!initialFetchDone || isLoading

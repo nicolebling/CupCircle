@@ -61,7 +61,7 @@ export default function SettingsScreen() {
     >
       <ScrollView style={styles.content}>
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>
+          <Text style={[styles.sectionTitle, { color: colors.text, marginTop: 32 }]}>
             Account
           </Text>
           <TouchableOpacity
@@ -167,7 +167,9 @@ export default function SettingsScreen() {
 
           <TouchableOpacity
             style={[styles.settingItem, { borderColor: colors.border }]}
-          >
+            onPress={() => openBrowserAsync('https://www.cupcircle.co/support')}
+            >
+          
             <View style={styles.settingContent}>
               <Ionicons
                 name="help-circle-outline"
