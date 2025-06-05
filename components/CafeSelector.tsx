@@ -190,14 +190,30 @@ export default function CafeSelector({
 
   const fetchCafes = async (lat, lng) => {
     try {
+      const apiKey = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY;
+      if (!apiKey) {
+        console.error("Google Maps API key is missing");
+        setErrorMsg("Google Maps API key not configured");
+        setIsLoading(false);
+        return;
+      }
+
       const response = await fetch(
-        `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=2000&type=cafe&keyword=coffee&key=${process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY}`,
+        `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=2000&type=cafe&keyword=coffee&key=${apiKey}`,
       );
       const data = await response.json();
-      setCafes(data.results);
+      
+      if (data.status === "REQUEST_DENIED") {
+        setErrorMsg("Google Maps API access denied. Please check your API key and permissions.");
+        setIsLoading(false);
+        return;
+      }
+      
+      setCafes(data.results || []);
       setIsLoading(false);
     } catch (error) {
       console.error("Error fetching cafes:", error);
+      setErrorMsg("Failed to load cafes. Please try again.");
       setIsLoading(false);
     }
   };

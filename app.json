@@ -27,6 +27,9 @@
         "NSLocationAlwaysUsageDescription": "This app needs location access even in the background.",
         "NSPhotoLibraryUsageDescription": "We need access to your photo library to upload images.",
         "ITSAppUsesNonExemptEncryption": false
+      },
+      "config": {
+        "googleMapsApiKey": "EXPO_PUBLIC_GOOGLE_MAPS_API_KEY"
       }
     },
     "android": {
@@ -42,7 +45,12 @@
         "CAMERA",
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_FINE_LOCATION"
-      ]
+      ],
+      "config": {
+        "googleMaps": {
+          "apiKey": "EXPO_PUBLIC_GOOGLE_MAPS_API_KEY"
+        }
+      }
     },
     "plugins": [
       "expo-router",
