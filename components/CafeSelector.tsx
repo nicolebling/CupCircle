@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import {
   View,
   Text,
@@ -115,6 +115,8 @@ export default function CafeSelector({
   const [isLoading, setIsLoading] = useState(true);
   const [cafes, setCafes] = useState([]);
   const [initialRegion, setInitialRegion] = useState(null); // Store initial region for first load
+  const [visibleMarkers, setVisibleMarkers] = useState([]); // Markers currently visible on map
+  const [markersLoaded, setMarkersLoaded] = useState(false);
 
   const [region, setRegion] = useState({
     latitude: 0,
@@ -188,6 +190,44 @@ export default function CafeSelector({
     }
   };
 
+  // Calculate distance between two coordinates
+  const calculateDistance = useCallback((lat1, lon1, lat2, lon2) => {
+    const R = 6371; // Earth's radius in km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = 
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+      Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+  }, []);
+
+  // Filter markers based on current map region to prevent overload
+  const filterVisibleMarkers = useCallback((allCafes, currentRegion) => {
+    if (!currentRegion || !allCafes.length) return [];
+    
+    const maxDistance = Math.max(
+      currentRegion.latitudeDelta * 111, // Convert degrees to km (roughly)
+      currentRegion.longitudeDelta * 111
+    ) / 2;
+
+    // Limit to 20 markers max to prevent performance issues
+    const filtered = allCafes
+      .filter(cafe => {
+        const distance = calculateDistance(
+          currentRegion.latitude,
+          currentRegion.longitude,
+          cafe.geometry.location.lat,
+          cafe.geometry.location.lng
+        );
+        return distance <= maxDistance;
+      })
+      .slice(0, 20); // Limit to 20 markers
+
+    return filtered;
+  }, [calculateDistance]);
+
   const fetchCafes = async (lat, lng) => {
     try {
       const apiKey = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY;
@@ -209,7 +249,13 @@ export default function CafeSelector({
         return;
       }
       
-      setCafes(data.results || []);
+      const allCafes = data.results || [];
+      setCafes(allCafes);
+      
+      // Initially filter markers for current region
+      const initialVisible = filterVisibleMarkers(allCafes, region);
+      setVisibleMarkers(initialVisible);
+      setMarkersLoaded(true);
       setIsLoading(false);
     } catch (error) {
       console.error("Error fetching cafes:", error);
@@ -223,12 +269,168 @@ export default function CafeSelector({
     return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=${process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY}`;
   };
 
+  // Debounced region change handler to update visible markers
+  const onRegionChangeComplete = useCallback((newRegion) => {
+    setRegion(newRegion);
+    
+    // Update visible markers based on new region
+    if (cafes.length > 0) {
+      const newVisible = filterVisibleMarkers(cafes, newRegion);
+      setVisibleMarkers(newVisible);
+    }
+  }, [cafes, filterVisibleMarkers]);
+
   const fetchCafesInRegion = () => {
     if (region) {
       setIsLoading(true);
+      setMarkersLoaded(false);
       fetchCafes(region.latitude, region.longitude); // Fetch cafes based on the saved region
     }
   };
+
+  // Memoize markers to prevent unnecessary re-renders
+  const memoizedMarkers = useMemo(() => {
+    if (!markersLoaded || visibleMarkers.length === 0) return [];
+    
+    return visibleMarkers.map((cafe) => (
+      <Marker
+        key={cafe.place_id}
+        coordinate={{
+          latitude: cafe.geometry.location.lat,
+          longitude: cafe.geometry.location.lng,
+        }}
+        title={cafe.name}
+        description={cafe.vicinity}
+        onPress={() => {}}
+      >
+        <Callout onPress={() => handleSelect(cafe)}>
+          <TouchableWithoutFeedback>
+            <View
+              style={{
+                padding: 10,
+                width: 200,
+                alignItems: "center",
+              }}
+            >
+              <Text
+                style={{
+                  fontFamily: "K2D-SemiBold",
+                  marginBottom: 5,
+                  textAlign: "center",
+                }}
+              >
+                {cafe.name}
+              </Text>
+              <Text
+                style={{
+                  fontFamily: "K2D-Regular",
+                  marginBottom: 5,
+                  textAlign: "center",
+                }}
+              >
+                {cafe.vicinity}
+              </Text>
+
+              {/* Show the rating */}
+              {cafe.rating && (
+                <View
+                  style={{
+                    flexDirection: "row",
+                    marginBottom: 5,
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  {Array.from({ length: 5 }, (_, index) => {
+                    if (index < Math.floor(cafe.rating)) {
+                      return (
+                        <Ionicons
+                          key={index}
+                          name="star"
+                          size={16}
+                          color="gold"
+                        />
+                      );
+                    } else if (index < Math.ceil(cafe.rating)) {
+                      return (
+                        <Ionicons
+                          key={index}
+                          name="star-half"
+                          size={16}
+                          color="gold"
+                        />
+                      );
+                    }
+                    return (
+                      <Ionicons
+                        key={index}
+                        name="star-outline"
+                        size={16}
+                        color="gold"
+                      />
+                    );
+                  })}
+                  <Text
+                    style={{
+                      marginLeft: 5,
+                      fontSize: 12,
+                      fontFamily: "K2D-SemiBold",
+                    }}
+                  >
+                    {cafe.rating.toFixed(1)}
+                  </Text>
+                </View>
+              )}
+
+              {cafe.photos && cafe.photos.length > 0 ? (
+                <Image
+                  source={{
+                    uri: getCafeImage(cafe.photos[0].photo_reference),
+                  }}
+                  style={{
+                    width: 120,
+                    height: 120,
+                    borderRadius: 10,
+                    alignSelf: "center",
+                  }}
+                  resizeMode="cover"
+                />
+              ) : (
+                <Text style={{ textAlign: "center" }}>
+                  No image available
+                </Text>
+              )}
+
+              <View
+                pointerEvents="box-none"
+                style={{ width: "100%" }}
+              >
+                <TouchableOpacity
+                  style={{
+                    backgroundColor: Colors.light.primary,
+                    padding: 10,
+                    borderRadius: 5,
+                    marginTop: 10,
+                    alignItems: "center",
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontFamily: "K2D-Medium",
+                      color: "white",
+                      textAlign: "center",
+                    }}
+                  >
+                    Select Cafe
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </TouchableWithoutFeedback>
+        </Callout>
+      </Marker>
+    ));
+  }, [visibleMarkers, markersLoaded]);
 
   return (
     <View>
@@ -352,23 +554,35 @@ export default function CafeSelector({
                   {errorMsg}
                 </Text>
               ) : region ? (
-                <MapView
-                  style={styles.map}
-                  customMapStyle={retroMapStyle} // Apply custom map style here
-                  region={region} // Bind the region state to the MapView
-                  initialRegion={initialRegion} // Set the initial region only once
-                  onRegionChangeComplete={setRegion} // Update region on map change
-                >
-                  <Marker
-                    coordinate={{
-                      latitude: location.latitude,
-                      longitude: location.longitude,
-                    }}
-                    title="Your Location"
-                    pinColor="#FF6347"
-                  />
+                <View style={styles.container}>
+                  <MapView
+                    style={styles.map}
+                    customMapStyle={retroMapStyle} // Apply custom map style here
+                    region={region} // Bind the region state to the MapView
+                    initialRegion={initialRegion} // Set the initial region only once
+                    onRegionChangeComplete={onRegionChangeComplete} // Update region on map change with debouncing
+                    showsUserLocation={true}
+                    showsMyLocationButton={false}
+                    loadingEnabled={true}
+                    moveOnMarkerPress={false}
+                    maxZoomLevel={18}
+                    minZoomLevel={10}
+                  >
+                    {location && (
+                      <Marker
+                        coordinate={{
+                          latitude: location.latitude,
+                          longitude: location.longitude,
+                        }}
+                        title="Your Location"
+                        pinColor="#FF6347"
+                      />
+                    )}
 
-                  {/* Markers for cafes */}
+                    {/* Lazy-loaded markers */}
+                    {memoizedMarkers}
+                  </MapView>
+
                   {/* Floating Search Button */}
                   <TouchableOpacity
                     style={styles.floatingSearchButton}
@@ -379,148 +593,16 @@ export default function CafeSelector({
                     </Text>
                   </TouchableOpacity>
 
-                  {cafes.map((cafe) => (
-                    <Marker
-                      key={cafe.place_id}
-                      coordinate={{
-                        latitude: cafe.geometry.location.lat,
-                        longitude: cafe.geometry.location.lng,
-                      }}
-                      title={cafe.name}
-                      description={cafe.vicinity}
-                      onPress={() => {}}
-                    >
-                      {/* Callout content */}
-                      <Callout onPress={() => handleSelect(cafe)}>
-                        <TouchableWithoutFeedback>
-                          <View
-                            style={{
-                              padding: 10,
-                              width: 200,
-                              alignItems: "center",
-                            }}
-                          >
-                            <Text
-                              style={{
-                                fontFamily: "K2D-SemiBold",
-                                marginBottom: 5,
-                                textAlign: "center",
-                              }}
-                            >
-                              {cafe.name}
-                            </Text>
-                            <Text
-                              style={{
-                                fontFamily: "K2D-Regular",
-                                marginBottom: 5,
-                                textAlign: "center",
-                              }}
-                            >
-                              {cafe.vicinity}
-                            </Text>
-
-                            {/* Show the rating */}
-                            {cafe.rating && (
-                              <View
-                                style={{
-                                  flexDirection: "row",
-                                  marginBottom: 5,
-                                  justifyContent: "center",
-                                  alignItems: "center",
-                                }}
-                              >
-                                {Array.from({ length: 5 }, (_, index) => {
-                                  if (index < Math.floor(cafe.rating)) {
-                                    return (
-                                      <Ionicons
-                                        key={index}
-                                        name="star"
-                                        size={16}
-                                        color="gold"
-                                      />
-                                    );
-                                  } else if (index < Math.ceil(cafe.rating)) {
-                                    return (
-                                      <Ionicons
-                                        key={index}
-                                        name="star-half"
-                                        size={16}
-                                        color="gold"
-                                      />
-                                    );
-                                  }
-                                  return (
-                                    <Ionicons
-                                      key={index}
-                                      name="star-outline"
-                                      size={16}
-                                      color="gold"
-                                    />
-                                  );
-                                })}
-                                <Text
-                                  style={{
-                                    marginLeft: 5,
-                                    fontSize: 12,
-                                    fontFamily: "K2D-SemiBold",
-                                  }}
-                                >
-                                  {cafe.rating.toFixed(1)}
-                                </Text>
-                              </View>
-                            )}
-
-                            {cafe.photos && cafe.photos.length > 0 ? (
-                              <Image
-                                source={{
-                                  uri: getCafeImage(
-                                    cafe.photos[0].photo_reference,
-                                  ),
-                                }}
-                                style={{
-                                  width: 120,
-                                  height: 120,
-                                  borderRadius: 10,
-                                  alignSelf: "center",
-                                }}
-                                resizeMode="cover"
-                              />
-                            ) : (
-                              <Text style={{ textAlign: "center" }}>
-                                No image available
-                              </Text>
-                            )}
-
-                            <View
-                              pointerEvents="box-none"
-                              style={{ width: "100%" }}
-                            >
-                              <TouchableOpacity
-                                style={{
-                                  backgroundColor: Colors.light.primary,
-                                  padding: 10,
-                                  borderRadius: 5,
-                                  marginTop: 10,
-                                  alignItems: "center",
-                                }}
-                              >
-                                <Text
-                                  style={{
-                                    fontFamily: "K2D-Medium",
-                                    color: "white",
-                                    textAlign: "center",
-                                  }}
-                                >
-                                  Select Cafe
-                                </Text>
-                              </TouchableOpacity>
-                            </View>
-                          </View>
-                        </TouchableWithoutFeedback>
-                      </Callout>
-                    </Marker>
-                  ))}
-                </MapView>
+                  {/* Loading indicator for markers */}
+                  {!markersLoaded && (
+                    <View style={styles.markerLoadingOverlay}>
+                      <ActivityIndicator size="small" color={colors.primary} />
+                      <Text style={[styles.markerLoadingText, { color: colors.text }]}>
+                        Loading cafes...
+                      </Text>
+                    </View>
+                  )}
+                </View>
               ) : null}
             </View>
 
@@ -744,5 +826,28 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
     fontSize: 14,
+  },
+  markerLoadingOverlay: {
+    position: "absolute",
+    bottom: 20,
+    right: 20,
+    backgroundColor: "rgba(255, 255, 255, 0.9)",
+    padding: 10,
+    borderRadius: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  markerLoadingText: {
+    marginLeft: 8,
+    fontSize: 12,
+    fontFamily: "K2D-Regular",
   },
 });
