@@ -399,7 +399,7 @@ export default function ChatsScreen() {
               keyExtractor={(item) => item.match_id || item.id}
               renderItem={renderConversationItem}
               contentContainerStyle={
-                filteredConversations.length === 0 ? { flex: 1 } : null
+                filteredConversations.length === 0 ? { flex: 1 }：null
               }
               ListEmptyComponent={EmptyListComponent}
             />
