@@ -33,6 +33,7 @@ interface Conversation {
     text: string;
     timestamp: string;
     isRead: boolean;
+    isRead: boolean;
   };
   unreadCount: number;
 }
@@ -215,9 +216,9 @@ export default function ChatsScreen() {
       // Update global unread count
       const totalUnread = sortedConversations.reduce((sum, conv) => sum + conv.unreadCount, 0);
       global.unreadMessageCount = totalUnread;
-      
+
       setConversations(sortedConversations);
-      
+
       // Trigger smooth fade-in animation
       opacity.value = withDelay(100, withTiming(1, { duration: 600 }));
       translateY.value = withDelay(100, withTiming(0, { duration: 600 }));
@@ -399,9 +400,10 @@ export default function ChatsScreen() {
               keyExtractor={(item) => item.match_id || item.id}
               renderItem={renderConversationItem}
               contentContainerStyle={
-                filteredConversations.length === 0 ? { flex: 1 }：null
+                filteredConversations.length === 0 ? { flex: 1, justifyContent: 'center', alignItems: 'center' } : { paddingBottom: 20 }
               }
               ListEmptyComponent={EmptyListComponent}
+              showsVerticalScrollIndicator={false}
             />
           </Animated.View>
         )}
@@ -460,7 +462,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     padding: 16,
     borderBottomWidth: 0.5,
-    
+
   },
   avatarContainer: {
     position: "relative",
