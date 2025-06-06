@@ -113,7 +113,11 @@ export default function ChatsScreen() {
 
       if (!matchesData || matchesData.length === 0) {
         setConversations([]);
+        setFilteredConversations([]);
         setLoading(false);
+        // Trigger animation even when empty
+        opacity.value = withDelay(100, withTiming(1, { duration: 600 }));
+        translateY.value = withDelay(100, withTiming(0, { duration: 600 }));
         return;
       }
 
@@ -224,6 +228,9 @@ export default function ChatsScreen() {
       translateY.value = withDelay(100, withTiming(0, { duration: 600 }));
     } catch (error) {
       console.error("Error in fetchConfirmedChats:", error);
+      setConversations([]);
+      setFilteredConversations([]);
+      setLoading(false);
       // Still show animation even on error
       opacity.value = withDelay(100, withTiming(1, { duration: 600 }));
       translateY.value = withDelay(100, withTiming(0, { duration: 600 }));
