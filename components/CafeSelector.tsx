@@ -193,40 +193,46 @@ export default function CafeSelector({
   // Calculate distance between two coordinates
   const calculateDistance = useCallback((lat1, lon1, lat2, lon2) => {
     const R = 6371; // Earth's radius in km
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a = 
-      Math.sin(dLat/2) * Math.sin(dLat/2) +
-      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
-      Math.sin(dLon/2) * Math.sin(dLon/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    const dLat = ((lat2 - lat1) * Math.PI) / 180;
+    const dLon = ((lon2 - lon1) * Math.PI) / 180;
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos((lat1 * Math.PI) / 180) *
+        Math.cos((lat2 * Math.PI) / 180) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
   }, []);
 
   // Filter markers based on current map region to prevent overload
-  const filterVisibleMarkers = useCallback((allCafes, currentRegion) => {
-    if (!currentRegion || !allCafes.length) return [];
-    
-    const maxDistance = Math.max(
-      currentRegion.latitudeDelta * 111, // Convert degrees to km (roughly)
-      currentRegion.longitudeDelta * 111
-    ) / 2;
+  const filterVisibleMarkers = useCallback(
+    (allCafes, currentRegion) => {
+      if (!currentRegion || !allCafes.length) return [];
 
-    // Limit to 20 markers max to prevent performance issues
-    const filtered = allCafes
-      .filter(cafe => {
-        const distance = calculateDistance(
-          currentRegion.latitude,
-          currentRegion.longitude,
-          cafe.geometry.location.lat,
-          cafe.geometry.location.lng
-        );
-        return distance <= maxDistance;
-      })
-      .slice(0, 20); // Limit to 20 markers
+      const maxDistance =
+        Math.max(
+          currentRegion.latitudeDelta * 111, // Convert degrees to km (roughly)
+          currentRegion.longitudeDelta * 111,
+        ) / 2;
 
-    return filtered;
-  }, [calculateDistance]);
+      // Limit to 20 markers max to prevent performance issues
+      const filtered = allCafes
+        .filter((cafe) => {
+          const distance = calculateDistance(
+            currentRegion.latitude,
+            currentRegion.longitude,
+            cafe.geometry.location.lat,
+            cafe.geometry.location.lng,
+          );
+          return distance <= maxDistance;
+        })
+        .slice(0, 20); // Limit to 20 markers
+
+      return filtered;
+    },
+    [calculateDistance],
+  );
 
   const fetchCafes = async (lat, lng) => {
     try {
@@ -239,19 +245,21 @@ export default function CafeSelector({
       }
 
       const response = await fetch(
-        `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=2000&type=cafe&keyword=coffee&key=${apiKey}`,
+        `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=2000&type=cafe&keyword=coffee&key=${process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY}`,
       );
       const data = await response.json();
-      
+
       if (data.status === "REQUEST_DENIED") {
-        setErrorMsg("Google Maps API access denied. Please check your API key and permissions.");
+        setErrorMsg(
+          "Google Maps API access denied. Please check your API key and permissions.",
+        );
         setIsLoading(false);
         return;
       }
-      
+
       const allCafes = data.results || [];
       setCafes(allCafes);
-      
+
       // Initially filter markers for current region
       const initialVisible = filterVisibleMarkers(allCafes, region);
       setVisibleMarkers(initialVisible);
@@ -270,15 +278,18 @@ export default function CafeSelector({
   };
 
   // Debounced region change handler to update visible markers
-  const onRegionChangeComplete = useCallback((newRegion) => {
-    setRegion(newRegion);
-    
-    // Update visible markers based on new region
-    if (cafes.length > 0) {
-      const newVisible = filterVisibleMarkers(cafes, newRegion);
-      setVisibleMarkers(newVisible);
-    }
-  }, [cafes, filterVisibleMarkers]);
+  const onRegionChangeComplete = useCallback(
+    (newRegion) => {
+      setRegion(newRegion);
+
+      // Update visible markers based on new region
+      if (cafes.length > 0) {
+        const newVisible = filterVisibleMarkers(cafes, newRegion);
+        setVisibleMarkers(newVisible);
+      }
+    },
+    [cafes, filterVisibleMarkers],
+  );
 
   const fetchCafesInRegion = () => {
     if (region) {
@@ -291,7 +302,7 @@ export default function CafeSelector({
   // Memoize markers to prevent unnecessary re-renders
   const memoizedMarkers = useMemo(() => {
     if (!markersLoaded || visibleMarkers.length === 0) return [];
-    
+
     return visibleMarkers.map((cafe) => (
       <Marker
         key={cafe.place_id}
@@ -396,15 +407,10 @@ export default function CafeSelector({
                   resizeMode="cover"
                 />
               ) : (
-                <Text style={{ textAlign: "center" }}>
-                  No image available
-                </Text>
+                <Text style={{ textAlign: "center" }}>No image available</Text>
               )}
 
-              <View
-                pointerEvents="box-none"
-                style={{ width: "100%" }}
-              >
+              <View pointerEvents="box-none" style={{ width: "100%" }}>
                 <TouchableOpacity
                   style={{
                     backgroundColor: Colors.light.primary,
@@ -597,7 +603,12 @@ export default function CafeSelector({
                   {!markersLoaded && (
                     <View style={styles.markerLoadingOverlay}>
                       <ActivityIndicator size="small" color={colors.primary} />
-                      <Text style={[styles.markerLoadingText, { color: colors.text }]}>
+                      <Text
+                        style={[
+                          styles.markerLoadingText,
+                          { color: colors.text },
+                        ]}
+                      >
                         Loading cafes...
                       </Text>
                     </View>
