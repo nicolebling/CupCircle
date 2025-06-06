@@ -9,7 +9,7 @@ import {
   ActivityIndicator,
   Alert,
   Modal,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback,
 } from "react-native";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Stack } from "expo-router";
@@ -20,7 +20,12 @@ import AvailabilityCard from "@/components/AvailabilityCard";
 import { format, addDays, isPast, isToday, parseISO } from "date-fns";
 import { useAvailability } from "../../hooks/useAvailability";
 import { supabase } from "../../lib/supabase";
-import Animated, { useSharedValue, useAnimatedStyle, withTiming, withDelay } from "react-native-reanimated";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  withDelay,
+} from "react-native-reanimated";
 import SkeletonLoader from "@/components/SkeletonLoader";
 
 // Type definitions
@@ -37,7 +42,12 @@ export default function AvailabilityScreen() {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const { user } = useAuth();
-  const { isLoading: apiLoading, error, createSlot, getSlots } = useAvailability();
+  const {
+    isLoading: apiLoading,
+    error,
+    createSlot,
+    getSlots,
+  } = useAvailability();
 
   const [selectedDate, setSelectedDate] = useState(() => {
     const now = new Date();
@@ -65,7 +75,7 @@ export default function AvailabilityScreen() {
   const getUserAvailability = async () => {
     try {
       setIsLoading(true);
-      
+
       const { data, error } = await supabase
         .from("availability")
         .select("*")
@@ -102,7 +112,7 @@ export default function AvailabilityScreen() {
       });
 
       setTimeSlots(sortedData);
-      
+
       // Trigger smooth fade-in animation
       opacity.value = withDelay(100, withTiming(1, { duration: 600 }));
       translateY.value = withDelay(100, withTiming(0, { duration: 600 }));
@@ -158,7 +168,10 @@ export default function AvailabilityScreen() {
     });
 
     if (hasOverlap) {
-      Alert.alert("Duplicate Time Slots", "The time slot you choose is already existed.");
+      Alert.alert(
+        "Duplicate Time Slots",
+        "The time slot you choose is already existed.",
+      );
       return;
     }
 
@@ -369,7 +382,11 @@ export default function AvailabilityScreen() {
 
   const SkeletonAvailabilityItem = () => (
     <View style={styles.dateGroup}>
-      <SkeletonLoader width="40%" height={16} style={{ marginBottom: 20, left: 20, top: 20 }} />
+      <SkeletonLoader
+        width="40%"
+        height={16}
+        style={{ marginBottom: 20, left: 20, top: 20 }}
+      />
       <View style={[styles.skeletonCard, { borderColor: colors.border }]}>
         <View style={styles.skeletonCardContent}>
           <SkeletonLoader width="30%" height={14} />
@@ -399,11 +416,7 @@ export default function AvailabilityScreen() {
               style={styles.headerButton}
               onPress={() => setShowAddSlot(true)}
             >
-              <Ionicons
-                name="add"
-                size={24}
-                color={colors.text}
-              />
+              <Ionicons name="add" size={24} color={colors.text} />
             </TouchableOpacity>
           ),
           title: "Availability",
@@ -420,7 +433,12 @@ export default function AvailabilityScreen() {
         <TouchableWithoutFeedback onPress={() => setShowAddSlot(false)}>
           <View style={styles.modalOverlay}>
             <TouchableWithoutFeedback onPress={() => {}}>
-              <View style={[styles.addSlotModalContent, { backgroundColor: colors.background }]}>
+              <View
+                style={[
+                  styles.addSlotModalContent,
+                  { backgroundColor: colors.background },
+                ]}
+              >
                 <View style={styles.modalHeader}>
                   <Text style={[styles.modalTitle, { color: colors.text }]}>
                     Add Availability
@@ -436,7 +454,8 @@ export default function AvailabilityScreen() {
                     horizontal
                     data={next7Days}
                     renderItem={({ item }) => {
-                      const isSelected = selectedDate.toDateString() === item.toDateString();
+                      const isSelected =
+                        selectedDate.toDateString() === item.toDateString();
                       const isPastDate = isPast(item) && !isToday(item);
                       const hasSlots = hasTimeSlotsOnDate(item);
 
@@ -489,17 +508,27 @@ export default function AvailabilityScreen() {
                 <View
                   style={[
                     styles.addSlotContainer,
-                    { backgroundColor: colors.card, borderColor: colors.border },
+                    {
+                      backgroundColor: colors.card,
+                      borderColor: colors.border,
+                    },
                   ]}
                 >
                   <Text style={[styles.addSlotTitle, { color: colors.text }]}>
                     Add Time Slot
                   </Text>
-                  <Text style={[styles.selectedDateText, { color: colors.secondaryText }]}>
+                  <Text
+                    style={[
+                      styles.selectedDateText,
+                      { color: colors.secondaryText },
+                    ]}
+                  >
                     {format(selectedDate, "EEEE, MMMM d, yyyy")}
                   </Text>
 
-                  <Text style={[styles.timeSelectorLabel, { color: colors.text }]}>
+                  <Text
+                    style={[styles.timeSelectorLabel, { color: colors.text }]}
+                  >
                     Select Start Time (30-minute duration)
                   </Text>
 
@@ -512,7 +541,8 @@ export default function AvailabilityScreen() {
 
                         const isTimeTaken = timeSlots.some(
                           (slot) =>
-                            slot.date.toDateString() === selectedDate.toDateString() &&
+                            slot.date.toDateString() ===
+                              selectedDate.toDateString() &&
                             slot.startTime === item,
                         );
 
@@ -529,25 +559,42 @@ export default function AvailabilityScreen() {
 
                         const isAlreadyAdded = timeSlots.some((slot) => {
                           const slotDateStr = format(
-                            new Date(slot.date instanceof Date ? slot.date : new Date(slot.date)),
-                            "yyyy-MM-dd"
+                            new Date(
+                              slot.date instanceof Date
+                                ? slot.date
+                                : new Date(slot.date),
+                            ),
+                            "yyyy-MM-dd",
                           );
-                          const selectedDateStr = format(selectedDate, "yyyy-MM-dd");
+                          const selectedDateStr = format(
+                            selectedDate,
+                            "yyyy-MM-dd",
+                          );
 
-                          const slotTimeStr = (slot.startTime || slot.start_time || "")
+                          const slotTimeStr = (
+                            slot.startTime ||
+                            slot.start_time ||
+                            ""
+                          )
                             .trim()
                             .replace(/\s+/g, " ");
                           const itemTimeStr = item.trim().replace(/\s+/g, " ");
 
-                          return slotDateStr === selectedDateStr && slotTimeStr === itemTimeStr;
+                          return (
+                            slotDateStr === selectedDateStr &&
+                            slotTimeStr === itemTimeStr
+                          );
                         });
 
                         return (
                           <TouchableOpacity
                             style={[
                               styles.timeButton,
-                              isSelectedTime && { backgroundColor: colors.primary },
-                              (isTimeTaken || isPastTime || isAlreadyAdded) && styles.disabledTime,
+                              isSelectedTime && {
+                                backgroundColor: colors.primary,
+                              },
+                              (isTimeTaken || isPastTime || isAlreadyAdded) &&
+                                styles.disabledTime,
                             ]}
                             onPress={() =>
                               !isTimeTaken &&
@@ -555,12 +602,16 @@ export default function AvailabilityScreen() {
                               !isAlreadyAdded &&
                               setSelectedTime(item)
                             }
-                            disabled={isTimeTaken || isPastTime || isAlreadyAdded}
+                            disabled={
+                              isTimeTaken || isPastTime || isAlreadyAdded
+                            }
                           >
                             <Text
                               style={[
                                 styles.timeText,
-                                { color: isSelectedTime ? "white" : colors.text },
+                                {
+                                  color: isSelectedTime ? "white" : colors.text,
+                                },
                                 isTimeTaken && styles.disabledText,
                               ]}
                             >
@@ -575,12 +626,20 @@ export default function AvailabilityScreen() {
                     />
                   </View>
 
-                  <Text style={[styles.endTimeText, { color: colors.secondaryText }]}>
+                  <Text
+                    style={[
+                      styles.endTimeText,
+                      { color: colors.secondaryText },
+                    ]}
+                  >
                     End Time: {calculateEndTime(selectedTime)}
                   </Text>
 
                   <TouchableOpacity
-                    style={[styles.saveButton, { backgroundColor: colors.primary }]}
+                    style={[
+                      styles.saveButton,
+                      { backgroundColor: colors.primary },
+                    ]}
                     onPress={() => {
                       handleAddSlot();
                       setShowAddSlot(false);
@@ -594,7 +653,6 @@ export default function AvailabilityScreen() {
           </View>
         </TouchableWithoutFeedback>
       </Modal>
-
 
       {/* Time Slots List */}
       <View style={styles.slotsContainer}>
@@ -612,9 +670,7 @@ export default function AvailabilityScreen() {
               size={64}
               color={colors.secondaryText}
             />
-            <Text
-              style={[styles.emptyStateText, { color: colors.text }]}
-            >
+            <Text style={[styles.emptyStateText, { color: colors.text }]}>
               Set your availability to get started
             </Text>
             <Text
@@ -662,23 +718,23 @@ export default function AvailabilityScreen() {
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'flex-end',
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "flex-end",
   },
   addSlotModalContent: {
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 20,
-    maxHeight: '90%',
+    maxHeight: "90%",
   },
   modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 20,
   },
   modalTitle: {
-    fontFamily: 'K2D-Bold',
+    fontFamily: "K2D-Bold",
     fontSize: 20,
   },
   headerButton: {
@@ -869,9 +925,9 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     borderWidth: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 8,
   },
   skeletonCardContent: {
