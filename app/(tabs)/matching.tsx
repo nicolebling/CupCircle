@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import {
   View,
   Text,
@@ -97,6 +97,10 @@ export default function MatchingScreen() {
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
   const [hasMoreProfiles, setHasMoreProfiles] = useState(false);
   const PROFILES_PER_PAGE = 10;
+
+  // Refs for auto-scroll functionality
+  const scrollViewRef = useRef<ScrollView>(null);
+  const messageInputRef = useRef<TextInput>(null);
 
   // Animation values
   const cardOffset = useSharedValue(0);
@@ -710,14 +714,16 @@ export default function MatchingScreen() {
           style={{ flex: 1 }}
         >
           <ScrollView
+            ref={scrollViewRef}
             style={{ flex: 1, width: "100%", padding: 16 }}
             contentContainerStyle={{
               flexGrow: 1,
-              paddingBottom: 20,
+              paddingBottom: 120, // Extra padding for keyboard space
               justifyContent: "center",
               alignItems: "center",
             }}
             keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
           >
             <View style={[styles.cardsContainer, { width: "100%" }]}>
               {isLoading ? (
@@ -1012,6 +1018,7 @@ export default function MatchingScreen() {
                           </Text>
 
                           <TextInput
+                            ref={messageInputRef}
                             style={[
                               styles.textArea,
                               isDark
@@ -1025,6 +1032,27 @@ export default function MatchingScreen() {
                             value={messageText}
                             onChangeText={setMessageText}
                             textAlignVertical="top"
+                            onFocus={() => {
+                              // Delay to ensure the keyboard animation starts
+                              setTimeout(() => {
+                                messageInputRef.current?.measure((x, y, width, height, pageX, pageY) => {
+                                  // Calculate scroll position to bring input into view
+                                  const inputBottomPosition = pageY + height;
+                                  const keyboardHeight = Platform.OS === 'ios' ? 350 : 300;
+                                  const screenHeight = require('react-native').Dimensions.get('window').height;
+                                  const visibleScreenHeight = screenHeight - keyboardHeight;
+                                  
+                                  // If input is below the visible area when keyboard is shown
+                                  if (inputBottomPosition > visibleScreenHeight) {
+                                    const scrollOffset = inputBottomPosition - visibleScreenHeight + 50; // 50px margin
+                                    scrollViewRef.current?.scrollTo({
+                                      y: scrollOffset,
+                                      animated: true
+                                    });
+                                  }
+                                });
+                              }, 300); // Wait for keyboard animation
+                            }}
                           />
                         </View>
                       )}
