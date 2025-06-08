@@ -227,7 +227,7 @@ export default function CafeSelector({
           );
           return distance <= maxDistance;
         })
-        .slice(0, 10); // Limit to 10 markers
+        .slice(0, 8); // Limit to 8 markers for better performance
 
       return filtered;
     },
@@ -280,24 +280,32 @@ export default function CafeSelector({
   // Debounced region change handler to update visible markers
   const onRegionChangeComplete = useCallback(
     (newRegion) => {
+      // Prevent excessive zooming that could cause crashes
+      if (newRegion.latitudeDelta < 0.001 || newRegion.longitudeDelta < 0.001) {
+        return;
+      }
+      
       setRegion(newRegion);
 
-      // Update visible markers based on new region
-      if (cafes.length > 0) {
+      // Only update markers if not too zoomed in
+      if (cafes.length > 0 && newRegion.latitudeDelta > 0.005) {
         const newVisible = filterVisibleMarkers(cafes, newRegion);
         setVisibleMarkers(newVisible);
+      } else if (newRegion.latitudeDelta <= 0.005) {
+        // Clear markers when zoomed too far in
+        setVisibleMarkers([]);
       }
     },
     [cafes, filterVisibleMarkers],
   );
 
-  const fetchCafesInRegion = () => {
-    if (region) {
+  const fetchCafesInRegion = useCallback(() => {
+    if (region && region.latitudeDelta > 0.005) {
       setIsLoading(true);
       setMarkersLoaded(false);
-      fetchCafes(region.latitude, region.longitude); // Fetch cafes based on the saved region
+      fetchCafes(region.latitude, region.longitude);
     }
-  };
+  }, [region]);
 
   // Memoize markers to prevent unnecessary re-renders
   const memoizedMarkers = useMemo(() => {
@@ -313,6 +321,7 @@ export default function CafeSelector({
         title={cafe.name}
         description={cafe.vicinity}
         onPress={() => {}}
+        tracksViewChanges={false}
       >
         <Callout onPress={() => handleSelect(cafe)}>
           <TouchableWithoutFeedback>
@@ -399,12 +408,13 @@ export default function CafeSelector({
                     uri: getCafeImage(cafe.photos[0].photo_reference),
                   }}
                   style={{
-                    width: 120,
-                    height: 120,
+                    width: 100,
+                    height: 100,
                     borderRadius: 10,
                     alignSelf: "center",
                   }}
                   resizeMode="cover"
+                  onError={() => console.log('Image failed to load')}
                 />
               ) : (
                 <Text style={{ textAlign: "center" }}>No image available</Text>
@@ -571,8 +581,8 @@ export default function CafeSelector({
                     showsMyLocationButton={false}
                     loadingEnabled={true}
                     moveOnMarkerPress={false}
-                    maxZoomLevel={18}
-                    minZoomLevel={10}
+                    maxZoomLevel={16}
+                    minZoomLevel={12}
                   >
                     {location && (
                       <Marker
