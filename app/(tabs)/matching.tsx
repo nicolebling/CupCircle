@@ -704,21 +704,17 @@ export default function MatchingScreen() {
           </View>
         </View>
       ) : (
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-          keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
-          style={{ flex: 1 }}
+        <ScrollView
+          style={{ flex: 1, width: "100%", padding: 16 }}
+          contentContainerStyle={{
+            flexGrow: 1,
+            paddingBottom: 200, // Add extra padding for keyboard
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
         >
-          <ScrollView
-            style={{ flex: 1, width: "100%", padding: 16 }}
-            contentContainerStyle={{
-              flexGrow: 1,
-              paddingBottom: 20,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-            keyboardShouldPersistTaps="handled"
-          >
             <View style={[styles.cardsContainer, { width: "100%" }]}>
               {isLoading ? (
                 <View style={styles.loadingContainer}>
@@ -993,40 +989,53 @@ export default function MatchingScreen() {
                       )}
                     {profiles[currentIndex].availabilitySlots &&
                       profiles[currentIndex].availabilitySlots.length > 0 && (
-                        <View
-                          style={[
-                            styles.detailsCard,
-                            {
-                              backgroundColor: colors.card,
-                              borderColor: colors.border,
-                            },
-                          ]}
+                        <KeyboardAvoidingView
+                          behavior={Platform.OS === "ios" ? "position" : "height"}
+                          keyboardVerticalOffset={Platform.OS === "ios" ? 150 : 80}
                         >
-                          <Text
-                            style={[
-                              styles.detailsTitle,
-                              { color: colors.text },
-                            ]}
-                          >
-                            Send a message
-                          </Text>
+                          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                            <View
+                              style={[
+                                styles.detailsCard,
+                                {
+                                  backgroundColor: colors.card,
+                                  borderColor: colors.border,
+                                },
+                              ]}
+                            >
+                              <Text
+                                style={[
+                                  styles.detailsTitle,
+                                  { color: colors.text },
+                                ]}
+                              >
+                                Send a message
+                              </Text>
 
-                          <TextInput
-                            style={[
-                              styles.textArea,
-                              isDark
-                                ? styles.inputDark
-                                : { backgroundColor: "#f8f8f8" },
-                            ]}
-                            placeholder="..."
-                            placeholderTextColor={colors.secondaryText}
-                            multiline
-                            numberOfLines={2}
-                            value={messageText}
-                            onChangeText={setMessageText}
-                            textAlignVertical="top"
-                          />
-                        </View>
+                              <TextInput
+                                style={[
+                                  styles.textArea,
+                                  isDark
+                                    ? styles.inputDark
+                                    : { backgroundColor: "#f8f8f8" },
+                                ]}
+                                placeholder="..."
+                                placeholderTextColor={colors.secondaryText}
+                                multiline
+                                numberOfLines={2}
+                                value={messageText}
+                                onChangeText={setMessageText}
+                                textAlignVertical="top"
+                                onFocus={() => {
+                                  // Small delay to ensure the keyboard is shown before scrolling
+                                  setTimeout(() => {
+                                    // This will help ensure the input is visible
+                                  }, 100);
+                                }}
+                              />
+                            </View>
+                          </TouchableWithoutFeedback>
+                        </KeyboardAvoidingView>
                       )}
                   </Animated.View>
 
@@ -1161,7 +1170,6 @@ export default function MatchingScreen() {
               )}
             </View>
           </ScrollView>
-        </KeyboardAvoidingView>
       )}
 
       {/* Filter Modal */}
