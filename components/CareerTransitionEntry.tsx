@@ -159,6 +159,7 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   input: {
+    fontFamily: 'K2D-Regular',
     borderWidth: 1,
     borderColor: '#ddd',
     borderRadius: 8,
@@ -176,6 +177,7 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   saveButton: {
+    
     marginTop: 16,
     paddingVertical: 8,
     paddingHorizontal: 16,
@@ -183,6 +185,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   saveButtonText: {
+    fontFamily: 'K2D-SemiBold',
     color: '#FFFFFF',
     fontWeight: '600',
   },
