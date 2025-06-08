@@ -177,7 +177,7 @@ export default function OnboardingScreen() {
             <Text style={[styles.sectionSubtitle, { color: colors.secondaryText }]}>This could be your job title, passion, or just something that describes you best.</Text>
             <TextInput
               style={[styles.input, { backgroundColor: colors.card, color: colors.text, borderColor: colors.border }]}
-              placeholder="Enter your job title"
+              placeholder="Headline (Max 25 characters)"
               placeholderTextColor={colors.secondaryText}
               value={profileData.occupation}
               onChangeText={(text) => setProfileData({ ...profileData, occupation: text })}
