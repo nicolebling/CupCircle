@@ -8,7 +8,7 @@ import { useFonts } from "expo-font";
 import { Stack, useRouter, useSegments } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { View, ActivityIndicator } from "react-native";
 import "react-native-reanimated";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
@@ -90,6 +90,24 @@ function RootLayoutNav() {
   );
 }
 
+// CustomSplashScreen component (replace with your actual component)
+function CustomSplashScreen({ onFinish }) {
+  useEffect(() => {
+    // Simulate some loading time
+    const timeout = setTimeout(() => {
+      onFinish();
+    }, 3000); // Adjust the time as needed
+
+    return () => clearTimeout(timeout);
+  }, [onFinish]);
+
+  return (
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'white' }}>
+      <Text>Custom Splash Screen</Text>
+    </View>
+  );
+}
+
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [loaded, error] = useFonts({
@@ -98,6 +116,7 @@ export default function RootLayout() {
     "K2D-Bold": require("../assets/fonts/K2D-Bold.ttf"),
     "K2D-SemiBold": require("../assets/fonts/K2D-SemiBold.ttf"),
   });
+  const [showCustomSplash, setShowCustomSplash] = useState(true);
 
   useEffect(() => {
     if (loaded) {
@@ -113,12 +132,19 @@ export default function RootLayout() {
         ...(TextInput.defaultProps.style || {}),
       };
 
+      // Hide the default splash screen immediately since we're using custom one
       SplashScreen.hideAsync();
     }
-  }, [loaded]);
+  }, [loaded, error]);
 
-  if (!loaded) {
+  if (!loaded && !error) {
     return null;
+  }
+
+  if (showCustomSplash) {
+    return (
+      <CustomSplashScreen onFinish={() => setShowCustomSplash(false)} />
+    );
   }
 
   return (
