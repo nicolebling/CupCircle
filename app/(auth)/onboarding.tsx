@@ -209,7 +209,7 @@ export default function OnboardingScreen() {
         case 4:
         return (
           <View style={styles.formSection}>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>Experience Level</Text>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>What best describes your current role or experience?</Text>
             <ExperienceLevelSelector
               selected={profileData.experience_level}
               onChange={(level) => setProfileData({ ...profileData, experience_level: level })}
@@ -224,7 +224,7 @@ export default function OnboardingScreen() {
             <Text style={[styles.sectionTitle, { color: colors.text }]}>Tell us about yourself</Text>
             <TextInput
               style={[styles.textArea, { backgroundColor: colors.card, color: colors.text, borderColor: colors.border }]}
-              placeholder="Write a short bio..."
+              placeholder="Designer by day, aspiring barista by night. Let’s talk UX or espresso shots."
               placeholderTextColor={colors.secondaryText}
               multiline
               numberOfLines={5}
@@ -274,10 +274,10 @@ export default function OnboardingScreen() {
       case 7:
         return (
           <View style={styles.formSection}>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>Education</Text>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Where did you study?</Text>
             <TextInput
               style={[styles.input, { backgroundColor: colors.card, color: colors.text, borderColor: colors.border }]}
-              placeholder="Enter your educational background"
+              placeholder="Enter your school or university"
               placeholderTextColor={colors.secondaryText}
               value={profileData.education}
               onChangeText={(text) => setProfileData({ ...profileData, education: text })}
@@ -289,7 +289,7 @@ export default function OnboardingScreen() {
       case 8:
         return (
           <View style={styles.formSection}>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>Industry Categories</Text>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>What’s your current professional focus? (Max 3)</Text>
             <IndustrySelector
               selected={profileData.industry_categories}
               onChange={(industries) => setProfileData({ ...profileData, industry_categories: industries })}
@@ -332,7 +332,7 @@ export default function OnboardingScreen() {
       case 11:
         return (
           <View style={styles.formSection}>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>Interests</Text>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>What do you enjoy doing?</Text>
             <InterestSelector
               selected={profileData.interests}
               onChange={(interests) => setProfileData({ ...profileData, interests })}
@@ -398,7 +398,7 @@ export default function OnboardingScreen() {
               disabled={loading}
             >
               <Text style={styles.nextButtonText}>
-                {step === 10 ? 'Finish' : 'Next'}
+                {step === 12 ? 'Finish' : 'Next'}
               </Text>
               {loading && <Ionicons name="sync" size={18} color="white" style={styles.loadingIcon} />}
             </TouchableOpacity>
