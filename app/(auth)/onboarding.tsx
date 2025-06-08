@@ -20,6 +20,8 @@ export default function OnboardingScreen() {
   const [step, setStep] = useState(1);
   const [profileData, setProfileData] = useState({
     name: user?.name || '',
+    firstName: '',
+    lastName: '',
     occupation: '',
     city: '',
     bio: '',
@@ -120,7 +122,7 @@ export default function OnboardingScreen() {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      if (!profileData.name || !profileData.occupation || !profileData.city || 
+      if (!profileData.firstName || !profileData.lastName || !profileData.occupation || !profileData.city || 
           !profileData.bio || !profileData.education || !profileData.experience_level || 
           !profileData.industry_categories.length || !profileData.interests.length || 
           !profileData.favorite_cafes.length || !profileData.photo_url) {
@@ -130,6 +132,7 @@ export default function OnboardingScreen() {
       }
       const profileDataWithId = {
     ...profileData,
+    name: `${profileData.firstName} ${profileData.lastName}`,
     id: user?.id
   };
   await updateUser(profileDataWithId);
@@ -152,10 +155,17 @@ export default function OnboardingScreen() {
             <Text style={[styles.sectionTitle, { color: colors.text }]}>What's your name?</Text>
             <TextInput
               style={[styles.input, { backgroundColor: colors.card, color: colors.text, borderColor: colors.border }]}
-              placeholder="Enter your full name"
+              placeholder="First name"
               placeholderTextColor={colors.secondaryText}
-              value={profileData.name}
-              onChangeText={(text) => setProfileData({ ...profileData, name: text })}
+              value={profileData.firstName}
+              onChangeText={(text) => setProfileData({ ...profileData, firstName: text })}
+            />
+            <TextInput
+              style={[styles.input, { backgroundColor: colors.card, color: colors.text, borderColor: colors.border, marginTop: 12 }]}
+              placeholder="Last name"
+              placeholderTextColor={colors.secondaryText}
+              value={profileData.lastName}
+              onChangeText={(text) => setProfileData({ ...profileData, lastName: text })}
             />
           </View>
         );
