@@ -141,22 +141,19 @@ export default function CafeSelector({
 
         if (userLocation && userLocation.coords) {
           setLocation(userLocation.coords);
-          // Set initialRegion only once
-          if (!initialRegion) {
-            setInitialRegion({
-              latitude: userLocation.coords.latitude,
-              longitude: userLocation.coords.longitude,
-              latitudeDelta: 0.05,
-              longitudeDelta: 0.05,
-            });
-          }
-          // Set region to current user location
-          setRegion({
+          
+          const newRegion = {
             latitude: userLocation.coords.latitude,
             longitude: userLocation.coords.longitude,
             latitudeDelta: 0.05,
             longitudeDelta: 0.05,
-          });
+          };
+          
+          // Set initialRegion only once
+          setInitialRegion(newRegion);
+          // Set region to current user location
+          setRegion(newRegion);
+          
           fetchCafes(
             userLocation.coords.latitude,
             userLocation.coords.longitude,
@@ -172,7 +169,7 @@ export default function CafeSelector({
     };
 
     getLocation();
-  }, [initialRegion]);
+  }, []); // Remove dependency to prevent re-runs
 
   const handleSelect = (place: any) => {
     if (!selected.includes(place)) {
@@ -260,8 +257,16 @@ export default function CafeSelector({
       const allCafes = data.results || [];
       setCafes(allCafes);
 
+      // Create region for filtering based on current location
+      const currentRegion = {
+        latitude: lat,
+        longitude: lng,
+        latitudeDelta: 0.05,
+        longitudeDelta: 0.05,
+      };
+
       // Initially filter markers for current region
-      const initialVisible = filterVisibleMarkers(allCafes, region);
+      const initialVisible = filterVisibleMarkers(allCafes, currentRegion);
       setVisibleMarkers(initialVisible);
       setMarkersLoaded(true);
       setIsLoading(false);
