@@ -126,53 +126,58 @@ export default function CafeSelector({
   });
 
   useEffect(() => {
+    let isMounted = true;
+    
     const getLocation = async () => {
       try {
         setIsLoading(true);
         let { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== "granted") {
-          setErrorMsg("Permission to access location was denied");
+          if (isMounted) {
+            setErrorMsg("Permission to access location was denied");
+            setIsLoading(false);
+          }
           return;
         }
 
         let userLocation = await Location.getCurrentPositionAsync({
-          accuracy: Location.Accuracy.High,
+          accuracy: Location.Accuracy.Balanced,
         });
 
-        if (userLocation && userLocation.coords) {
-          setLocation(userLocation.coords);
-          // Set initialRegion only once
-          if (!initialRegion) {
-            setInitialRegion({
-              latitude: userLocation.coords.latitude,
-              longitude: userLocation.coords.longitude,
-              latitudeDelta: 0.05,
-              longitudeDelta: 0.05,
-            });
-          }
-          // Set region to current user location
-          setRegion({
-            latitude: userLocation.coords.latitude,
-            longitude: userLocation.coords.longitude,
+        if (userLocation && userLocation.coords && isMounted) {
+          const coords = userLocation.coords;
+          setLocation(coords);
+          
+          const newRegion = {
+            latitude: coords.latitude,
+            longitude: coords.longitude,
             latitudeDelta: 0.05,
             longitudeDelta: 0.05,
-          });
-          fetchCafes(
-            userLocation.coords.latitude,
-            userLocation.coords.longitude,
-          );
-        } else {
+          };
+          
+          setInitialRegion(newRegion);
+          setRegion(newRegion);
+          
+          // Fetch cafes after setting region
+          fetchCafes(coords.latitude, coords.longitude);
+        } else if (isMounted) {
           setErrorMsg("Could not fetch location. Please try again.");
+          setIsLoading(false);
         }
       } catch (error) {
-        setErrorMsg("Error fetching location: " + error.message);
-      } finally {
-        setIsLoading(false);
+        if (isMounted) {
+          setErrorMsg("Error fetching location: " + error.message);
+          setIsLoading(false);
+        }
       }
     };
 
     getLocation();
-  }, [initialRegion]);
+    
+    return () => {
+      isMounted = false;
+    };
+  }, []); // Remove initialRegion dependency to prevent loops
 
   const handleSelect = (place: any) => {
     if (!selected.includes(place)) {
@@ -208,7 +213,7 @@ export default function CafeSelector({
   // Filter markers based on current map region to prevent overload
   const filterVisibleMarkers = useCallback(
     (allCafes, currentRegion) => {
-      if (!currentRegion || !allCafes.length) return [];
+      if (!currentRegion || !allCafes || !allCafes.length) return [];
 
       const maxDistance =
         Math.max(
@@ -216,18 +221,22 @@ export default function CafeSelector({
           currentRegion.longitudeDelta * 111,
         ) / 2;
 
-      // Limit to 20 markers max to prevent performance issues
+      // Limit to 15 markers max to prevent performance issues
       const filtered = allCafes
         .filter((cafe) => {
+          if (!cafe?.geometry?.location?.lat || !cafe?.geometry?.location?.lng) {
+            return false;
+          }
+          
           const distance = calculateDistance(
             currentRegion.latitude,
             currentRegion.longitude,
             cafe.geometry.location.lat,
             cafe.geometry.location.lng,
           );
-          return distance <= maxDistance;
+          return distance <= maxDistance && !isNaN(distance);
         })
-        .slice(0, 15); // Limit to 10 markers
+        .slice(0, 15);
 
       return filtered;
     },
@@ -236,6 +245,8 @@ export default function CafeSelector({
 
   const fetchCafes = async (lat, lng) => {
     try {
+      setMarkersLoaded(false);
+      
       const apiKey = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY;
       if (!apiKey) {
         console.error("Google Maps API key is missing");
@@ -245,7 +256,7 @@ export default function CafeSelector({
       }
 
       const response = await fetch(
-        `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=2000&type=cafe&keyword=coffee&key=${process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY}`,
+        `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=2000&type=cafe&keyword=coffee&key=${apiKey}`,
       );
       const data = await response.json();
 
@@ -260,8 +271,15 @@ export default function CafeSelector({
       const allCafes = data.results || [];
       setCafes(allCafes);
 
-      // Initially filter markers for current region
-      const initialVisible = filterVisibleMarkers(allCafes, region);
+      // Use the current region for filtering
+      const currentRegion = {
+        latitude: lat,
+        longitude: lng,
+        latitudeDelta: 0.05,
+        longitudeDelta: 0.05,
+      };
+      
+      const initialVisible = filterVisibleMarkers(allCafes, currentRegion);
       setVisibleMarkers(initialVisible);
       setMarkersLoaded(true);
       setIsLoading(false);
@@ -274,9 +292,20 @@ export default function CafeSelector({
 
   
 
-  // Debounced region change handler to update visible markers
+  // Throttled region change handler to update visible markers
   const onRegionChangeComplete = useCallback(
     (newRegion) => {
+      // Validate region to prevent crashes
+      if (!newRegion || 
+          typeof newRegion.latitude !== 'number' || 
+          typeof newRegion.longitude !== 'number' ||
+          isNaN(newRegion.latitude) || 
+          isNaN(newRegion.longitude) ||
+          newRegion.latitudeDelta <= 0 ||
+          newRegion.longitudeDelta <= 0) {
+        return;
+      }
+
       setRegion(newRegion);
 
       // Update visible markers based on new region
@@ -545,16 +574,18 @@ export default function CafeSelector({
                 <View style={styles.container}>
                   <MapView
                     style={styles.map}
-                    customMapStyle={retroMapStyle} // Apply custom map style here
-                    region={region} // Bind the region state to the MapView
-                    initialRegion={initialRegion} // Set the initial region only once
-                    onRegionChangeComplete={onRegionChangeComplete} // Update region on map change with debouncing
+                    customMapStyle={retroMapStyle}
+                    region={region}
+                    initialRegion={initialRegion}
+                    onRegionChangeComplete={onRegionChangeComplete}
                     showsUserLocation={true}
                     showsMyLocationButton={false}
                     loadingEnabled={true}
                     moveOnMarkerPress={false}
-                    maxZoomLevel={18}
-                    minZoomLevel={10}
+                    pitchEnabled={false}
+                    rotateEnabled={false}
+                    scrollEnabled={true}
+                    zoomEnabled={true}
                   >
                     {location && (
                       <Marker
