@@ -227,7 +227,7 @@ export default function CafeSelector({
           );
           return distance <= maxDistance;
         })
-        .slice(0, 10); // Limit to 10 markers
+        .slice(0, 15); // Limit to 10 markers
 
       return filtered;
     },
