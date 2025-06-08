@@ -467,7 +467,11 @@ export default function CircleChatsScreen() {
               </TouchableOpacity>
             </View>
             {selectedProfile && (
-              <ScrollView style={{ flex: 1 }}>
+              <ScrollView 
+                style={{ flex: 1 }} 
+                contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 20 }}
+                showsVerticalScrollIndicator={false}
+              >
                 <View style={{ alignItems: "center" }}>
                   <ProfileCard
                     profile={{
@@ -679,6 +683,8 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     overflow: "hidden",
     flex: 1,
+    backgroundColor: colors.background,
+    paddingTop: 20,
   },
   modalHeader: {
     flexDirection: "row",
