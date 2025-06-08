@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -97,10 +97,6 @@ export default function MatchingScreen() {
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
   const [hasMoreProfiles, setHasMoreProfiles] = useState(false);
   const PROFILES_PER_PAGE = 10;
-
-  // Refs for scrolling
-  const scrollViewRef = useRef<ScrollView>(null);
-  const textInputRef = useRef<TextInput>(null);
 
   // Animation values
   const cardOffset = useSharedValue(0);
@@ -714,16 +710,14 @@ export default function MatchingScreen() {
           style={{ flex: 1 }}
         >
           <ScrollView
-            ref={scrollViewRef}
             style={{ flex: 1, width: "100%", padding: 16 }}
             contentContainerStyle={{
               flexGrow: 1,
-              paddingBottom: 200, // Extra padding for keyboard
+              paddingBottom: 20,
               justifyContent: "center",
               alignItems: "center",
             }}
             keyboardShouldPersistTaps="handled"
-            showsVerticalScrollIndicator={false}
           >
             <View style={[styles.cardsContainer, { width: "100%" }]}>
               {isLoading ? (
@@ -1018,7 +1012,6 @@ export default function MatchingScreen() {
                           </Text>
 
                           <TextInput
-                            ref={textInputRef}
                             style={[
                               styles.textArea,
                               isDark
@@ -1032,24 +1025,6 @@ export default function MatchingScreen() {
                             value={messageText}
                             onChangeText={setMessageText}
                             textAlignVertical="top"
-                            onFocus={() => {
-                              // Delay to ensure keyboard animation starts
-                              setTimeout(() => {
-                                textInputRef.current?.measure((x, y, width, height, pageX, pageY) => {
-                                  // Calculate the position to scroll to
-                                  const inputPosition = pageY + height;
-                                  const screenHeight = Platform.OS === 'ios' ? 700 : 600; // Approximate visible area when keyboard is up
-                                  
-                                  if (inputPosition > screenHeight) {
-                                    const scrollToY = inputPosition - screenHeight + 100; // Extra margin
-                                    scrollViewRef.current?.scrollTo({
-                                      y: scrollToY,
-                                      animated: true
-                                    });
-                                  }
-                                });
-                              }, 300); // Wait for keyboard animation
-                            }}
                           />
                         </View>
                       )}
