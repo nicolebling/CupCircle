@@ -19,7 +19,6 @@ import { useRouter, useNavigation } from "expo-router";
 import ProfileCard from "@/components/ProfileCard";
 import { format, addDays, isPast, isToday, parseISO } from "date-fns";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import SkeletonLoader from "@/components/SkeletonLoader";
 
 export default function CircleChatsScreen() {
   const colorScheme = useColorScheme();
@@ -497,60 +496,6 @@ export default function CircleChatsScreen() {
           />
         </View>
       </View>
-
-      {/* Loading skeletons */}
-      {!initialFetchDone && isLoading && (
-        <View style={styles.section}>
-          <SkeletonLoader width="40%" height={18} style={{ marginBottom: 12, marginLeft: 16 }} />
-          {[1, 2, 3].map((item) => (
-            <View
-              key={item}
-              style={[
-                styles.chatCard,
-                {
-                  backgroundColor: colors.card,
-                  borderColor: colors.border,
-                  marginHorizontal: 16,
-                },
-              ]}
-            >
-              <View style={styles.chatHeader}>
-                <View style={styles.profileSection}>
-                  <SkeletonLoader width={48} height={48} borderRadius={24} />
-                  <View style={styles.profileInfo}>
-                    <SkeletonLoader width="60%" height={16} style={{ marginBottom: 4 }} />
-                    <SkeletonLoader width="80%" height={14} />
-                  </View>
-                </View>
-                <SkeletonLoader width={80} height={24} borderRadius={12} />
-              </View>
-
-              <View style={styles.meetingDetails}>
-                <View style={styles.detailRow}>
-                  <SkeletonLoader width={20} height={20} borderRadius={10} style={{ marginRight: 8 }} />
-                  <SkeletonLoader width="50%" height={14} />
-                </View>
-                <View style={styles.detailRow}>
-                  <SkeletonLoader width={20} height={20} borderRadius={10} style={{ marginRight: 8 }} />
-                  <SkeletonLoader width="40%" height={14} />
-                </View>
-                <View style={styles.detailRow}>
-                  <SkeletonLoader width={20} height={20} borderRadius={10} style={{ marginRight: 8 }} />
-                  <View style={{ flex: 1 }}>
-                    <SkeletonLoader width="70%" height={14} style={{ marginBottom: 4 }} />
-                    <SkeletonLoader width="90%" height={14} />
-                  </View>
-                </View>
-              </View>
-
-              <View style={styles.actions}>
-                <SkeletonLoader width={80} height={36} borderRadius={18} style={{ marginRight: 8 }} />
-                <SkeletonLoader width={80} height={36} borderRadius={18} />
-              </View>
-            </View>
-          ))}
-        </View>
-      )}
 
       {/* Empty states */}
       {initialFetchDone && !isLoading && showEmptyState
