@@ -326,24 +326,15 @@ export default function CafeSelector({
 
   
 
-  // Debounced region change handler to prevent excessive updates
+  // Simple region change handler without restrictions
   const onRegionChangeComplete = useCallback(
     (newRegion) => {
-      // Only basic validation to prevent null/undefined crashes
-      if (!newRegion) {
-        return;
-      }
-
       setRegion(newRegion);
-
-      // Debounce marker updates to prevent crashes during rapid panning/zooming
-      clearTimeout(window.regionChangeTimeout);
-      window.regionChangeTimeout = setTimeout(() => {
-        if (cafes.length > 0) {
-          const newVisible = filterVisibleMarkers(cafes, newRegion);
-          setVisibleMarkers(newVisible);
-        }
-      }, 300); // Reduced debounce time for better responsiveness
+      
+      if (cafes.length > 0) {
+        const newVisible = filterVisibleMarkers(cafes, newRegion);
+        setVisibleMarkers(newVisible);
+      }
     },
     [cafes, filterVisibleMarkers],
   );
@@ -635,8 +626,6 @@ export default function CafeSelector({
                     rotateEnabled={false}
                     scrollEnabled={true}
                     zoomEnabled={true}
-                    minZoomLevel={8}
-                    maxZoomLevel={20}
                     cacheEnabled={true}
                     showsCompass={false}
                     showsScale={false}
