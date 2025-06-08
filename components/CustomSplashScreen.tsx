@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
     zIndex: 1000,
   },
   title: {
-    fontSize: 48,
+    fontSize: 38,
     fontFamily: 'K2D-Bold',
     textAlign: 'center',
   },
