@@ -272,10 +272,7 @@ export default function CafeSelector({
     }
   };
 
-  // Function to fetch the image URL of the cafe using the photo_reference
-  const getCafeImage = (photoReference: string) => {
-    return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=${process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY}`;
-  };
+  
 
   // Debounced region change handler to update visible markers
   const onRegionChangeComplete = useCallback(
@@ -393,22 +390,17 @@ export default function CafeSelector({
                 </View>
               )}
 
-              {cafe.photos && cafe.photos.length > 0 ? (
-                <Image
-                  source={{
-                    uri: getCafeImage(cafe.photos[0].photo_reference),
-                  }}
-                  style={{
-                    width: 120,
-                    height: 120,
-                    borderRadius: 10,
-                    alignSelf: "center",
-                  }}
-                  resizeMode="cover"
-                />
-              ) : (
-                <Text style={{ textAlign: "center" }}>No image available</Text>
-              )}
+              <View style={{
+                width: 120,
+                height: 80,
+                backgroundColor: '#f5f5f5',
+                borderRadius: 10,
+                alignSelf: "center",
+                justifyContent: 'center',
+                alignItems: 'center'
+              }}>
+                <Ionicons name="cafe" size={32} color="#ccc" />
+              </View>
 
               <View pointerEvents="box-none" style={{ width: "100%" }}>
                 <TouchableOpacity
