@@ -130,12 +130,13 @@ export default function OnboardingScreen() {
         setLoading(false);
         return;
       }
+      const { firstName, lastName, ...profileDataWithoutNames } = profileData;
       const profileDataWithId = {
-    ...profileData,
-    name: `${profileData.firstName} ${profileData.lastName}`,
-    id: user?.id
-  };
-  await updateUser(profileDataWithId);
+        ...profileDataWithoutNames,
+        name: `${firstName} ${lastName}`,
+        id: user?.id
+      };
+      await updateUser(profileDataWithId);
       router.replace('/(tabs)/matching');
     } catch (error) {
       console.error('Failed to save profile', error);
