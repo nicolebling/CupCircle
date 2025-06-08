@@ -121,8 +121,8 @@ export default function CafeSelector({
   const [region, setRegion] = useState({
     latitude: 0,
     longitude: 0,
-    latitudeDelta: 0.02,
-    longitudeDelta: 0.02,
+    latitudeDelta: 0.05,
+    longitudeDelta: 0.05,
   });
 
   useEffect(() => {
@@ -151,8 +151,8 @@ export default function CafeSelector({
           const newRegion = {
             latitude: coords.latitude,
             longitude: coords.longitude,
-            latitudeDelta: 0.02,
-            longitudeDelta: 0.02,
+            latitudeDelta: 0.05,
+            longitudeDelta: 0.05,
           };
           
           setInitialRegion(newRegion);
@@ -221,41 +221,22 @@ export default function CafeSelector({
           currentRegion.longitudeDelta * 111,
         ) / 2;
 
-      // Limit to 20 markers max to prevent performance issues
+      // Limit to 15 markers max to prevent performance issues
       const filtered = allCafes
         .filter((cafe) => {
-          // Enhanced validation to prevent crashes
-          if (!cafe || 
-              !cafe.place_id || 
-              !cafe.geometry || 
-              !cafe.geometry.location ||
-              !cafe.name ||
-              !cafe.vicinity) {
-            return false;
-          }
-
-          const lat = cafe.geometry.location.lat;
-          const lng = cafe.geometry.location.lng;
-
-          // Validate coordinates are valid numbers within range
-          if (typeof lat !== 'number' || 
-              typeof lng !== 'number' ||
-              isNaN(lat) || 
-              isNaN(lng) ||
-              Math.abs(lat) > 90 ||
-              Math.abs(lng) > 180) {
+          if (!cafe?.geometry?.location?.lat || !cafe?.geometry?.location?.lng) {
             return false;
           }
           
           const distance = calculateDistance(
             currentRegion.latitude,
             currentRegion.longitude,
-            lat,
-            lng,
+            cafe.geometry.location.lat,
+            cafe.geometry.location.lng,
           );
           return distance <= maxDistance && !isNaN(distance);
         })
-        .slice(0, 20);
+        .slice(0, 15);
 
       return filtered;
     },
@@ -287,30 +268,15 @@ export default function CafeSelector({
         return;
       }
 
-      const allCafes = (data.results || []).filter((cafe) => {
-        // Filter out any cafes with invalid data at the source
-        return (
-          cafe &&
-          cafe.place_id &&
-          cafe.geometry &&
-          cafe.geometry.location &&
-          typeof cafe.geometry.location.lat === 'number' &&
-          typeof cafe.geometry.location.lng === 'number' &&
-          !isNaN(cafe.geometry.location.lat) &&
-          !isNaN(cafe.geometry.location.lng) &&
-          cafe.name &&
-          cafe.vicinity
-        );
-      });
-      
+      const allCafes = data.results || [];
       setCafes(allCafes);
 
       // Use the current region for filtering
       const currentRegion = {
         latitude: lat,
         longitude: lng,
-        latitudeDelta: 0.02,
-        longitudeDelta: 0.02,
+        latitudeDelta: 0.05,
+        longitudeDelta: 0.05,
       };
       
       const initialVisible = filterVisibleMarkers(allCafes, currentRegion);
@@ -326,11 +292,23 @@ export default function CafeSelector({
 
   
 
-  // Simple region change handler without restrictions
+  // Throttled region change handler to update visible markers
   const onRegionChangeComplete = useCallback(
     (newRegion) => {
+      // Validate region to prevent crashes
+      if (!newRegion || 
+          typeof newRegion.latitude !== 'number' || 
+          typeof newRegion.longitude !== 'number' ||
+          isNaN(newRegion.latitude) || 
+          isNaN(newRegion.longitude) ||
+          newRegion.latitudeDelta <= 0 ||
+          newRegion.longitudeDelta <= 0) {
+        return;
+      }
+
       setRegion(newRegion);
-      
+
+      // Update visible markers based on new region
       if (cafes.length > 0) {
         const newVisible = filterVisibleMarkers(cafes, newRegion);
         setVisibleMarkers(newVisible);
@@ -351,35 +329,17 @@ export default function CafeSelector({
   const memoizedMarkers = useMemo(() => {
     if (!markersLoaded || visibleMarkers.length === 0) return [];
 
-    return visibleMarkers
-      .filter((cafe) => {
-        // Validate that all required fields exist and are valid numbers
-        return (
-          cafe &&
-          cafe.place_id &&
-          cafe.geometry &&
-          cafe.geometry.location &&
-          typeof cafe.geometry.location.lat === 'number' &&
-          typeof cafe.geometry.location.lng === 'number' &&
-          !isNaN(cafe.geometry.location.lat) &&
-          !isNaN(cafe.geometry.location.lng) &&
-          Math.abs(cafe.geometry.location.lat) <= 90 &&
-          Math.abs(cafe.geometry.location.lng) <= 180 &&
-          cafe.name &&
-          cafe.vicinity
-        );
-      })
-      .map((cafe) => (
-        <Marker
-          key={cafe.place_id}
-          coordinate={{
-            latitude: cafe.geometry.location.lat,
-            longitude: cafe.geometry.location.lng,
-          }}
-          title={cafe.name}
-          description={cafe.vicinity}
-          onPress={() => {}}
-        >
+    return visibleMarkers.map((cafe) => (
+      <Marker
+        key={cafe.place_id}
+        coordinate={{
+          latitude: cafe.geometry.location.lat,
+          longitude: cafe.geometry.location.lng,
+        }}
+        title={cafe.name}
+        description={cafe.vicinity}
+        onPress={() => {}}
+      >
         <Callout onPress={() => handleSelect(cafe)}>
           <TouchableWithoutFeedback>
             <View
@@ -626,12 +586,6 @@ export default function CafeSelector({
                     rotateEnabled={false}
                     scrollEnabled={true}
                     zoomEnabled={true}
-                    cacheEnabled={true}
-                    showsCompass={false}
-                    showsScale={false}
-                    showsBuildings={false}
-                    showsTraffic={false}
-                    showsIndoors={false}
                   >
                     {location && (
                       <Marker
