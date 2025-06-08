@@ -32,7 +32,7 @@ export default function CustomSplashScreen({ onFinish }: CustomSplashScreenProps
     <Animated.View 
       style={[
         styles.container, 
-        { backgroundColor: colors.background, opacity: fadeAnim }
+        { backgroundColor: '#ffffff', opacity: fadeAnim }
       ]}
     >
       <Text style={[styles.title, { color: colors.primary }]}>CupCircle</Text>
