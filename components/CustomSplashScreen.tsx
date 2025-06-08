@@ -1,6 +1,6 @@
 
 import React, { useEffect } from 'react';
-import { View, StyleSheet, Animated, Text } from 'react-native';
+import { View, StyleSheet, Text } from 'react-native';
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
@@ -11,32 +11,25 @@ interface CustomSplashScreenProps {
 export default function CustomSplashScreen({ onFinish }: CustomSplashScreenProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
-  const fadeAnim = React.useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
-    // Show splash for 3 seconds then fade out
+    // Show splash for 3 seconds then disappear immediately
     const timer = setTimeout(() => {
-      Animated.timing(fadeAnim, {
-        toValue: 0,
-        duration: 500,
-        useNativeDriver: true,
-      }).start(() => {
-        onFinish();
-      });
+      onFinish();
     }, 3000);
 
     return () => clearTimeout(timer);
-  }, [fadeAnim, onFinish]);
+  }, [onFinish]);
 
   return (
-    <Animated.View 
+    <View 
       style={[
         styles.container, 
-        { backgroundColor: '#ffffff', opacity: fadeAnim }
+        { backgroundColor: '#ffffff' }
       ]}
     >
       <Text style={[styles.title, { color: colors.primary }]}>CupCircle</Text>
-    </Animated.View>
+    </View>
   );
 }
 
