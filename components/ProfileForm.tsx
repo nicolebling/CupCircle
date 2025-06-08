@@ -581,7 +581,7 @@ export default function ProfileForm({
 
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isDark && styles.textDark]}>
-                Industry Categories
+                Industry
               </Text>
               <IndustrySelector
                 selected={industryCategories}

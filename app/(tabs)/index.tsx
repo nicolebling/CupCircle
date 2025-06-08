@@ -671,11 +671,11 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.5)",
     justifyContent: "flex-end",
     alignItems: "center",
+    
   },
   modalContent: {
     width: "100%",
     maxHeight: "85%",
-
     borderRadius: 16,
     overflow: "hidden",
     flex: 1,

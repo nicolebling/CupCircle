@@ -343,7 +343,7 @@ export default function ChatsScreen() {
       <Text style={[styles.emptySubtitle, { color: colors.secondaryText }]}>
         {searchQuery
           ? "No matches found for your search"
-          : "Confirm a Coffee Chat in Circle Chats to begin chatting"}
+          : "Chat opens up when a coffee chat is confirmed"}
       </Text>
     </View>
   );
