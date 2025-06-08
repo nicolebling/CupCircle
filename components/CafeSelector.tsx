@@ -215,6 +215,14 @@ export default function CafeSelector({
     (allCafes, currentRegion) => {
       if (!currentRegion || !allCafes || !allCafes.length) return [];
 
+      // Validate region data
+      if (typeof currentRegion.latitude !== 'number' ||
+          typeof currentRegion.longitude !== 'number' ||
+          isNaN(currentRegion.latitude) ||
+          isNaN(currentRegion.longitude)) {
+        return [];
+      }
+
       const maxDistance =
         Math.max(
           currentRegion.latitudeDelta * 111, // Convert degrees to km (roughly)
@@ -224,7 +232,15 @@ export default function CafeSelector({
       // Limit to 15 markers max to prevent performance issues
       const filtered = allCafes
         .filter((cafe) => {
-          if (!cafe?.geometry?.location?.lat || !cafe?.geometry?.location?.lng) {
+          // More comprehensive validation
+          if (!cafe || 
+              !cafe.place_id ||
+              !cafe.geometry || 
+              !cafe.geometry.location ||
+              typeof cafe.geometry.location.lat !== 'number' ||
+              typeof cafe.geometry.location.lng !== 'number' ||
+              isNaN(cafe.geometry.location.lat) ||
+              isNaN(cafe.geometry.location.lng)) {
             return false;
           }
           
@@ -234,7 +250,7 @@ export default function CafeSelector({
             cafe.geometry.location.lat,
             cafe.geometry.location.lng,
           );
-          return distance <= maxDistance && !isNaN(distance);
+          return distance <= maxDistance && !isNaN(distance) && distance >= 0;
         })
         .slice(0, 15);
 
@@ -268,7 +284,19 @@ export default function CafeSelector({
         return;
       }
 
-      const allCafes = data.results || [];
+      const allCafes = (data.results || []).filter(cafe => {
+        // Filter out cafes with invalid data at the source
+        return cafe &&
+               cafe.place_id &&
+               cafe.geometry &&
+               cafe.geometry.location &&
+               typeof cafe.geometry.location.lat === 'number' &&
+               typeof cafe.geometry.location.lng === 'number' &&
+               !isNaN(cafe.geometry.location.lat) &&
+               !isNaN(cafe.geometry.location.lng) &&
+               cafe.name;
+      });
+      
       setCafes(allCafes);
 
       // Use the current region for filtering
@@ -295,14 +323,23 @@ export default function CafeSelector({
   // Throttled region change handler to update visible markers
   const onRegionChangeComplete = useCallback(
     (newRegion) => {
-      // Validate region to prevent crashes
+      // Enhanced validation to prevent crashes
       if (!newRegion || 
           typeof newRegion.latitude !== 'number' || 
           typeof newRegion.longitude !== 'number' ||
+          typeof newRegion.latitudeDelta !== 'number' ||
+          typeof newRegion.longitudeDelta !== 'number' ||
           isNaN(newRegion.latitude) || 
           isNaN(newRegion.longitude) ||
+          isNaN(newRegion.latitudeDelta) ||
+          isNaN(newRegion.longitudeDelta) ||
           newRegion.latitudeDelta <= 0 ||
-          newRegion.longitudeDelta <= 0) {
+          newRegion.longitudeDelta <= 0 ||
+          newRegion.latitude < -90 ||
+          newRegion.latitude > 90 ||
+          newRegion.longitude < -180 ||
+          newRegion.longitude > 180) {
+        console.warn('Invalid region data received:', newRegion);
         return;
       }
 
@@ -310,8 +347,12 @@ export default function CafeSelector({
 
       // Update visible markers based on new region
       if (cafes.length > 0) {
-        const newVisible = filterVisibleMarkers(cafes, newRegion);
-        setVisibleMarkers(newVisible);
+        try {
+          const newVisible = filterVisibleMarkers(cafes, newRegion);
+          setVisibleMarkers(newVisible);
+        } catch (error) {
+          console.error('Error filtering markers:', error);
+        }
       }
     },
     [cafes, filterVisibleMarkers],
@@ -329,17 +370,34 @@ export default function CafeSelector({
   const memoizedMarkers = useMemo(() => {
     if (!markersLoaded || visibleMarkers.length === 0) return [];
 
-    return visibleMarkers.map((cafe) => (
-      <Marker
-        key={cafe.place_id}
-        coordinate={{
-          latitude: cafe.geometry.location.lat,
-          longitude: cafe.geometry.location.lng,
-        }}
-        title={cafe.name}
-        description={cafe.vicinity}
-        onPress={() => {}}
-      >
+    return visibleMarkers
+      .filter((cafe) => {
+        // Validate all required properties exist and are valid numbers
+        return cafe &&
+               cafe.place_id &&
+               cafe.geometry &&
+               cafe.geometry.location &&
+               typeof cafe.geometry.location.lat === 'number' &&
+               typeof cafe.geometry.location.lng === 'number' &&
+               !isNaN(cafe.geometry.location.lat) &&
+               !isNaN(cafe.geometry.location.lng) &&
+               cafe.geometry.location.lat >= -90 &&
+               cafe.geometry.location.lat <= 90 &&
+               cafe.geometry.location.lng >= -180 &&
+               cafe.geometry.location.lng <= 180 &&
+               cafe.name;
+      })
+      .map((cafe) => (
+        <Marker
+          key={cafe.place_id}
+          coordinate={{
+            latitude: cafe.geometry.location.lat,
+            longitude: cafe.geometry.location.lng,
+          }}
+          title={cafe.name || 'Unknown Cafe'}
+          description={cafe.vicinity || 'Location not specified'}
+          onPress={() => {}}
+        >
         <Callout onPress={() => handleSelect(cafe)}>
           <TouchableWithoutFeedback>
             <View
@@ -587,7 +645,11 @@ export default function CafeSelector({
                     scrollEnabled={true}
                     zoomEnabled={true}
                   >
-                    {location && (
+                    {location && 
+                     typeof location.latitude === 'number' &&
+                     typeof location.longitude === 'number' &&
+                     !isNaN(location.latitude) &&
+                     !isNaN(location.longitude) && (
                       <Marker
                         coordinate={{
                           latitude: location.latitude,
