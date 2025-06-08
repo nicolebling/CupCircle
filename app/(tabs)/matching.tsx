@@ -1033,24 +1033,9 @@ export default function MatchingScreen() {
                             onChangeText={setMessageText}
                             textAlignVertical="top"
                             onFocus={() => {
-                              // Delay to ensure the keyboard animation starts
+                              // Delay to ensure the keyboard animation starts, then scroll to bottom
                               setTimeout(() => {
-                                messageInputRef.current?.measure((x, y, width, height, pageX, pageY) => {
-                                  // Calculate scroll position to bring input into view
-                                  const inputBottomPosition = pageY + height;
-                                  const keyboardHeight = Platform.OS === 'ios' ? 350 : 300;
-                                  const screenHeight = require('react-native').Dimensions.get('window').height;
-                                  const visibleScreenHeight = screenHeight - keyboardHeight;
-                                  
-                                  // If input is below the visible area when keyboard is shown
-                                  if (inputBottomPosition > visibleScreenHeight) {
-                                    const scrollOffset = inputBottomPosition - visibleScreenHeight + 50; // 50px margin
-                                    scrollViewRef.current?.scrollTo({
-                                      y: scrollOffset,
-                                      animated: true
-                                    });
-                                  }
-                                });
+                                scrollViewRef.current?.scrollToEnd({ animated: true });
                               }, 300); // Wait for keyboard animation
                             }}
                           />
