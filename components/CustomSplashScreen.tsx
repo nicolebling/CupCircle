@@ -1,7 +1,6 @@
 
 import React, { useEffect } from 'react';
-import { View, StyleSheet, Animated } from 'react-native';
-import LogoAnimation from './LogoAnimation';
+import { View, StyleSheet, Animated, Text } from 'react-native';
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
@@ -36,7 +35,7 @@ export default function CustomSplashScreen({ onFinish }: CustomSplashScreenProps
         { backgroundColor: colors.background, opacity: fadeAnim }
       ]}
     >
-      <LogoAnimation showText={true} showSubtitle={false} size={120} />
+      <Text style={[styles.title, { color: colors.primary }]}>CupCircle</Text>
     </Animated.View>
   );
 }
@@ -52,5 +51,10 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     zIndex: 1000,
+  },
+  title: {
+    fontSize: 48,
+    fontFamily: 'K2D-Bold',
+    textAlign: 'center',
   },
 });
