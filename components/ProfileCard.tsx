@@ -50,6 +50,12 @@ const getCoffeeTheme = (level: string): string => {
       return "Nitro Cold Brew";
     case "Executive":
       return "Espresso";
+    case "Self-employed":
+      return "Drip";
+    case "Founder":
+      return "Home Brewed";
+    case "I don't work":
+      return "Decaf";
     default:
       return "";
   }
@@ -72,6 +78,12 @@ const getCoffeeColor = (level: string): string => {
       return "#483C32"; // Nitro cold brew
     case "Executive":
       return "#301E1E"; // Espresso
+    case "Self-employed":
+      return "#8B4513"; // Drip coffee color
+    case "Founder":
+      return "#6B4E3D"; // Home brewed color
+    case "I don't work":
+      return "#D2B48C"; // Decaf color
     default:
       return "#F97415"; // App primary color
   }
