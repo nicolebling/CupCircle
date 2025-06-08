@@ -124,6 +124,7 @@ export default function CafeSelector({
     latitudeDelta: 0.05,
     longitudeDelta: 0.05,
   });
+  const [isMapReady, setIsMapReady] = useState(false);
 
   useEffect(() => {
     const getLocation = async () => {
@@ -210,13 +211,16 @@ export default function CafeSelector({
     (allCafes, currentRegion) => {
       if (!currentRegion || !allCafes.length) return [];
 
+      const zoomLevel = Math.log2(360 / currentRegion.latitudeDelta);
+      const maxMarkers = zoomLevel > 15 ? 8 : zoomLevel > 12 ? 12 : 15;
+
       const maxDistance =
         Math.max(
           currentRegion.latitudeDelta * 111, // Convert degrees to km (roughly)
           currentRegion.longitudeDelta * 111,
         ) / 2;
 
-      // Limit to 20 markers max to prevent performance issues
+      // Filter and limit markers based on zoom level
       const filtered = allCafes
         .filter((cafe) => {
           const distance = calculateDistance(
@@ -227,7 +231,7 @@ export default function CafeSelector({
           );
           return distance <= maxDistance;
         })
-        .slice(0, 15); // Limit to 10 markers
+        .slice(0, maxMarkers);
 
       return filtered;
     },
@@ -277,16 +281,24 @@ export default function CafeSelector({
   // Debounced region change handler to update visible markers
   const onRegionChangeComplete = useCallback(
     (newRegion) => {
+      if (!isMapReady) return;
+      
       setRegion(newRegion);
 
-      // Update visible markers based on new region
-      if (cafes.length > 0) {
-        const newVisible = filterVisibleMarkers(cafes, newRegion);
-        setVisibleMarkers(newVisible);
-      }
+      // Debounce marker updates to prevent crashes during rapid zoom
+      setTimeout(() => {
+        if (cafes.length > 0) {
+          const newVisible = filterVisibleMarkers(cafes, newRegion);
+          setVisibleMarkers(newVisible);
+        }
+      }, 300);
     },
-    [cafes, filterVisibleMarkers],
+    [cafes, filterVisibleMarkers, isMapReady],
   );
+
+  const onMapReady = useCallback(() => {
+    setIsMapReady(true);
+  }, []);
 
   const fetchCafesInRegion = () => {
     if (region) {
@@ -311,110 +323,46 @@ export default function CafeSelector({
         description={cafe.vicinity}
         onPress={() => {}}
       >
-        <Callout onPress={() => handleSelect(cafe)}>
-          <TouchableWithoutFeedback>
-            <View
+        <Callout onPress={() => handleSelect(cafe)} tooltip>
+          <View
+            style={{
+              padding: 8,
+              width: 180,
+              alignItems: "center",
+            }}
+          >
+            <Text
               style={{
-                padding: 10,
-                width: 200,
-                alignItems: "center",
+                fontFamily: "K2D-SemiBold",
+                marginBottom: 4,
+                textAlign: "center",
+                fontSize: 14,
               }}
             >
+              {cafe.name}
+            </Text>
+            <Text
+              style={{
+                fontFamily: "K2D-Regular",
+                marginBottom: 4,
+                textAlign: "center",
+                fontSize: 12,
+              }}
+            >
+              {cafe.vicinity}
+            </Text>
+            {cafe.rating && (
               <Text
                 style={{
-                  fontFamily: "K2D-SemiBold",
-                  marginBottom: 5,
-                  textAlign: "center",
+                  fontSize: 12,
+                  fontFamily: "K2D-Medium",
+                  color: "#666",
                 }}
               >
-                {cafe.name}
+                ⭐ {cafe.rating.toFixed(1)}
               </Text>
-              <Text
-                style={{
-                  fontFamily: "K2D-Regular",
-                  marginBottom: 5,
-                  textAlign: "center",
-                }}
-              >
-                {cafe.vicinity}
-              </Text>
-
-              {/* Show the rating */}
-              {cafe.rating && (
-                <View
-                  style={{
-                    flexDirection: "row",
-                    marginBottom: 5,
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  {Array.from({ length: 5 }, (_, index) => {
-                    if (index < Math.floor(cafe.rating)) {
-                      return (
-                        <Ionicons
-                          key={index}
-                          name="star"
-                          size={16}
-                          color="gold"
-                        />
-                      );
-                    } else if (index < Math.ceil(cafe.rating)) {
-                      return (
-                        <Ionicons
-                          key={index}
-                          name="star-half"
-                          size={16}
-                          color="gold"
-                        />
-                      );
-                    }
-                    return (
-                      <Ionicons
-                        key={index}
-                        name="star-outline"
-                        size={16}
-                        color="gold"
-                      />
-                    );
-                  })}
-                  <Text
-                    style={{
-                      marginLeft: 5,
-                      fontSize: 12,
-                      fontFamily: "K2D-SemiBold",
-                    }}
-                  >
-                    {cafe.rating.toFixed(1)}
-                  </Text>
-                </View>
-              )}
-
-              
-
-              <View pointerEvents="box-none" style={{ width: "100%" }}>
-                <TouchableOpacity
-                  style={{
-                    backgroundColor: Colors.light.primary,
-                    padding: 10,
-                    borderRadius: 5,
-                    marginTop: 10,
-                    alignItems: "center",
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontFamily: "K2D-Medium",
-                      color: "white",
-                      textAlign: "center",
-                    }}
-                  >
-                    Select Cafe
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </TouchableWithoutFeedback>
+            )}
+          </View>
         </Callout>
       </Marker>
     ));
@@ -549,12 +497,17 @@ export default function CafeSelector({
                     region={region} // Bind the region state to the MapView
                     initialRegion={initialRegion} // Set the initial region only once
                     onRegionChangeComplete={onRegionChangeComplete} // Update region on map change with debouncing
+                    onMapReady={onMapReady}
                     showsUserLocation={true}
                     showsMyLocationButton={false}
                     loadingEnabled={true}
                     moveOnMarkerPress={false}
-                    maxZoomLevel={18}
+                    maxZoomLevel={17}
                     minZoomLevel={10}
+                    cacheEnabled={true}
+                    zoomTapEnabled={false}
+                    rotateEnabled={false}
+                    pitchEnabled={false}
                   >
                     {location && (
                       <Marker
@@ -568,7 +521,7 @@ export default function CafeSelector({
                     )}
 
                     {/* Lazy-loaded markers */}
-                    {memoizedMarkers}
+                    {isMapReady && memoizedMarkers}
                   </MapView>
 
                   {/* Floating Search Button */}
