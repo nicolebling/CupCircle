@@ -224,15 +224,34 @@ export default function CafeSelector({
       // Limit to 15 markers max to prevent performance issues
       const filtered = allCafes
         .filter((cafe) => {
-          if (!cafe?.geometry?.location?.lat || !cafe?.geometry?.location?.lng) {
+          // Enhanced validation to prevent crashes
+          if (!cafe || 
+              !cafe.place_id || 
+              !cafe.geometry || 
+              !cafe.geometry.location ||
+              !cafe.name ||
+              !cafe.vicinity) {
+            return false;
+          }
+
+          const lat = cafe.geometry.location.lat;
+          const lng = cafe.geometry.location.lng;
+
+          // Validate coordinates are valid numbers within range
+          if (typeof lat !== 'number' || 
+              typeof lng !== 'number' ||
+              isNaN(lat) || 
+              isNaN(lng) ||
+              Math.abs(lat) > 90 ||
+              Math.abs(lng) > 180) {
             return false;
           }
           
           const distance = calculateDistance(
             currentRegion.latitude,
             currentRegion.longitude,
-            cafe.geometry.location.lat,
-            cafe.geometry.location.lng,
+            lat,
+            lng,
           );
           return distance <= maxDistance && !isNaN(distance);
         })
@@ -268,7 +287,22 @@ export default function CafeSelector({
         return;
       }
 
-      const allCafes = data.results || [];
+      const allCafes = (data.results || []).filter((cafe) => {
+        // Filter out any cafes with invalid data at the source
+        return (
+          cafe &&
+          cafe.place_id &&
+          cafe.geometry &&
+          cafe.geometry.location &&
+          typeof cafe.geometry.location.lat === 'number' &&
+          typeof cafe.geometry.location.lng === 'number' &&
+          !isNaN(cafe.geometry.location.lat) &&
+          !isNaN(cafe.geometry.location.lng) &&
+          cafe.name &&
+          cafe.vicinity
+        );
+      });
+      
       setCafes(allCafes);
 
       // Use the current region for filtering
@@ -329,17 +363,35 @@ export default function CafeSelector({
   const memoizedMarkers = useMemo(() => {
     if (!markersLoaded || visibleMarkers.length === 0) return [];
 
-    return visibleMarkers.map((cafe) => (
-      <Marker
-        key={cafe.place_id}
-        coordinate={{
-          latitude: cafe.geometry.location.lat,
-          longitude: cafe.geometry.location.lng,
-        }}
-        title={cafe.name}
-        description={cafe.vicinity}
-        onPress={() => {}}
-      >
+    return visibleMarkers
+      .filter((cafe) => {
+        // Validate that all required fields exist and are valid numbers
+        return (
+          cafe &&
+          cafe.place_id &&
+          cafe.geometry &&
+          cafe.geometry.location &&
+          typeof cafe.geometry.location.lat === 'number' &&
+          typeof cafe.geometry.location.lng === 'number' &&
+          !isNaN(cafe.geometry.location.lat) &&
+          !isNaN(cafe.geometry.location.lng) &&
+          Math.abs(cafe.geometry.location.lat) <= 90 &&
+          Math.abs(cafe.geometry.location.lng) <= 180 &&
+          cafe.name &&
+          cafe.vicinity
+        );
+      })
+      .map((cafe) => (
+        <Marker
+          key={cafe.place_id}
+          coordinate={{
+            latitude: cafe.geometry.location.lat,
+            longitude: cafe.geometry.location.lng,
+          }}
+          title={cafe.name}
+          description={cafe.vicinity}
+          onPress={() => {}}
+        >
         <Callout onPress={() => handleSelect(cafe)}>
           <TouchableWithoutFeedback>
             <View
