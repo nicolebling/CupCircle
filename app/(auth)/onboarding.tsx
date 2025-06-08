@@ -158,14 +158,20 @@ export default function OnboardingScreen() {
               placeholder="First name"
               placeholderTextColor={colors.secondaryText}
               value={profileData.firstName}
-              onChangeText={(text) => setProfileData({ ...profileData, firstName: text })}
+              onChangeText={(text) => {
+                const capitalizedText = text.charAt(0).toUpperCase() + text.slice(1);
+                setProfileData({ ...profileData, firstName: capitalizedText });
+              }}
             />
             <TextInput
               style={[styles.input, { backgroundColor: colors.card, color: colors.text, borderColor: colors.border, marginTop: 12 }]}
               placeholder="Last name"
               placeholderTextColor={colors.secondaryText}
               value={profileData.lastName}
-              onChangeText={(text) => setProfileData({ ...profileData, lastName: text })}
+              onChangeText={(text) => {
+                const capitalizedText = text.charAt(0).toUpperCase() + text.slice(1);
+                setProfileData({ ...profileData, lastName: capitalizedText });
+              }}
             />
           </View>
         );
