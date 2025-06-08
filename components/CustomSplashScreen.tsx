@@ -36,7 +36,7 @@ export default function CustomSplashScreen({ onFinish }: CustomSplashScreenProps
         { backgroundColor: colors.background, opacity: fadeAnim }
       ]}
     >
-      <LogoAnimation showText={true} size={120} />
+      <LogoAnimation showText={true} showSubtitle={false} size={120} />
     </Animated.View>
   );
 }

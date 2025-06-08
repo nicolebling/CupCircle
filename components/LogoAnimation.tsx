@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Animated, Easing } from 'react-native';
 import Colors from '@/constants/Colors';
@@ -7,9 +6,10 @@ import { useColorScheme } from '@/hooks/useColorScheme';
 interface LogoAnimationProps {
   showText?: boolean;
   size?: number;
+  showSubtitle?: boolean;
 }
 
-export default function LogoAnimation({ showText = false, size = 96 }: LogoAnimationProps) {
+export default function LogoAnimation({ showText = false, size = 96, showSubtitle = false }: LogoAnimationProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const rotateAnim1 = useRef(new Animated.Value(0)).current;
@@ -94,7 +94,9 @@ export default function LogoAnimation({ showText = false, size = 96 }: LogoAnima
       {showText && (
         <>
           <Text style={[styles.title, { color: colors.primary }]}>CupCircle</Text>
-          <Text style={[styles.subtitle, { color: colors.primary }]}>Where every cup connects</Text>
+          {showSubtitle && (
+            <Text style={[styles.subtitle, { color: colors.primary }]}>Where every cup connects</Text>
+          )}
         </>
       )}
     </View>
