@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import {
   View,
   Text,
@@ -114,16 +114,9 @@ export default function CafeSelector({
   const [errorMsg, setErrorMsg] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [cafes, setCafes] = useState([]);
-  const [initialRegion, setInitialRegion] = useState(null);
-  const [visibleMarkers, setVisibleMarkers] = useState([]);
+  const [initialRegion, setInitialRegion] = useState(null); // Store initial region for first load
+  const [visibleMarkers, setVisibleMarkers] = useState([]); // Markers currently visible on map
   const [markersLoaded, setMarkersLoaded] = useState(false);
-
-  // Cache and debouncing refs
-  const cafeCache = useRef(new Map());
-  const debounceTimer = useRef(null);
-  const lastFetchLocation = useRef(null);
-  const apiCallCount = useRef(0);
-  const lastApiCall = useRef(0);
 
   const [region, setRegion] = useState({
     latitude: 0,
@@ -143,22 +136,27 @@ export default function CafeSelector({
         }
 
         let userLocation = await Location.getCurrentPositionAsync({
-          accuracy: Location.Accuracy.Balanced, // Use balanced instead of high for better performance
+          accuracy: Location.Accuracy.High,
         });
 
         if (userLocation && userLocation.coords) {
           setLocation(userLocation.coords);
-          
-          const newRegion = {
+          // Set initialRegion only once
+          if (!initialRegion) {
+            setInitialRegion({
+              latitude: userLocation.coords.latitude,
+              longitude: userLocation.coords.longitude,
+              latitudeDelta: 0.05,
+              longitudeDelta: 0.05,
+            });
+          }
+          // Set region to current user location
+          setRegion({
             latitude: userLocation.coords.latitude,
             longitude: userLocation.coords.longitude,
             latitudeDelta: 0.05,
             longitudeDelta: 0.05,
-          };
-          
-          setInitialRegion(newRegion);
-          setRegion(newRegion);
-          
+          });
           fetchCafes(
             userLocation.coords.latitude,
             userLocation.coords.longitude,
@@ -174,14 +172,7 @@ export default function CafeSelector({
     };
 
     getLocation();
-    
-    // Cleanup function
-    return () => {
-      if (debounceTimer.current) {
-        clearTimeout(debounceTimer.current);
-      }
-    };
-  }, []);
+  }, [initialRegion]);
 
   const handleSelect = (place: any) => {
     if (!selected.includes(place)) {
@@ -214,44 +205,6 @@ export default function CafeSelector({
     return R * c;
   }, []);
 
-  // Rate limiting helper
-  const canMakeApiCall = useCallback(() => {
-    const now = Date.now();
-    const timeSinceLastCall = now - lastApiCall.current;
-    const callsPerMinute = 10; // Limit to 10 calls per minute
-    
-    if (timeSinceLastCall < 60000 / callsPerMinute) {
-      return false;
-    }
-    
-    lastApiCall.current = now;
-    apiCallCount.current++;
-    return true;
-  }, []);
-
-  // Generate cache key for location
-  const getCacheKey = useCallback((lat, lng, radius = 1500) => {
-    // Round to 3 decimal places to group nearby locations
-    const roundedLat = Math.round(lat * 1000) / 1000;
-    const roundedLng = Math.round(lng * 1000) / 1000;
-    return `${roundedLat},${roundedLng},${radius}`;
-  }, []);
-
-  // Check if location is significantly different from last fetch
-  const shouldFetchNewData = useCallback((lat, lng) => {
-    if (!lastFetchLocation.current) return true;
-    
-    const distance = calculateDistance(
-      lastFetchLocation.current.lat,
-      lastFetchLocation.current.lng,
-      lat,
-      lng
-    );
-    
-    // Only fetch if moved more than 0.5km
-    return distance > 0.5;
-  }, [calculateDistance]);
-
   // Filter markers based on current map region to prevent overload
   const filterVisibleMarkers = useCallback(
     (allCafes, currentRegion) => {
@@ -259,11 +212,11 @@ export default function CafeSelector({
 
       const maxDistance =
         Math.max(
-          currentRegion.latitudeDelta * 111,
+          currentRegion.latitudeDelta * 111, // Convert degrees to km (roughly)
           currentRegion.longitudeDelta * 111,
         ) / 2;
 
-      // Limit to 15 markers max and prioritize by rating
+      // Limit to 20 markers max to prevent performance issues
       const filtered = allCafes
         .filter((cafe) => {
           const distance = calculateDistance(
@@ -274,15 +227,14 @@ export default function CafeSelector({
           );
           return distance <= maxDistance;
         })
-        .sort((a, b) => (b.rating || 0) - (a.rating || 0)) // Sort by rating
-        .slice(0, 15); // Limit to 15 markers for better performance
+        .slice(0, 10); // Limit to 10 markers
 
       return filtered;
     },
     [calculateDistance],
   );
 
-  const fetchCafes = async (lat, lng, useCache = true) => {
+  const fetchCafes = async (lat, lng) => {
     try {
       const apiKey = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY;
       if (!apiKey) {
@@ -292,86 +244,24 @@ export default function CafeSelector({
         return;
       }
 
-      // Check cache first
-      const cacheKey = getCacheKey(lat, lng, 1500);
-      if (useCache && cafeCache.current.has(cacheKey)) {
-        console.log("Using cached cafe data");
-        const cachedData = cafeCache.current.get(cacheKey);
-        setCafes(cachedData);
-        
-        const currentRegion = {
-          latitude: lat,
-          longitude: lng,
-          latitudeDelta: 0.05,
-          longitudeDelta: 0.05,
-        };
-        
-        const initialVisible = filterVisibleMarkers(cachedData, currentRegion);
-        setVisibleMarkers(initialVisible);
-        setMarkersLoaded(true);
-        setIsLoading(false);
-        return;
-      }
-
-      // Check if we should make API call
-      if (!canMakeApiCall()) {
-        console.log("Rate limit reached, using existing data");
-        setIsLoading(false);
-        return;
-      }
-
-      // Check if location changed significantly
-      if (!shouldFetchNewData(lat, lng)) {
-        console.log("Location change too small, skipping fetch");
-        setIsLoading(false);
-        return;
-      }
-
-      console.log(`Making API call ${apiCallCount.current} for location: ${lat}, ${lng}`);
-      
       const response = await fetch(
-        `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=1500&type=cafe&keyword=coffee&key=${apiKey}`,
-        {
-          timeout: 10000, // 10 second timeout
-        }
+        `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=2000&type=cafe&keyword=coffee&key=${process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY}`,
       );
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
       const data = await response.json();
 
       if (data.status === "REQUEST_DENIED") {
-        setErrorMsg("Google Maps API access denied. Please check your API key and permissions.");
-        setIsLoading(false);
-        return;
-      }
-
-      if (data.status === "OVER_QUERY_LIMIT") {
-        setErrorMsg("Too many requests. Please try again later.");
+        setErrorMsg(
+          "Google Maps API access denied. Please check your API key and permissions.",
+        );
         setIsLoading(false);
         return;
       }
 
       const allCafes = data.results || [];
-      
-      // Cache the results
-      cafeCache.current.set(cacheKey, allCafes);
-      
-      // Store last fetch location
-      lastFetchLocation.current = { lat, lng };
-      
       setCafes(allCafes);
 
-      const currentRegion = {
-        latitude: lat,
-        longitude: lng,
-        latitudeDelta: 0.05,
-        longitudeDelta: 0.05,
-      };
-
-      const initialVisible = filterVisibleMarkers(allCafes, currentRegion);
+      // Initially filter markers for current region
+      const initialVisible = filterVisibleMarkers(allCafes, region);
       setVisibleMarkers(initialVisible);
       setMarkersLoaded(true);
       setIsLoading(false);
@@ -392,41 +282,20 @@ export default function CafeSelector({
     (newRegion) => {
       setRegion(newRegion);
 
-      // Clear any existing debounce timer
-      if (debounceTimer.current) {
-        clearTimeout(debounceTimer.current);
-      }
-
-      // Update visible markers immediately for better UX
+      // Update visible markers based on new region
       if (cafes.length > 0) {
         const newVisible = filterVisibleMarkers(cafes, newRegion);
         setVisibleMarkers(newVisible);
       }
-
-      // Debounce API calls for 2 seconds
-      debounceTimer.current = setTimeout(() => {
-        if (shouldFetchNewData(newRegion.latitude, newRegion.longitude)) {
-          // Only fetch if we've moved significantly and have cache space
-          if (cafeCache.current.size < 50) { // Limit cache size
-            fetchCafes(newRegion.latitude, newRegion.longitude, false);
-          }
-        }
-      }, 2000);
     },
-    [cafes, filterVisibleMarkers, shouldFetchNewData],
+    [cafes, filterVisibleMarkers],
   );
 
   const fetchCafesInRegion = () => {
-    if (region && canMakeApiCall()) {
+    if (region) {
       setIsLoading(true);
       setMarkersLoaded(false);
-      fetchCafes(region.latitude, region.longitude, false); // Force fresh fetch
-    } else {
-      Alert.alert(
-        "Rate Limit",
-        "Please wait a moment before searching again to avoid excessive API usage.",
-        [{ text: "OK" }]
-      );
+      fetchCafes(region.latitude, region.longitude); // Fetch cafes based on the saved region
     }
   };
 
