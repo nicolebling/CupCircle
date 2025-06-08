@@ -23,7 +23,7 @@ export default function OnboardingScreen() {
     firstName: '',
     lastName: '',
     occupation: '',
-    city: '',
+    city: 'New York City',
     bio: '',
     photo_url: user?.photo_url || '',
     education: '',
@@ -197,11 +197,11 @@ export default function OnboardingScreen() {
             <Text style={[styles.sectionTitle, { color: colors.text }]}>Where are you located?</Text>
             <Text style={[styles.sectionSubtitle, { color: colors.secondaryText }]}>Currently, we're based only in NYC.</Text>
             <TextInput
-              style={[styles.input, { backgroundColor: colors.card, color: colors.text, borderColor: colors.border }]}
+              style={[styles.input, { backgroundColor: colors.card, color: colors.secondaryText, borderColor: colors.border, opacity: 0.6 }]}
               placeholder="New York City"
               placeholderTextColor={colors.secondaryText}
-              value={profileData.city}
-              onChangeText={(text) => setProfileData({ ...profileData, city: text })}
+              value="New York City"
+              editable={false}
             />
           </View>
         );
