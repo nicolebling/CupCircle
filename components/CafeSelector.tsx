@@ -121,8 +121,8 @@ export default function CafeSelector({
   const [region, setRegion] = useState({
     latitude: 0,
     longitude: 0,
-    latitudeDelta: 0.05,
-    longitudeDelta: 0.05,
+    latitudeDelta: 0.02,
+    longitudeDelta: 0.02,
   });
 
   useEffect(() => {
@@ -151,8 +151,8 @@ export default function CafeSelector({
           const newRegion = {
             latitude: coords.latitude,
             longitude: coords.longitude,
-            latitudeDelta: 0.05,
-            longitudeDelta: 0.05,
+            latitudeDelta: 0.02,
+            longitudeDelta: 0.02,
           };
           
           setInitialRegion(newRegion);
@@ -221,7 +221,7 @@ export default function CafeSelector({
           currentRegion.longitudeDelta * 111,
         ) / 2;
 
-      // Limit to 15 markers max to prevent performance issues
+      // Limit to 20 markers max to prevent performance issues
       const filtered = allCafes
         .filter((cafe) => {
           // Enhanced validation to prevent crashes
@@ -255,7 +255,7 @@ export default function CafeSelector({
           );
           return distance <= maxDistance && !isNaN(distance);
         })
-        .slice(0, 15);
+        .slice(0, 20);
 
       return filtered;
     },
@@ -309,8 +309,8 @@ export default function CafeSelector({
       const currentRegion = {
         latitude: lat,
         longitude: lng,
-        latitudeDelta: 0.05,
-        longitudeDelta: 0.05,
+        latitudeDelta: 0.02,
+        longitudeDelta: 0.02,
       };
       
       const initialVisible = filterVisibleMarkers(allCafes, currentRegion);
@@ -326,7 +326,7 @@ export default function CafeSelector({
 
   
 
-  // Throttled region change handler to update visible markers
+  // Debounced region change handler to prevent excessive updates
   const onRegionChangeComplete = useCallback(
     (newRegion) => {
       // Validate region to prevent crashes
@@ -340,13 +340,21 @@ export default function CafeSelector({
         return;
       }
 
+      // Prevent excessive zoom levels that cause crashes
+      if (newRegion.latitudeDelta < 0.001 || newRegion.longitudeDelta < 0.001) {
+        return;
+      }
+
       setRegion(newRegion);
 
-      // Update visible markers based on new region
-      if (cafes.length > 0) {
-        const newVisible = filterVisibleMarkers(cafes, newRegion);
-        setVisibleMarkers(newVisible);
-      }
+      // Debounce marker updates to prevent crashes during rapid panning/zooming
+      clearTimeout(window.regionChangeTimeout);
+      window.regionChangeTimeout = setTimeout(() => {
+        if (cafes.length > 0) {
+          const newVisible = filterVisibleMarkers(cafes, newRegion);
+          setVisibleMarkers(newVisible);
+        }
+      }, 300);
     },
     [cafes, filterVisibleMarkers],
   );
@@ -638,6 +646,14 @@ export default function CafeSelector({
                     rotateEnabled={false}
                     scrollEnabled={true}
                     zoomEnabled={true}
+                    minZoomLevel={10}
+                    maxZoomLevel={18}
+                    cacheEnabled={true}
+                    showsCompass={false}
+                    showsScale={false}
+                    showsBuildings={false}
+                    showsTraffic={false}
+                    showsIndoors={false}
                   >
                     {location && (
                       <Marker
