@@ -8,7 +8,7 @@ import { useFonts } from "expo-font";
 import { Stack, useRouter, useSegments } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { View, ActivityIndicator } from "react-native";
 import "react-native-reanimated";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
@@ -16,6 +16,7 @@ import { NetworkProvider } from "@/contexts/NetworkContext";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Text, TextInput } from "react-native";
 import Colors from "@/constants/Colors";
+import CustomSplashScreen from "@/components/CustomSplashScreen";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -98,9 +99,10 @@ export default function RootLayout() {
     "K2D-Bold": require("../assets/fonts/K2D-Bold.ttf"),
     "K2D-SemiBold": require("../assets/fonts/K2D-SemiBold.ttf"),
   });
+  const [showCustomSplash, setShowCustomSplash] = useState(true);
 
   useEffect(() => {
-    if (loaded) {
+    if (loaded || error) {
       Text.defaultProps = Text.defaultProps || {};
       Text.defaultProps.style = {
         fontFamily: "K2D-Regular",
@@ -113,12 +115,19 @@ export default function RootLayout() {
         ...(TextInput.defaultProps.style || {}),
       };
 
+      // Hide the default splash screen immediately since we're using custom one
       SplashScreen.hideAsync();
     }
-  }, [loaded]);
+  }, [loaded, error]);
 
-  if (!loaded) {
+  if (!loaded && !error) {
     return null;
+  }
+
+  if (showCustomSplash) {
+    return (
+      <CustomSplashScreen onFinish={() => setShowCustomSplash(false)} />
+    );
   }
 
   return (
