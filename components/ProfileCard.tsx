@@ -38,7 +38,7 @@ const getCoffeeTheme = (level: string): string => {
   switch (level) {
     case "Student":
       return "Warm Milk";
-    case "Internship":
+    case "Intern":
       return "Latte";
     case "Entry":
       return "Light Roast";
@@ -66,7 +66,7 @@ const getCoffeeColor = (level: string): string => {
   switch (level) {
     case "Student":
       return "#E6C8A0"; // Warm milk color
-    case "Internship":
+    case "Intern":
       return "#D2B48C"; // Latte color
     case "Entry":
       return "#C19A6B"; // Light roast
@@ -79,11 +79,11 @@ const getCoffeeColor = (level: string): string => {
     case "Executive":
       return "#301E1E"; // Espresso
     case "Self-employed":
-      return "#8B4513"; // Drip coffee color
+      return "#27449F"; // Drip coffee color
     case "Founder":
-      return "#6B4E3D"; // Home brewed color
+      return "#2f6569"; // Home brewed color
     case "I don't work":
-      return "#D2B48C"; // Decaf color
+      return "#6d5271"; // Decaf color
     default:
       return "#F97415"; // App primary color
   }
@@ -1525,12 +1525,12 @@ const styles = StyleSheet.create({
   },
   decorativeCircle: {
     position: "absolute",
-    width: (width - 32) * 0.6 + 16, // 8px larger on each side
-    height: (width - 32) * 0.6 + 16,
+    width: (width - 32) * 0.6 + 20, // 8px larger on each side, was +16
+    height: (width - 32) * 0.6 + 20,
     borderRadius: ((width - 32) * 0.6 + 16) / 2,
-    borderWidth: 4,
+    borderWidth: 6,
     backgroundColor: "transparent",
-    top: -8,
+    top: -10, //was -8
     zIndex: 1,
     shadowColor: "#FFF",
     shadowOffset: { width: 0, height: 0 },

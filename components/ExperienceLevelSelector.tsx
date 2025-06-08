@@ -13,9 +13,9 @@ const EXPERIENCE_LEVELS = [
   { level: 'Senior', coffeeTheme: 'Dark Roast', icon: 'cafe-outline' },
   { level: 'Director', coffeeTheme: 'Nitro Cold Brew', icon: 'cafe-outline' },
   { level: 'Executive', coffeeTheme: 'Espresso', icon: 'cafe-outline' },
-  { level: 'Self-employed', coffeeTheme: 'Drip', icon: 'briefcase-outline' },
-  { level: 'Founder', coffeeTheme: 'Home Brewed', icon: 'bulb-outline' },
-  { level: 'I don\'t work', coffeeTheme: 'Decaf', icon: 'home-outline' }
+  { level: 'Self-employed', coffeeTheme: 'Drip', icon: 'cafe-outline' },
+  { level: 'Founder', coffeeTheme: 'Home Brewed', icon: 'cafe-outline' },
+  { level: 'I don\'t work', coffeeTheme: 'Decaf', icon: 'cafe-outline' }
 ];
 
 type ExperienceLevelSelectorProps = {
@@ -142,15 +142,15 @@ export default function ExperienceLevelSelector(props: ExperienceLevelSelectorPr
 const getCoffeeColor = (level: string, defaultColor: string): string => {
   switch (level) {
     case 'Student': return '#E6C8A0'; // Warm milk color
-    case 'Internship': return '#D2B48C'; // Latte color
+    case 'Intern': return '#D2B48C'; // Latte color
     case 'Entry': return '#C19A6B'; // Light roast
     case 'Junior': return '#A67B5B'; // Medium roast
     case 'Senior': return '#654321'; // Dark roast
     case 'Director': return '#483C32'; // Nitro cold brew
     case 'Executive': return '#301E1E'; // Espresso
-    case 'Self-employed': return '#8B4513'; // Drip coffee color
-    case 'Founder': return '#6B4E3D'; // Home brewed color
-    case 'I don\'t work': return '#D2B48C'; // Decaf color
+    case 'Self-employed': return '#27449F'; // Drip coffee color
+    case 'Founder': return '#2f6569'; // Home brewed color
+    case 'I don\'t work': return '#6d5271'; // Decaf color
     default: return defaultColor;
   }
 };
