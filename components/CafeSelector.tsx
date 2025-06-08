@@ -329,19 +329,17 @@ export default function CafeSelector({
   // Debounced region change handler to prevent excessive updates
   const onRegionChangeComplete = useCallback(
     (newRegion) => {
-      // Validate region to prevent crashes
+      // Basic validation to prevent crashes but allow normal map interaction
       if (!newRegion || 
           typeof newRegion.latitude !== 'number' || 
           typeof newRegion.longitude !== 'number' ||
           isNaN(newRegion.latitude) || 
-          isNaN(newRegion.longitude) ||
-          newRegion.latitudeDelta <= 0 ||
-          newRegion.longitudeDelta <= 0) {
+          isNaN(newRegion.longitude)) {
         return;
       }
 
-      // Prevent excessive zoom levels that cause crashes
-      if (newRegion.latitudeDelta < 0.001 || newRegion.longitudeDelta < 0.001) {
+      // Only prevent extremely small deltas that could cause crashes
+      if (newRegion.latitudeDelta < 0.0001 || newRegion.longitudeDelta < 0.0001) {
         return;
       }
 
@@ -354,7 +352,7 @@ export default function CafeSelector({
           const newVisible = filterVisibleMarkers(cafes, newRegion);
           setVisibleMarkers(newVisible);
         }
-      }, 300);
+      }, 500); // Increased debounce time
     },
     [cafes, filterVisibleMarkers],
   );
@@ -646,8 +644,8 @@ export default function CafeSelector({
                     rotateEnabled={false}
                     scrollEnabled={true}
                     zoomEnabled={true}
-                    minZoomLevel={10}
-                    maxZoomLevel={18}
+                    minZoomLevel={8}
+                    maxZoomLevel={20}
                     cacheEnabled={true}
                     showsCompass={false}
                     showsScale={false}
