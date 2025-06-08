@@ -13,6 +13,7 @@ import {
   ScrollView,
   Image,
 } from "react-native";
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Link, router } from "expo-router";
 import LogoAnimation from "@/components/LogoAnimation";
 import { useColorScheme } from "@/hooks/useColorScheme";
@@ -64,6 +65,7 @@ export default function LoginScreen() {
   const [error, setError] = useState("");
   const [toastVisible, setToastVisible] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
+  const insets = useSafeAreaInsets();
 
   const { signIn } = useAuth();
   const colorScheme = useColorScheme();
@@ -153,15 +155,15 @@ export default function LoginScreen() {
       <SafeAreaView
         style={[styles.container, { backgroundColor: theme.colors.background }]}
       >
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "position" : "height"}
-          keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
-          style={styles.keyboardAvoidingView}
-        >
+          <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            keyboardVerticalOffset={Platform.OS === "ios" ? insets.top + 200 : 20}
+            style={styles.keyboardAvoidingView}
+          >
           <View style={styles.content}>
             {/* Logo & Branding */}
             <View style={styles.header}>
-              <LogoAnimation showText={true} />
+              <LogoAnimation showText={true} showSubtitle={true} />
             </View>
 
             {/* Form Container */}

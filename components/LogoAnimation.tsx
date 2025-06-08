@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontFamily: 'K2D-Bold',
-    marginTop: 24,
+   
     textAlign: 'center',
   },
   subtitle: {
