@@ -303,27 +303,13 @@ export default function ProfileCard({
             </View>
           )}
           {profile.experience_level && (
-              <>
-                <View
-                  style={[
-                    styles.decorativeCircle,
-                    { borderColor: getCoffeeColor(profile.experience_level) },
-                  ]}
-                />
-                <View
-                  style={[
-                    styles.decorativeCircleDots,
-                    { borderColor: getCoffeeColor(profile.experience_level) },
-                  ]}
-                />
-                <View
-                  style={[
-                    styles.decorativeCircleInner,
-                    { borderColor: getCoffeeColor(profile.experience_level) },
-                  ]}
-                />
-              </>
-            )}
+            <View
+              style={[
+                styles.decorativeCircle,
+                { borderColor: getCoffeeColor(profile.experience_level) },
+              ]}
+            />
+          )}
         </View>
 
         {/* Match badge - Edit for later */}
@@ -654,26 +640,12 @@ export default function ProfileCard({
               </View>
             )}
             {profile.experience_level && (
-              <>
-                <View
-                  style={[
-                    styles.decorativeCircle,
-                    { borderColor: getCoffeeColor(profile.experience_level) },
-                  ]}
-                />
-                <View
-                  style={[
-                    styles.decorativeCircleDots,
-                    { borderColor: getCoffeeColor(profile.experience_level) },
-                  ]}
-                />
-                <View
-                  style={[
-                    styles.decorativeCircleInner,
-                    { borderColor: getCoffeeColor(profile.experience_level) },
-                  ]}
-                />
-              </>
+              <View
+                style={[
+                  styles.decorativeCircle,
+                  { borderColor: getCoffeeColor(profile.experience_level) },
+                ]}
+              />
             )}
           </View>
 
@@ -1213,8 +1185,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    ```python
-marginBottom: 8,
+    marginBottom: 8,
   },
   name: {
     fontFamily: "K2D-Bold",
@@ -1566,40 +1537,6 @@ marginBottom: 8,
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 5,
-    overflow: "visible",
-  },
-    decorativeCircleDots: {
-    position: "absolute",
-    width: (width - 32) * 0.6 + 8, // slightly smaller
-    height: (width - 32) * 0.6 + 8,
-    borderRadius: ((width - 32) * 0.6 + 8) / 2,
-    borderWidth: 4,
-    borderStyle: 'dotted',
-    backgroundColor: "transparent",
-    top: -4, // adjust to center
-    zIndex: 0,
-    shadowColor: "#FFF",
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.2,
-    shadowRadius: 6,
-    elevation: 4,
-    overflow: "visible",
-  },
-  decorativeCircleInner: {
-    position: "absolute",
-    width: (width - 32) * 0.6 + 24, // slightly larger
-    height: (width - 32) * 0.6 + 24,
-    borderRadius: ((width - 32) * 0.6 + 24) / 2,
-    borderWidth: 2,
-    borderStyle: 'dashed',
-    backgroundColor: "transparent",
-    top: -12, // adjust to center
-    zIndex: 0,
-    shadowColor: "#FFF",
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
     overflow: "visible",
   },
 });
