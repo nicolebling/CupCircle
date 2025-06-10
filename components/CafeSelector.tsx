@@ -414,6 +414,7 @@ export default function CafeSelector({
           key={clusterId}
           coordinate={coordinate}
           onPress={onPress}
+          tracksViewChanges={false}
         >
           <View style={[styles.clusterMarker, { backgroundColor: colors.primary }]}>
             <Text style={[styles.clusterText, { color: colors.background }]}>
@@ -440,6 +441,7 @@ export default function CafeSelector({
         title={cafe.name}
         description={cafe.vicinity || 'Unknown location'}
         onPress={() => {}}
+        tracksViewChanges={false}
       >
         <Callout onPress={() => handleSelect(cafe)}>
           <TouchableWithoutFeedback>
@@ -645,6 +647,7 @@ export default function CafeSelector({
                         }}
                         title="Your Location"
                         pinColor="#FF6347"
+                        tracksViewChanges={false}
                       />
                     )}
 
