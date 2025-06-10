@@ -224,7 +224,10 @@ export default function CafeSelector({
       // Limit to 15 markers max to prevent performance issues
       const filtered = allCafes
         .filter((cafe) => {
-          if (!cafe?.geometry?.location?.lat || !cafe?.geometry?.location?.lng) {
+          if (
+            !cafe?.geometry?.location?.lat ||
+            !cafe?.geometry?.location?.lng
+          ) {
             return false;
           }
 
@@ -256,7 +259,7 @@ export default function CafeSelector({
       }
 
       const response = await fetch(
-        `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=2000&type=cafe&keyword=coffee&key=${apiKey}`,
+        `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=2000&type=cafe&keyword=coffee&key=${process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEYapiKey}`,
       );
       const data = await response.json();
 
@@ -290,19 +293,19 @@ export default function CafeSelector({
     }
   };
 
-
-
   // Throttled region change handler to update visible markers
   const onRegionChangeComplete = useCallback(
     (newRegion) => {
       // Validate region to prevent crashes
-      if (!newRegion || 
-          typeof newRegion.latitude !== 'number' || 
-          typeof newRegion.longitude !== 'number' ||
-          isNaN(newRegion.latitude) || 
-          isNaN(newRegion.longitude) ||
-          newRegion.latitudeDelta <= 0 ||
-          newRegion.longitudeDelta <= 0) {
+      if (
+        !newRegion ||
+        typeof newRegion.latitude !== "number" ||
+        typeof newRegion.longitude !== "number" ||
+        isNaN(newRegion.latitude) ||
+        isNaN(newRegion.longitude) ||
+        newRegion.latitudeDelta <= 0 ||
+        newRegion.longitudeDelta <= 0
+      ) {
         return;
       }
 
@@ -330,7 +333,8 @@ export default function CafeSelector({
     if (!markersLoaded || visibleMarkers.length === 0) return [];
 
     try {
-      return visibleMarkers.map((cafe) => {
+      return visibleMarkers
+        .map((cafe) => {
           try {
             return (
               <Marker
@@ -422,8 +426,6 @@ export default function CafeSelector({
                         </View>
                       )}
 
-
-
                       <View pointerEvents="box-none" style={{ width: "100%" }}>
                         <TouchableOpacity
                           style={{
@@ -451,13 +453,13 @@ export default function CafeSelector({
               </Marker>
             );
           } catch (error) {
-            console.error('Error rendering marker:', error, cafe);
+            console.error("Error rendering marker:", error, cafe);
             return null;
           }
         })
         .filter(Boolean); // Remove any null markers
     } catch (error) {
-      console.error('Error creating markers:', error);
+      console.error("Error creating markers:", error);
       return [];
     }
   }, [visibleMarkers, markersLoaded]);

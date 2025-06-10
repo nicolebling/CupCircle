@@ -10,6 +10,7 @@
     "userInterfaceStyle": "automatic",
     "platforms": ["ios", "android"],
     "newArchEnabled": true,
+    "jsEngine": "jsc",
     "extra": {
       "API_URL": "https://cupcircle-api.yourusername.replit.app",
       "eas": {
