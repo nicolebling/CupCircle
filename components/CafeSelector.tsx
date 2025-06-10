@@ -351,10 +351,10 @@ export default function CafeSelector({
     }
   }, [region, cafes, cluster, getMapBounds, getZoomLevel]);
 
-  // Throttled region change handler
+  // Throttled region change handler with enhanced validation
   const handleRegionChange = useCallback(
     (newRegion) => {
-      // Validate region to prevent crashes
+      // Enhanced validation to prevent crashes
       if (
         !newRegion ||
         typeof newRegion.latitude !== "number" ||
@@ -362,24 +362,55 @@ export default function CafeSelector({
         isNaN(newRegion.latitude) ||
         isNaN(newRegion.longitude) ||
         newRegion.latitudeDelta <= 0 ||
-        newRegion.longitudeDelta <= 0
+        newRegion.longitudeDelta <= 0 ||
+        Math.abs(newRegion.latitude) > 90 ||
+        Math.abs(newRegion.longitude) > 180 ||
+        newRegion.latitudeDelta > 180 ||
+        newRegion.longitudeDelta > 360
       ) {
         console.log('Invalid region data filtered out:', newRegion);
         return;
       }
 
-      console.log('Region changed to:', newRegion);
-      setRegion(newRegion);
+      // Ensure minimum deltas to prevent zoom crashes
+      const safeRegion = {
+        ...newRegion,
+        latitudeDelta: Math.max(newRegion.latitudeDelta, 0.001),
+        longitudeDelta: Math.max(newRegion.longitudeDelta, 0.001),
+      };
+
+      console.log('Region changed to:', safeRegion);
+      setRegion(safeRegion);
     },
     [],
   );
 
-  // Throttle the region change handler to prevent excessive re-renders
+  // Enhanced throttling and debouncing to prevent crashes
   const throttledRegionChange = useMemo(() => {
     let timeoutId;
-    return (region) => {
-      if (timeoutId) clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => handleRegionChange(region), 300);
+    let lastUpdate = 0;
+    const THROTTLE_DELAY = 500; // Increased delay
+    const MIN_UPDATE_INTERVAL = 100;
+    
+    return (newRegion) => {
+      const now = Date.now();
+      
+      // Clear any pending timeout
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+      
+      // If enough time has passed, update immediately
+      if (now - lastUpdate > MIN_UPDATE_INTERVAL) {
+        lastUpdate = now;
+        handleRegionChange(newRegion);
+      } else {
+        // Otherwise, schedule an update
+        timeoutId = setTimeout(() => {
+          lastUpdate = Date.now();
+          handleRegionChange(newRegion);
+        }, THROTTLE_DELAY);
+      }
     };
   }, [handleRegionChange]);
 
@@ -394,20 +425,47 @@ export default function CafeSelector({
   // Handle cluster press to zoom in
   const onClusterPress = useCallback((clusterId) => {
     try {
-      const expansionZoom = cluster.getClusterExpansionZoom(clusterId);
-      const clusterFeature = cluster.getClusterExpansion(clusterId);
+      if (!clusterId || !cluster || !region) {
+        console.log('Invalid cluster press data:', { clusterId, cluster: !!cluster, region: !!region });
+        return;
+      }
+
+      // Get the cluster's children (leaves)
+      const clusterFeatures = cluster.getLeaves(clusterId, Infinity);
       
-      if (clusterFeature && clusterFeature.length > 0) {
-        const [longitude, latitude] = clusterFeature[0].geometry.coordinates;
-        
-        const newRegion = {
-          latitude,
-          longitude,
-          latitudeDelta: region.latitudeDelta / 2,
-          longitudeDelta: region.longitudeDelta / 2,
-        };
-        
-        setRegion(newRegion);
+      if (clusterFeatures && clusterFeatures.length > 0) {
+        // Calculate the center of all points in the cluster
+        let totalLat = 0;
+        let totalLng = 0;
+        let validPoints = 0;
+
+        clusterFeatures.forEach(feature => {
+          const [lng, lat] = feature.geometry.coordinates;
+          if (typeof lat === 'number' && typeof lng === 'number' && !isNaN(lat) && !isNaN(lng)) {
+            totalLat += lat;
+            totalLng += lng;
+            validPoints++;
+          }
+        });
+
+        if (validPoints > 0) {
+          const centerLat = totalLat / validPoints;
+          const centerLng = totalLng / validPoints;
+          
+          // Calculate new region with validated bounds
+          const newLatDelta = Math.max(region.latitudeDelta / 2, 0.001); // Minimum delta to prevent crash
+          const newLngDelta = Math.max(region.longitudeDelta / 2, 0.001);
+          
+          const newRegion = {
+            latitude: centerLat,
+            longitude: centerLng,
+            latitudeDelta: newLatDelta,
+            longitudeDelta: newLngDelta,
+          };
+          
+          console.log('Zooming to cluster center:', newRegion);
+          setRegion(newRegion);
+        }
       }
     } catch (error) {
       console.error('Error handling cluster press:', error);
@@ -636,6 +694,13 @@ export default function CafeSelector({
                     rotateEnabled={false}
                     scrollEnabled={true}
                     zoomEnabled={true}
+                    maxZoomLevel={20}
+                    minZoomLevel={3}
+                    onMapReady={() => console.log('Map ready')}
+                    onError={(error) => {
+                      console.error('MapView error:', error);
+                      setErrorMsg('Map error occurred. Please try refreshing.');
+                    }}
                   >
                     {location && 
                       typeof location.latitude === 'number' && 
@@ -652,8 +717,15 @@ export default function CafeSelector({
                       />
                     )}
 
-                    {/* Render clustered markers */}
-                    {clusteredMarkers.map(renderMarker)}
+                    {/* Render clustered markers with error handling */}
+                    {clusteredMarkers.length > 0 && clusteredMarkers.map((marker) => {
+                      try {
+                        return renderMarker(marker);
+                      } catch (error) {
+                        console.error('Error rendering marker:', error, marker);
+                        return null;
+                      }
+                    })}
                   </MapView>
 
                   {/* Floating Search Button */}
