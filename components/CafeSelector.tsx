@@ -622,7 +622,6 @@ export default function CafeSelector({
                 <View style={styles.container}>
                   <MapView
                     style={styles.map}
-                    customMapStyle={retroMapStyle}
                     region={region}
                     onRegionChangeComplete={throttledRegionChange}
                     showsUserLocation={true}
