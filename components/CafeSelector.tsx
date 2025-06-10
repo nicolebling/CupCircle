@@ -633,7 +633,7 @@ export default function CafeSelector({
                     pitchEnabled={false}
                     rotateEnabled={false}
                     scrollEnabled={true}
-                    zoomEnabled={false}
+                    zoomEnabled={true}
                   >
                     {/* Temporarily removed all markers to test crash prevention */}
                     {/* User location marker commented out */}
