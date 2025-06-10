@@ -263,9 +263,9 @@ export default function CafeSelector({
           cafe?.place_id &&
           cafe?.name
         );
-      });
+      }).slice(0, 10); // Limit to maximum 10 markers
 
-      console.log(`Loaded ${validCafes.length} valid cafes out of ${allCafes.length} total`);
+      console.log(`Loaded ${validCafes.length} valid cafes out of ${allCafes.length} total (limited to 10 for performance)`);
       
       // Transform data for supercluster
       const points = validCafes.map((cafe) => ({
@@ -296,7 +296,7 @@ export default function CafeSelector({
     }
   };
 
-  // Get clustered markers for current region
+  // Get clustered markers for current region (limited to 10)
   const clusteredMarkers = useMemo(() => {
     if (!region || cafes.length === 0) return [];
 
@@ -319,9 +319,9 @@ export default function CafeSelector({
       
       console.log(`Getting clusters for zoom ${zoom} with bounds:`, bounds);
       
-      const clusters = cluster.getClusters(bounds, zoom);
+      const clusters = cluster.getClusters(bounds, zoom).slice(0, 10); // Limit to 10 markers
       
-      console.log(`Generated ${clusters.length} clusters/markers`);
+      console.log(`Generated ${clusters.length} clusters/markers (limited to 10 for performance)`);
       
       return clusters.map((feature, index) => {
         const [longitude, latitude] = feature.geometry.coordinates;
