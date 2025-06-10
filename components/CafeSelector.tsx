@@ -127,7 +127,7 @@ export default function CafeSelector({
 
   useEffect(() => {
     let isMounted = true;
-    
+
     const getLocation = async () => {
       try {
         setIsLoading(true);
@@ -147,17 +147,17 @@ export default function CafeSelector({
         if (userLocation && userLocation.coords && isMounted) {
           const coords = userLocation.coords;
           setLocation(coords);
-          
+
           const newRegion = {
             latitude: coords.latitude,
             longitude: coords.longitude,
             latitudeDelta: 0.05,
             longitudeDelta: 0.05,
           };
-          
+
           setInitialRegion(newRegion);
           setRegion(newRegion);
-          
+
           // Fetch cafes after setting region
           fetchCafes(coords.latitude, coords.longitude);
         } else if (isMounted) {
@@ -173,7 +173,7 @@ export default function CafeSelector({
     };
 
     getLocation();
-    
+
     return () => {
       isMounted = false;
     };
@@ -227,7 +227,7 @@ export default function CafeSelector({
           if (!cafe?.geometry?.location?.lat || !cafe?.geometry?.location?.lng) {
             return false;
           }
-          
+
           const distance = calculateDistance(
             currentRegion.latitude,
             currentRegion.longitude,
@@ -246,7 +246,7 @@ export default function CafeSelector({
   const fetchCafes = async (lat, lng) => {
     try {
       setMarkersLoaded(false);
-      
+
       const apiKey = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY;
       if (!apiKey) {
         console.error("Google Maps API key is missing");
@@ -278,7 +278,7 @@ export default function CafeSelector({
         latitudeDelta: 0.05,
         longitudeDelta: 0.05,
       };
-      
+
       const initialVisible = filterVisibleMarkers(allCafes, currentRegion);
       setVisibleMarkers(initialVisible);
       setMarkersLoaded(true);
@@ -290,7 +290,7 @@ export default function CafeSelector({
     }
   };
 
-  
+
 
   // Throttled region change handler to update visible markers
   const onRegionChangeComplete = useCallback(
@@ -329,124 +329,137 @@ export default function CafeSelector({
   const memoizedMarkers = useMemo(() => {
     if (!markersLoaded || visibleMarkers.length === 0) return [];
 
-    return visibleMarkers.map((cafe) => (
-      <Marker
-        key={cafe.place_id}
-        coordinate={{
-          latitude: cafe.geometry.location.lat,
-          longitude: cafe.geometry.location.lng,
-        }}
-        title={cafe.name}
-        description={cafe.vicinity}
-        onPress={() => {}}
-      >
-        <Callout onPress={() => handleSelect(cafe)}>
-          <TouchableWithoutFeedback>
-            <View
-              style={{
-                padding: 10,
-                width: 200,
-                alignItems: "center",
-              }}
-            >
-              <Text
-                style={{
-                  fontFamily: "K2D-SemiBold",
-                  marginBottom: 5,
-                  textAlign: "center",
+    try {
+      return visibleMarkers.map((cafe) => {
+          try {
+            return (
+              <Marker
+                key={cafe.place_id}
+                coordinate={{
+                  latitude: cafe.geometry.location.lat,
+                  longitude: cafe.geometry.location.lng,
                 }}
+                title={cafe.name}
+                description={cafe.vicinity}
+                onPress={() => {}}
               >
-                {cafe.name}
-              </Text>
-              <Text
-                style={{
-                  fontFamily: "K2D-Regular",
-                  marginBottom: 5,
-                  textAlign: "center",
-                }}
-              >
-                {cafe.vicinity}
-              </Text>
+                <Callout onPress={() => handleSelect(cafe)}>
+                  <TouchableWithoutFeedback>
+                    <View
+                      style={{
+                        padding: 10,
+                        width: 200,
+                        alignItems: "center",
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontFamily: "K2D-SemiBold",
+                          marginBottom: 5,
+                          textAlign: "center",
+                        }}
+                      >
+                        {cafe.name}
+                      </Text>
+                      <Text
+                        style={{
+                          fontFamily: "K2D-Regular",
+                          marginBottom: 5,
+                          textAlign: "center",
+                        }}
+                      >
+                        {cafe.vicinity}
+                      </Text>
 
-              {/* Show the rating */}
-              {cafe.rating && (
-                <View
-                  style={{
-                    flexDirection: "row",
-                    marginBottom: 5,
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  {Array.from({ length: 5 }, (_, index) => {
-                    if (index < Math.floor(cafe.rating)) {
-                      return (
-                        <Ionicons
-                          key={index}
-                          name="star"
-                          size={16}
-                          color="gold"
-                        />
-                      );
-                    } else if (index < Math.ceil(cafe.rating)) {
-                      return (
-                        <Ionicons
-                          key={index}
-                          name="star-half"
-                          size={16}
-                          color="gold"
-                        />
-                      );
-                    }
-                    return (
-                      <Ionicons
-                        key={index}
-                        name="star-outline"
-                        size={16}
-                        color="gold"
-                      />
-                    );
-                  })}
-                  <Text
-                    style={{
-                      marginLeft: 5,
-                      fontSize: 12,
-                      fontFamily: "K2D-SemiBold",
-                    }}
-                  >
-                    {cafe.rating.toFixed(1)}
-                  </Text>
-                </View>
-              )}
+                      {/* Show the rating */}
+                      {cafe.rating && (
+                        <View
+                          style={{
+                            flexDirection: "row",
+                            marginBottom: 5,
+                            justifyContent: "center",
+                            alignItems: "center",
+                          }}
+                        >
+                          {Array.from({ length: 5 }, (_, index) => {
+                            if (index < Math.floor(cafe.rating)) {
+                              return (
+                                <Ionicons
+                                  key={index}
+                                  name="star"
+                                  size={16}
+                                  color="gold"
+                                />
+                              );
+                            } else if (index < Math.ceil(cafe.rating)) {
+                              return (
+                                <Ionicons
+                                  key={index}
+                                  name="star-half"
+                                  size={16}
+                                  color="gold"
+                                />
+                              );
+                            }
+                            return (
+                              <Ionicons
+                                key={index}
+                                name="star-outline"
+                                size={16}
+                                color="gold"
+                              />
+                            );
+                          })}
+                          <Text
+                            style={{
+                              marginLeft: 5,
+                              fontSize: 12,
+                              fontFamily: "K2D-SemiBold",
+                            }}
+                          >
+                            {cafe.rating.toFixed(1)}
+                          </Text>
+                        </View>
+                      )}
 
-              
 
-              <View pointerEvents="box-none" style={{ width: "100%" }}>
-                <TouchableOpacity
-                  style={{
-                    backgroundColor: Colors.light.primary,
-                    padding: 10,
-                    borderRadius: 5,
-                    marginTop: 10,
-                    alignItems: "center",
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontFamily: "K2D-Medium",
-                      color: "white",
-                      textAlign: "center",
-                    }}
-                  >
-                    Select Cafe
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </TouchableWithoutFeedback>
-        </Callout>
-      </Marker>
-    ));
+
+                      <View pointerEvents="box-none" style={{ width: "100%" }}>
+                        <TouchableOpacity
+                          style={{
+                            backgroundColor: Colors.light.primary,
+                            padding: 10,
+                            borderRadius: 5,
+                            marginTop: 10,
+                            alignItems: "center",
+                          }}
+                        >
+                          <Text
+                            style={{
+                              fontFamily: "K2D-Medium",
+                              color: "white",
+                              textAlign: "center",
+                            }}
+                          >
+                            Select Cafe
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  </TouchableWithoutFeedback>
+                </Callout>
+              </Marker>
+            );
+          } catch (error) {
+            console.error('Error rendering marker:', error, cafe);
+            return null;
+          }
+        })
+        .filter(Boolean); // Remove any null markers
+    } catch (error) {
+      console.error('Error creating markers:', error);
+      return [];
+    }
   }, [visibleMarkers, markersLoaded]);
 
   return (
