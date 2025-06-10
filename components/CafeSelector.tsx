@@ -294,7 +294,7 @@ export default function CafeSelector({
   };
 
   // Throttled region change handler to update visible markers
-  const onRegionChangeComplete = useCallback(
+  const handleRegionChange = useCallback(
     (newRegion) => {
       // Validate region to prevent crashes
       if (
@@ -306,19 +306,31 @@ export default function CafeSelector({
         newRegion.latitudeDelta <= 0 ||
         newRegion.longitudeDelta <= 0
       ) {
+        console.log('Invalid region data filtered out:', newRegion);
         return;
       }
 
+      console.log('Region changed to:', newRegion);
       setRegion(newRegion);
 
       // Update visible markers based on new region
       if (cafes.length > 0) {
         const newVisible = filterVisibleMarkers(cafes, newRegion);
+        console.log(`Updated visible markers: ${newVisible.length} out of ${cafes.length} total cafes`);
         setVisibleMarkers(newVisible);
       }
     },
     [cafes, filterVisibleMarkers],
   );
+
+  // Throttle the region change handler to prevent excessive re-renders
+  const throttledRegionChange = useMemo(() => {
+    let timeoutId;
+    return (region) => {
+      if (timeoutId) clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => handleRegionChange(region), 300);
+    };
+  }, [handleRegionChange]);
 
   const fetchCafesInRegion = () => {
     if (region) {
@@ -328,27 +340,71 @@ export default function CafeSelector({
     }
   };
 
-  // Transform cafes data for clustering
+  // Transform cafes data for clustering with validation
   const clusteredData = useMemo(() => {
     if (!visibleMarkers?.length) return [];
 
-    return visibleMarkers.map((cafe) => ({
-      geometry: {
-        coordinates: [cafe.geometry.location.lng, cafe.geometry.location.lat]
-      },
-      properties: {
-        ...cafe,
-        place_id: cafe.place_id,
-        name: cafe.name,
-        vicinity: cafe.vicinity,
-        rating: cafe.rating,
-      }
-    }));
+    const validatedData = visibleMarkers
+      .filter((cafe) => {
+        // Validate marker data before rendering
+        const lat = cafe?.geometry?.location?.lat;
+        const lng = cafe?.geometry?.location?.lng;
+        
+        if (
+          typeof lat !== 'number' ||
+          typeof lng !== 'number' ||
+          isNaN(lat) ||
+          isNaN(lng) ||
+          !cafe?.place_id ||
+          !cafe?.name
+        ) {
+          console.log('Invalid cafe data filtered out:', cafe);
+          return false;
+        }
+        
+        return true;
+      })
+      .map((cafe) => ({
+        geometry: {
+          coordinates: [cafe.geometry.location.lng, cafe.geometry.location.lat]
+        },
+        properties: {
+          ...cafe,
+          place_id: cafe.place_id,
+          name: cafe.name,
+          vicinity: cafe.vicinity || 'Unknown location',
+          rating: cafe.rating || 0,
+        }
+      }));
+
+    console.log(`Rendering ${validatedData.length} valid markers out of ${visibleMarkers.length} total`);
+    return validatedData;
   }, [visibleMarkers]);
 
-  // Render cluster or individual marker
+  // Render cluster or individual marker with validation
   const renderCluster = (cluster, onPress) => {
+    // Validate cluster data
+    if (!cluster || !cluster.coordinate) {
+      console.log('Invalid cluster data:', cluster);
+      return null;
+    }
+
     const { id, point_count, coordinate } = cluster;
+    
+    // Validate coordinate
+    const lat = coordinate?.latitude;
+    const lng = coordinate?.longitude;
+    
+    if (
+      typeof lat !== 'number' ||
+      typeof lng !== 'number' ||
+      isNaN(lat) ||
+      isNaN(lng)
+    ) {
+      console.log('Invalid coordinate data:', coordinate);
+      return null;
+    }
+
     const clusterId = `cluster-${id}`;
 
     if (point_count > 1) {
@@ -370,12 +426,19 @@ export default function CafeSelector({
 
     // Render individual cafe marker
     const cafe = cluster.properties;
+    
+    // Validate cafe data
+    if (!cafe?.place_id || !cafe?.name) {
+      console.log('Invalid cafe properties:', cafe);
+      return null;
+    }
+
     return (
       <Marker
         key={cafe.place_id}
         coordinate={coordinate}
         title={cafe.name}
-        description={cafe.vicinity}
+        description={cafe.vicinity || 'Unknown location'}
         onPress={() => {}}
       >
         <Callout onPress={() => handleSelect(cafe)}>
@@ -403,7 +466,7 @@ export default function CafeSelector({
                   textAlign: "center",
                 }}
               >
-                {cafe.vicinity}
+                {cafe.vicinity || 'Unknown location'}
               </Text>
               <Text
                 style={{
@@ -560,7 +623,7 @@ export default function CafeSelector({
                     customMapStyle={retroMapStyle}
                     region={region}
                     initialRegion={initialRegion}
-                    onRegionChangeComplete={onRegionChangeComplete}
+                    onRegionChangeComplete={throttledRegionChange}
                     showsUserLocation={true}
                     showsMyLocationButton={false}
                     loadingEnabled={true}
@@ -570,7 +633,11 @@ export default function CafeSelector({
                     scrollEnabled={true}
                     zoomEnabled={true}
                   >
-                    {location && (
+                    {location && 
+                      typeof location.latitude === 'number' && 
+                      typeof location.longitude === 'number' && 
+                      !isNaN(location.latitude) && 
+                      !isNaN(location.longitude) && (
                       <Marker
                         coordinate={{
                           latitude: location.latitude,
@@ -581,28 +648,42 @@ export default function CafeSelector({
                       />
                     )}
 
-                    {/* Lazy-loaded markers */}
-                    {/* {memoizedMarkers} */}
+                    {/* Validated markers */}
                     {clusteredData.map((cluster, index) => {
+                      // Validate cluster geometry before rendering
+                      const lat = cluster?.geometry?.coordinates?.[1];
+                      const lng = cluster?.geometry?.coordinates?.[0];
+                      
+                      if (
+                        typeof lat !== 'number' ||
+                        typeof lng !== 'number' ||
+                        isNaN(lat) ||
+                        isNaN(lng)
+                      ) {
+                        console.log('Invalid cluster geometry:', cluster);
+                        return null;
+                      }
+
                       const onPress = () => {
                         const newRegion = {
-                          latitude: cluster.geometry.coordinates[1],
-                          longitude: cluster.geometry.coordinates[0],
+                          latitude: lat,
+                          longitude: lng,
                           latitudeDelta: region.latitudeDelta / 2,
                           longitudeDelta: region.longitudeDelta / 2,
                         };
                         setRegion(newRegion);
                       };
+                      
                       return renderCluster({
                         id: index,
                         point_count: 1,
                         coordinate: {
-                          latitude: cluster.geometry.coordinates[1],
-                          longitude: cluster.geometry.coordinates[0],
+                          latitude: lat,
+                          longitude: lng,
                         },
                         properties: cluster.properties,
-                      }, onPress)
-                    })}
+                      }, onPress);
+                    }).filter(Boolean)}
                   </MapView>
 
                   {/* Floating Search Button */}
