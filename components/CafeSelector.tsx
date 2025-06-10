@@ -239,7 +239,7 @@ export default function CafeSelector({
           );
           return distance <= maxDistance && !isNaN(distance);
         })
-        .slice(0, 15);
+        .slice(0, 10);
 
       return filtered;
     },
