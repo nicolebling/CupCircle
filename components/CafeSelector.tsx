@@ -121,8 +121,8 @@ export default function CafeSelector({
   const [region, setRegion] = useState({
     latitude: 0,
     longitude: 0,
-    latitudeDelta: 0.05,
-    longitudeDelta: 0.05,
+    latitudeDelta: 0.01,
+    longitudeDelta: 0.01,
   });
 
   useEffect(() => {
@@ -151,8 +151,8 @@ export default function CafeSelector({
           const newRegion = {
             latitude: coords.latitude,
             longitude: coords.longitude,
-            latitudeDelta: 0.05,
-            longitudeDelta: 0.05,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
           };
 
           setInitialRegion(newRegion);
@@ -221,7 +221,7 @@ export default function CafeSelector({
           currentRegion.longitudeDelta * 111,
         ) / 2;
 
-      // Limit to 15 markers max to prevent performance issues
+      // Limit to 10 markers max to prevent performance issues
       const filtered = allCafes
         .filter((cafe) => {
           if (
@@ -239,7 +239,7 @@ export default function CafeSelector({
           );
           return distance <= maxDistance && !isNaN(distance);
         })
-        .slice(0, 15);
+        .slice(0, 10);
 
       return filtered;
     },
@@ -278,8 +278,8 @@ export default function CafeSelector({
       const currentRegion = {
         latitude: lat,
         longitude: lng,
-        latitudeDelta: 0.05,
-        longitudeDelta: 0.05,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
       };
 
       const initialVisible = filterVisibleMarkers(allCafes, currentRegion);
@@ -632,6 +632,8 @@ export default function CafeSelector({
                     rotateEnabled={false}
                     scrollEnabled={true}
                     zoomEnabled={true}
+                    minZoomLevel={15}
+                    maxZoomLevel={20}
                   >
                     {location && 
                       typeof location.latitude === 'number' && 
