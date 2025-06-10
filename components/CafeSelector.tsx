@@ -349,7 +349,7 @@ export default function CafeSelector({
         // Validate marker data before rendering
         const lat = cafe?.geometry?.location?.lat;
         const lng = cafe?.geometry?.location?.lng;
-        
+
         if (
           typeof lat !== 'number' ||
           typeof lng !== 'number' ||
@@ -361,7 +361,7 @@ export default function CafeSelector({
           console.log('Invalid cafe data filtered out:', cafe);
           return false;
         }
-        
+
         return true;
       })
       .map((cafe) => ({
@@ -390,11 +390,11 @@ export default function CafeSelector({
     }
 
     const { id, point_count, coordinate } = cluster;
-    
+
     // Validate coordinate
     const lat = coordinate?.latitude;
     const lng = coordinate?.longitude;
-    
+
     if (
       typeof lat !== 'number' ||
       typeof lng !== 'number' ||
@@ -427,7 +427,7 @@ export default function CafeSelector({
 
     // Render individual cafe marker
     const cafe = cluster.properties;
-    
+
     // Validate cafe data
     if (!cafe?.place_id || !cafe?.name) {
       console.log('Invalid cafe properties:', cafe);
@@ -633,7 +633,7 @@ export default function CafeSelector({
                     pitchEnabled={false}
                     rotateEnabled={false}
                     scrollEnabled={true}
-                    zoomEnabled={true}
+                    zoomEnabled={false}
                   >
                     {location && 
                       typeof location.latitude === 'number' && 
@@ -656,7 +656,7 @@ export default function CafeSelector({
                       // Validate cluster geometry before rendering
                       const lat = cluster?.geometry?.coordinates?.[1];
                       const lng = cluster?.geometry?.coordinates?.[0];
-                      
+
                       if (
                         typeof lat !== 'number' ||
                         typeof lng !== 'number' ||
@@ -676,7 +676,7 @@ export default function CafeSelector({
                         };
                         setRegion(newRegion);
                       };
-                      
+
                       return renderCluster({
                         id: index,
                         point_count: 1,
