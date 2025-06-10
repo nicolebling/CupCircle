@@ -635,7 +635,9 @@ export default function CafeSelector({
                     scrollEnabled={true}
                     zoomEnabled={false}
                   >
-                    {location && 
+                    {/* Temporarily removed all markers to test crash prevention */}
+                    {/* User location marker commented out */}
+                    {/* {location && 
                       typeof location.latitude === 'number' && 
                       typeof location.longitude === 'number' && 
                       !isNaN(location.latitude) && 
@@ -649,11 +651,10 @@ export default function CafeSelector({
                         pinColor="#FF6347"
                         tracksViewChanges={false}
                       />
-                    )}
+                    )} */}
 
-                    {/* Validated markers */}
-                    {clusteredData.map((cluster, index) => {
-                      // Validate cluster geometry before rendering
+                    {/* Cafe markers commented out */}
+                    {/* {clusteredData.map((cluster, index) => {
                       const lat = cluster?.geometry?.coordinates?.[1];
                       const lng = cluster?.geometry?.coordinates?.[0];
 
@@ -686,7 +687,7 @@ export default function CafeSelector({
                         },
                         properties: cluster.properties,
                       }, onPress);
-                    }).filter(Boolean)}
+                    }).filter(Boolean)} */}
                   </MapView>
 
                   {/* Floating Search Button */}
