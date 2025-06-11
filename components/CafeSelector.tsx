@@ -284,162 +284,9 @@ export default function CafeSelector({
     }
   };
 
-  // Transform cafes data for clustering with validation
-  const clusteredData = useMemo(() => {
-    if (!visibleMarkers?.length) return [];
+  
 
-    const validatedData = visibleMarkers
-      .filter((cafe) => {
-        // Validate marker data before rendering
-        const lat = cafe?.geometry?.location?.lat;
-        const lng = cafe?.geometry?.location?.lng;
-
-        if (
-          typeof lat !== 'number' ||
-          typeof lng !== 'number' ||
-          isNaN(lat) ||
-          isNaN(lng) ||
-          !cafe?.place_id ||
-          !cafe?.name
-        ) {
-          console.log('Invalid cafe data filtered out:', cafe);
-          return false;
-        }
-
-        return true;
-      })
-      .map((cafe) => ({
-        geometry: {
-          coordinates: [cafe.geometry.location.lng, cafe.geometry.location.lat]
-        },
-        properties: {
-          ...cafe,
-          place_id: cafe.place_id,
-          name: cafe.name,
-          vicinity: cafe.vicinity || 'Unknown location',
-          rating: cafe.rating || 0,
-        }
-      }));
-
-    console.log(`Rendering ${validatedData.length} valid markers out of ${visibleMarkers.length} total`);
-    return validatedData;
-  }, [visibleMarkers]);
-
-  // Render cluster or individual marker with validation
-  const renderCluster = (cluster, onPress) => {
-    // Validate cluster data
-    if (!cluster || !cluster.coordinate) {
-      console.log('Invalid cluster data:', cluster);
-      return null;
-    }
-
-    const { id, point_count, coordinate } = cluster;
-
-    // Validate coordinate
-    const lat = coordinate?.latitude;
-    const lng = coordinate?.longitude;
-
-    if (
-      typeof lat !== 'number' ||
-      typeof lng !== 'number' ||
-      isNaN(lat) ||
-      isNaN(lng)
-    ) {
-      console.log('Invalid coordinate data:', coordinate);
-      return null;
-    }
-
-    const clusterId = `cluster-${id}`;
-
-    if (point_count > 1) {
-      // Render cluster marker
-      return (
-        <Marker
-          key={clusterId}
-          coordinate={coordinate}
-          onPress={onPress}
-          tracksViewChanges={false}
-        >
-          <View style={[styles.clusterMarker, { backgroundColor: colors.primary }]}>
-            <Text style={[styles.clusterText, { color: colors.background }]}>
-              {point_count}
-            </Text>
-          </View>
-        </Marker>
-      );
-    }
-
-    // Render individual cafe marker
-    const cafe = cluster.properties;
-
-    // Validate cafe data
-    if (!cafe?.place_id || !cafe?.name) {
-      console.log('Invalid cafe properties:', cafe);
-      return null;
-    }
-
-    return (
-      <Marker
-        key={cafe.place_id}
-        coordinate={coordinate}
-        title={cafe.name}
-        description={cafe.vicinity || 'Unknown location'}
-        onPress={() => {}}
-        tracksViewChanges={false}
-      >
-        <Callout onPress={() => handleSelect(cafe)}>
-          <TouchableWithoutFeedback>
-            <View
-              style={{
-                padding: 10,
-                width: 200,
-                alignItems: "center",
-              }}
-            >
-              <Text
-                style={{
-                  fontFamily: "K2D-SemiBold",
-                  marginBottom: 5,
-                  textAlign: "center",
-                }}
-              >
-                {cafe.name}
-              </Text>
-              <Text
-                style={{
-                  fontFamily: "K2D-Regular",
-                  marginBottom: 5,
-                  textAlign: "center",
-                }}
-              >
-                {cafe.vicinity || 'Unknown location'}
-              </Text>
-              <Text
-                style={{
-                  fontFamily: "K2D-Regular",
-                  fontSize: 12,
-                  color: colors.primary,
-                  textAlign: "center",
-                }}
-              >
-                {cafe.rating ? `⭐ ${cafe.rating}` : ""}
-              </Text>
-              <Text
-                style={{
-                  fontFamily: "K2D-SemiBold",
-                  color: colors.primary,
-                  marginTop: 5,
-                  textAlign: "center",
-                }}
-              >
-                Select this café
-              </Text>
-            </View>
-          </TouchableWithoutFeedback>
-        </Callout>
-      </Marker>
-    );
-  };
+  
 
   return (
     <View>
@@ -595,41 +442,70 @@ export default function CafeSelector({
                       />
                     )}
 
-                    {/* Cafe markers - only rendered on initial load and search button press */}
-                    {clusteredData.map((cluster, index) => {
-                      const lat = cluster?.geometry?.coordinates?.[1];
-                      const lng = cluster?.geometry?.coordinates?.[0];
-
-                      if (
-                        typeof lat !== 'number' ||
-                        typeof lng !== 'number' ||
-                        isNaN(lat) ||
-                        isNaN(lng)
-                      ) {
-                        console.log('Invalid cluster geometry:', cluster);
-                        return null;
-                      }
-
-                      const onPress = () => {
-                        const newRegion = {
-                          latitude: lat,
-                          longitude: lng,
-                          latitudeDelta: region.latitudeDelta / 2,
-                          longitudeDelta: region.longitudeDelta / 2,
-                        };
-                        setRegion(newRegion);
-                      };
-
-                      return renderCluster({
-                        id: index,
-                        point_count: 1,
-                        coordinate: {
-                          latitude: lat,
-                          longitude: lng,
-                        },
-                        properties: cluster.properties,
-                      }, onPress);
-                    }).filter(Boolean)}
+                    {/* Cafe markers */}
+                    {visibleMarkers.map((cafe) => (
+                      <Marker
+                        key={cafe.place_id}
+                        coordinate={{
+                          latitude: cafe.geometry.location.lat,
+                          longitude: cafe.geometry.location.lng,
+                        }}
+                        title={cafe.name}
+                        description={cafe.vicinity || 'Unknown location'}
+                        tracksViewChanges={false}
+                      >
+                        <Callout onPress={() => handleSelect(cafe)}>
+                          <TouchableWithoutFeedback>
+                            <View
+                              style={{
+                                padding: 10,
+                                width: 200,
+                                alignItems: "center",
+                              }}
+                            >
+                              <Text
+                                style={{
+                                  fontFamily: "K2D-SemiBold",
+                                  marginBottom: 5,
+                                  textAlign: "center",
+                                }}
+                              >
+                                {cafe.name}
+                              </Text>
+                              <Text
+                                style={{
+                                  fontFamily: "K2D-Regular",
+                                  marginBottom: 5,
+                                  textAlign: "center",
+                                }}
+                              >
+                                {cafe.vicinity || 'Unknown location'}
+                              </Text>
+                              <Text
+                                style={{
+                                  fontFamily: "K2D-Regular",
+                                  fontSize: 12,
+                                  color: colors.primary,
+                                  textAlign: "center",
+                                }}
+                              >
+                                {cafe.rating ? `⭐ ${cafe.rating}` : ""}
+                              </Text>
+                              <Text
+                                style={{
+                                  fontFamily: "K2D-SemiBold",
+                                  color: colors.primary,
+                                  marginTop: 5,
+                                  textAlign: "center",
+                                }}
+                              >
+                                Select this café
+                              </Text>
+                            </View>
+                          </TouchableWithoutFeedback>
+                        </Callout>
+                      </Marker>
+                    ))}
                   </MapView>
 
                   {/* Floating Search Button */}
@@ -904,17 +780,5 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: "K2D-Regular",
   },
-    clusterMarker: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 3,
-    borderColor: 'white',
-  },
-  clusterText: {
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
+    
 });
