@@ -60,9 +60,13 @@ export default function MessageScreen() {
   const [partner, setPartner] = useState<Profile | null>(null);
   const [partnerProfile, setPartnerProfile] = useState(null);
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [hasMoreMessages, setHasMoreMessages] = useState(true);
+  const [loadingMoreMessages, setLoadingMoreMessages] = useState(false);
+  const [totalMessageCount, setTotalMessageCount] = useState(0);
   //const [activeTab, setActiveTab] = useState("messages"); // 'messages' or 'profile' - Removed
 
   const flatListRef = useRef<FlatList>(null);
+  const MESSAGES_PER_PAGE = 30;
 
   // Fetch messages and partner info
   useEffect(() => {
@@ -215,25 +219,34 @@ export default function MessageScreen() {
         setPartnerProfile(fullProfileData);
       }
 
-      // Fetch messages - first check if chat_id exists in table columns
+      // First get total message count for this conversation
+      const { count: totalCount, error: countError } = await supabase
+        .from("message")
+        .select("*", { count: "exact", head: true })
+        .or(`and(sender_id.eq.${user?.id},receiver_id.eq.${partnerId}),and(sender_id.eq.${partnerId},receiver_id.eq.${user?.id})`);
+
+      if (countError) {
+        console.error("Error getting message count:", countError);
+      } else {
+        setTotalMessageCount(totalCount || 0);
+        setHasMoreMessages((totalCount || 0) > MESSAGES_PER_PAGE);
+      }
+
+      // Fetch the most recent messages (last 30)
       const { data: messagesData, error: messagesError } = await supabase
         .from("message")
         .select("*")
-        .or(`sender_id.eq.${user?.id},receiver_id.eq.${user?.id}`)
-        .order("created_at", { ascending: true });
+        .or(`and(sender_id.eq.${user?.id},receiver_id.eq.${partnerId}),and(sender_id.eq.${partnerId},receiver_id.eq.${user?.id})`)
+        .order("created_at", { ascending: false })
+        .limit(MESSAGES_PER_PAGE);
 
       if (messagesError) throw messagesError;
 
-      // Filter messages that belong to this conversation (between these two users)
-      const filteredMessages =
-        messagesData?.filter(
-          (msg) =>
-            (msg.sender_id === user?.id && msg.receiver_id === partnerId) ||
-            (msg.sender_id === partnerId && msg.receiver_id === user?.id),
-        ) || [];
+      // Reverse the messages to show oldest first
+      const filteredMessages = (messagesData || []).reverse();
 
       console.log(
-        `Found ${filteredMessages.length} messages for this conversation`,
+        `Found ${filteredMessages.length} messages for this conversation (${totalCount || 0} total)`,
       );
       // If there's an initial message, add it to the beginning of the messages array
       const initialMessages = [...filteredMessages];
@@ -353,6 +366,44 @@ export default function MessageScreen() {
       clearInterval(pollingInterval);
     };
   }, [user?.id, id, partner?.id]);
+
+  // Function to load more messages when user scrolls up
+  const loadMoreMessages = async () => {
+    if (!user?.id || !partner?.id || loadingMoreMessages || !hasMoreMessages) return;
+
+    try {
+      setLoadingMoreMessages(true);
+      
+      const oldestMessage = messages[0];
+      if (!oldestMessage) return;
+
+      // Get messages older than the oldest currently loaded message
+      const { data: olderMessages, error } = await supabase
+        .from("message")
+        .select("*")
+        .or(`and(sender_id.eq.${user?.id},receiver_id.eq.${partner.id}),and(sender_id.eq.${partner.id},receiver_id.eq.${user?.id})`)
+        .lt("created_at", oldestMessage.created_at)
+        .order("created_at", { ascending: false })
+        .limit(MESSAGES_PER_PAGE);
+
+      if (error) throw error;
+
+      if (olderMessages && olderMessages.length > 0) {
+        // Reverse to maintain chronological order and prepend to existing messages
+        const reversedOlderMessages = olderMessages.reverse();
+        setMessages(prevMessages => [...reversedOlderMessages, ...prevMessages]);
+        
+        // Check if there are more messages to load
+        setHasMoreMessages(olderMessages.length === MESSAGES_PER_PAGE);
+      } else {
+        setHasMoreMessages(false);
+      }
+    } catch (error) {
+      console.error("Error loading more messages:", error);
+    } finally {
+      setLoadingMoreMessages(false);
+    }
+  };
 
   // Function to refresh messages
   const refreshMessages = async (partnerId: string) => {
@@ -663,6 +714,23 @@ export default function MessageScreen() {
                   flatListRef.current?.scrollToEnd({ animated: false });
                 }, 100);
               }}
+              onRefresh={loadMoreMessages}
+              refreshing={loadingMoreMessages}
+              ListHeaderComponent={
+                hasMoreMessages ? (
+                  <View style={styles.loadMoreContainer}>
+                    <Text style={[styles.loadMoreText, { color: colors.secondaryText }]}>
+                      Pull down to load more messages
+                    </Text>
+                  </View>
+                ) : messages.length >= MESSAGES_PER_PAGE ? (
+                  <View style={styles.loadMoreContainer}>
+                    <Text style={[styles.loadMoreText, { color: colors.secondaryText }]}>
+                      No more messages
+                    </Text>
+                  </View>
+                ) : null
+              }
             />
         )}
 
@@ -914,5 +982,13 @@ const styles = StyleSheet.create({
     top: 20,
     right: 20,
     zIndex: 1,
+  },
+  loadMoreContainer: {
+    padding: 15,
+    alignItems: "center",
+  },
+  loadMoreText: {
+    fontSize: 12,
+    fontFamily: "K2D-Regular",
   },
 });
