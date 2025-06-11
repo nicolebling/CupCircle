@@ -24,82 +24,6 @@ interface CafeSelectorProps {
   isDark?: boolean;
 }
 
-const retroMapStyle = [
-  { elementType: "geometry", stylers: [{ color: "#f5f5f5" }] },
-  { elementType: "labels.text.fill", stylers: [{ color: "#616161" }] },
-  { elementType: "labels.text.stroke", stylers: [{ color: "#f5f5f5" }] },
-  {
-    featureType: "administrative.land_parcel",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#bdbdbd" }],
-  },
-  {
-    featureType: "poi",
-    elementType: "geometry",
-    stylers: [{ color: "#eeeeee" }],
-  },
-  {
-    featureType: "poi",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#757575" }],
-  },
-  {
-    featureType: "poi.park",
-    elementType: "geometry",
-    stylers: [{ color: "#e5e5e5" }],
-  },
-  {
-    featureType: "poi.park",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#9e9e9e" }],
-  },
-  {
-    featureType: "road",
-    elementType: "geometry",
-    stylers: [{ color: "#ffffff" }],
-  },
-  {
-    featureType: "road.arterial",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#757575" }],
-  },
-  {
-    featureType: "road.highway",
-    elementType: "geometry",
-    stylers: [{ color: "#dadada" }],
-  },
-  {
-    featureType: "road.highway",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#616161" }],
-  },
-  {
-    featureType: "road.local",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#9e9e9e" }],
-  },
-  {
-    featureType: "transit.line",
-    elementType: "geometry",
-    stylers: [{ color: "#e5e5e5" }],
-  },
-  {
-    featureType: "transit.station",
-    elementType: "geometry",
-    stylers: [{ color: "#eeeeee" }],
-  },
-  {
-    featureType: "water",
-    elementType: "geometry",
-    stylers: [{ color: "#c9c9c9" }],
-  },
-  {
-    featureType: "water",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#9e9e9e" }],
-  },
-];
-
 export default function CafeSelector({
   selected = [],
   onChange,
@@ -635,7 +559,7 @@ export default function CafeSelector({
                   >
                     {/* Temporarily removed all markers to test crash prevention */}
                     {/* User location marker commented out */}
-                    {/* {location && 
+                    {location && 
                       typeof location.latitude === 'number' && 
                       typeof location.longitude === 'number' && 
                       !isNaN(location.latitude) && 
@@ -649,10 +573,10 @@ export default function CafeSelector({
                         pinColor="#FF6347"
                         tracksViewChanges={false}
                       />
-                    )} */}
+                    )}
 
                     {/* Cafe markers commented out */}
-                    {/* {clusteredData.map((cluster, index) => {
+                    {clusteredData.map((cluster, index) => {
                       const lat = cluster?.geometry?.coordinates?.[1];
                       const lng = cluster?.geometry?.coordinates?.[0];
 
@@ -685,7 +609,7 @@ export default function CafeSelector({
                         },
                         properties: cluster.properties,
                       }, onPress);
-                    }).filter(Boolean)} */}
+                    }).filter(Boolean)}
                   </MapView>
 
                   {/* Floating Search Button */}
