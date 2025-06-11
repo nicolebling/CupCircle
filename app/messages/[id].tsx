@@ -54,15 +54,12 @@ export default function MessageScreen() {
   const navigation = useNavigation();
 
   const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
   const [sending, setSending] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [partner, setPartner] = useState<Profile | null>(null);
   const [partnerProfile, setPartnerProfile] = useState(null);
   const [showProfileModal, setShowProfileModal] = useState(false);
-  const [hasMoreMessages, setHasMoreMessages] = useState(true);
-  const [oldestMessageDate, setOldestMessageDate] = useState<string | null>(null);
   //const [activeTab, setActiveTab] = useState("messages"); // 'messages' or 'profile' - Removed
 
   const flatListRef = useRef<FlatList>(null);
@@ -172,6 +169,13 @@ export default function MessageScreen() {
     try {
       setLoading(true);
 
+      // Try to get cached messages first
+      const cachedMessages = await cacheService.getCachedMessages(user?.id, id);
+      if (cachedMessages) {
+        setMessages(cachedMessages);
+        setLoading(false);
+      }
+
       // Fetch the partner profile from the matching table
       const { data: matchingData, error: matchingError } = await supabase
         .from("matching")
@@ -211,40 +215,16 @@ export default function MessageScreen() {
         setPartnerProfile(fullProfileData);
       }
 
-      // Load initial messages (last 3 days)
-      await loadMessages(partnerId, true);
-    } catch (error) {
-      console.error("Error fetching chat details:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const loadMessages = async (partnerId: string, isInitial: boolean = false) => {
-    try {
-      if (!isInitial) {
-        setLoadingMore(true);
-      }
-
-      // Calculate date range (3 days)
-      const endDate = isInitial ? new Date() : new Date(oldestMessageDate || new Date());
-      const startDate = new Date(endDate);
-      startDate.setDate(startDate.getDate() - 3);
-
-      console.log(`Loading messages from ${startDate.toISOString()} to ${endDate.toISOString()}`);
-
-      // Fetch messages for the date range
+      // Fetch messages - first check if chat_id exists in table columns
       const { data: messagesData, error: messagesError } = await supabase
         .from("message")
         .select("*")
         .or(`sender_id.eq.${user?.id},receiver_id.eq.${user?.id}`)
-        .gte("created_at", startDate.toISOString())
-        .lt("created_at", endDate.toISOString())
         .order("created_at", { ascending: true });
 
       if (messagesError) throw messagesError;
 
-      // Filter messages that belong to this conversation
+      // Filter messages that belong to this conversation (between these two users)
       const filteredMessages =
         messagesData?.filter(
           (msg) =>
@@ -252,59 +232,36 @@ export default function MessageScreen() {
             (msg.sender_id === partnerId && msg.receiver_id === user?.id),
         ) || [];
 
-      console.log(`Found ${filteredMessages.length} messages for this date range`);
-
-      if (isInitial) {
-        // For initial load, also add the initial message if it exists
-        const initialMessages = [...filteredMessages];
-        
-        // Get matching data for initial message
-        const { data: matchingData } = await supabase
+      console.log(
+        `Found ${filteredMessages.length} messages for this conversation`,
+      );
+      // If there's an initial message, add it to the beginning of the messages array
+      const initialMessages = [...filteredMessages];
+      if (matchingData.initial_message) {
+        // Get the created_at timestamp from matching data
+        const { data: timestampData } = await supabase
           .from("matching")
-          .select("user1_id, user2_id, initial_message, created_at")
+          .select("created_at")
           .eq("match_id", id)
           .single();
 
-        if (matchingData?.initial_message) {
-          initialMessages.unshift({
-            id: `initial-${id}`,
-            sender_id: matchingData.user1_id,
-            receiver_id: matchingData.user2_id,
-            content: matchingData.initial_message,
-            created_at: matchingData.created_at || new Date().toISOString(),
-            read: true,
-          });
-        }
-
-        setMessages(initialMessages);
-        
-        if (filteredMessages.length > 0) {
-          setOldestMessageDate(filteredMessages[0].created_at);
-        }
-      } else {
-        // For loading more, prepend to existing messages
-        setMessages(prevMessages => [...filteredMessages, ...prevMessages]);
-        
-        if (filteredMessages.length > 0) {
-          setOldestMessageDate(filteredMessages[0].created_at);
-        }
+        initialMessages.unshift({
+          id: `initial-${id}`,
+          sender_id: matchingData.user1_id,
+          receiver_id: matchingData.user2_id,
+          content: matchingData.initial_message,
+          created_at: timestampData?.created_at || new Date().toISOString(),
+          read: true,
+        });
       }
-
-      // Check if there are more messages to load
-      setHasMoreMessages(filteredMessages.length > 0);
-
+      setMessages(initialMessages);
+      // We don't automatically mark messages as read when fetched
+      // They'll be marked as read by the useEffect when viewed
     } catch (error) {
-      console.error("Error loading messages:", error);
+      console.error("Error fetching messages:", error);
     } finally {
-      if (!isInitial) {
-        setLoadingMore(false);
-      }
+      setLoading(false);
     }
-  };
-
-  const loadMoreMessages = async () => {
-    if (!partner?.id || !hasMoreMessages || loadingMore) return;
-    await loadMessages(partner.id, false);
   };
 
   const markMessageAsRead = async (chatId: number, setMessages: any) => {
@@ -397,20 +354,22 @@ export default function MessageScreen() {
     };
   }, [user?.id, id, partner?.id]);
 
-  // Function to refresh recent messages (for polling)
+  // Function to refresh messages
   const refreshMessages = async (partnerId: string) => {
     try {
       if (!user?.id || !partnerId) return;
 
-      // Only fetch messages from the last hour to check for new ones
-      const oneHourAgo = new Date();
-      oneHourAgo.setHours(oneHourAgo.getHours() - 1);
+      // Get matching data for initial message
+      const { data: matchingData } = await supabase
+        .from("matching")
+        .select("*")
+        .eq("match_id", id)
+        .single();
 
       const { data: messagesData, error: messagesError } = await supabase
         .from("message")
         .select("*")
         .or(`sender_id.eq.${user?.id},receiver_id.eq.${user?.id}`)
-        .gte("created_at", oneHourAgo.toISOString())
         .order("created_at", { ascending: true });
 
       if (messagesError) throw messagesError;
@@ -423,20 +382,28 @@ export default function MessageScreen() {
             (msg.sender_id === partnerId && msg.receiver_id === user?.id),
         ) || [];
 
-      // Only add new messages that aren't already in our state
-      const newMessages = filteredMessages.filter(
-        (newMsg) => !messages.some((existingMsg) => existingMsg.id === newMsg.id)
-      );
-
-      if (newMessages.length > 0) {
-        console.log(`Found ${newMessages.length} new messages from polling`);
-        setMessages(prevMessages => [...prevMessages, ...newMessages]);
-
-        // Mark unread messages as read
-        newMessages
-          .filter((msg) => msg.receiver_id === user?.id && !msg.read)
-          .forEach((msg) => markMessageAsRead(msg.id));
+      // Add initial message if it exists
+      const initialMessages = [...filteredMessages];
+      if (matchingData?.initial_message) {
+        initialMessages.unshift({
+          id: `initial-${id}`,
+          sender_id: matchingData.user1_id,
+          receiver_id: matchingData.user2_id,
+          content: matchingData.initial_message,
+          created_at: matchingData.created_at,
+          read: true,
+        });
       }
+
+      console.log(
+        `Found ${initialMessages.length} messages, updating from polling`,
+      );
+      setMessages(initialMessages);
+
+      // Mark unread messages as read
+      filteredMessages
+        .filter((msg) => msg.receiver_id === user?.id && !msg.read)
+        .forEach((msg) => markMessageAsRead(msg.id));
     } catch (error) {
       console.error("Error refreshing messages:", error);
     }
@@ -696,19 +663,6 @@ export default function MessageScreen() {
                   flatListRef.current?.scrollToEnd({ animated: false });
                 }, 100);
               }}
-              onEndReached={loadMoreMessages}
-              onEndReachedThreshold={0.1}
-              inverted={true}
-              ListHeaderComponent={
-                loadingMore ? (
-                  <View style={styles.loadingMoreContainer}>
-                    <ActivityIndicator size="small" color={colors.primary} />
-                    <Text style={[styles.loadingMoreText, { color: colors.secondaryText }]}>
-                      Loading more messages...
-                    </Text>
-                  </View>
-                ) : null
-              }
             />
         )}
 
@@ -960,16 +914,5 @@ const styles = StyleSheet.create({
     top: 20,
     right: 20,
     zIndex: 1,
-  },
-  loadingMoreContainer: {
-    padding: 16,
-    alignItems: "center",
-    flexDirection: "row",
-    justifyContent: "center",
-  },
-  loadingMoreText: {
-    marginLeft: 8,
-    fontSize: 14,
-    fontFamily: "K2D-Regular",
   },
 });
