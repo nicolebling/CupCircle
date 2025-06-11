@@ -105,7 +105,7 @@ export default function MessageScreen() {
     const setupMessageSubscription = (partnerUserId: string) => {
       // Use unique channel name for each conversation
       const channelName = `messages_${user.id}_${partnerUserId}_${id}`;
-      
+
       const messageSubscription = supabase
         .channel(channelName)
         .on(
@@ -651,16 +651,6 @@ export default function MessageScreen() {
               item.id || `msg-${item.created_at}-${item.sender_id}`
             }
             contentContainerStyle={styles.messagesList}
-            onContentSizeChange={() => {
-              if (messages.length > 0) {
-                flatListRef.current?.scrollToEnd({ animated: false });
-              }
-            }}
-            onLayout={() => {
-              if (messages.length > 0) {
-                flatListRef.current?.scrollToEnd({ animated: false });
-              }
-            }}
           />
         )}
 
@@ -914,3 +904,7 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
 });
+```
+
+```
+</replit_final_file>

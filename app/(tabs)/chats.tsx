@@ -115,9 +115,9 @@ export default function ChatsScreen() {
         setConversations([]);
         setFilteredConversations([]);
         setLoading(false);
-        // Trigger animation even when empty
-        opacity.value = withDelay(100, withTiming(1, { duration: 600 }));
-        translateY.value = withDelay(100, withTiming(0, { duration: 600 }));
+        // Set values immediately without animation
+        opacity.value = 1;
+        translateY.value = 0;
         return;
       }
 
@@ -231,9 +231,9 @@ export default function ChatsScreen() {
       setConversations([]);
       setFilteredConversations([]);
       setLoading(false);
-      // Still show animation even on error
-      opacity.value = withDelay(100, withTiming(1, { duration: 600 }));
-      translateY.value = withDelay(100, withTiming(0, { duration: 600 }));
+      // Set values immediately without animation
+      opacity.value = 1;
+      translateY.value = 0;
     } finally {
       // Small delay to ensure smooth transition
       setTimeout(() => setLoading(false), 200);
