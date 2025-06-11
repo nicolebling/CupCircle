@@ -217,7 +217,7 @@ export default function CafeSelector({
     }
   };
 
-  // Throttled region change handler to update visible markers
+  // Simple region change handler that only tracks region without updating markers
   const handleRegionChange = useCallback(
     (newRegion) => {
       // Validate region to prevent crashes
@@ -236,31 +236,51 @@ export default function CafeSelector({
 
       console.log('Region changed to:', newRegion);
       setRegion(newRegion);
-
-      // Update visible markers based on new region
-      if (cafes.length > 0) {
-        const newVisible = filterVisibleMarkers(cafes, newRegion);
-        console.log(`Updated visible markers: ${newVisible.length} out of ${cafes.length} total cafes`);
-        setVisibleMarkers(newVisible);
-      }
+      // Removed automatic marker updates - markers only update on initial load and search button
     },
-    [cafes, filterVisibleMarkers],
+    [],
   );
 
-  // Throttle the region change handler to prevent excessive re-renders
-  const throttledRegionChange = useMemo(() => {
-    let timeoutId;
-    return (region) => {
-      if (timeoutId) clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => handleRegionChange(region), 300);
-    };
-  }, [handleRegionChange]);
-
-  const fetchCafesInRegion = () => {
+  const fetchCafesInRegion = async () => {
     if (region) {
       setIsLoading(true);
       setMarkersLoaded(false);
-      fetchCafes(region.latitude, region.longitude); // Fetch cafes based on the saved region
+      
+      try {
+        const apiKey = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY;
+        if (!apiKey) {
+          console.error("Google Maps API key is missing");
+          setErrorMsg("Google Maps API key not configured");
+          setIsLoading(false);
+          return;
+        }
+
+        const response = await fetch(
+          `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${region.latitude},${region.longitude}&radius=2000&type=cafe&keyword=coffee&key=${process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY}`,
+        );
+        const data = await response.json();
+
+        if (data.status === "REQUEST_DENIED") {
+          setErrorMsg(
+            "Google Maps API access denied. Please check your API key and permissions.",
+          );
+          setIsLoading(false);
+          return;
+        }
+
+        const allCafes = data.results || [];
+        setCafes(allCafes);
+
+        // Update visible markers based on current region
+        const newVisible = filterVisibleMarkers(allCafes, region);
+        setVisibleMarkers(newVisible);
+        setMarkersLoaded(true);
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error fetching cafes:", error);
+        setErrorMsg("Failed to load cafes. Please try again.");
+        setIsLoading(false);
+      }
     }
   };
 
@@ -547,7 +567,7 @@ export default function CafeSelector({
                   <MapView
                     style={styles.map}
                     initialRegion={initialRegion}
-                    onRegionChangeComplete={throttledRegionChange}
+                    onRegionChangeComplete={handleRegionChange}
                     showsUserLocation={true}
                     showsMyLocationButton={false}
                     loadingEnabled={true}
@@ -575,8 +595,8 @@ export default function CafeSelector({
                       />
                     )}
 
-                    {/* Cafe markers commented out */}
-                    {/* {clusteredData.map((cluster, index) => {
+                    {/* Cafe markers - only rendered on initial load and search button press */}
+                    {clusteredData.map((cluster, index) => {
                       const lat = cluster?.geometry?.coordinates?.[1];
                       const lng = cluster?.geometry?.coordinates?.[0];
 
@@ -609,7 +629,7 @@ export default function CafeSelector({
                         },
                         properties: cluster.properties,
                       }, onPress);
-                    }).filter(Boolean)} */}
+                    }).filter(Boolean)}
                   </MapView>
 
                   {/* Floating Search Button */}
