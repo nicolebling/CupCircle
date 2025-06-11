@@ -103,8 +103,11 @@ export default function MessageScreen() {
 
     // Setup message subscription function
     const setupMessageSubscription = (partnerUserId: string) => {
+      // Use unique channel name for each conversation
+      const channelName = `messages_${user.id}_${partnerUserId}_${id}`;
+      
       const messageSubscription = supabase
-        .channel("messages_channel")
+        .channel(channelName)
         .on(
           "postgres_changes",
           {
@@ -144,7 +147,8 @@ export default function MessageScreen() {
         )
         .subscribe();
 
-      // Return cleanup function
+      // Store subscription for cleanup
+      subscription = messageSubscription;
       return messageSubscription;
     };
 
@@ -154,7 +158,9 @@ export default function MessageScreen() {
     // Return cleanup function
     return () => {
       if (subscription) {
+        console.log("Cleaning up subscription");
         supabase.removeChannel(subscription);
+        subscription = null;
       }
     };
   }, [user, id]);
