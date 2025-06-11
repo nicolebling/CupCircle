@@ -566,7 +566,7 @@ export default function CafeSelector({
                 <View style={styles.container}>
                   <MapView
                     style={styles.map}
-                    initialRegion={initialRegion}
+                    region={region}
                     onRegionChangeComplete={handleRegionChange}
                     showsUserLocation={true}
                     showsMyLocationButton={false}
