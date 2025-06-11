@@ -653,8 +653,8 @@ export default function MessageScreen() {
               contentContainerStyle={styles.messagesList}
               initialScrollIndex={messages.length > 0 ? messages.length - 1 : 0}
               getItemLayout={(data, index) => ({
-                length: 80, // Approximate height of each message
-                offset: 80 * index,
+                length: 120, // Approximate height of each message
+                offset: 120 * index,
                 index,
               })}
               onScrollToIndexFailed={(info) => {
