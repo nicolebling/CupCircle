@@ -75,8 +75,8 @@ export default function CafeSelector({
           const newRegion = {
             latitude: coords.latitude,
             longitude: coords.longitude,
-            latitudeDelta: 0.05,
-            longitudeDelta: 0.05,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
           };
 
           setInitialRegion(newRegion);
@@ -546,7 +546,7 @@ export default function CafeSelector({
                 <View style={styles.container}>
                   <MapView
                     style={styles.map}
-                    region={region}
+                    initialRegion={initialRegion}
                     onRegionChangeComplete={throttledRegionChange}
                     showsUserLocation={true}
                     showsMyLocationButton={false}
@@ -555,7 +555,7 @@ export default function CafeSelector({
                     pitchEnabled={false}
                     rotateEnabled={false}
                     scrollEnabled={true}
-                    zoomEnabled={true}
+                    zoomEnabled={false}
                   >
                     {/* Temporarily removed all markers to test crash prevention */}
                     {/* User location marker commented out */}
@@ -576,7 +576,7 @@ export default function CafeSelector({
                     )}
 
                     {/* Cafe markers commented out */}
-                    {clusteredData.map((cluster, index) => {
+                    {/* {clusteredData.map((cluster, index) => {
                       const lat = cluster?.geometry?.coordinates?.[1];
                       const lng = cluster?.geometry?.coordinates?.[0];
 
@@ -609,7 +609,7 @@ export default function CafeSelector({
                         },
                         properties: cluster.properties,
                       }, onPress);
-                    }).filter(Boolean)}
+                    }).filter(Boolean)} */}
                   </MapView>
 
                   {/* Floating Search Button */}
