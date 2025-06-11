@@ -105,7 +105,7 @@ export default function MessageScreen() {
     const setupMessageSubscription = (partnerUserId: string) => {
       // Use unique channel name for each conversation
       const channelName = `messages_${user.id}_${partnerUserId}_${id}`;
-      
+
       const messageSubscription = supabase
         .channel(channelName)
         .on(
@@ -644,24 +644,26 @@ export default function MessageScreen() {
           </View>
         ) : (
           <FlatList
-            ref={flatListRef}
-            data={messages}
-            renderItem={renderItem}
-            keyExtractor={(item) =>
-              item.id || `msg-${item.created_at}-${item.sender_id}`
-            }
-            contentContainerStyle={styles.messagesList}
-            onContentSizeChange={() => {
-              if (messages.length > 0) {
-                flatListRef.current?.scrollToEnd({ animated: false });
+              ref={flatListRef}
+              data={messages}
+              renderItem={renderItem}
+              keyExtractor={(item) =>
+                item.id || `msg-${item.created_at}-${item.sender_id}`
               }
-            }}
-            onLayout={() => {
-              if (messages.length > 0) {
-                flatListRef.current?.scrollToEnd({ animated: false });
-              }
-            }}
-          />
+              contentContainerStyle={styles.messagesList}
+              initialScrollIndex={messages.length > 0 ? messages.length - 1 : 0}
+              getItemLayout={(data, index) => ({
+                length: 80, // Approximate height of each message
+                offset: 80 * index,
+                index,
+              })}
+              onScrollToIndexFailed={(info) => {
+                // Fallback to scrollToEnd if initialScrollIndex fails
+                setTimeout(() => {
+                  flatListRef.current?.scrollToEnd({ animated: false });
+                }, 100);
+              }}
+            />
         )}
 
         {/* Input Area */}
