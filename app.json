@@ -65,7 +65,16 @@
           "locationAlwaysAndWhenInUsePermission": "Allow CupCircle to access your location?",
           "locationWhenInUsePermission": "Allow CupCircle to access your location only while using the app?"
         }
-      ]
+      ],
+      "expo-build-properties",
+      {
+        "android": {
+          "minSdkVersion": 26
+        },
+        "ios": {
+          "deploymentTarget": "14.0" 
+        }
+      }
     ],
     "experiments": {
       "typedRoutes": true

@@ -75,8 +75,8 @@ export default function CafeSelector({
           const newRegion = {
             latitude: coords.latitude,
             longitude: coords.longitude,
-            latitudeDelta: 0.02,
-            longitudeDelta: 0.02,
+            latitudeDelta: 0.03,
+            longitudeDelta: 0.03,
           };
 
           setInitialRegion(newRegion);
@@ -183,7 +183,7 @@ export default function CafeSelector({
       }
 
       const response = await fetch(
-        `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=2000&type=cafe&keyword=coffee&key=${process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY}`,
+        `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=2000&type=cafe&key=${process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY}`,
       );
       const data = await response.json();
 
@@ -649,6 +649,7 @@ const styles = StyleSheet.create({
   tagAddress: {
     fontSize: 12,
     marginTop: 2,
+    fontFamily: "K2D-Regular",
   },
   removeButton: {
     marginLeft: "auto",
