@@ -18,7 +18,7 @@ import { Text, TextInput } from "react-native";
 import Colors from "@/constants/Colors";
 import CustomSplashScreen from "@/components/CustomSplashScreen";
 import { Platform } from "react-native";
-import Superwall from 'expo-superwall';
+import Superwall from "expo-superwall/compat";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -129,11 +129,14 @@ export default function RootLayout() {
   }, [loaded]);
 
   useEffect(() => {
-    const apiKey = Platform.OS === "ios" 
-      ? process.env.EXPO_PUBLIC_SUPERWALL_IOS_API_KEY 
-      : process.env.EXPO_PUBLIC_SUPERWALL_ANDROID_API_KEY;
+    const apiKey =
+      Platform.OS === "ios"
+        ? process.env.EXPO_PUBLIC_SUPERWALL_IOS_API_KEY
+        : process.env.EXPO_PUBLIC_SUPERWALL_ANDROID_API_KEY;
 
     if (apiKey) {
+      const apiKey =
+        Platform.OS === "ios" ? "MY_IOS_API_KEY" : "MY_ANDROID_API_KEY";
       Superwall.configure({
         apiKey: apiKey,
       });
