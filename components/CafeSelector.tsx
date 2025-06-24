@@ -183,7 +183,7 @@ export default function CafeSelector({
       }
 
       const response = await fetch(
-        `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=2000&type=cafe&key=${process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY}`,
+        `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${region.latitude},${region.longitude}&radius=2000&type=cafe&keyword=coffee&key=${process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY}`,
       );
       const data = await response.json();
 
@@ -218,34 +218,31 @@ export default function CafeSelector({
   };
 
   // Simple region change handler that only tracks region without updating markers
-  const handleRegionChange = useCallback(
-    (newRegion) => {
-      // Validate region to prevent crashes
-      if (
-        !newRegion ||
-        typeof newRegion.latitude !== "number" ||
-        typeof newRegion.longitude !== "number" ||
-        isNaN(newRegion.latitude) ||
-        isNaN(newRegion.longitude) ||
-        newRegion.latitudeDelta <= 0 ||
-        newRegion.longitudeDelta <= 0
-      ) {
-        console.log('Invalid region data filtered out:', newRegion);
-        return;
-      }
+  const handleRegionChange = useCallback((newRegion) => {
+    // Validate region to prevent crashes
+    if (
+      !newRegion ||
+      typeof newRegion.latitude !== "number" ||
+      typeof newRegion.longitude !== "number" ||
+      isNaN(newRegion.latitude) ||
+      isNaN(newRegion.longitude) ||
+      newRegion.latitudeDelta <= 0 ||
+      newRegion.longitudeDelta <= 0
+    ) {
+      console.log("Invalid region data filtered out:", newRegion);
+      return;
+    }
 
-      console.log('Region changed to:', newRegion);
-      setRegion(newRegion);
-      // Removed automatic marker updates - markers only update on initial load and search button
-    },
-    [],
-  );
+    console.log("Region changed to:", newRegion);
+    setRegion(newRegion);
+    // Removed automatic marker updates - markers only update on initial load and search button
+  }, []);
 
   const fetchCafesInRegion = async () => {
     if (region) {
       setIsLoading(true);
       setMarkersLoaded(false);
-      
+
       try {
         const apiKey = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY;
         if (!apiKey) {
@@ -283,10 +280,6 @@ export default function CafeSelector({
       }
     }
   };
-
-  
-
-  
 
   return (
     <View>
@@ -426,21 +419,21 @@ export default function CafeSelector({
                   >
                     {/* Temporarily removed all markers to test crash prevention */}
                     {/* User location marker commented out */}
-                    {location && 
-                      typeof location.latitude === 'number' && 
-                      typeof location.longitude === 'number' && 
-                      !isNaN(location.latitude) && 
+                    {location &&
+                      typeof location.latitude === "number" &&
+                      typeof location.longitude === "number" &&
+                      !isNaN(location.latitude) &&
                       !isNaN(location.longitude) && (
-                      <Marker
-                        coordinate={{
-                          latitude: location.latitude,
-                          longitude: location.longitude,
-                        }}
-                        title="Your Location"
-                        pinColor="#FF6347"
-                        tracksViewChanges={false}
-                      />
-                    )}
+                        <Marker
+                          coordinate={{
+                            latitude: location.latitude,
+                            longitude: location.longitude,
+                          }}
+                          title="Your Location"
+                          pinColor="#FF6347"
+                          tracksViewChanges={false}
+                        />
+                      )}
 
                     {/* Cafe markers */}
                     {visibleMarkers.map((cafe) => (
@@ -451,7 +444,7 @@ export default function CafeSelector({
                           longitude: cafe.geometry.location.lng,
                         }}
                         title={cafe.name}
-                        description={cafe.vicinity || 'Unknown location'}
+                        description={cafe.vicinity || "Unknown location"}
                         tracksViewChanges={false}
                       >
                         <Callout onPress={() => handleSelect(cafe)}>
@@ -479,7 +472,7 @@ export default function CafeSelector({
                                   textAlign: "center",
                                 }}
                               >
-                                {cafe.vicinity || 'Unknown location'}
+                                {cafe.vicinity || "Unknown location"}
                               </Text>
                               <Text
                                 style={{
@@ -781,5 +774,4 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: "K2D-Regular",
   },
-    
 });
