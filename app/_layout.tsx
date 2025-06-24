@@ -17,8 +17,8 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { Text, TextInput } from "react-native";
 import Colors from "@/constants/Colors";
 import CustomSplashScreen from "@/components/CustomSplashScreen";
-import { Platform } from 'react-native';
-import Superwall from 'expo-superwall/compat';
+import { Platform } from "react-native";
+import Superwall from "expo-superwall";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -74,19 +74,19 @@ function RootLayoutNav() {
         headerTitleStyle: {
           fontFamily: "K2D-SemiBold",
         },
-        animation: 'slide_from_right',
+        animation: "slide_from_right",
       }}
     >
       <Stack.Screen name="(auth)" options={{ headerShown: false }} />
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="messages" options={{ headerShown: false }} />
-      <Stack.Screen 
-        name="settings" 
-        options={{ 
+      <Stack.Screen
+        name="settings"
+        options={{
           title: "Settings",
           headerShown: true,
-          animation: 'slide_from_right'
-        }} 
+          animation: "slide_from_right",
+        }}
       />
       <Stack.Screen name="+not-found" options={{ title: "Not Found" }} />
     </Stack>
@@ -145,9 +145,7 @@ export default function RootLayout() {
   }
 
   if (showCustomSplash) {
-    return (
-      <CustomSplashScreen onFinish={() => setShowCustomSplash(false)} />
-    );
+    return <CustomSplashScreen onFinish={() => setShowCustomSplash(false)} />;
   }
 
   return (
