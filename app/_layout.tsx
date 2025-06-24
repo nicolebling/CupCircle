@@ -18,7 +18,7 @@ import { Text, TextInput } from "react-native";
 import Colors from "@/constants/Colors";
 import CustomSplashScreen from "@/components/CustomSplashScreen";
 import { Platform } from "react-native";
-import Superwall from 'expo-superwall/compat';
+import Superwall from 'expo-superwall';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
