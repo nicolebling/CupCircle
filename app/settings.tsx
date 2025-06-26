@@ -6,7 +6,7 @@ import {
   View,
   Text,
   TouchableOpacity,
-  Platform
+  Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -14,7 +14,7 @@ import { useNavigation } from "expo-router";
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { useAuth } from "@/contexts/AuthContext";
-import { openBrowserAsync } from 'expo-web-browser';
+import { openBrowserAsync } from "expo-web-browser";
 import Superwall from "expo-superwall/compat";
 
 export default function SettingsScreen() {
@@ -44,14 +44,19 @@ export default function SettingsScreen() {
     }
   };
 
+  // Optional: Register placement if you want to provide a feature callback
+  Superwall.shared.register({
+    placement: "app_launch",
+    feature: () => {
+      console.log("Access granted (either free or paid).");
+      // You can navigate to a screen or show a message
+    },
+  });
 
   React.useEffect(() => {
     navigation.setOptions({
       headerLeft: () => (
-        <TouchableOpacity
-          onPress={() => router.back()}
-          
-        >
+        <TouchableOpacity onPress={() => router.back()}>
           <Ionicons name="chevron-back" size={24} color={colors.text} />
         </TouchableOpacity>
       ),
@@ -64,7 +69,9 @@ export default function SettingsScreen() {
     >
       <ScrollView style={styles.content}>
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.text, marginTop: 32 }]}>
+          <Text
+            style={[styles.sectionTitle, { color: colors.text, marginTop: 32 }]}
+          >
             Account
           </Text>
           <TouchableOpacity
@@ -84,23 +91,14 @@ export default function SettingsScreen() {
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.settingItem, { borderColor: colors.border }]}
-            onPress={async () => {
-              try {
-                // Optional: Register placement if you want to provide a feature callback
-                Superwall.shared.register({
-                  placement: 'after_meetup',
-                  feature: () => {
-                    console.log("Access granted (either free or paid).");
-                    // You can navigate to a screen or show a message
-                  },
-                });
-
-                // Trigger the paywall and handle the result
-                const result = await Superwall.shared.getPresentationResult('after_meetup');
-                console.log("Paywall presentation result:", result);
-              } catch (error) {
-                console.error("Error presenting paywall:", error);
-              }
+            onPress={() => {
+              Superwall.shared.getPresentationResult({
+                placement: "after_meetup",
+                feature: () => {
+                  console.log("Access granted (either free or paid).");
+                  // You can navigate to a screen or show a message here
+                },
+              });
             }}
           >
             <View style={styles.settingContent}>
@@ -115,9 +113,16 @@ export default function SettingsScreen() {
               color={colors.secondaryText}
             />
           </TouchableOpacity>
-
         </View>
 
+        {/* async () => {
+        try {
+
+          await Superwall.shared.getPresentationResult('after_meetup');
+        } catch (error) {
+          console.error("Error presenting paywall:", error);
+        }
+      } */}
 
         {/* Superwall.shared.register({
           placement: 'after_meetup',
@@ -189,7 +194,6 @@ export default function SettingsScreen() {
               />
             </TouchableOpacity>
           </View> */}
-          
         </View>
 
         <View style={styles.section}>
@@ -199,9 +203,8 @@ export default function SettingsScreen() {
 
           <TouchableOpacity
             style={[styles.settingItem, { borderColor: colors.border }]}
-            onPress={() => openBrowserAsync('https://www.cupcircle.co/support')}
-            >
-          
+            onPress={() => openBrowserAsync("https://www.cupcircle.co/support")}
+          >
             <View style={styles.settingContent}>
               <Ionicons
                 name="help-circle-outline"
@@ -221,7 +224,9 @@ export default function SettingsScreen() {
 
           <TouchableOpacity
             style={[styles.settingItem, { borderColor: colors.border }]}
-            onPress={() => openBrowserAsync('https://www.cupcircle.co/terms-of-service')}
+            onPress={() =>
+              openBrowserAsync("https://www.cupcircle.co/terms-of-service")
+            }
           >
             <View style={styles.settingContent}>
               <Ionicons
@@ -242,7 +247,9 @@ export default function SettingsScreen() {
 
           <TouchableOpacity
             style={[styles.settingItem, { borderColor: colors.border }]}
-            onPress={() => openBrowserAsync('https://www.cupcircle.co/privacy-policy')}
+            onPress={() =>
+              openBrowserAsync("https://www.cupcircle.co/privacy-policy")
+            }
           >
             <View style={styles.settingContent}>
               <Ionicons name="shield-outline" size={22} color={colors.text} />
