@@ -93,22 +93,45 @@ export default function SettingsScreen() {
             style={[styles.settingItem, { borderColor: colors.border }]}
             onPress={async () => {
               try {
+                // Define placement name and validate it
+                const placementName = "after_meetup";
+
                 console.log(
                   "[SUPERWALL DEBUG] Settings - Starting paywall presentation",
                 );
                 console.log(
                   "[SUPERWALL DEBUG] Settings - Placement:",
-                  "after_meetup",
+                  placementName,
+                );
+                console.log(
+                  "[SUPERWALL DEBUG] Settings - Placement type:",
+                  typeof placementName,
                 );
                 console.log(
                   "[SUPERWALL DEBUG] Settings - Current timestamp:",
                   new Date().toISOString(),
                 );
 
-                const result =
-                  await Superwall.shared.getPresentationResult("after_meetup");
+                // Validate placement name is not undefined or empty
+                if (!placementName || typeof placementName !== 'string') {
+                  throw new Error(`Invalid placement name: ${placementName} (type: ${typeof placementName})`);
+                }
+
+                // First try to register the placement
+                console.log("[SUPERWALL DEBUG] Settings - Registering placement");
+                Superwall.shared.register({
+                  placement: placementName,
+                  feature: () => {
+                    console.log("[SUPERWALL DEBUG] Settings - Feature access granted");
+                  },
+                });
+
+                console.log("[SUPERWALL DEBUG] Settings - Getting presentation result");
+                const result = await Superwall.shared.getPresentationResult(placementName);
 
                 console.log("✅ Paywall result:", result);
+                console.log("✅ Paywall result type:", typeof result);
+                console.log("✅ Paywall result state:", result?.state);
 
                 console.log(
                   "[SUPERWALL SUCCESS] Settings - Paywall presentation completed",
@@ -119,10 +142,22 @@ export default function SettingsScreen() {
                   error,
                 );
                 console.error("[SUPERWALL ERROR] Settings - Error details:", {
-                  message: error.message,
-                  stack: error.stack,
+                  message: error?.message,
+                  stack: error?.stack,
+                  name: error?.name,
                   placement: "after_meetup",
+                  errorType: typeof error,
                 });
+
+                // Try alternative approach
+                try {
+                  console.log("[SUPERWALL DEBUG] Settings - Trying alternative approach");
+                  await Superwall.shared.register({
+                    placement: "after_meetup"
+                  });
+                } catch (fallbackError) {
+                  console.error("[SUPERWALL ERROR] Settings - Fallback also failed:", fallbackError);
+                }
               }
             }}
           >
