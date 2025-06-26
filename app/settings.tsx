@@ -91,14 +91,26 @@ export default function SettingsScreen() {
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.settingItem, { borderColor: colors.border }]}
-            onPress={() => {
-              Superwall.shared.getPresentationResult({
-                placement: "after_meetup",
-                feature: () => {
-                  console.log("Access granted (either free or paid).");
-                  // You can navigate to a screen or show a message here
-                },
-              });
+            onPress={async () => {
+              try {
+                console.log('[SUPERWALL DEBUG] Settings - Starting paywall presentation');
+                console.log('[SUPERWALL DEBUG] Settings - Placement:', "after_meetup");
+                console.log('[SUPERWALL DEBUG] Settings - Current timestamp:', new Date().toISOString());
+
+                const result =
+                  await Superwall.shared.getPresentationResult("after_meetup");
+
+                console.log("✅ Paywall result:", result);
+
+                console.log('[SUPERWALL SUCCESS] Settings - Paywall presentation completed');
+              } catch (error) {
+                console.error('[SUPERWALL ERROR] Settings - Error presenting paywall:', error);
+                console.error('[SUPERWALL ERROR] Settings - Error details:', {
+                  message: error.message,
+                  stack: error.stack,
+                  placement: "after_meetup"
+                });
+              }
             }}
           >
             <View style={styles.settingContent}>

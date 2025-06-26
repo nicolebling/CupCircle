@@ -41,6 +41,58 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Function to validate and format UUID for Superwall with detailed logging
+const formatUserIdForSuperwall = (userId: string, context: string): string => {
+  console.log(`[SUPERWALL DEBUG] ${context} - Raw user ID:`, userId);
+  console.log(`[SUPERWALL DEBUG] ${context} - User ID type:`, typeof userId);
+  console.log(`[SUPERWALL DEBUG] ${context} - User ID length:`, userId?.length);
+
+  if (!userId) {
+    console.error(`[SUPERWALL ERROR] ${context} - User ID is null or undefined`);
+    return userId;
+  }
+
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  const isValidUUID = uuidRegex.test(userId);
+
+  console.log(`[SUPERWALL DEBUG] ${context} - Is valid UUID:`, isValidUUID);
+
+  if (!isValidUUID) {
+    console.warn(`[SUPERWALL WARNING] ${context} - User ID is not a valid UUID format:`, userId);
+    console.warn(`[SUPERWALL WARNING] ${context} - This may cause issues with Apple's appAccountToken requirements`);
+  } else {
+    console.log(`[SUPERWALL SUCCESS] ${context} - User ID is valid UUID format`);
+  }
+
+  return userId;
+};
+
+// Function to safely identify user with Superwall with comprehensive logging
+const identifyUserWithSuperwall = (userId: string, context: string) => {
+  try {
+    console.log(`[SUPERWALL DEBUG] ${context} - Starting user identification process`);
+
+    const formattedUserId = formatUserIdForSuperwall(userId, context);
+
+    console.log(`[SUPERWALL DEBUG] ${context} - Calling Superwall.shared.identify with:`, {
+      userId: formattedUserId,
+      timestamp: new Date().toISOString()
+    });
+
+    Superwall.shared.identify({ userId: formattedUserId });
+
+    console.log(`[SUPERWALL SUCCESS] ${context} - User identification completed successfully`);
+
+  } catch (error) {
+    console.error(`[SUPERWALL ERROR] ${context} - Failed to identify user:`, error);
+    console.error(`[SUPERWALL ERROR] ${context} - Error details:`, {
+      message: error.message,
+      stack: error.stack,
+      userId: userId
+    });
+  }
+};
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
@@ -50,27 +102,61 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log('[SUPERWALL DEBUG] AuthContext - useEffect initializing');
+
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('[SUPERWALL DEBUG] Initial session check:', {
+        hasSession: !!session,
+        hasUser: !!session?.user,
+        userId: session?.user?.id,
+        userEmail: session?.user?.email
+      });
+
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
 
       // Identify user with Superwall
       if (session?.user) {
-        Superwall.shared.identify({ userId: session.user.id });
+        identifyUserWithSuperwall(session.user.id, 'Initial Session Check');
+      } else {
+        console.log('[SUPERWALL DEBUG] Initial Session Check - No user to identify');
       }
+    }).catch(error => {
+      console.error('[SUPERWALL ERROR] Failed to get initial session:', error);
+      setLoading(false);
     });
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('[SUPERWALL DEBUG] Auth state change:', {
+        event,
+        hasSession: !!session,
+        hasUser: !!session?.user,
+        userId: session?.user?.id,
+        userEmail: session?.user?.email,
+        timestamp: new Date().toISOString()
+      });
+
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
 
       // Identify user with Superwall
       if (session?.user) {
-        Superwall.shared.identify({ userId: session.user.id });
+        identifyUserWithSuperwall(session.user.id, `Auth State Change (${event})`);
+      } else {
+        console.log(`[SUPERWALL DEBUG] Auth State Change (${event}) - No user to identify`);
+        if (event === 'SIGNED_OUT') {
+          console.log('[SUPERWALL DEBUG] User signed out, calling Superwall.shared.reset()');
+          try {
+            Superwall.shared.reset();
+            console.log('[SUPERWALL SUCCESS] Superwall reset completed');
+          } catch (error) {
+            console.error('[SUPERWALL ERROR] Failed to reset Superwall:', error);
+          }
+        }
       }
     });
 
@@ -79,25 +165,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const signIn = async (email: string, password: string) => {
     try {
+      console.log('[SUPERWALL DEBUG] SignIn - Starting sign in process for:', email);
       setLoading(true);
+
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('[SUPERWALL ERROR] SignIn - Authentication failed:', error);
+        throw error;
+      }
+
+      console.log('[SUPERWALL DEBUG] SignIn - Authentication successful:', {
+        hasUser: !!data.user,
+        hasSession: !!data.session,
+        userId: data.user?.id,
+        userEmail: data.user?.email
+      });
 
       if (data.user) {
         setUser(data.user);
         setSession(data.session);
 
-        // Identify user with Superwall
-        Superwall.shared.identify({ userId: data.user.id });
+        // Identify user with Superwall using validated UUID
+        identifyUserWithSuperwall(data.user.id, 'Manual Sign In');
 
+        console.log('[SUPERWALL DEBUG] SignIn - Navigating to profile-setup');
         router.replace("/profile-setup");
+      } else {
+        console.warn('[SUPERWALL WARNING] SignIn - No user data received despite successful authentication');
       }
     } catch (error) {
-      console.error("Login failed:", error);
+      console.error("[SUPERWALL ERROR] SignIn - Login failed:", error);
       throw error;
     } finally {
       setLoading(false);
@@ -106,7 +207,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const signUp = async (email: string, password: string, name: string) => {
     try {
+      console.log('[SUPERWALL DEBUG] SignUp - Starting sign up process for:', email, 'with name:', name);
       setLoading(true);
+
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -115,19 +218,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('[SUPERWALL ERROR] SignUp - Registration failed:', error);
+        throw error;
+      }
+
+      console.log('[SUPERWALL DEBUG] SignUp - Registration successful:', {
+        hasUser: !!data.user,
+        hasSession: !!data.session,
+        userId: data.user?.id,
+        userEmail: data.user?.email,
+        needsConfirmation: !data.session
+      });
 
       if (data.user) {
         setUser(data.user);
         setSession(data.session);
 
-        // Identify user with Superwall
-        Superwall.shared.identify({ userId: data.user.id });
+        // Identify user with Superwall using validated UUID
+        identifyUserWithSuperwall(data.user.id, 'Manual Sign Up');
 
+        console.log('[SUPERWALL DEBUG] SignUp - Navigating to profile-setup');
         router.replace("/profile-setup");
+      } else {
+        console.warn('[SUPERWALL WARNING] SignUp - No user data received despite successful registration');
       }
     } catch (error) {
-      console.error("Registration failed:", error);
+      console.error("[SUPERWALL ERROR] SignUp - Registration failed:", error);
       throw error;
     } finally {
       setLoading(false);
