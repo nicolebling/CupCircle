@@ -51,12 +51,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
+
+      // Identify user with Superwall
+      if (session?.user) {
+          Superwall.shared.identify({ userId: session.user.id });
+      }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
+
+      // Identify user with Superwall
+      if (session?.user) {
+          Superwall.shared.identify({ userId: session.user.id });
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -75,6 +85,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (data.user) {
         setUser(data.user);
         setSession(data.session);
+
+        // Identify user with Superwall
+        Superwall.shared.identify({ userId: data.user.id });
+
         router.replace('/profile-setup');
       }
     } catch (error) {
@@ -101,6 +115,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (data.user) {
         setUser(data.user);
         setSession(data.session);
+
+        // Identify user with Superwall
+        Superwall.shared.identify({ userId: data.user.id });
+
         router.replace('/profile-setup');
       }
     } catch (error) {
@@ -127,6 +145,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setSession(null);
       setProfile(null);
       setUser(null);
+
+      // Reset Superwall
+      Superwall.shared.reset();
 
       // Small delay before completing
       await new Promise(resolve => setTimeout(resolve, 200));
