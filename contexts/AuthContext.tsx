@@ -79,7 +79,7 @@ const identifyUserWithSuperwall = (userId: string, context: string) => {
       timestamp: new Date().toISOString()
     });
 
-    Superwall.shared.identify({ userId: formattedUserId });
+    Superwall.shared.identify({ userId: String(session.user.id) });
 
     console.log(`[SUPERWALL SUCCESS] ${context} - User identification completed successfully`);
 
