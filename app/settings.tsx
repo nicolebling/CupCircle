@@ -6,6 +6,7 @@ import {
   View,
   Text,
   TouchableOpacity,
+  Platform
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -14,6 +15,7 @@ import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { useAuth } from "@/contexts/AuthContext";
 import { openBrowserAsync } from 'expo-web-browser';
+import Superwall from "expo-superwall/compat";
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -41,6 +43,7 @@ export default function SettingsScreen() {
       console.error("Logout error:", error);
     }
   };
+
 
   React.useEffect(() => {
     navigation.setOptions({
@@ -81,6 +84,19 @@ export default function SettingsScreen() {
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.settingItem, { borderColor: colors.border }]}
+            onPress={() => {
+              // Optional: Register placement if you want to provide a feature callback
+              Superwall.shared.register({
+                placement: 'after_meetup',
+                feature: () => {
+                  console.log("Access granted (either free or paid).");
+                  // You can navigate to a screen or show a message
+                },
+              });
+
+              // Trigger the paywall
+              Superwall.shared.getPresentationResult('after_meetup');
+            }}
           >
             <View style={styles.settingContent}>
               <Ionicons name="key-outline" size={22} color={colors.text} />
@@ -94,7 +110,18 @@ export default function SettingsScreen() {
               color={colors.secondaryText}
             />
           </TouchableOpacity>
+
         </View>
+
+
+        {/* Superwall.shared.register({
+          placement: 'after_meetup',
+          feature: () => {
+            navigation.navigate('LaunchedFeature', {
+              value: 'Non-gated feature launched',
+            });
+          } 
+        }); */}
 
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>
