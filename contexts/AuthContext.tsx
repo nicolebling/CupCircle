@@ -1,8 +1,9 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
-import { router } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { supabase } from '../lib/supabase';
-import { Session } from '@supabase/supabase-js';
+import React, { createContext, useState, useContext, useEffect } from "react";
+import { router } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { supabase } from "../lib/supabase";
+import { Session } from "@supabase/supabase-js";
+import Superwall from "expo-superwall/compat";
 
 type User = {
   id: string;
@@ -40,7 +41,9 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -54,18 +57,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       // Identify user with Superwall
       if (session?.user) {
-          Superwall.shared.identify({ userId: session.user.id });
+        Superwall.shared.identify({ userId: session.user.id });
       }
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
 
       // Identify user with Superwall
       if (session?.user) {
-          Superwall.shared.identify({ userId: session.user.id });
+        Superwall.shared.identify({ userId: session.user.id });
       }
     });
 
@@ -77,7 +82,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setLoading(true);
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
-        password
+        password,
       });
 
       if (error) throw error;
@@ -89,10 +94,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // Identify user with Superwall
         Superwall.shared.identify({ userId: data.user.id });
 
-        router.replace('/profile-setup');
+        router.replace("/profile-setup");
       }
     } catch (error) {
-      console.error('Login failed:', error);
+      console.error("Login failed:", error);
       throw error;
     } finally {
       setLoading(false);
@@ -106,8 +111,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         email,
         password,
         options: {
-          data: { name }
-        }
+          data: { name },
+        },
       });
 
       if (error) throw error;
@@ -119,10 +124,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // Identify user with Superwall
         Superwall.shared.identify({ userId: data.user.id });
 
-        router.replace('/profile-setup');
+        router.replace("/profile-setup");
       }
     } catch (error) {
-      console.error('Registration failed:', error);
+      console.error("Registration failed:", error);
       throw error;
     } finally {
       setLoading(false);
@@ -134,12 +139,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setLoading(true);
 
       // Add small delay for visual feedback
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await new Promise((resolve) => setTimeout(resolve, 300));
 
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
 
-      router.replace('/(auth)/login');
+      router.replace("/(auth)/login");
 
       // Update state after navigation starts
       setSession(null);
@@ -150,11 +155,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       Superwall.shared.reset();
 
       // Small delay before completing
-      await new Promise(resolve => setTimeout(resolve, 200));
+      await new Promise((resolve) => setTimeout(resolve, 200));
       setLoading(false);
     } catch (error) {
       setLoading(false);
-      console.error('Logout failed:', error);
+      console.error("Logout failed:", error);
       throw error;
     }
   };
@@ -164,20 +169,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (!user?.id) return null;
 
       const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('user_id', user.id)
+        .from("profiles")
+        .select("*")
+        .eq("user_id", user.id)
         .single();
 
       if (error) {
-        console.error('Error fetching profile:', error);
+        console.error("Error fetching profile:", error);
         return null;
       }
 
       setProfile(data);
       return data;
     } catch (error) {
-      console.error('Failed to fetch profile:', error);
+      console.error("Failed to fetch profile:", error);
       return null;
     }
   };
@@ -193,15 +198,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       const { error } = await supabase
-        .from('profiles')
+        .from("profiles")
         .update(processedUserData)
-        .eq('id', user.id);
+        .eq("id", user.id);
 
       if (error) throw error;
 
-      setProfile(prev => prev ? { ...prev, ...userData } : null);
+      setProfile((prev) => (prev ? { ...prev, ...userData } : null));
     } catch (error) {
-      console.error('Update user failed:', error);
+      console.error("Update user failed:", error);
       throw error;
     }
   };
@@ -228,7 +233,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };
