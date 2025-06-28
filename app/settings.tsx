@@ -6,9 +6,7 @@ import {
   View,
   Text,
   TouchableOpacity,
-  Platform,
-  Button,
-  Alert
+  Platform
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -18,8 +16,6 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { useAuth } from "@/contexts/AuthContext";
 import { openBrowserAsync } from "expo-web-browser";
 import Superwall, { LogLevel } from "expo-superwall/compat";
-import { usePlacement, useUser } from "expo-superwall";
-
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -55,7 +51,7 @@ export default function SettingsScreen() {
         Superwall.configure({
           apiKey: apiKey,
         });
-
+        
         // Set debug level for more detailed logging
         await Superwall.shared.setLogLevel(LogLevel.Debug);
         console.log('Superwall configured with debug logging in settings');
@@ -63,7 +59,7 @@ export default function SettingsScreen() {
         console.error('Failed to configure Superwall in settings:', error);
       }
     };
-
+    
     initializeSuperwall();
   }, [])
 
@@ -77,21 +73,8 @@ export default function SettingsScreen() {
     });
   }, [colors.text]);
 
-  const { registerPlacement, state: placementState } = usePlacement({
-    onError: (err) => console.error("Placement Error:", err),
-    onPresent: (info) => console.log("Paywall Presented:", info),
-    onDismiss: (info, result) =>
-      console.log("Paywall Dismissed:", info, "Result:", result),
-  });
-
-  const handleTriggerPlacement = async () => {
-    await registerPlacement({
-      placement: "campaign_trigger"
-    });
-  };
-
   return (
-
+   
       <SafeAreaView
         style={[styles.container, { backgroundColor: colors.background }]}
       >
@@ -122,7 +105,6 @@ export default function SettingsScreen() {
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.settingItem, { borderColor: colors.border }]}
-              onPress={handleTriggerPlacement}
             >
               <View style={styles.settingContent}>
                 <Ionicons name="key-outline" size={22} color={colors.text} />
@@ -279,12 +261,9 @@ export default function SettingsScreen() {
             <Ionicons name="log-out-outline" size={22} color="#FF3B30" />
             <Text style={styles.logoutText}>Log Out</Text>
           </TouchableOpacity>
-          {placementState && (
-            <Text>Last Paywall Result: {JSON.stringify(placementState)}</Text>
-          )}
         </ScrollView>
       </SafeAreaView>
-
+   
   );
 }
 
