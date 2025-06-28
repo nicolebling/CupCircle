@@ -8,7 +8,10 @@
     "icon": "./assets/images/cupcircle_logo.png",
     "scheme": "cupcircle",
     "userInterfaceStyle": "automatic",
-    "platforms": ["ios", "android"],
+    "platforms": [
+      "ios",
+      "android"
+    ],
     "newArchEnabled": true,
     "jsEngine": "jsc",
     "extra": {
@@ -76,7 +79,8 @@
             "deploymentTarget": "15.1"
           }
         }
-      ]
+      ],
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true

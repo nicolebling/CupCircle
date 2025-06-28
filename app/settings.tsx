@@ -13,7 +13,7 @@ import { useNavigation } from "expo-router";
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { useAuth } from "@/contexts/AuthContext";
-import { openBrowserAsync } from 'expo-web-browser';
+import { openBrowserAsync } from "expo-web-browser";
 import { SuperwallProvider } from "expo-superwall";
 
 export default function SettingsScreen() {
@@ -46,10 +46,7 @@ export default function SettingsScreen() {
   React.useEffect(() => {
     navigation.setOptions({
       headerLeft: () => (
-        <TouchableOpacity
-          onPress={() => router.back()}
-          
-        >
+        <TouchableOpacity onPress={() => router.back()}>
           <Ionicons name="chevron-back" size={24} color={colors.text} />
         </TouchableOpacity>
       ),
@@ -57,83 +54,94 @@ export default function SettingsScreen() {
   }, [colors.text]);
 
   return (
-    <SafeAreaView
-      style={[styles.container, { backgroundColor: colors.background }]}
+    <SuperwallProvider
+      apiKeys={{
+        ios: "pk_62d74e42465ff893d4306f3f41f6fd62858dcdcc06124485",
+        // android: process.env.EXPO_PUBLIC_SUPERWALL_ANDROID_API_KEY // Add if you have Android key
+      }}
     >
-      <ScrollView style={styles.content}>
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.text, marginTop: 32 }]}>
-            Account
-          </Text>
-          <TouchableOpacity
-            style={[styles.settingItem, { borderColor: colors.border }]}
-          >
-            <View style={styles.settingContent}>
-              <Ionicons name="key-outline" size={22} color={colors.text} />
-              <Text style={[styles.settingText, { color: colors.text }]}>
-                Change Password
-              </Text>
-            </View>
-            <Ionicons
-              name="chevron-forward"
-              size={20}
-              color={colors.secondaryText}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.settingItem, { borderColor: colors.border }]}
-          >
-            <View style={styles.settingContent}>
-              <Ionicons name="key-outline" size={22} color={colors.text} />
-              <Text style={[styles.settingText, { color: colors.text }]}>
-                Manage Subscription
-              </Text>
-            </View>
-            <Ionicons
-              name="chevron-forward"
-              size={20}
-              color={colors.secondaryText}
-            />
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>
-            Preferences
-          </Text>
-
-          <View style={[styles.settingItem, { borderColor: colors.border }]}>
-            <View style={styles.settingContent}>
-              <Ionicons
-                name="notifications-outline"
-                size={22}
-                color={colors.text}
-              />
-              <Text style={[styles.settingText, { color: colors.text }]}>
-                Notifications
-              </Text>
-            </View>
-            <TouchableOpacity
+      <SafeAreaView
+        style={[styles.container, { backgroundColor: colors.background }]}
+      >
+        <ScrollView style={styles.content}>
+          <View style={styles.section}>
+            <Text
               style={[
-                styles.toggle,
-                notifications
-                  ? { backgroundColor: colors.primary }
-                  : { backgroundColor: colors.border },
+                styles.sectionTitle,
+                { color: colors.text, marginTop: 32 },
               ]}
-              onPress={handleNotificationsToggle}
             >
-              <View
-                style={[
-                  styles.toggleKnob,
-                  notifications ? { right: 2 } : { left: 2 },
-                  { backgroundColor: "white" },
-                ]}
+              Account
+            </Text>
+            <TouchableOpacity
+              style={[styles.settingItem, { borderColor: colors.border }]}
+            >
+              <View style={styles.settingContent}>
+                <Ionicons name="key-outline" size={22} color={colors.text} />
+                <Text style={[styles.settingText, { color: colors.text }]}>
+                  Change Password
+                </Text>
+              </View>
+              <Ionicons
+                name="chevron-forward"
+                size={20}
+                color={colors.secondaryText}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.settingItem, { borderColor: colors.border }]}
+            >
+              <View style={styles.settingContent}>
+                <Ionicons name="key-outline" size={22} color={colors.text} />
+                <Text style={[styles.settingText, { color: colors.text }]}>
+                  Manage Subscription
+                </Text>
+              </View>
+              <Ionicons
+                name="chevron-forward"
+                size={20}
+                color={colors.secondaryText}
               />
             </TouchableOpacity>
           </View>
 
-          {/* Dark mode - future implementation */}
-          {/* <View style={[styles.settingItem, { borderColor: colors.border }]}>
+          <View style={styles.section}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>
+              Preferences
+            </Text>
+
+            <View style={[styles.settingItem, { borderColor: colors.border }]}>
+              <View style={styles.settingContent}>
+                <Ionicons
+                  name="notifications-outline"
+                  size={22}
+                  color={colors.text}
+                />
+                <Text style={[styles.settingText, { color: colors.text }]}>
+                  Notifications
+                </Text>
+              </View>
+              <TouchableOpacity
+                style={[
+                  styles.toggle,
+                  notifications
+                    ? { backgroundColor: colors.primary }
+                    : { backgroundColor: colors.border },
+                ]}
+                onPress={handleNotificationsToggle}
+              >
+                <View
+                  style={[
+                    styles.toggleKnob,
+                    notifications ? { right: 2 } : { left: 2 },
+                    { backgroundColor: "white" },
+                  ]}
+                />
+              </TouchableOpacity>
+            </View>
+
+            {/* Dark mode - future implementation */}
+            {/* <View style={[styles.settingItem, { borderColor: colors.border }]}>
             <View style={styles.settingContent}>
               <Ionicons name="moon-outline" size={22} color={colors.text} />
               <Text style={[styles.settingText, { color: colors.text }]}>
@@ -158,84 +166,89 @@ export default function SettingsScreen() {
               />
             </TouchableOpacity>
           </View> */}
-          
-        </View>
+          </View>
 
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>
-            Support
-          </Text>
+          <View style={styles.section}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>
+              Support
+            </Text>
 
-          <TouchableOpacity
-            style={[styles.settingItem, { borderColor: colors.border }]}
-            onPress={() => openBrowserAsync('https://www.cupcircle.co/support')}
+            <TouchableOpacity
+              style={[styles.settingItem, { borderColor: colors.border }]}
+              onPress={() =>
+                openBrowserAsync("https://www.cupcircle.co/support")
+              }
             >
-          
-            <View style={styles.settingContent}>
+              <View style={styles.settingContent}>
+                <Ionicons
+                  name="help-circle-outline"
+                  size={22}
+                  color={colors.text}
+                />
+                <Text style={[styles.settingText, { color: colors.text }]}>
+                  Help Center
+                </Text>
+              </View>
               <Ionicons
-                name="help-circle-outline"
-                size={22}
-                color={colors.text}
+                name="chevron-forward"
+                size={20}
+                color={colors.secondaryText}
               />
-              <Text style={[styles.settingText, { color: colors.text }]}>
-                Help Center
-              </Text>
-            </View>
-            <Ionicons
-              name="chevron-forward"
-              size={20}
-              color={colors.secondaryText}
-            />
-          </TouchableOpacity>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.settingItem, { borderColor: colors.border }]}
+              onPress={() =>
+                openBrowserAsync("https://www.cupcircle.co/terms-of-service")
+              }
+            >
+              <View style={styles.settingContent}>
+                <Ionicons
+                  name="document-text-outline"
+                  size={22}
+                  color={colors.text}
+                />
+                <Text style={[styles.settingText, { color: colors.text }]}>
+                  Terms of Service
+                </Text>
+              </View>
+              <Ionicons
+                name="chevron-forward"
+                size={20}
+                color={colors.secondaryText}
+              />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.settingItem, { borderColor: colors.border }]}
+              onPress={() =>
+                openBrowserAsync("https://www.cupcircle.co/privacy-policy")
+              }
+            >
+              <View style={styles.settingContent}>
+                <Ionicons name="shield-outline" size={22} color={colors.text} />
+                <Text style={[styles.settingText, { color: colors.text }]}>
+                  Privacy Policy
+                </Text>
+              </View>
+              <Ionicons
+                name="chevron-forward"
+                size={20}
+                color={colors.secondaryText}
+              />
+            </TouchableOpacity>
+          </View>
 
           <TouchableOpacity
-            style={[styles.settingItem, { borderColor: colors.border }]}
-            onPress={() => openBrowserAsync('https://www.cupcircle.co/terms-of-service')}
+            style={[styles.logoutButton, { borderColor: colors.border }]}
+            onPress={handleLogout}
           >
-            <View style={styles.settingContent}>
-              <Ionicons
-                name="document-text-outline"
-                size={22}
-                color={colors.text}
-              />
-              <Text style={[styles.settingText, { color: colors.text }]}>
-                Terms of Service
-              </Text>
-            </View>
-            <Ionicons
-              name="chevron-forward"
-              size={20}
-              color={colors.secondaryText}
-            />
+            <Ionicons name="log-out-outline" size={22} color="#FF3B30" />
+            <Text style={styles.logoutText}>Log Out</Text>
           </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.settingItem, { borderColor: colors.border }]}
-            onPress={() => openBrowserAsync('https://www.cupcircle.co/privacy-policy')}
-          >
-            <View style={styles.settingContent}>
-              <Ionicons name="shield-outline" size={22} color={colors.text} />
-              <Text style={[styles.settingText, { color: colors.text }]}>
-                Privacy Policy
-              </Text>
-            </View>
-            <Ionicons
-              name="chevron-forward"
-              size={20}
-              color={colors.secondaryText}
-            />
-          </TouchableOpacity>
-        </View>
-
-        <TouchableOpacity
-          style={[styles.logoutButton, { borderColor: colors.border }]}
-          onPress={handleLogout}
-        >
-          <Ionicons name="log-out-outline" size={22} color="#FF3B30" />
-          <Text style={styles.logoutText}>Log Out</Text>
-        </TouchableOpacity>
-      </ScrollView>
-    </SafeAreaView>
+        </ScrollView>
+      </SafeAreaView>
+    </SuperwallProvider>
   );
 }
 

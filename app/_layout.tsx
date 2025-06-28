@@ -17,7 +17,7 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { Text, TextInput } from "react-native";
 import Colors from "@/constants/Colors";
 import CustomSplashScreen from "@/components/CustomSplashScreen";
-import { SuperwallProvider } from "expo-superwall";
+
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -139,7 +139,7 @@ export default function RootLayout() {
     <NetworkProvider>
       <AuthProvider>
        
-        >
+        
           <ThemeProvider
             value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
           >
