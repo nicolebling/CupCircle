@@ -9,7 +9,7 @@ import { Stack, useRouter, useSegments } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
-import { View, ActivityIndicator } from "react-native";
+import { View, ActivityIndicator, Platform } from "react-native";
 import "react-native-reanimated";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { NetworkProvider } from "@/contexts/NetworkContext";
@@ -17,7 +17,7 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { Text, TextInput } from "react-native";
 import Colors from "@/constants/Colors";
 import CustomSplashScreen from "@/components/CustomSplashScreen";
-
+import Superwall from "expo-superwall/compat";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -101,6 +101,13 @@ export default function RootLayout() {
     "K2D-SemiBold": require("../assets/fonts/K2D-SemiBold.ttf"),
   });
   const [showCustomSplash, setShowCustomSplash] = useState(true);
+
+  useEffect(() => {
+    const apiKey = Platform.OS === "ios" ? "MY_IOS_API_KEY" : "MY_ANDROID_API_KEY"
+    Superwall.configure({
+      apiKey: apiKey,
+    })
+  }, [])
 
   useEffect(() => {
     if (loaded || error) {

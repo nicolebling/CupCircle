@@ -6,6 +6,7 @@ import {
   View,
   Text,
   TouchableOpacity,
+  Platform
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -14,7 +15,7 @@ import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { useAuth } from "@/contexts/AuthContext";
 import { openBrowserAsync } from "expo-web-browser";
-import { SuperwallProvider } from "expo-superwall";
+import Superwall from "expo-superwall/compat";
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -44,6 +45,13 @@ export default function SettingsScreen() {
   };
 
   React.useEffect(() => {
+    const apiKey = "pk_62d74e42465ff893d4306f3f41f6fd62858dcdcc06124485";
+    Superwall.configure({
+      apiKey: apiKey,
+    })
+  }, [])
+
+  React.useEffect(() => {
     navigation.setOptions({
       headerLeft: () => (
         <TouchableOpacity onPress={() => router.back()}>
@@ -54,12 +62,7 @@ export default function SettingsScreen() {
   }, [colors.text]);
 
   return (
-    <SuperwallProvider
-      apiKeys={{
-        ios: "pk_62d74e42465ff893d4306f3f41f6fd62858dcdcc06124485",
-        // android: process.env.EXPO_PUBLIC_SUPERWALL_ANDROID_API_KEY // Add if you have Android key
-      }}
-    >
+   
       <SafeAreaView
         style={[styles.container, { backgroundColor: colors.background }]}
       >
@@ -248,7 +251,7 @@ export default function SettingsScreen() {
           </TouchableOpacity>
         </ScrollView>
       </SafeAreaView>
-    </SuperwallProvider>
+   
   );
 }
 

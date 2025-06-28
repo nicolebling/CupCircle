@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '../lib/supabase';
 import { Session } from '@supabase/supabase-js';
+import Superwall, {SuperwallOptions, LogLevel, LogScope} from "expo-superwall/compat";
 
 type User = {
   id: string;
@@ -46,6 +47,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
 
+
+  //Superwall DEBUGGING
+  const options = new SuperwallOptions()
+  options.logging.level = LogLevel.Warn
+  options.logging.scopes = [LogScope.PaywallPresentation, LogScope.PaywallTransactions]
+
+ 
+
+  // Or you can set:
+  await Superwall.shared.setLogLevel(LogLevel.Warn)
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
@@ -77,6 +89,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setSession(data.session);
         router.replace('/profile-setup');
       }
+
+      Superwall.shared.identify({ userId: data.user.id })
+
+      
     } catch (error) {
       console.error('Login failed:', error);
       throw error;
