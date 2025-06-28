@@ -47,16 +47,33 @@ export default function SettingsScreen() {
   React.useEffect(() => {
     const initializeSuperwall = async () => {
       try {
+        console.log('🔧 Starting Superwall initialization in settings...');
         const apiKey = "pk_62d74e42465ff893d4306f3f41f6fd62858dcdcc06124485";
+        console.log('🔑 Using API key:', apiKey.substring(0, 10) + '...');
+        
+        console.log('⚙️ Calling Superwall.configure...');
         Superwall.configure({
           apiKey: apiKey,
         });
+        console.log('✅ Superwall.configure completed');
         
         // Set debug level for more detailed logging
+        console.log('📊 Setting Superwall log level to Debug...');
         await Superwall.shared.setLogLevel(LogLevel.Debug);
-        console.log('Superwall configured with debug logging in settings');
+        console.log('✅ Superwall configured with debug logging in settings');
+        
+        // Test if Superwall is working
+        console.log('🧪 Testing Superwall availability...');
+        console.log('  - Superwall object exists:', !!Superwall);
+        console.log('  - Superwall.shared exists:', !!Superwall.shared);
+        console.log('  - Register function exists:', typeof Superwall.shared.register);
+        
       } catch (error) {
-        console.error('Failed to configure Superwall in settings:', error);
+        console.error('❌ Failed to configure Superwall in settings:', error);
+        console.error('📋 Configuration error details:');
+        console.error('  - Error message:', error.message);
+        console.error('  - Error name:', error.name);
+        console.error('  - Full error:', JSON.stringify(error, null, 2));
       }
     };
     
@@ -106,10 +123,37 @@ export default function SettingsScreen() {
             <TouchableOpacity
               style={[styles.settingItem, { borderColor: colors.border }]}
               onPress={async () => {
+                console.log('🔄 Manage Subscription button pressed');
+                console.log('📍 Attempting to register Superwall placement: subscription_onPress');
+                
                 try {
-                  await Superwall.shared.register({placement: 'subscription_onPress'});
+                  // Check if Superwall is configured
+                  console.log('🔍 Checking Superwall configuration status...');
+                  
+                  // Log current user identification status
+                  console.log('👤 Current user session available:', !!user);
+                  if (user) {
+                    console.log('👤 User ID:', user.id);
+                  }
+                  
+                  console.log('🚀 Calling Superwall.shared.register...');
+                  const result = await Superwall.shared.register({placement: 'subscription_onPress'});
+                  console.log('✅ Superwall register completed successfully');
+                  console.log('📊 Register result:', result);
+                  
                 } catch (error) {
-                  console.error('Error showing Superwall placement:', error);
+                  console.error('❌ Error showing Superwall placement:', error);
+                  console.error('📋 Error details:');
+                  console.error('  - Error message:', error.message);
+                  console.error('  - Error name:', error.name);
+                  console.error('  - Error stack:', error.stack);
+                  console.error('  - Full error object:', JSON.stringify(error, null, 2));
+                  
+                  // Additional debugging info
+                  console.log('🔧 Debug Info:');
+                  console.log('  - Superwall object exists:', !!Superwall);
+                  console.log('  - Superwall.shared exists:', !!Superwall.shared);
+                  console.log('  - Register function exists:', typeof Superwall.shared.register);
                 }
               }}
             >
