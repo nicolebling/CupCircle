@@ -15,7 +15,7 @@ import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { useAuth } from "@/contexts/AuthContext";
 import { openBrowserAsync } from "expo-web-browser";
-import Superwall from "expo-superwall/compat";
+import Superwall, { LogLevel } from "expo-superwall/compat";
 
 export default function SettingsScreen() {
   const router = useRouter();
