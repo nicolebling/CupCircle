@@ -17,8 +17,7 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { Text, TextInput } from "react-native";
 import Colors from "@/constants/Colors";
 import CustomSplashScreen from "@/components/CustomSplashScreen";
-import { Platform } from "react-native";
-import Superwall from "expo-superwall/compat";
+import { SuperwallProvider } from "expo-superwall";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -128,22 +127,6 @@ export default function RootLayout() {
     }
   }, [loaded]);
 
-  useEffect(() => {
-    const apiKey =
-      Platform.OS === "ios"
-        ? process.env.EXPO_PUBLIC_SUPERWALL_IOS_API_KEY
-        : process.env.EXPO_PUBLIC_SUPERWALL_ANDROID_API_KEY;
-
-    if (apiKey) {
-      const apiKey =
-        Platform.OS === "ios" ? "MY_IOS_API_KEY" : "MY_ANDROID_API_KEY";
-      Superwall.configure({
-        apiKey: apiKey,
-      });
-    }
-  }, []);
-
-
   if (!loaded && !error) {
     return null;
   }
@@ -155,12 +138,15 @@ export default function RootLayout() {
   return (
     <NetworkProvider>
       <AuthProvider>
-        <ThemeProvider
-          value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+       
         >
-          <RootLayoutNav />
-          <StatusBar style="auto" />
-        </ThemeProvider>
+          <ThemeProvider
+            value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+          >
+            <RootLayoutNav />
+            <StatusBar style="auto" />
+          </ThemeProvider>
+       
       </AuthProvider>
     </NetworkProvider>
   );
