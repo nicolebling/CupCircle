@@ -1,0 +1,18 @@
+ Error showing Superwall placement: [ReferenceError: Can't find variable: user]
+ ERROR  📋 Error details:
+ ERROR    - Error message: Can't find variable: user
+ ERROR    - Error name: ReferenceError
+ ERROR  Warning:   - Error stack: @
+asyncGeneratorStep@http://7tdonra-anonymous-8081.exp.direct/node_modules/expo-router/entry.bundle//&platform=ios&dev=true&hot=false&lazy=true&transform.routerRoot=app:9371:19
+_next@http://7tdonra-anonymous-8081.exp.direct/node_modules/expo-router/entry.bundle//&platform=ios&dev=true&hot=false&lazy=true&transform.routerRoot=app:9385:29
+@http://7tdonra-anonymous-8081.exp.direct/node_modules/expo-router/entry.bundle//&platform=ios&dev=true&hot=false&lazy=true&transform.routerRoot=app:9390:14
+tryCallTwo@http://7tdonra-anonymous-8081.exp.direct/node_modules/expo-router/entry.bundle//&platform=ios&dev=true&hot=false&lazy=true&transform.routerRoot=app:37748:9
+doResolve@http://7tdonra-anonymous-8081.exp.direct/node_modules/expo-router/entry.bundle//&platform=ios&dev=true&hot=false&lazy=true&transform.routerRoot=app:37887:25
+Promise@http://7tdonra-anonymous-8081.exp.direct/node_modules/expo-router/entry.bundle//&platform=ios&dev=true&hot=false&lazy=true&transform.routerRoot=app:37767:14
+@http://7tdonra-anonymous-8081.exp.direct/node_modules/expo-router/entry.bundle//&platform=ios&dev=true&hot=false&lazy=true&transform.routerRoot=app:9382:25
+_performTransitionSideEffects@http://7tdonra-anonymous-8081.exp.direct/node_modules/expo-router/entry.bundle//&platform=ios&dev=true&hot=false&lazy=true&transform.routerRoot=app:66047:22
+_receiveSignal@http://7tdonra-anonymous-8081.exp.direct/node_modules/expo-router/entry.bundle//&platform=ios&dev=true&hot=false&lazy=true&transform.routerRoot=app:66003:45
+onResponderRelease@http://7tdonra-anonymous-8081.exp.direct/node_modules/expo-router/entry.bundle//&platform=ios&dev=true&hot=false&lazy=true&transform.routerRoot=app:65866:34
+executeDispatch@http://7tdonra-anonymous-8081.exp.direct/node_modules/expo-router/entry.bundle//&platform=ios&dev=true&hot=false&lazy=true&transform.routerRoot=app:16914:17
+executeDispatchesAndReleaseTopLevel@http://7tdonra-anonymous-8081.exp.direct/node_modules/expo-router/entry.bundle//&platform=ios&dev=true&hot=false&lazy=true&transform.routerRoot=app:17262:229
+forEach@[native code]
