@@ -1,9 +1,13 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
-import { router } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { supabase } from '../lib/supabase';
-import { Session } from '@supabase/supabase-js';
-import Superwall, {SuperwallOptions, LogLevel, LogScope} from "expo-superwall/compat";
+import React, { createContext, useState, useContext, useEffect } from "react";
+import { router } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { supabase } from "../lib/supabase";
+import { Session } from "@supabase/supabase-js";
+import Superwall, {
+  SuperwallOptions,
+  LogLevel,
+  LogScope,
+} from "expo-superwall/compat";
 
 type User = {
   id: string;
@@ -41,12 +45,13 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
-
 
   // Initialize Superwall logging
   useEffect(() => {
@@ -59,7 +64,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.error('Failed to initialize Superwall logging:', error);
       }
     };
-    
+
     initializeSuperwall();
   }, []);
 
@@ -67,41 +72,58 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
-      
+
       // Identify user with Superwall if session exists
       if (session?.user) {
         try {
           await Superwall.shared.identify({ userId: session.user.id });
-          console.log('Superwall user identified from existing session:', session.user.id);
+          console.log(
+            "Superwall user identified from existing session:",
+            session.user.id,
+          );
         } catch (error) {
-          console.error('Failed to identify user with Superwall from session:', error);
+          console.error(
+            "Failed to identify user with Superwall from session:",
+            error,
+          );
         }
       }
-      
+
       setLoading(false);
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
-      
+
       // Handle Superwall user identification based on auth state
       if (session?.user) {
         try {
           await Superwall.shared.identify({ userId: session.user.id });
-          console.log('Superwall user identified on auth state change:', session.user.id);
+          console.log(
+            "Superwall user identified on auth state change:",
+            session.user.id,
+          );
         } catch (error) {
-          console.error('Failed to identify user with Superwall on auth state change:', error);
+          console.error(
+            "Failed to identify user with Superwall on auth state change:",
+            error,
+          );
         }
       } else {
         try {
           await Superwall.shared.reset();
-          console.log('Superwall user reset on auth state change');
+          console.log("Superwall user reset on auth state change");
         } catch (error) {
-          console.error('Failed to reset Superwall user on auth state change:', error);
+          console.error(
+            "Failed to reset Superwall user on auth state change:",
+            error,
+          );
         }
       }
-      
+
       setLoading(false);
     });
 
@@ -113,7 +135,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setLoading(true);
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
-        password
+        password,
       });
 
       if (error) throw error;
@@ -121,21 +143,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (data.user) {
         setUser(data.user);
         setSession(data.session);
-        
+
         // Identify user with Superwall
         try {
           await Superwall.shared.identify({ userId: data.user.id });
-          console.log('Superwall user identified:', data.user.id);
+          console.log("Superwall user identified:", data.user.id);
         } catch (error) {
-          console.error('Failed to identify user with Superwall:', error);
+          console.error("Failed to identify user with Superwall:", error);
         }
-        
-        router.replace('/profile-setup');
-      }
 
-      
+        router.replace("/profile-setup");
+      }
     } catch (error) {
-      console.error('Login failed:', error);
+      console.error("Login failed:", error);
       throw error;
     } finally {
       setLoading(false);
@@ -149,8 +169,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         email,
         password,
         options: {
-          data: { name }
-        }
+          data: { name },
+        },
       });
 
       if (error) throw error;
@@ -158,19 +178,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (data.user) {
         setUser(data.user);
         setSession(data.session);
-        
+
         // Identify user with Superwall
         try {
           await Superwall.shared.identify({ userId: data.user.id });
-          console.log('Superwall user identified during signup:', data.user.id);
+          console.log("Superwall user identified during signup:", data.user.id);
         } catch (error) {
-          console.error('Failed to identify user with Superwall during signup:', error);
+          console.error(
+            "Failed to identify user with Superwall during signup:",
+            error,
+          );
         }
-        
-        router.replace('/profile-setup');
+
+        router.replace("/profile-setup");
       }
     } catch (error) {
-      console.error('Registration failed:', error);
+      console.error("Registration failed:", error);
       throw error;
     } finally {
       setLoading(false);
@@ -182,19 +205,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setLoading(true);
 
       // Add small delay for visual feedback
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await new Promise((resolve) => setTimeout(resolve, 300));
 
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
 
-      router.replace('/(auth)/login');
+      router.replace("/(auth)/login");
 
       // Reset Superwall user identification
       try {
         await Superwall.shared.reset();
-        console.log('Superwall user reset on logout');
+        console.log("Superwall user reset on logout");
       } catch (error) {
-        console.error('Failed to reset Superwall user:', error);
+        console.error("Failed to reset Superwall user:", error);
       }
 
       // Update state after navigation starts
@@ -203,11 +226,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(null);
 
       // Small delay before completing
-      await new Promise(resolve => setTimeout(resolve, 200));
+      await new Promise((resolve) => setTimeout(resolve, 200));
       setLoading(false);
     } catch (error) {
       setLoading(false);
-      console.error('Logout failed:', error);
+      console.error("Logout failed:", error);
       throw error;
     }
   };
@@ -217,20 +240,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (!user?.id) return null;
 
       const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('user_id', user.id)
+        .from("profiles")
+        .select("*")
+        .eq("user_id", user.id)
         .single();
 
       if (error) {
-        console.error('Error fetching profile:', error);
+        console.error("Error fetching profile:", error);
         return null;
       }
 
       setProfile(data);
       return data;
     } catch (error) {
-      console.error('Failed to fetch profile:', error);
+      console.error("Failed to fetch profile:", error);
       return null;
     }
   };
@@ -246,15 +269,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       const { error } = await supabase
-        .from('profiles')
+        .from("profiles")
         .update(processedUserData)
-        .eq('id', user.id);
+        .eq("id", user.id);
 
       if (error) throw error;
 
-      setProfile(prev => prev ? { ...prev, ...userData } : null);
+      setProfile((prev) => (prev ? { ...prev, ...userData } : null));
     } catch (error) {
-      console.error('Update user failed:', error);
+      console.error("Update user failed:", error);
       throw error;
     }
   };
@@ -281,7 +304,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };
