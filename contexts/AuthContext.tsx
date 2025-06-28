@@ -54,19 +54,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [loading, setLoading] = useState(true);
 
   // Initialize Superwall logging
-  useEffect(() => {
-    const initializeSuperwall = async () => {
-      try {
-        // Set log level for debugging
-        await Superwall.shared.setLogLevel(LogLevel.Warn);
-        console.log('Superwall logging initialized with Warn level');
-      } catch (error) {
-        console.error('Failed to initialize Superwall logging:', error);
-      }
-    };
+  // useEffect(() => {
+  //   const initializeSuperwall = async () => {
+  //     try {
+  //       // Set log level for debugging
+  //       await Superwall.shared.setLogLevel(LogLevel.Warn);
+  //       console.log('Superwall logging initialized with Warn level');
+  //     } catch (error) {
+  //       console.error('Failed to initialize Superwall logging:', error);
+  //     }
+  //   };
 
-    initializeSuperwall();
-  }, []);
+  //   initializeSuperwall();
+  // }, []);
 
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
