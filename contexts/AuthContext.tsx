@@ -48,26 +48,60 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
 
-  //Superwall DEBUGGING
-  const options = new SuperwallOptions()
-  options.logging.level = LogLevel.Warn
-  options.logging.scopes = [LogScope.PaywallPresentation, LogScope.PaywallTransactions]
-
- 
-
-  // Or you can set:
-  await Superwall.shared.setLogLevel(LogLevel.Warn)
+  // Initialize Superwall logging
+  useEffect(() => {
+    const initializeSuperwall = async () => {
+      try {
+        // Set log level for debugging
+        await Superwall.shared.setLogLevel(LogLevel.Warn);
+        console.log('Superwall logging initialized with Warn level');
+      } catch (error) {
+        console.error('Failed to initialize Superwall logging:', error);
+      }
+    };
+    
+    initializeSuperwall();
+  }, []);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
+      
+      // Identify user with Superwall if session exists
+      if (session?.user) {
+        try {
+          await Superwall.shared.identify({ userId: session.user.id });
+          console.log('Superwall user identified from existing session:', session.user.id);
+        } catch (error) {
+          console.error('Failed to identify user with Superwall from session:', error);
+        }
+      }
+      
       setLoading(false);
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
+      
+      // Handle Superwall user identification based on auth state
+      if (session?.user) {
+        try {
+          await Superwall.shared.identify({ userId: session.user.id });
+          console.log('Superwall user identified on auth state change:', session.user.id);
+        } catch (error) {
+          console.error('Failed to identify user with Superwall on auth state change:', error);
+        }
+      } else {
+        try {
+          await Superwall.shared.reset();
+          console.log('Superwall user reset on auth state change');
+        } catch (error) {
+          console.error('Failed to reset Superwall user on auth state change:', error);
+        }
+      }
+      
       setLoading(false);
     });
 
@@ -87,10 +121,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (data.user) {
         setUser(data.user);
         setSession(data.session);
+        
+        // Identify user with Superwall
+        try {
+          await Superwall.shared.identify({ userId: data.user.id });
+          console.log('Superwall user identified:', data.user.id);
+        } catch (error) {
+          console.error('Failed to identify user with Superwall:', error);
+        }
+        
         router.replace('/profile-setup');
       }
-
-      Superwall.shared.identify({ userId: data.user.id })
 
       
     } catch (error) {
@@ -117,6 +158,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (data.user) {
         setUser(data.user);
         setSession(data.session);
+        
+        // Identify user with Superwall
+        try {
+          await Superwall.shared.identify({ userId: data.user.id });
+          console.log('Superwall user identified during signup:', data.user.id);
+        } catch (error) {
+          console.error('Failed to identify user with Superwall during signup:', error);
+        }
+        
         router.replace('/profile-setup');
       }
     } catch (error) {
@@ -138,6 +188,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (error) throw error;
 
       router.replace('/(auth)/login');
+
+      // Reset Superwall user identification
+      try {
+        await Superwall.shared.reset();
+        console.log('Superwall user reset on logout');
+      } catch (error) {
+        console.error('Failed to reset Superwall user:', error);
+      }
 
       // Update state after navigation starts
       setSession(null);

@@ -45,10 +45,22 @@ export default function SettingsScreen() {
   };
 
   React.useEffect(() => {
-    const apiKey = "pk_62d74e42465ff893d4306f3f41f6fd62858dcdcc06124485";
-    Superwall.configure({
-      apiKey: apiKey,
-    })
+    const initializeSuperwall = async () => {
+      try {
+        const apiKey = "pk_62d74e42465ff893d4306f3f41f6fd62858dcdcc06124485";
+        Superwall.configure({
+          apiKey: apiKey,
+        });
+        
+        // Set debug level for more detailed logging
+        await Superwall.shared.setLogLevel(LogLevel.Debug);
+        console.log('Superwall configured with debug logging in settings');
+      } catch (error) {
+        console.error('Failed to configure Superwall in settings:', error);
+      }
+    };
+    
+    initializeSuperwall();
   }, [])
 
   React.useEffect(() => {
