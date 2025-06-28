@@ -26,7 +26,7 @@ export default function SettingsScreen() {
   const navigation = useNavigation();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
-  const { signOut } = useAuth();
+  const { signOut, user } = useAuth();
 
   const [notifications, setNotifications] = React.useState(true);
   const [darkMode, setDarkMode] = React.useState(false);
