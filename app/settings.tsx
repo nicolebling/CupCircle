@@ -105,6 +105,13 @@ export default function SettingsScreen() {
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.settingItem, { borderColor: colors.border }]}
+              onPress={async () => {
+                try {
+                  await Superwall.shared.register({placement: 'subscription_onPress'});
+                } catch (error) {
+                  console.error('Error showing Superwall placement:', error);
+                }
+              }}
             >
               <View style={styles.settingContent}>
                 <Ionicons name="key-outline" size={22} color={colors.text} />
@@ -155,32 +162,6 @@ export default function SettingsScreen() {
               </TouchableOpacity>
             </View>
 
-            {/* Dark mode - future implementation */}
-            {/* <View style={[styles.settingItem, { borderColor: colors.border }]}>
-            <View style={styles.settingContent}>
-              <Ionicons name="moon-outline" size={22} color={colors.text} />
-              <Text style={[styles.settingText, { color: colors.text }]}>
-                Dark Mode
-              </Text>
-            </View>
-            <TouchableOpacity
-              style={[
-                styles.toggle,
-                darkMode
-                  ? { backgroundColor: colors.primary }
-                  : { backgroundColor: colors.border },
-              ]}
-              onPress={handleDarkModeToggle}
-            >
-              <View
-                style={[
-                  styles.toggleKnob,
-                  darkMode ? { right: 2 } : { left: 2 },
-                  { backgroundColor: "white" },
-                ]}
-              />
-            </TouchableOpacity>
-          </View> */}
           </View>
 
           <View style={styles.section}>
