@@ -60,6 +60,7 @@ export default function ChatsScreen() {
     Conversation[]
   >([]);
   const [loading, setLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Animation values
   const opacity = useSharedValue(0);
@@ -67,7 +68,7 @@ export default function ChatsScreen() {
 
   useEffect(() => {
     if (user) {
-      fetchConfirmedChats();
+      fetchConfirmedChats(true); // Initial load
     }
   }, [user]);
 
@@ -75,7 +76,7 @@ export default function ChatsScreen() {
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", () => {
       if (user) {
-        fetchConfirmedChats();
+        fetchConfirmedChats(false); // Not initial load
       }
     });
 
@@ -94,11 +95,16 @@ export default function ChatsScreen() {
     }
   }, [searchQuery, conversations]);
 
-  const fetchConfirmedChats = async () => {
+  const fetchConfirmedChats = async (isInitialLoad = false) => {
     if (!user?.id) return;
 
     try {
-      setLoading(true);
+      // Only show skeleton loading on initial load or when no conversations exist
+      if (isInitialLoad || conversations.length === 0) {
+        setLoading(true);
+      } else {
+        setIsRefreshing(true);
+      }
       // Fetch all confirmed matches with the current user
       const { data: matchesData, error: matchesError } = await supabase
         .from("matching")
@@ -115,6 +121,7 @@ export default function ChatsScreen() {
         setConversations([]);
         setFilteredConversations([]);
         setLoading(false);
+        setIsRefreshing(false);
         // Trigger animation even when empty
         opacity.value = withDelay(100, withTiming(1, { duration: 600 }));
         translateY.value = withDelay(100, withTiming(0, { duration: 600 }));
@@ -231,12 +238,16 @@ export default function ChatsScreen() {
       setConversations([]);
       setFilteredConversations([]);
       setLoading(false);
+      setIsRefreshing(false);
       // Still show animation even on error
       opacity.value = withDelay(100, withTiming(1, { duration: 600 }));
       translateY.value = withDelay(100, withTiming(0, { duration: 600 }));
     } finally {
       // Small delay to ensure smooth transition
-      setTimeout(() => setLoading(false), 200);
+      setTimeout(() => {
+        setLoading(false);
+        setIsRefreshing(false);
+      }, 200);
     }
   };
 
@@ -411,6 +422,8 @@ export default function ChatsScreen() {
               }
               ListEmptyComponent={EmptyListComponent}
               showsVerticalScrollIndicator={false}
+              refreshing={isRefreshing}
+              onRefresh={() => fetchConfirmedChats(false)}
             />
           </Animated.View>
         )}
