@@ -39,10 +39,7 @@ export default function SkeletonLoader({
 
     pulse.start();
 
-    return () => {
-      pulse.stop();
-      pulseAnim.removeAllListeners();
-    };
+    return () => pulse.stop();
   }, [pulseAnim]);
 
   const animatedStyle = {

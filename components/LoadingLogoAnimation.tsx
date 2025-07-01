@@ -34,8 +34,6 @@ export default function LoadingLogoAnimation() {
     return () => {
       rotate1.stop();
       rotate2.stop();
-      rotateAnim1.removeAllListeners();
-      rotateAnim2.removeAllListeners();
       rotateAnim1.setValue(0);
       rotateAnim2.setValue(0);
     };

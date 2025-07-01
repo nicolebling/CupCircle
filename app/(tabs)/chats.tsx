@@ -65,14 +65,6 @@ export default function ChatsScreen() {
   const opacity = useSharedValue(0);
   const translateY = useSharedValue(30);
 
-  // Cleanup animations on unmount
-  useEffect(() => {
-    return () => {
-      opacity.value = 0;
-      translateY.value = 30;
-    };
-  }, []);
-
   useEffect(() => {
     if (user) {
       fetchConfirmedChats();

@@ -18,10 +18,6 @@ export function HelloWave() {
       withSequence(withTiming(25, { duration: 150 }), withTiming(0, { duration: 150 })),
       4 // Run the animation 4 times
     );
-    
-    return () => {
-      rotationAnimation.value = 0;
-    };
   }, []);
 
   const animatedStyle = useAnimatedStyle(() => ({
