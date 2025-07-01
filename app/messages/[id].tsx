@@ -586,7 +586,7 @@ export default function MessageScreen() {
       {/* Header */}
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
         <TouchableOpacity
-          onPress={() => router.back("/(tabs)/chats")}
+          onPress={() => router.back()}
           style={{ marginLeft: 4 }}
         >
           <Ionicons name="chevron-back" size={24} color={colors.text} />
