@@ -145,12 +145,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         setSession(data.session);
 
         // Identify user with Superwall
-        try {
-          await Superwall.shared.identify({ userId: data.user.id });
-          console.log("Superwall user identified:", data.user.id);
-        } catch (error) {
-          console.error("Failed to identify user with Superwall:", error);
-        }
+        // try {
+        //   await Superwall.shared.identify({ userId: data.user.id });
+        //   console.log("Superwall user identified:", data.user.id);
+        // } catch (error) {
+        //   console.error("Failed to identify user with Superwall:", error);
+        // }
 
         router.replace("/profile-setup");
       }
