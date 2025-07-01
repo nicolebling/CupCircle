@@ -16,6 +16,7 @@ import { Stack } from "expo-router";
 import Colors from "@/constants/Colors";
 import { useAuth } from "@/contexts/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
+import * as Haptics from 'expo-haptics';
 import AvailabilityCard from "@/components/AvailabilityCard";
 import { format, addDays, isPast, isToday, parseISO } from "date-fns";
 import { useAvailability } from "../../hooks/useAvailability";
@@ -414,7 +415,10 @@ export default function AvailabilityScreen() {
           headerRight: () => (
             <TouchableOpacity
               style={styles.headerButton}
-              onPress={() => setShowAddSlot(true)}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                setShowAddSlot(true);
+              }}
             >
               <Ionicons name="add" size={24} color={colors.text} />
             </TouchableOpacity>
