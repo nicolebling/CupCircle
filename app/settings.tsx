@@ -9,7 +9,8 @@ import {
   Platform,
   Modal,
   TextInput,
-  Alert
+  Alert,
+  Switch
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -216,23 +217,13 @@ export default function SettingsScreen() {
                   Notifications
                 </Text>
               </View>
-              <TouchableOpacity
-                style={[
-                  styles.toggle,
-                  notifications
-                    ? { backgroundColor: colors.primary }
-                    : { backgroundColor: colors.border },
-                ]}
-                onPress={handleNotificationsToggle}
-              >
-                <View
-                  style={[
-                    styles.toggleKnob,
-                    notifications ? { right: 2 } : { left: 2 },
-                    { backgroundColor: "white" },
-                  ]}
-                />
-              </TouchableOpacity>
+              <Switch
+                value={notifications}
+                onValueChange={handleNotificationsToggle}
+                trackColor={{ false: colors.border, true: colors.primary }}
+                thumbColor={Platform.OS === 'ios' ? undefined : 'white'}
+                ios_backgroundColor={colors.border}
+              />
             </View>
 
             {/* Dark mode - future implementation */}
@@ -513,18 +504,7 @@ const styles = StyleSheet.create({
     marginLeft: 12,
     fontFamily: "K2D-Regular",
   },
-  toggle: {
-    width: 50,
-    height: 28,
-    borderRadius: 14,
-    justifyContent: "center",
-  },
-  toggleKnob: {
-    position: "absolute",
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-  },
+  
   logoutButton: {
     flexDirection: "row",
     alignItems: "center",
