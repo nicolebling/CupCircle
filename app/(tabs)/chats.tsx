@@ -60,6 +60,7 @@ export default function ChatsScreen() {
     Conversation[]
   >([]);
   const [loading, setLoading] = useState(true);
+  const [showSkeleton, setShowSkeleton] = useState(false);
 
   // Animation values
   const opacity = useSharedValue(0);
@@ -99,6 +100,12 @@ export default function ChatsScreen() {
 
     try {
       setLoading(true);
+      setShowSkeleton(false);
+      
+      // Set a timer to show skeleton only if loading takes longer than 800ms
+      const skeletonTimer = setTimeout(() => {
+        setShowSkeleton(true);
+      }, 800);
       // Fetch all confirmed matches with the current user
       const { data: matchesData, error: matchesError } = await supabase
         .from("matching")
@@ -223,11 +230,15 @@ export default function ChatsScreen() {
 
       setConversations(sortedConversations);
 
+      // Clear the skeleton timer since we're done loading
+      clearTimeout(skeletonTimer);
+      
       // Trigger smooth fade-in animation
       opacity.value = withDelay(100, withTiming(1, { duration: 600 }));
       translateY.value = withDelay(100, withTiming(0, { duration: 600 }));
     } catch (error) {
       console.error("Error in fetchConfirmedChats:", error);
+      clearTimeout(skeletonTimer);
       setConversations([]);
       setFilteredConversations([]);
       setLoading(false);
@@ -392,7 +403,7 @@ export default function ChatsScreen() {
           )}
         </View> */}
 
-        {loading ? (
+        {loading && showSkeleton ? (
           <View style={{ flex: 1 }}>
             {/* Show 3-4 skeleton chat items while loading */}
             <SkeletonChatItem />
