@@ -133,7 +133,10 @@ export default function ProfileScreen() {
           </TouchableOpacity>
           {!isEditMode && (
             <TouchableOpacity
-              onPress={() => router.push("/settings")}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                router.push("/settings");
+              }}
               style={{ marginRight: 23 }}
             >
               <Ionicons
