@@ -40,6 +40,8 @@ export default function LogoAnimation({ showText = false, size = 96, showSubtitl
     return () => {
       rotate1.stop();
       rotate2.stop();
+      rotateAnim1.removeAllListeners();
+      rotateAnim2.removeAllListeners();
       rotateAnim1.setValue(0);
       rotateAnim2.setValue(0);
     };
