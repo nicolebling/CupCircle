@@ -10,6 +10,7 @@ import { Stack, useRouter, useSegments, useNavigation } from "expo-router";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, withDelay } from "react-native-reanimated";
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import * as Haptics from 'expo-haptics';
 
 export default function ProfileScreen() {
   const colorScheme = useColorScheme();
@@ -89,6 +90,9 @@ export default function ProfileScreen() {
   };
 
   const handleEdit = () => {
+    // Add haptic feedback
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    
     const newEditMode = !isEditMode;
     setIsEditMode(newEditMode);
     navigation.setParams({ isEditMode: newEditMode });
