@@ -103,11 +103,14 @@ export default function RootLayout() {
   const [showCustomSplash, setShowCustomSplash] = useState(true);
 
   useEffect(() => {
-    const apiKey = Platform.OS === "ios" ? "MY_IOS_API_KEY" : "MY_ANDROID_API_KEY"
+    const apiKey =
+      Platform.OS === "ios"
+        ? process.env.EXPO_PUBLIC_SUPERWALL_IOS_API_KEY
+        : process.env.EXPO_PUBLIC_SUPERWALL_ANDROID_API_KEY;
     Superwall.configure({
       apiKey: apiKey,
-    })
-  }, [])
+    });
+  }, []);
 
   useEffect(() => {
     if (loaded || error) {
@@ -145,15 +148,12 @@ export default function RootLayout() {
   return (
     <NetworkProvider>
       <AuthProvider>
-       
-        
-          <ThemeProvider
-            value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
-          >
-            <RootLayoutNav />
-            <StatusBar style="auto" />
-          </ThemeProvider>
-       
+        <ThemeProvider
+          value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+        >
+          <RootLayoutNav />
+          <StatusBar style="auto" />
+        </ThemeProvider>
       </AuthProvider>
     </NetworkProvider>
   );

@@ -180,6 +180,11 @@ export default function SettingsScreen() {
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.settingItem, { borderColor: colors.border }]}
+              onPress={() => {
+                Superwall.shared.register({
+                  placement: 'subscription_onPress',
+                });
+              }}
             >
               <View style={styles.settingContent}>
                 <Ionicons name="key-outline" size={22} color={colors.text} />
