@@ -30,7 +30,6 @@ export default function SettingsScreen() {
   const { signOut, user } = useAuth();
 
   const [notifications, setNotifications] = React.useState(true);
-  const [darkMode, setDarkMode] = React.useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -41,10 +40,6 @@ export default function SettingsScreen() {
 
   const handleNotificationsToggle = () => {
     setNotifications(!notifications);
-  };
-
-  const handleDarkModeToggle = () => {
-    setDarkMode(!darkMode);
   };
 
   const handleLogout = async () => {
