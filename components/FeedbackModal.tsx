@@ -153,11 +153,16 @@ export default function FeedbackModal({
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={styles.keyboardAvoidingView}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
         >
           <View
             style={[styles.modalContent, { backgroundColor: colors.background }]}
           >
-            <ScrollView showsVerticalScrollIndicator={false}>
+            <ScrollView 
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
+              contentContainerStyle={{ flexGrow: 1 }}
+            >
             <View style={styles.modalHeader}>
               <Text style={[styles.modalTitle, { color: colors.text }]}>
                 How was your coffee chat?
@@ -262,9 +267,10 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     width: "90%",
-    maxHeight: "80%",
+    maxHeight: "85%",
     borderRadius: 16,
     padding: 20,
+    maxWidth: 400,
   },
   modalHeader: {
     flexDirection: "row",
