@@ -46,6 +46,7 @@ export default function CircleChatsScreen() {
   const [feedbackQueue, setFeedbackQueue] = useState<FeedbackEligibleMatch[]>(
     [],
   );
+  const [feedbackGiven, setFeedbackGiven] = useState<Set<string>>(new Set());
 
   const fetchChats = async () => {
     if (!user) return;
@@ -99,6 +100,16 @@ export default function CircleChatsScreen() {
 
       setProfiles(profileMap);
       setChats(matchesData);
+
+      // Check feedback status for past confirmed chats
+      const pastConfirmedChats = matchesData.filter(
+        (match) =>
+          match.status === "confirmed" &&
+          new Date(match.meeting_date) < new Date(),
+      );
+      if (pastConfirmedChats.length > 0) {
+        checkFeedbackStatus(pastConfirmedChats.map((chat) => chat.match_id));
+      }
     } catch (error) {
       console.warn(
         "Unexpected error in fetchChats:",
@@ -218,6 +229,24 @@ export default function CircleChatsScreen() {
   const getPartnerProfile = (chat) => {
     const partnerId = chat.user1_id === user.id ? chat.user2_id : chat.user1_id;
     return profiles[partnerId] || {};
+  };
+
+  const checkFeedbackStatus = async (matchIds: string[]) => {
+    try {
+      const { data: existingFeedback, error } = await supabase
+        .from("feedback")
+        .select("match_id")
+        .in("match_id", matchIds);
+
+      if (error) throw error;
+
+      const feedbackGivenSet = new Set(
+        existingFeedback?.map((f) => f.match_id) || [],
+      );
+      setFeedbackGiven(feedbackGivenSet);
+    } catch (error) {
+      console.error("Error checking feedback status:", error);
+    }
   };
 
   const renderChatCard = (chat) => {
@@ -379,6 +408,33 @@ export default function CircleChatsScreen() {
               </TouchableOpacity>
             </>
           )}
+          {chat.status === "confirmed" && showPastChats && (
+            <TouchableOpacity
+              style={[
+                styles.actionButton,
+                feedbackGiven.has(chat.match_id)
+                  ? { backgroundColor: colors.secondaryText }
+                  : { backgroundColor: colors.primary },
+              ]}
+              onPress={() => {
+                if (!feedbackGiven.has(chat.match_id)) {
+                  const partnerProfile = getPartnerProfile(chat);
+                  setCurrentFeedbackMatch({
+                    match_id: chat.match_id,
+                    partner_name: partnerProfile.name || "Unknown",
+                    meeting_date: chat.meeting_date,
+                    start_time: chat.start_time,
+                  });
+                  setShowFeedbackModal(true);
+                }
+              }}
+              disabled={feedbackGiven.has(chat.match_id)}
+            >
+              <Text style={styles.actionButtonText}>
+                {feedbackGiven.has(chat.match_id) ? "Feedback Given" : "Give Feedback"}
+              </Text>
+            </TouchableOpacity>
+          )}
           {chat.user2_id === user.id && chat.status === "pending" && (
             <>
               <TouchableOpacity
@@ -500,6 +556,11 @@ export default function CircleChatsScreen() {
   };
 
   const handleFeedbackSubmitSuccess = () => {
+    // Add the current match to feedback given set
+    if (currentFeedbackMatch) {
+      setFeedbackGiven(prev => new Set([...prev, currentFeedbackMatch.match_id]));
+    }
+
     // Remove current match from queue
     const updatedQueue = feedbackQueue.slice(1);
     setFeedbackQueue(updatedQueue);
