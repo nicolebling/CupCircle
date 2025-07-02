@@ -5,6 +5,7 @@ export interface FeedbackEligibleMatch {
   partner_name: string;
   meeting_date: string;
   start_time: string;
+  coffeePlace: string;
 }
 
 export const feedbackService = {
@@ -26,7 +27,8 @@ export const feedbackService = {
           user2_id,
           meeting_date,
           start_time,
-          status
+          status,
+          meeting_location
         `,
         )
         .eq("status", "confirmed")
@@ -91,6 +93,7 @@ export const feedbackService = {
             partner_name: partnerProfile.name || "Unknown",
             meeting_date: match.meeting_date,
             start_time: match.start_time,
+            coffeePlace: match.meeting_location.split("|||")[0]
           });
         }
       }

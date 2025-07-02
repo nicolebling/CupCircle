@@ -325,13 +325,14 @@ export default function CircleChatsScreen() {
             />
             <Text style={[styles.detailText, { color: colors.text }]}>
               {(() => {
-                const [year, month, day] = chat.meeting_date.split("-").map(Number);
+                const [year, month, day] = chat.meeting_date
+                  .split("-")
+                  .map(Number);
                 const date = new Date(year, month - 1, day); // month is 0-indexed
                 return format(date, "EEEE, MMMM d");
               })()}
             </Text>
           </View>
-
 
           <View style={styles.detailRow}>
             <Ionicons
@@ -422,6 +423,7 @@ export default function CircleChatsScreen() {
                   setCurrentFeedbackMatch({
                     match_id: chat.match_id,
                     partner_name: partnerProfile.name || "Unknown",
+                    coffeePlace: chat.meeting_location.split("|||")[0],
                     meeting_date: chat.meeting_date,
                     start_time: chat.start_time,
                   });
@@ -431,7 +433,9 @@ export default function CircleChatsScreen() {
               disabled={feedbackGiven.has(chat.match_id)}
             >
               <Text style={styles.actionButtonText}>
-                {feedbackGiven.has(chat.match_id) ? "Feedback Given" : "Give Feedback"}
+                {feedbackGiven.has(chat.match_id)
+                  ? "Feedback Given"
+                  : "Give Feedback"}
               </Text>
             </TouchableOpacity>
           )}
@@ -558,7 +562,9 @@ export default function CircleChatsScreen() {
   const handleFeedbackSubmitSuccess = () => {
     // Add the current match to feedback given set
     if (currentFeedbackMatch) {
-      setFeedbackGiven(prev => new Set([...prev, currentFeedbackMatch.match_id]));
+      setFeedbackGiven(
+        (prev) => new Set([...prev, currentFeedbackMatch.match_id]),
+      );
     }
 
     // Remove current match from queue
@@ -706,6 +712,7 @@ export default function CircleChatsScreen() {
           onClose={handleFeedbackModalClose}
           matchId={currentFeedbackMatch.match_id}
           partnerName={currentFeedbackMatch.partner_name}
+          coffeePlace={currentFeedbackMatch.coffeePlace}
           onSubmitSuccess={handleFeedbackSubmitSuccess}
         />
       )}

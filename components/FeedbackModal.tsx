@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   Modal,
   View,
@@ -9,17 +8,18 @@ import {
   TextInput,
   Alert,
   ScrollView,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { useColorScheme } from '@/hooks/useColorScheme';
-import Colors from '@/constants/Colors';
-import { supabase } from '@/lib/supabase';
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { useColorScheme } from "@/hooks/useColorScheme";
+import Colors from "@/constants/Colors";
+import { supabase } from "@/lib/supabase";
 
 interface FeedbackModalProps {
   visible: boolean;
   onClose: () => void;
   matchId: string;
   partnerName: string;
+  coffeePlace: string;
   onSubmitSuccess: () => void;
 }
 
@@ -28,22 +28,31 @@ export default function FeedbackModal({
   onClose,
   matchId,
   partnerName,
+  coffeePlace,
   onSubmitSuccess,
 }: FeedbackModalProps) {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme ?? 'light'];
+  const colors = Colors[colorScheme ?? "light"];
 
-  const [rating, setRating] = useState<number>(0);
-  const [feedback, setFeedback] = useState('');
+  const [rating1, setRating1] = useState<number>(0);
+   const [rating2, setRating2] = useState<number>(0);
+  const [feedback, setFeedback] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  const handleStarPress = (selectedRating: number) => {
-    setRating(selectedRating);
+  const handleStarPress1 = (selectedRating: number) => {
+    setRating1(selectedRating);
+  };
+
+  const handleStarPress2 = (selectedRating: number) => {
+    setRating2(selectedRating);
   };
 
   const handleSubmit = async () => {
-    if (rating === 0) {
-      Alert.alert('Rating Required', 'Please provide a rating before submitting.');
+    if (rating1 || rating2 === 0) {
+      Alert.alert(
+        "Rating Required",
+        "Please provide a rating before submitting.",
+      );
       return;
     }
 
@@ -51,61 +60,81 @@ export default function FeedbackModal({
       setSubmitting(true);
 
       // Insert feedback into database
-      const { error } = await supabase
-        .from('feedback')
-        .insert([
-          {
-            match_id: matchId,
-            rating: rating,
-            feedback: feedback.trim(),
-            created_at: new Date().toISOString(),
-          },
-        ]);
+      const { error } = await supabase.from("feedback").insert([
+        {
+          match_id: matchId,
+          rating1: rating1,
+          rating2: rating2,
+          feedback: feedback.trim(),
+          created_at: new Date().toISOString(),
+        },
+      ]);
 
       if (error) throw error;
 
       Alert.alert(
-        'Thank You!',
-        'Your feedback has been submitted successfully.',
+        "Thank You!",
+        "Your feedback has been submitted successfully.",
         [
           {
-            text: 'OK',
+            text: "OK",
             onPress: () => {
               onSubmitSuccess();
               onClose();
               resetForm();
             },
           },
-        ]
+        ],
       );
     } catch (error) {
-      console.error('Error submitting feedback:', error);
-      Alert.alert('Error', 'Failed to submit feedback. Please try again.');
+      console.error("Error submitting feedback:", error);
+      Alert.alert("Error", "Failed to submit feedback. Please try again.");
     } finally {
       setSubmitting(false);
     }
   };
 
   const resetForm = () => {
-    setRating(0);
-    setFeedback('');
+    setRating1(0);
+    setRating2(0);
+    setFeedback("");
   };
 
-  const renderStars = () => {
+  const renderStars1 = () => {
     const stars = [];
     for (let i = 1; i <= 5; i++) {
       stars.push(
         <TouchableOpacity
           key={i}
-          onPress={() => handleStarPress(i)}
+          onPress={() => handleStarPress1(i)}
           style={styles.starButton}
         >
           <Ionicons
-            name={i <= rating ? 'star' : 'star-outline'}
+            name={i <= rating1 ? "star" : "star-outline"}
             size={32}
-            color={i <= rating ? '#FFD700' : colors.secondaryText}
+            color={i <= rating1 ? "#FFD700" : colors.secondaryText}
           />
-        </TouchableOpacity>
+        </TouchableOpacity>,
+      );
+    }
+    return stars;
+  };
+
+  const renderStars2 = () => {
+    const stars = [];
+    for (let i = 1; i <= 5; i++) {
+      stars.push(
+        <TouchableOpacity
+          key={i}
+          onPress={() => handleStarPress2(i)}
+          style={styles.starButton}
+        >
+          <Ionicons
+            name={i <= rating2 ? "star" : "star-outline"}
+            size={32}
+            color={i <= rating2 ? "#FFD700" : colors.secondaryText}
+          />
+        </TouchableOpacity>,
       );
     }
     return stars;
@@ -119,7 +148,9 @@ export default function FeedbackModal({
       onRequestClose={onClose}
     >
       <View style={styles.modalOverlay}>
-        <View style={[styles.modalContent, { backgroundColor: colors.background }]}>
+        <View
+          style={[styles.modalContent, { backgroundColor: colors.background }]}
+        >
           <ScrollView showsVerticalScrollIndicator={false}>
             <View style={styles.modalHeader}>
               <Text style={[styles.modalTitle, { color: colors.text }]}>
@@ -138,9 +169,18 @@ export default function FeedbackModal({
               <Text style={[styles.ratingLabel, { color: colors.text }]}>
                 Rate your experience
               </Text>
-              <View style={styles.starsContainer}>
-                {renderStars()}
-              </View>
+              <View style={styles.starsContainer}>{renderStars1()}</View>
+            </View>
+
+            <Text style={[styles.partnerText, { color: colors.secondaryText }]}>
+              {coffeePlace}
+            </Text>
+
+            <View style={styles.ratingSection}>
+              <Text style={[styles.ratingLabel, { color: colors.text }]}>
+                Rate the Cafe
+              </Text>
+              <View style={styles.starsContainer}>{renderStars2()}</View>
             </View>
 
             <View style={styles.feedbackSection}>
@@ -189,7 +229,7 @@ export default function FeedbackModal({
                 disabled={submitting}
               >
                 <Text style={styles.submitButtonText}>
-                  {submitting ? 'Submitting...' : 'Submit Feedback'}
+                  {submitting ? "Submitting..." : "Submit Feedback"}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -203,25 +243,25 @@ export default function FeedbackModal({
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
   },
   modalContent: {
-    width: '90%',
-    maxHeight: '80%',
+    width: "90%",
+    maxHeight: "80%",
     borderRadius: 16,
     padding: 20,
   },
   modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 16,
   },
   modalTitle: {
     fontSize: 20,
-    fontFamily: 'K2D-SemiBold',
+    fontFamily: "K2D-SemiBold",
     flex: 1,
   },
   closeButton: {
@@ -229,7 +269,7 @@ const styles = StyleSheet.create({
   },
   partnerText: {
     fontSize: 14,
-    fontFamily: 'K2D-Regular',
+    fontFamily: "K2D-Regular",
     marginBottom: 24,
   },
   ratingSection: {
@@ -237,12 +277,12 @@ const styles = StyleSheet.create({
   },
   ratingLabel: {
     fontSize: 16,
-    fontFamily: 'K2D-Medium',
+    fontFamily: "K2D-Medium",
     marginBottom: 12,
   },
   starsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
     gap: 8,
   },
   starButton: {
@@ -253,7 +293,7 @@ const styles = StyleSheet.create({
   },
   feedbackLabel: {
     fontSize: 16,
-    fontFamily: 'K2D-Medium',
+    fontFamily: "K2D-Medium",
     marginBottom: 12,
   },
   feedbackInput: {
@@ -261,11 +301,11 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
     fontSize: 14,
-    fontFamily: 'K2D-Regular',
+    fontFamily: "K2D-Regular",
     minHeight: 100,
   },
   buttonContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 12,
   },
   cancelButton: {
@@ -273,22 +313,22 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 8,
     borderWidth: 1,
-    alignItems: 'center',
+    alignItems: "center",
   },
   cancelButtonText: {
     fontSize: 16,
-    fontFamily: 'K2D-Medium',
+    fontFamily: "K2D-Medium",
   },
   submitButton: {
     flex: 1,
     paddingVertical: 12,
     borderRadius: 8,
-    alignItems: 'center',
+    alignItems: "center",
   },
   submitButtonText: {
-    color: '#FFFFFF',
+    color: "#FFFFFF",
     fontSize: 16,
-    fontFamily: 'K2D-Medium',
+    fontFamily: "K2D-Medium",
   },
   disabledButton: {
     opacity: 0.6,
