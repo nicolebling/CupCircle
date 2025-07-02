@@ -266,7 +266,7 @@ export default function MatchingScreen() {
         setIsLoading(false);
         return;
       }
-d
+
       // Get unique user IDs and filter out users that have active or past chats
       let userIds = [
         ...new Set(availabilityData.map((item) => item.id)),
@@ -1049,8 +1049,7 @@ d
                         try {
                           if (!user?.id) {
                             //console.error("No user ID found");
-                            return;
-                          }
+                            return;                          }
 
                           const currentProfile = profiles[currentIndex];
                           if (!selectedCafe && !selectedTimeSlot) {
@@ -1478,6 +1477,7 @@ const styles = StyleSheet.create({
   emptyCardButtonText: {
     color: "white",
     fontFamily: "K2D-SemiBold",
+    fontSize: 16,
   },
   noMoreCard: {
     width: "90%",
