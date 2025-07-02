@@ -8,6 +8,8 @@ import {
   TextInput,
   Alert,
   ScrollView,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useColorScheme } from "@/hooks/useColorScheme";
@@ -148,10 +150,14 @@ export default function FeedbackModal({
       onRequestClose={onClose}
     >
       <View style={styles.modalOverlay}>
-        <View
-          style={[styles.modalContent, { backgroundColor: colors.background }]}
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.keyboardAvoidingView}
         >
-          <ScrollView showsVerticalScrollIndicator={false}>
+          <View
+            style={[styles.modalContent, { backgroundColor: colors.background }]}
+          >
+            <ScrollView showsVerticalScrollIndicator={false}>
             <View style={styles.modalHeader}>
               <Text style={[styles.modalTitle, { color: colors.text }]}>
                 How was your coffee chat?
@@ -235,6 +241,7 @@ export default function FeedbackModal({
             </View>
           </ScrollView>
         </View>
+        </KeyboardAvoidingView>
       </View>
     </Modal>
   );
@@ -246,6 +253,12 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.5)",
     justifyContent: "center",
     alignItems: "center",
+  },
+  keyboardAvoidingView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
   },
   modalContent: {
     width: "90%",
