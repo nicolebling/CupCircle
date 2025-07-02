@@ -40,6 +40,7 @@ export default function FeedbackModal({
    const [rating2, setRating2] = useState<number>(0);
   const [feedback, setFeedback] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const scrollViewRef = React.useRef<ScrollView>(null);
 
   const handleStarPress1 = (selectedRating: number) => {
     setRating1(selectedRating);
@@ -159,6 +160,7 @@ export default function FeedbackModal({
             style={[styles.modalContent, { backgroundColor: colors.background }]}
           >
             <ScrollView 
+              ref={scrollViewRef}
               showsVerticalScrollIndicator={false}
               keyboardShouldPersistTaps="handled"
               contentContainerStyle={{ flexGrow: 1 }}
@@ -215,6 +217,11 @@ export default function FeedbackModal({
                 numberOfLines={4}
                 textAlignVertical="top"
                 maxLength={500}
+                onFocus={() => {
+                  setTimeout(() => {
+                    scrollViewRef.current?.scrollToEnd({ animated: true });
+                  }, 300);
+                }}
               />
             </View>
 
