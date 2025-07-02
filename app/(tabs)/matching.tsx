@@ -266,7 +266,7 @@ export default function MatchingScreen() {
         setIsLoading(false);
         return;
       }
-
+d
       // Get unique user IDs and filter out users that have active or past chats
       let userIds = [
         ...new Set(availabilityData.map((item) => item.id)),

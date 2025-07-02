@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import {
   View,
   Text,
@@ -19,6 +19,11 @@ import { useRouter, useNavigation } from "expo-router";
 import ProfileCard from "@/components/ProfileCard";
 import { format, addDays, isPast, isToday, parseISO } from "date-fns";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import FeedbackModal from "@/components/FeedbackModal";
+import {
+  feedbackService,
+  FeedbackEligibleMatch,
+} from "@/services/feedbackService";
 
 export default function CircleChatsScreen() {
   const colorScheme = useColorScheme();
@@ -35,6 +40,12 @@ export default function CircleChatsScreen() {
   const [selectedProfile, setSelectedProfile] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [initialFetchDone, setInitialFetchDone] = useState(false);
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [currentFeedbackMatch, setCurrentFeedbackMatch] =
+    useState<FeedbackEligibleMatch | null>(null);
+  const [feedbackQueue, setFeedbackQueue] = useState<FeedbackEligibleMatch[]>(
+    [],
+  );
 
   const fetchChats = async () => {
     if (!user) return;
@@ -284,9 +295,14 @@ export default function CircleChatsScreen() {
               style={styles.detailIcon}
             />
             <Text style={[styles.detailText, { color: colors.text }]}>
-              {format(chat.meeting_date, "EEEE, MMMM d")}
+              {(() => {
+                const [year, month, day] = chat.meeting_date.split("-").map(Number);
+                const date = new Date(year, month - 1, day); // month is 0-indexed
+                return format(date, "EEEE, MMMM d");
+              })()}
             </Text>
           </View>
+
 
           <View style={styles.detailRow}>
             <Ionicons
@@ -444,6 +460,80 @@ export default function CircleChatsScreen() {
       pending.length === 0) ||
     (showPastChats && pastConfirmed.length === 0);
 
+  useEffect(() => {
+    if (user) {
+      fetchChats();
+      checkForFeedbackEligibility();
+    }
+  }, [user]);
+
+  const checkForFeedbackEligibility = async () => {
+    if (!user?.id) return;
+
+    try {
+      const eligibleMatches =
+        await feedbackService.getEligibleMatchesForFeedback(user.id);
+
+      if (eligibleMatches.length > 0) {
+        // Filter out matches that we've already requested feedback for
+        const newMatches = [];
+        for (const match of eligibleMatches) {
+          const alreadyRequested =
+            await feedbackService.isFeedbackAlreadyRequested(match.match_id);
+          if (!alreadyRequested) {
+            newMatches.push(match);
+          }
+        }
+
+        if (newMatches.length > 0) {
+          setFeedbackQueue(newMatches);
+          // Show feedback modal for the first match
+          setCurrentFeedbackMatch(newMatches[0]);
+          setShowFeedbackModal(true);
+          // Mark as requested to avoid showing again
+          await feedbackService.markFeedbackRequested(newMatches[0].match_id);
+        }
+      }
+    } catch (error) {
+      console.error("Error checking feedback eligibility:", error);
+    }
+  };
+
+  const handleFeedbackSubmitSuccess = () => {
+    // Remove current match from queue
+    const updatedQueue = feedbackQueue.slice(1);
+    setFeedbackQueue(updatedQueue);
+
+    // Show next feedback modal if there are more matches
+    if (updatedQueue.length > 0) {
+      setTimeout(() => {
+        setCurrentFeedbackMatch(updatedQueue[0]);
+        setShowFeedbackModal(true);
+        feedbackService.markFeedbackRequested(updatedQueue[0].match_id);
+      }, 1000);
+    } else {
+      setCurrentFeedbackMatch(null);
+    }
+  };
+
+  const handleFeedbackModalClose = () => {
+    setShowFeedbackModal(false);
+
+    // Show next feedback modal if there are more matches in queue
+    const remainingQueue = feedbackQueue.slice(1);
+    if (remainingQueue.length > 0) {
+      setTimeout(() => {
+        setCurrentFeedbackMatch(remainingQueue[0]);
+        setShowFeedbackModal(true);
+        feedbackService.markFeedbackRequested(remainingQueue[0].match_id);
+      }, 500);
+    } else {
+      setCurrentFeedbackMatch(null);
+    }
+
+    setFeedbackQueue(remainingQueue);
+  };
+
   return (
     <ScrollView
       style={[styles.container, { backgroundColor: colors.background }]}
@@ -488,7 +578,9 @@ export default function CircleChatsScreen() {
 
       <View style={styles.header}>
         <View style={styles.toggleContainer}>
-          <Text style={[styles.toggleLabel, { color: colors.text }]}>Past Chats</Text>
+          <Text style={[styles.toggleLabel, { color: colors.text }]}>
+            Past Chats
+          </Text>
           <Switch
             value={showPastChats}
             onValueChange={setShowPastChats}
@@ -544,6 +636,17 @@ export default function CircleChatsScreen() {
           </Text>
           {pending.map(renderChatCard)}
         </View>
+      )}
+
+      {/* Feedback Modal */}
+      {currentFeedbackMatch && (
+        <FeedbackModal
+          visible={showFeedbackModal}
+          onClose={handleFeedbackModalClose}
+          matchId={currentFeedbackMatch.match_id}
+          partnerName={currentFeedbackMatch.partner_name}
+          onSubmitSuccess={handleFeedbackSubmitSuccess}
+        />
       )}
     </ScrollView>
   );
@@ -671,7 +774,6 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.5)",
     justifyContent: "flex-end",
     alignItems: "center",
-    
   },
   modalContent: {
     width: "100%",
