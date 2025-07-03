@@ -15,7 +15,7 @@ export const feedbackService = {
   ): Promise<FeedbackEligibleMatch[]> {
     try {
       const now = new Date();
-      const twoHoursAgo = new Date(now.getTime() - 7 * 60 * 60 * 1000);
+      const twoHoursAgo = new Date(now.getTime() - 7999 * 60 * 60 * 1000);
 
       // Get confirmed matches where the user hasn't provided feedback yet
       const { data: matches, error: matchError } = await supabase
