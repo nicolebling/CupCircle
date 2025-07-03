@@ -15,6 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import Colors from "@/constants/Colors";
 import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface FeedbackModalProps {
   visible: boolean;
@@ -35,6 +36,7 @@ export default function FeedbackModal({
 }: FeedbackModalProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
+  const { user } = useAuth();
 
   const [userRating, setUserRating] = useState<number>(0);
   const [cafeRating, setCafeRating] = useState<number>(0);
@@ -62,10 +64,24 @@ export default function FeedbackModal({
     try {
       setSubmitting(true);
 
-      // Insert feedback into database
+      // Get the match details to find the partner
+      const { data: matchData, error: matchError } = await supabase
+        .from("matching")
+        .select("user1_id, user2_id")
+        .eq("match_id", matchId)
+        .single();
+
+      if (matchError) throw matchError;
+
+      // Determine the partner ID
+      const partnerId = matchData.user1_id === user.id ? matchData.user2_id : matchData.user1_id;
+
+      // Insert feedback into database with both user IDs for complete tracking
       const { error } = await supabase.from("feedback").insert([
         {
           match_id: matchId,
+          user1_id: user.id, // User giving the feedback
+          user2_id: partnerId, // User being rated
           user_rating: userRating,
           cafe_rating: cafeRating,
           feedback_text: feedbackText.trim(),
