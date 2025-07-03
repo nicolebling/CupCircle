@@ -235,8 +235,9 @@ export default function CircleChatsScreen() {
     try {
       const { data: existingFeedback, error } = await supabase
         .from("feedback")
-        .select("match_id")
-        .in("match_id", matchIds);
+        .select("match_id, user1_id")
+        .in("match_id", matchIds)
+        .eq("user1_id", user.id);
 
       if (error) throw error;
 
@@ -418,7 +419,16 @@ export default function CircleChatsScreen() {
                   : { backgroundColor: colors.primary },
               ]}
               onPress={async () => {
-                // Check if feedback has already been given by this specific user for this match
+                // If we already know feedback was given, don't allow click
+                if (feedbackGiven.has(chat.match_id)) {
+                  Alert.alert(
+                    "Feedback Already Given",
+                    "You have already submitted feedback for this coffee chat.",
+                  );
+                  return;
+                }
+
+                // Check database one more time to be sure
                 const { data: existingFeedback, error } = await supabase
                   .from("feedback")
                   .select("feedback_id")
@@ -454,7 +464,7 @@ export default function CircleChatsScreen() {
                 });
                 setShowFeedbackModal(true);
               }}
-             // disabled={feedbackGiven.has(chat.match_id)}
+              disabled={feedbackGiven.has(chat.match_id)}
             >
               <Text style={styles.actionButtonText}>
                 {feedbackGiven.has(chat.match_id)
