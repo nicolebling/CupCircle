@@ -64,16 +64,13 @@ export default function FeedbackModal({
           // PGRST116 means no rows found, which is expected if no feedback given
           throw error;
         }
-        var hasGivenFeedback = !!data;
-        if (data !== null) {
-          setFeedbackAlreadyGiven(true);
-          hasGivenFeedback = true;
-        }
-        // const hasGivenFeedback = !!data;
+        const hasGivenFeedback = !!data;
         console.log("HERE!!!!", hasGivenFeedback);
         console.log("HERE!!!!", matchId);
         console.log("HERE!!!!", user.id);
         console.log("Feedback data:", data);
+
+        setFeedbackAlreadyGiven(hasGivenFeedback);
 
         if (hasGivenFeedback) {
           Alert.alert(
