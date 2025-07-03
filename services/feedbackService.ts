@@ -107,12 +107,18 @@ export const feedbackService = {
   },
 
   // Mark feedback as requested to avoid showing multiple times
-  async markFeedbackRequested(matchId: string, userId: string): Promise<void> {
+  async markFeedbackRequested(matchId: string): Promise<void> {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error("No authenticated user found");
+      }
+
       const { error } = await supabase.from("feedback").insert([
         {
           match_id: matchId,
-          user1_id: userId, 
+          user1_id: user.id, 
           created_at: new Date().toISOString(),
         },
       ]);
@@ -149,7 +155,6 @@ export const feedbackService = {
   // Submit feedback with new schema
   async submitFeedback(
     matchId: string,
-    userId: string,
     feedbackData: {
       userRating: number;
       cafeRating: number;
@@ -157,10 +162,16 @@ export const feedbackService = {
     }
   ): Promise<void> {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error("No authenticated user found");
+      }
+
       const { error } = await supabase.from("feedback").insert([
         {
           match_id: matchId,
-          user1_id: userId, // This should be the user giving the feedback
+          user1_id: user.id, // This should be the user giving the feedback
           user2_id: null, // This can be populated if needed for tracking who the feedback is about
           user_rating: feedbackData.userRating,
           cafe_rating: feedbackData.cafeRating,
