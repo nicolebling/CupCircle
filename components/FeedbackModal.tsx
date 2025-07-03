@@ -16,6 +16,7 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import Colors from "@/constants/Colors";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
+import LoadingLogoAnimation from "@/components/LoadingLogoAnimation";
 
 interface FeedbackModalProps {
   visible: boolean;
@@ -335,14 +336,7 @@ export default function FeedbackModal({
 
               {checkingFeedback && (
                 <View style={styles.loadingContainer}>
-                  <Text
-                    style={[
-                      styles.loadingText,
-                      { color: colors.secondaryText },
-                    ]}
-                  >
-                    Checking feedback status...
-                  </Text>
+                  <LoadingLogoAnimation />
                 </View>
               )}
               <Text style={styles.actionButtonText}>
