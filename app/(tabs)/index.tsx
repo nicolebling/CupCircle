@@ -244,12 +244,7 @@ export default function CircleChatsScreen() {
       const feedbackGivenSet = new Set(
         existingFeedback?.map((f) => f.match_id) || [],
       );
-      
-      // Merge with existing state instead of replacing it
-      setFeedbackGiven(prevSet => {
-        const mergedSet = new Set([...prevSet, ...feedbackGivenSet]);
-        return mergedSet;
-      });
+      setFeedbackGiven(feedbackGivenSet);
     } catch (error) {
       console.error("Error checking feedback status:", error);
     }
@@ -599,7 +594,7 @@ export default function CircleChatsScreen() {
   };
 
   const handleFeedbackSubmitSuccess = () => {
-    // Add the current match to feedback given set and persist it
+    // Add the current match to feedback given set
     if (currentFeedbackMatch) {
       setFeedbackGiven(
         (prev) => new Set([...prev, currentFeedbackMatch.match_id]),
