@@ -205,11 +205,11 @@ export default function FeedbackModal({
         return;
       }
 
-      // Increment successful_chat column for the user
+      // Increment successful_chat column for the user (handle null case)
       const { error: profileUpdateError } = await supabase
         .from("profiles")
         .update({ 
-          successful_chat: supabase.raw('successful_chat + 1')
+          successful_chat: supabase.raw('COALESCE(successful_chat, 0) + 1')
         })
         .eq("id", user.id);
 
