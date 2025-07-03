@@ -58,25 +58,22 @@ export default function FeedbackModal({
           .from("feedback")
           .select("feedback_id")
           .eq("match_id", matchId)
-          .eq("user1_id", user.id)
-          .single();
+          .eq("user1_id", user.id);
 
         if (error && error.code !== "PGRST116") {
           // PGRST116 means no rows found, which is expected if no feedback given
           throw error;
         }
-        if (data !== null){
+        var hasGivenFeedback = !!data;
+        if (data !== null) {
           setFeedbackAlreadyGiven(true);
-          const hasGivenFeedback = true;
-        } else {
-          
+          hasGivenFeedback = true;
         }
         // const hasGivenFeedback = !!data;
         console.log("HERE!!!!", hasGivenFeedback);
         console.log("HERE!!!!", matchId);
         console.log("HERE!!!!", user.id);
         console.log("Feedback data:", data);
-
 
         if (hasGivenFeedback) {
           Alert.alert(
