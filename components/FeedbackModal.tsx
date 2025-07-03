@@ -106,6 +106,30 @@ export default function FeedbackModal({
         
         console.log("🔍 Feedback with your ID in user2_id:", JSON.stringify(user2Feedback, null, 2));
 
+        // Let's also check the entire feedback table to see what's in there
+        const { data: allFeedback, error: allFeedbackError } = await supabase
+          .from("feedback")
+          .select("*")
+          .limit(10);
+        
+        console.log("🗃️ First 10 feedback records in database:", JSON.stringify(allFeedback, null, 2));
+
+        // Check if there's any feedback with your user ID anywhere
+        const { data: userAnyFeedback, error: userAnyError } = await supabase
+          .from("feedback")
+          .select("*")
+          .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`);
+        
+        console.log("👤 Any feedback with your user ID (either column):", JSON.stringify(userAnyFeedback, null, 2));
+
+        // Check the matching table to see if match_id 25 exists
+        const { data: matchData, error: matchDataError } = await supabase
+          .from("matching")
+          .select("*")
+          .eq("match_id", matchId);
+        
+        console.log("🤝 Match data for match_id", matchId, ":", JSON.stringify(matchData, null, 2));
+
         setFeedbackAlreadyGiven(hasGivenFeedback);
 
         if (hasGivenFeedback) {
