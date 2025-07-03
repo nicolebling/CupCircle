@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Modal,
   View,
@@ -42,17 +42,76 @@ export default function FeedbackModal({
   const [cafeRating, setCafeRating] = useState<number>(0);
   const [feedbackText, setFeedbackText] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [feedbackAlreadyGiven, setFeedbackAlreadyGiven] = useState(false);
+  const [checkingFeedback, setCheckingFeedback] = useState(true);
   const scrollViewRef = React.useRef<ScrollView>(null);
 
+  // Check if feedback has already been given when modal opens
+  useEffect(() => {
+    const checkExistingFeedback = async () => {
+      if (!visible || !user?.id || !matchId) return;
+
+      try {
+        setCheckingFeedback(true);
+        
+        const { data, error } = await supabase
+          .from("feedback")
+          .select("feedback_id")
+          .eq("match_id", matchId)
+          .eq("user1_id", user.id)
+          .single();
+
+        if (error && error.code !== "PGRST116") {
+          // PGRST116 means no rows found, which is expected if no feedback given
+          throw error;
+        }
+
+        const hasGivenFeedback = !!data;
+        setFeedbackAlreadyGiven(hasGivenFeedback);
+
+        if (hasGivenFeedback) {
+          Alert.alert(
+            "Feedback Already Given",
+            "You have already provided feedback for this meeting.",
+            [
+              {
+                text: "OK",
+                onPress: () => onClose(),
+              },
+            ]
+          );
+        }
+      } catch (error) {
+        console.error("Error checking existing feedback:", error);
+        // On error, allow the user to proceed (fail open)
+        setFeedbackAlreadyGiven(false);
+      } finally {
+        setCheckingFeedback(false);
+      }
+    };
+
+    checkExistingFeedback();
+  }, [visible, user?.id, matchId]);
+
   const handleStarPress1 = (selectedRating: number) => {
+    if (feedbackAlreadyGiven) return;
     setUserRating(selectedRating);
   };
 
   const handleStarPress2 = (selectedRating: number) => {
+    if (feedbackAlreadyGiven) return;
     setCafeRating(selectedRating);
   };
 
   const handleSubmit = async () => {
+    if (feedbackAlreadyGiven) {
+      Alert.alert(
+        "Feedback Already Given",
+        "You have already provided feedback for this meeting."
+      );
+      return;
+    }
+
     if (userRating === 0 || cafeRating === 0) {
       Alert.alert(
         "Rating Required",
@@ -63,6 +122,27 @@ export default function FeedbackModal({
 
     try {
       setSubmitting(true);
+
+      // Double-check if feedback already exists before submitting
+      const { data: existingFeedback, error: checkError } = await supabase
+        .from("feedback")
+        .select("feedback_id")
+        .eq("match_id", matchId)
+        .eq("user1_id", user.id)
+        .single();
+
+      if (checkError && checkError.code !== "PGRST116") {
+        throw checkError;
+      }
+
+      if (existingFeedback) {
+        Alert.alert(
+          "Feedback Already Given",
+          "You have already provided feedback for this meeting."
+        );
+        setFeedbackAlreadyGiven(true);
+        return;
+      }
 
       // Get the match details to find the partner
       const { data: matchData, error: matchError } = await supabase
@@ -118,6 +198,8 @@ export default function FeedbackModal({
     setUserRating(0);
     setCafeRating(0);
     setFeedbackText("");
+    setFeedbackAlreadyGiven(false);
+    setCheckingFeedback(true);
   };
 
   const renderStars1 = () => {
@@ -127,12 +209,22 @@ export default function FeedbackModal({
         <TouchableOpacity
           key={i}
           onPress={() => handleStarPress1(i)}
-          style={styles.starButton}
+          style={[
+            styles.starButton,
+            feedbackAlreadyGiven && styles.disabledButton
+          ]}
+          disabled={feedbackAlreadyGiven}
         >
           <Ionicons
             name={i <= userRating ? "star" : "star-outline"}
             size={32}
-            color={i <= userRating ? "#FFD700" : colors.secondaryText}
+            color={
+              feedbackAlreadyGiven 
+                ? colors.secondaryText + "50"
+                : i <= userRating 
+                ? "#FFD700" 
+                : colors.secondaryText
+            }
           />
         </TouchableOpacity>,
       );
@@ -147,12 +239,22 @@ export default function FeedbackModal({
         <TouchableOpacity
           key={i}
           onPress={() => handleStarPress2(i)}
-          style={styles.starButton}
+          style={[
+            styles.starButton,
+            feedbackAlreadyGiven && styles.disabledButton
+          ]}
+          disabled={feedbackAlreadyGiven}
         >
           <Ionicons
             name={i <= cafeRating ? "star" : "star-outline"}
             size={32}
-            color={i <= cafeRating ? "#FFD700" : colors.secondaryText}
+            color={
+              feedbackAlreadyGiven 
+                ? colors.secondaryText + "50"
+                : i <= cafeRating 
+                ? "#FFD700" 
+                : colors.secondaryText
+            }
           />
         </TouchableOpacity>,
       );
@@ -187,12 +289,32 @@ export default function FeedbackModal({
             >
               <View style={styles.modalHeader}>
                 <Text style={[styles.modalTitle, { color: colors.text }]}>
-                  How was your coffee chat?
+                  {checkingFeedback ? "Loading..." : feedbackAlreadyGiven ? "Feedback Already Given" : "How was your coffee chat?"}
                 </Text>
                 <TouchableOpacity onPress={onClose} style={styles.closeButton}>
                   <Ionicons name="close" size={24} color={colors.text} />
                 </TouchableOpacity>
               </View>
+
+              {checkingFeedback && (
+                <View style={styles.loadingContainer}>
+                  <Text style={[styles.loadingText, { color: colors.secondaryText }]}>
+                    Checking feedback status...
+                  </Text>
+                </View>
+              )}
+
+              {feedbackAlreadyGiven && !checkingFeedback && (
+                <View style={styles.alreadyGivenContainer}>
+                  <Ionicons name="checkmark-circle" size={48} color={colors.primary} />
+                  <Text style={[styles.alreadyGivenText, { color: colors.text }]}>
+                    You have already provided feedback for this meeting with {partnerName}.
+                  </Text>
+                </View>
+              )}
+
+              {!checkingFeedback && !feedbackAlreadyGiven && (
+                <>
 
               <Text
                 style={[styles.partnerText, { color: colors.secondaryText }]}
@@ -228,20 +350,22 @@ export default function FeedbackModal({
                   style={[
                     styles.feedbackInput,
                     {
-                      color: colors.text,
+                      color: feedbackAlreadyGiven ? colors.secondaryText + "50" : colors.text,
                       backgroundColor: colors.card,
                       borderColor: colors.border,
                     },
+                    feedbackAlreadyGiven && styles.disabledInput
                   ]}
                   placeholder="Share your thoughts about the meeting..."
                   placeholderTextColor={colors.secondaryText}
                   value={feedbackText}
-                  onChangeText={setFeedbackText}
+                  onChangeText={feedbackAlreadyGiven ? undefined : setFeedbackText}
                   multiline
                   numberOfLines={4}
                   textAlignVertical="top"
                   maxLength={500}
-                  onFocus={() => {
+                  editable={!feedbackAlreadyGiven}
+                  onFocus={feedbackAlreadyGiven ? undefined : () => {
                     setTimeout(() => {
                       scrollViewRef.current?.scrollToEnd({ animated: true });
                     }, 300);
@@ -267,16 +391,17 @@ export default function FeedbackModal({
                   style={[
                     styles.submitButton,
                     { backgroundColor: colors.primary },
-                    submitting && styles.disabledButton,
+                    (submitting || feedbackAlreadyGiven) && styles.disabledButton,
                   ]}
                   onPress={handleSubmit}
-                  disabled={submitting}
+                  disabled={submitting || feedbackAlreadyGiven}
                 >
                   <Text style={styles.submitButtonText}>
-                    {submitting ? "Submitting..." : "Submit Feedback"}
+                    {submitting ? "Submitting..." : feedbackAlreadyGiven ? "Feedback Already Given" : "Submit Feedback"}
                   </Text>
                 </TouchableOpacity>
               </View>
+              )}
             </ScrollView>
           </View>
         </KeyboardAvoidingView>
@@ -384,5 +509,28 @@ const styles = StyleSheet.create({
   },
   disabledButton: {
     opacity: 0.6,
+  },
+  disabledInput: {
+    opacity: 0.6,
+  },
+  loadingContainer: {
+    alignItems: "center",
+    paddingVertical: 40,
+  },
+  loadingText: {
+    fontSize: 16,
+    fontFamily: "K2D-Regular",
+  },
+  alreadyGivenContainer: {
+    alignItems: "center",
+    paddingVertical: 40,
+    paddingHorizontal: 20,
+  },
+  alreadyGivenText: {
+    fontSize: 16,
+    fontFamily: "K2D-Regular",
+    textAlign: "center",
+    marginTop: 16,
+    lineHeight: 24,
   },
 });
