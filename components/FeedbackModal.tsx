@@ -401,6 +401,7 @@ export default function FeedbackModal({
                   </Text>
                 </TouchableOpacity>
               </View>
+                  </>
               )}
             </ScrollView>
           </View>
