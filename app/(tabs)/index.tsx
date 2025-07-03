@@ -231,32 +231,19 @@ export default function CircleChatsScreen() {
     return profiles[partnerId] || {};
   };
 
-  const checkFeedbackStatus = async () => {
-    if (!user?.id || chats.length === 0) return;
-
+  const checkFeedbackStatus = async (matchIds: string[]) => {
     try {
-      // Get all match IDs for this user
-      const matchIds = chats.map((chat) => chat.match_id).filter(Boolean);
-
-      if (matchIds.length === 0) return;
-
-      // Check which matches have feedback from this user
       const { data: existingFeedback, error } = await supabase
         .from("feedback")
-        .select("match_id")
+        .select("match_id, user1_id")
         .in("match_id", matchIds)
         .eq("user1_id", user.id);
 
-      if (error) {
-        console.error("Error checking feedback status:", error);
-        return;
-      }
+      if (error) throw error;
 
       const feedbackGivenSet = new Set(
         existingFeedback?.map((f) => f.match_id) || [],
       );
-
-      // Always replace the state with the current database state
       setFeedbackGiven(feedbackGivenSet);
     } catch (error) {
       console.error("Error checking feedback status:", error);

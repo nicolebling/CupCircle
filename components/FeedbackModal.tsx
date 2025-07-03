@@ -65,10 +65,18 @@ export default function FeedbackModal({
           // PGRST116 means no rows found, which is expected if no feedback given
           throw error;
         }
-
-        const hasGivenFeedback = !!data;
+        if (data !== null){
+          setFeedbackAlreadyGiven(true);
+          const hasGivenFeedback = true;
+        } else {
+          
+        }
+        // const hasGivenFeedback = !!data;
         console.log("HERE!!!!", hasGivenFeedback);
-        setFeedbackAlreadyGiven(true);
+        console.log("HERE!!!!", matchId);
+        console.log("HERE!!!!", user.id);
+        console.log("Feedback data:", data);
+
 
         if (hasGivenFeedback) {
           Alert.alert(
@@ -129,7 +137,8 @@ export default function FeedbackModal({
         .from("feedback")
         .select("feedback_id")
         .eq("match_id", matchId)
-        .eq("user1_id", user.id);
+        .eq("user1_id", user.id)
+        .limit(1);
 
       if (checkError) {
         console.error("Error checking existing feedback:", checkError);
@@ -141,12 +150,14 @@ export default function FeedbackModal({
       }
 
       if (existingFeedback && existingFeedback.length > 0) {
+        setFeedbackAlreadyGiven(true);
+        console.log("123", setFeedbackAlreadyGiven);
         Alert.alert(
           "Feedback Already Given",
           "You have already provided feedback for this meeting.",
           [{ text: "OK", onPress: () => onClose() }],
         );
-        setFeedbackAlreadyGiven(true);
+        // setFeedbackAlreadyGiven(true);
         return;
       }
 
@@ -154,8 +165,7 @@ export default function FeedbackModal({
       const { data: matchData, error: matchError } = await supabase
         .from("matching")
         .select("user1_id, user2_id")
-        .eq("match_id", matchId)
-        .single();
+        .eq("match_id", matchId);
 
       if (matchError) throw matchError;
 
@@ -169,8 +179,8 @@ export default function FeedbackModal({
       const { error } = await supabase.from("feedback").insert([
         {
           match_id: matchId,
-          user1_id: user.id, // User giving the feedback
-          user2_id: partnerId, // User being rated
+          user1_id: user.id,
+          user2_id: partnerId,
           user_rating: userRating,
           cafe_rating: cafeRating,
           feedback_text: feedbackText.trim(),
@@ -178,7 +188,21 @@ export default function FeedbackModal({
         },
       ]);
 
-      if (error) throw error;
+      if (error) {
+        if (error.code === "23505") {
+          // PostgreSQL unique_violation
+          setFeedbackAlreadyGiven(true);
+          Alert.alert(
+            "Feedback Already Given",
+            "You have already submitted feedback for this meeting.",
+            [{ text: "OK", onPress: () => onClose() }],
+          );
+        } else {
+          console.error("Error submitting feedback:", error);
+          Alert.alert("Error", "Failed to submit feedback. Please try again.");
+        }
+        return;
+      }
 
       Alert.alert(
         "Thank You!",
@@ -322,11 +346,10 @@ export default function FeedbackModal({
                 </View>
               )}
               <Text style={styles.actionButtonText}>
-              {feedbackAlreadyGiven && !checkingFeedback 
-                    ? "Feedback Given"
-                    : "Give Feedback"
-                </Text>
-              )}
+                {feedbackAlreadyGiven && !checkingFeedback
+                  ? "Feedback Given"
+                  : "Give Feedback"}
+              </Text>
 
               {!checkingFeedback && !feedbackAlreadyGiven && (
                 <>
