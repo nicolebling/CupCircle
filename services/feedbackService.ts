@@ -61,7 +61,8 @@ export const feedbackService = {
       const { data: existingFeedback, error: feedbackError } = await supabase
         .from("feedback")
         .select("match_id")
-        .in("match_id", matchIds);
+        .in("match_id", matchIds)
+        .eq("user1_id", userId);
 
       if (feedbackError) throw feedbackError;
 
@@ -108,10 +109,10 @@ export const feedbackService = {
   // Mark feedback as requested to avoid showing multiple times
   async markFeedbackRequested(matchId: string): Promise<void> {
     try {
-      const { error } = await supabase.from("feedback").insert([
+      const { error } = await supabase.from("feedback_requests").insert([
         {
           match_id: matchId,
-          created_at: new Date().toISOString(),
+          requested_at: new Date().toISOString(),
         },
       ]);
 
@@ -125,7 +126,7 @@ export const feedbackService = {
   async isFeedbackAlreadyRequested(matchId: string): Promise<boolean> {
     try {
       const { data, error } = await supabase
-        .from("feedback")
+        .from("feedback_requests")
         .select("match_id")
         .eq("match_id", matchId)
         .single();

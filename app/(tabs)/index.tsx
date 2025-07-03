@@ -417,18 +417,42 @@ export default function CircleChatsScreen() {
                   ? { backgroundColor: colors.secondaryText }
                   : { backgroundColor: colors.primary },
               ]}
-              onPress={() => {
-                if (!feedbackGiven.has(chat.match_id)) {
-                  const partnerProfile = getPartnerProfile(chat);
-                  setCurrentFeedbackMatch({
-                    match_id: chat.match_id,
-                    partner_name: partnerProfile.name || "Unknown",
-                    coffeePlace: chat.meeting_location.split("|||")[0],
-                    meeting_date: chat.meeting_date,
-                    start_time: chat.start_time,
-                  });
-                  setShowFeedbackModal(true);
+              onPress={async () => {
+                // Check if feedback has already been given by this specific user for this match
+                const { data: existingFeedback, error } = await supabase
+                  .from("feedback")
+                  .select("feedback_id")
+                  .eq("match_id", chat.match_id)
+                  .eq("user1_id", user.id);
+
+                if (error) {
+                  console.error("Error checking feedback:", error);
+                  Alert.alert(
+                    "Error",
+                    "There was an error checking feedback status.",
+                  );
+                  return;
                 }
+
+                if (existingFeedback && existingFeedback.length > 0) {
+                  // Update local state to reflect that feedback was given
+                  setFeedbackGiven(prev => new Set([...prev, chat.match_id]));
+                  Alert.alert(
+                    "Feedback Already Given",
+                    "You have already submitted feedback for this coffee chat.",
+                  );
+                  return;
+                }
+
+                const partnerProfile = getPartnerProfile(chat);
+                setCurrentFeedbackMatch({
+                  match_id: chat.match_id,
+                  partner_name: partnerProfile.name || "Unknown",
+                  coffeePlace: chat.meeting_location.split("|||")[0],
+                  meeting_date: chat.meeting_date,
+                  start_time: chat.start_time,
+                });
+                setShowFeedbackModal(true);
               }}
              // disabled={feedbackGiven.has(chat.match_id)}
             >

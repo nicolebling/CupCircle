@@ -123,22 +123,24 @@ export default function FeedbackModal({
     try {
       setSubmitting(true);
 
-      // Double-check if feedback already exists before submitting
+      // Final check if feedback already exists before submitting
       const { data: existingFeedback, error: checkError } = await supabase
         .from("feedback")
         .select("feedback_id")
         .eq("match_id", matchId)
-        .eq("user1_id", user.id)
-        .single();
+        .eq("user1_id", user.id);
 
-      if (checkError && checkError.code !== "PGRST116") {
-        throw checkError;
+      if (checkError) {
+        console.error("Error checking existing feedback:", checkError);
+        Alert.alert("Error", "Failed to verify feedback status. Please try again.");
+        return;
       }
 
-      if (existingFeedback) {
+      if (existingFeedback && existingFeedback.length > 0) {
         Alert.alert(
           "Feedback Already Given",
-          "You have already provided feedback for this meeting."
+          "You have already provided feedback for this meeting.",
+          [{ text: "OK", onPress: () => onClose() }]
         );
         setFeedbackAlreadyGiven(true);
         return;
