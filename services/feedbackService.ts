@@ -115,10 +115,23 @@ export const feedbackService = {
         throw new Error("No authenticated user found");
       }
 
+      // Get the match details to find the partner
+      const { data: matchData, error: matchError } = await supabase
+        .from("matching")
+        .select("user1_id, user2_id")
+        .eq("match_id", matchId)
+        .single();
+
+      if (matchError) throw matchError;
+
+      // Determine the partner ID
+      const partnerId = matchData.user1_id === user.id ? matchData.user2_id : matchData.user1_id;
+
       const { error } = await supabase.from("feedback").insert([
         {
           match_id: matchId,
           user1_id: user.id, 
+          user2_id: partnerId,
           created_at: new Date().toISOString(),
         },
       ]);
@@ -168,11 +181,23 @@ export const feedbackService = {
         throw new Error("No authenticated user found");
       }
 
+      // Get the match details to find the partner
+      const { data: matchData, error: matchError } = await supabase
+        .from("matching")
+        .select("user1_id, user2_id")
+        .eq("match_id", matchId)
+        .single();
+
+      if (matchError) throw matchError;
+
+      // Determine the partner ID
+      const partnerId = matchData.user1_id === user.id ? matchData.user2_id : matchData.user1_id;
+
       const { error } = await supabase.from("feedback").insert([
         {
           match_id: matchId,
           user1_id: user.id, // This should be the user giving the feedback
-          user2_id: null, // This can be populated if needed for tracking who the feedback is about
+          user2_id: partnerId, // This is the user the feedback is about
           user_rating: feedbackData.userRating,
           cafe_rating: feedbackData.cafeRating,
           feedback_text: feedbackData.feedbackText,
