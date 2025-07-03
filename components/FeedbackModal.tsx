@@ -36,22 +36,22 @@ export default function FeedbackModal({
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
 
-  const [rating1, setRating1] = useState<number>(0);
-   const [rating2, setRating2] = useState<number>(0);
-  const [feedback, setFeedback] = useState("");
+  const [userRating, setUserRating] = useState<number>(0);
+   const [cafeRating, setCafeRating] = useState<number>(0);
+  const [feedbackText, setFeedbackText] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const scrollViewRef = React.useRef<ScrollView>(null);
 
   const handleStarPress1 = (selectedRating: number) => {
-    setRating1(selectedRating);
+    setUserRating(selectedRating);
   };
 
   const handleStarPress2 = (selectedRating: number) => {
-    setRating2(selectedRating);
+    setCafeRating(selectedRating);
   };
 
   const handleSubmit = async () => {
-    if (rating1 || rating2 === 0) {
+    if (userRating || cafeRating === 0) {
       Alert.alert(
         "Rating Required",
         "Please provide a rating before submitting.",
@@ -66,9 +66,9 @@ export default function FeedbackModal({
       const { error } = await supabase.from("feedback").insert([
         {
           match_id: matchId,
-          rating1: rating1,
-          rating2: rating2,
-          feedback: feedback.trim(),
+          user_rating: userRating,
+          cafe_rating: cafeRating,
+          feedback_text: feedbackText.trim(),
           created_at: new Date().toISOString(),
         },
       ]);
@@ -98,9 +98,10 @@ export default function FeedbackModal({
   };
 
   const resetForm = () => {
-    setRating1(0);
-    setRating2(0);
-    setFeedback("");
+    // Reset form
+      setUserRating(0);
+      setCafeRating(0);
+      setFeedbackText("");
   };
 
   const renderStars1 = () => {
@@ -113,9 +114,9 @@ export default function FeedbackModal({
           style={styles.starButton}
         >
           <Ionicons
-            name={i <= rating1 ? "star" : "star-outline"}
+            name={i <= userRating ? "star" : "star-outline"}
             size={32}
-            color={i <= rating1 ? "#FFD700" : colors.secondaryText}
+            color={i <= userRating ? "#FFD700" : colors.secondaryText}
           />
         </TouchableOpacity>,
       );
@@ -133,9 +134,9 @@ export default function FeedbackModal({
           style={styles.starButton}
         >
           <Ionicons
-            name={i <= rating2 ? "star" : "star-outline"}
+            name={i <= cafeRating ? "star" : "star-outline"}
             size={32}
-            color={i <= rating2 ? "#FFD700" : colors.secondaryText}
+            color={i <= cafeRating ? "#FFD700" : colors.secondaryText}
           />
         </TouchableOpacity>,
       );
@@ -211,8 +212,8 @@ export default function FeedbackModal({
                 ]}
                 placeholder="Share your thoughts about the meeting..."
                 placeholderTextColor={colors.secondaryText}
-                value={feedback}
-                onChangeText={setFeedback}
+                value={feedbackText}
+                onChangeText={setFeedbackText}
                 multiline
                 numberOfLines={4}
                 textAlignVertical="top"

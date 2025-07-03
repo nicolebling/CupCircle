@@ -143,4 +143,34 @@ export const feedbackService = {
       return true; // Assume already requested to avoid spam
     }
   },
+
+  // Submit feedback with new schema
+  async submitFeedback(
+    matchId: string,
+    userId: string,
+    feedbackData: {
+      userRating: number;
+      cafeRating: number;
+      feedbackText: string;
+    }
+  ): Promise<void> {
+    try {
+      const { error } = await supabase.from("feedback").insert([
+        {
+          match_id: matchId,
+          user1_id: userId, // This should be the user giving the feedback
+          user2_id: null, // This can be populated if needed for tracking who the feedback is about
+          user_rating: feedbackData.userRating,
+          cafe_rating: feedbackData.cafeRating,
+          feedback_text: feedbackData.feedbackText,
+          created_at: new Date().toISOString(),
+        },
+      ]);
+
+      if (error) throw error;
+    } catch (error) {
+      console.error("Error submitting feedback:", error);
+      throw error;
+    }
+  },
 };
