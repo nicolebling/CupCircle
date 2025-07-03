@@ -244,13 +244,7 @@ export default function CircleChatsScreen() {
       const feedbackGivenSet = new Set(
         existingFeedback?.map((f) => f.match_id) || [],
       );
-      
-      // Only update state if there are actual changes to avoid unnecessary re-renders
-      setFeedbackGiven(prevSet => {
-        const hasChanges = feedbackGivenSet.size !== prevSet.size || 
-          [...feedbackGivenSet].some(id => !prevSet.has(id));
-        return hasChanges ? feedbackGivenSet : prevSet;
-      });
+      setFeedbackGiven(feedbackGivenSet);
     } catch (error) {
       console.error("Error checking feedback status:", error);
     }
@@ -600,19 +594,11 @@ export default function CircleChatsScreen() {
   };
 
   const handleFeedbackSubmitSuccess = () => {
-    // Add the current match to feedback given set and persist it
+    // Add the current match to feedback given set
     if (currentFeedbackMatch) {
       setFeedbackGiven(
         (prev) => new Set([...prev, currentFeedbackMatch.match_id]),
       );
-      
-      // Force a small delay before any potential re-fetch to ensure database consistency
-      setTimeout(() => {
-        // Re-check feedback status for this specific match to ensure consistency
-        if (currentFeedbackMatch) {
-          checkFeedbackStatus([currentFeedbackMatch.match_id]);
-        }
-      }, 500);
     }
 
     // Remove current match from queue
