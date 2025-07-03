@@ -430,7 +430,7 @@ export default function CircleChatsScreen() {
                   setShowFeedbackModal(true);
                 }
               }}
-              disabled={feedbackGiven.has(chat.match_id)}
+             // disabled={feedbackGiven.has(chat.match_id)}
             >
               <Text style={styles.actionButtonText}>
                 {feedbackGiven.has(chat.match_id)
