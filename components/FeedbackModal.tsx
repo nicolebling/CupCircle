@@ -53,7 +53,7 @@ export default function FeedbackModal({
 
       try {
         setCheckingFeedback(true);
-        
+
         const { data, error } = await supabase
           .from("feedback")
           .select("feedback_id")
@@ -78,7 +78,7 @@ export default function FeedbackModal({
                 text: "OK",
                 onPress: () => onClose(),
               },
-            ]
+            ],
           );
         }
       } catch (error) {
@@ -107,7 +107,7 @@ export default function FeedbackModal({
     if (feedbackAlreadyGiven) {
       Alert.alert(
         "Feedback Already Given",
-        "You have already provided feedback for this meeting."
+        "You have already provided feedback for this meeting.",
       );
       return;
     }
@@ -132,7 +132,10 @@ export default function FeedbackModal({
 
       if (checkError) {
         console.error("Error checking existing feedback:", checkError);
-        Alert.alert("Error", "Failed to verify feedback status. Please try again.");
+        Alert.alert(
+          "Error",
+          "Failed to verify feedback status. Please try again.",
+        );
         return;
       }
 
@@ -140,7 +143,7 @@ export default function FeedbackModal({
         Alert.alert(
           "Feedback Already Given",
           "You have already provided feedback for this meeting.",
-          [{ text: "OK", onPress: () => onClose() }]
+          [{ text: "OK", onPress: () => onClose() }],
         );
         setFeedbackAlreadyGiven(true);
         return;
@@ -156,7 +159,10 @@ export default function FeedbackModal({
       if (matchError) throw matchError;
 
       // Determine the partner ID
-      const partnerId = matchData.user1_id === user.id ? matchData.user2_id : matchData.user1_id;
+      const partnerId =
+        matchData.user1_id === user.id
+          ? matchData.user2_id
+          : matchData.user1_id;
 
       // Insert feedback into database with both user IDs for complete tracking
       const { error } = await supabase.from("feedback").insert([
@@ -213,7 +219,7 @@ export default function FeedbackModal({
           onPress={() => handleStarPress1(i)}
           style={[
             styles.starButton,
-            feedbackAlreadyGiven && styles.disabledButton
+            feedbackAlreadyGiven && styles.disabledButton,
           ]}
           disabled={feedbackAlreadyGiven}
         >
@@ -221,11 +227,11 @@ export default function FeedbackModal({
             name={i <= userRating ? "star" : "star-outline"}
             size={32}
             color={
-              feedbackAlreadyGiven 
+              feedbackAlreadyGiven
                 ? colors.secondaryText + "50"
-                : i <= userRating 
-                ? "#FFD700" 
-                : colors.secondaryText
+                : i <= userRating
+                  ? "#FFD700"
+                  : colors.secondaryText
             }
           />
         </TouchableOpacity>,
@@ -243,7 +249,7 @@ export default function FeedbackModal({
           onPress={() => handleStarPress2(i)}
           style={[
             styles.starButton,
-            feedbackAlreadyGiven && styles.disabledButton
+            feedbackAlreadyGiven && styles.disabledButton,
           ]}
           disabled={feedbackAlreadyGiven}
         >
@@ -251,11 +257,11 @@ export default function FeedbackModal({
             name={i <= cafeRating ? "star" : "star-outline"}
             size={32}
             color={
-              feedbackAlreadyGiven 
+              feedbackAlreadyGiven
                 ? colors.secondaryText + "50"
-                : i <= cafeRating 
-                ? "#FFD700" 
-                : colors.secondaryText
+                : i <= cafeRating
+                  ? "#FFD700"
+                  : colors.secondaryText
             }
           />
         </TouchableOpacity>,
@@ -291,7 +297,11 @@ export default function FeedbackModal({
             >
               <View style={styles.modalHeader}>
                 <Text style={[styles.modalTitle, { color: colors.text }]}>
-                  {checkingFeedback ? "Loading..." : feedbackAlreadyGiven ? "Feedback Already Given" : "How was your coffee chat?"}
+                  {checkingFeedback
+                    ? "Loading..."
+                    : feedbackAlreadyGiven
+                      ? "Feedback Already Given"
+                      : "How was your coffee chat?"}
                 </Text>
                 <TouchableOpacity onPress={onClose} style={styles.closeButton}>
                   <Ionicons name="close" size={24} color={colors.text} />
@@ -300,7 +310,12 @@ export default function FeedbackModal({
 
               {checkingFeedback && (
                 <View style={styles.loadingContainer}>
-                  <Text style={[styles.loadingText, { color: colors.secondaryText }]}>
+                  <Text
+                    style={[
+                      styles.loadingText,
+                      { color: colors.secondaryText },
+                    ]}
+                  >
                     Checking feedback status...
                   </Text>
                 </View>
@@ -308,102 +323,137 @@ export default function FeedbackModal({
 
               {feedbackAlreadyGiven && !checkingFeedback && (
                 <View style={styles.alreadyGivenContainer}>
-                  <Ionicons name="checkmark-circle" size={48} color={colors.primary} />
-                  <Text style={[styles.alreadyGivenText, { color: colors.text }]}>
-                    You have already provided feedback for this meeting with {partnerName}.
+                  <Ionicons
+                    name="checkmark-circle"
+                    size={48}
+                    color={colors.primary}
+                  />
+                  <Text
+                    style={[styles.alreadyGivenText, { color: colors.text }]}
+                  >
+                    You have already provided feedback for this meeting with{" "}
+                    {partnerName}.
                   </Text>
                 </View>
               )}
 
               {!checkingFeedback && !feedbackAlreadyGiven && (
                 <>
-
-              <Text
-                style={[styles.partnerText, { color: colors.secondaryText }]}
-              >
-                Your meeting with {partnerName}
-              </Text>
-
-              <View style={styles.ratingSection}>
-                <Text style={[styles.ratingLabel, { color: colors.text }]}>
-                  Rate your experience
-                </Text>
-                <View style={styles.starsContainer}>{renderStars1()}</View>
-              </View>
-
-              <Text
-                style={[styles.partnerText, { color: colors.secondaryText }]}
-              >
-                {coffeePlace}
-              </Text>
-
-              <View style={styles.ratingSection}>
-                <Text style={[styles.ratingLabel, { color: colors.text }]}>
-                  Rate the Cafe
-                </Text>
-                <View style={styles.starsContainer}>{renderStars2()}</View>
-              </View>
-
-              <View style={styles.feedbackSection}>
-                <Text style={[styles.feedbackLabel, { color: colors.text }]}>
-                  Tell us more about your experience (optional)
-                </Text>
-                <TextInput
-                  style={[
-                    styles.feedbackInput,
-                    {
-                      color: feedbackAlreadyGiven ? colors.secondaryText + "50" : colors.text,
-                      backgroundColor: colors.card,
-                      borderColor: colors.border,
-                    },
-                    feedbackAlreadyGiven && styles.disabledInput
-                  ]}
-                  placeholder="Share your thoughts about the meeting..."
-                  placeholderTextColor={colors.secondaryText}
-                  value={feedbackText}
-                  onChangeText={feedbackAlreadyGiven ? undefined : setFeedbackText}
-                  multiline
-                  numberOfLines={4}
-                  textAlignVertical="top"
-                  maxLength={500}
-                  editable={!feedbackAlreadyGiven}
-                  onFocus={feedbackAlreadyGiven ? undefined : () => {
-                    setTimeout(() => {
-                      scrollViewRef.current?.scrollToEnd({ animated: true });
-                    }, 300);
-                  }}
-                />
-              </View>
-
-              <View style={styles.buttonContainer}>
-                <TouchableOpacity
-                  style={[styles.cancelButton, { borderColor: colors.border }]}
-                  onPress={() => {
-                    onClose();
-                    resetForm();
-                  }}
-                >
                   <Text
-                    style={[styles.cancelButtonText, { color: colors.text }]}
+                    style={[
+                      styles.partnerText,
+                      { color: colors.secondaryText },
+                    ]}
                   >
-                    Skip
+                    Your meeting with {partnerName}
                   </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    styles.submitButton,
-                    { backgroundColor: colors.primary },
-                    (submitting || feedbackAlreadyGiven) && styles.disabledButton,
-                  ]}
-                  onPress={handleSubmit}
-                  disabled={submitting || feedbackAlreadyGiven}
-                >
-                  <Text style={styles.submitButtonText}>
-                    {submitting ? "Submitting..." : feedbackAlreadyGiven ? "Feedback Already Given" : "Submit Feedback"}
+
+                  <View style={styles.ratingSection}>
+                    <Text style={[styles.ratingLabel, { color: colors.text }]}>
+                      Rate your experience
+                    </Text>
+                    <View style={styles.starsContainer}>{renderStars1()}</View>
+                  </View>
+
+                  <Text
+                    style={[
+                      styles.partnerText,
+                      { color: colors.secondaryText },
+                    ]}
+                  >
+                    {coffeePlace}
                   </Text>
-                </TouchableOpacity>
-              </View>
-                  </>
+
+                  <View style={styles.ratingSection}>
+                    <Text style={[styles.ratingLabel, { color: colors.text }]}>
+                      Rate the Cafe
+                    </Text>
+                    <View style={styles.starsContainer}>{renderStars2()}</View>
+                  </View>
+
+                  <View style={styles.feedbackSection}>
+                    <Text
+                      style={[styles.feedbackLabel, { color: colors.text }]}
+                    >
+                      Tell us more about your experience (optional)
+                    </Text>
+                    <TextInput
+                      style={[
+                        styles.feedbackInput,
+                        {
+                          color: feedbackAlreadyGiven
+                            ? colors.secondaryText + "50"
+                            : colors.text,
+                          backgroundColor: colors.card,
+                          borderColor: colors.border,
+                        },
+                        feedbackAlreadyGiven && styles.disabledInput,
+                      ]}
+                      placeholder="Share your thoughts about the meeting..."
+                      placeholderTextColor={colors.secondaryText}
+                      value={feedbackText}
+                      onChangeText={
+                        feedbackAlreadyGiven ? undefined : setFeedbackText
+                      }
+                      multiline
+                      numberOfLines={4}
+                      textAlignVertical="top"
+                      maxLength={500}
+                      editable={!feedbackAlreadyGiven}
+                      onFocus={
+                        feedbackAlreadyGiven
+                          ? undefined
+                          : () => {
+                              setTimeout(() => {
+                                scrollViewRef.current?.scrollToEnd({
+                                  animated: true,
+                                });
+                              }, 300);
+                            }
+                      }
+                    />
+                  </View>
+
+                  <View style={styles.buttonContainer}>
+                    <TouchableOpacity
+                      style={[
+                        styles.cancelButton,
+                        { borderColor: colors.border },
+                      ]}
+                      onPress={() => {
+                        onClose();
+                        resetForm();
+                      }}
+                    >
+                      <Text
+                        style={[
+                          styles.cancelButtonText,
+                          { color: colors.text },
+                        ]}
+                      >
+                        Skip
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[
+                        styles.submitButton,
+                        { backgroundColor: colors.primary },
+                        (submitting || feedbackAlreadyGiven) &&
+                          styles.disabledButton,
+                      ]}
+                      onPress={handleSubmit}
+                      disabled={submitting || feedbackAlreadyGiven}
+                    >
+                      <Text style={styles.submitButtonText}>
+                        {submitting
+                          ? "Submitting..."
+                          : feedbackAlreadyGiven
+                            ? "Feedback Already Given"
+                            : "Submit Feedback"}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </>
               )}
             </ScrollView>
           </View>
