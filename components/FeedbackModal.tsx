@@ -166,7 +166,8 @@ export default function FeedbackModal({
       const { data: matchData, error: matchError } = await supabase
         .from("matching")
         .select("user1_id, user2_id")
-        .eq("match_id", matchId);
+        .eq("match_id", matchId)
+        .single();
 
       if (matchError) throw matchError;
 
@@ -175,6 +176,10 @@ export default function FeedbackModal({
         matchData.user1_id === user.id
           ? matchData.user2_id
           : matchData.user1_id;
+
+      console.log("Match data:", matchData);
+      console.log("Current user ID:", user.id);
+      console.log("Partner ID:", partnerId);
 
       // Insert feedback into database with both user IDs for complete tracking
       const { error } = await supabase.from("feedback").insert([
