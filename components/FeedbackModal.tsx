@@ -37,7 +37,7 @@ export default function FeedbackModal({
   const colors = Colors[colorScheme ?? "light"];
 
   const [userRating, setUserRating] = useState<number>(0);
-   const [cafeRating, setCafeRating] = useState<number>(0);
+  const [cafeRating, setCafeRating] = useState<number>(0);
   const [feedbackText, setFeedbackText] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const scrollViewRef = React.useRef<ScrollView>(null);
@@ -51,7 +51,7 @@ export default function FeedbackModal({
   };
 
   const handleSubmit = async () => {
-    if (userRating || cafeRating === 0) {
+    if (userRating === 0 || cafeRating === 0) {
       Alert.alert(
         "Rating Required",
         "Please provide a rating before submitting.",
@@ -99,9 +99,9 @@ export default function FeedbackModal({
 
   const resetForm = () => {
     // Reset form
-      setUserRating(0);
-      setCafeRating(0);
-      setFeedbackText("");
+    setUserRating(0);
+    setCafeRating(0);
+    setFeedbackText("");
   };
 
   const renderStars1 = () => {
@@ -153,107 +153,116 @@ export default function FeedbackModal({
     >
       <View style={styles.modalOverlay}>
         <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
           style={styles.keyboardAvoidingView}
-          keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+          keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
         >
           <View
-            style={[styles.modalContent, { backgroundColor: colors.background }]}
+            style={[
+              styles.modalContent,
+              { backgroundColor: colors.background },
+            ]}
           >
-            <ScrollView 
+            <ScrollView
               ref={scrollViewRef}
               showsVerticalScrollIndicator={false}
               keyboardShouldPersistTaps="handled"
               contentContainerStyle={{ flexGrow: 1 }}
             >
-            <View style={styles.modalHeader}>
-              <Text style={[styles.modalTitle, { color: colors.text }]}>
-                How was your coffee chat?
-              </Text>
-              <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-                <Ionicons name="close" size={24} color={colors.text} />
-              </TouchableOpacity>
-            </View>
-
-            <Text style={[styles.partnerText, { color: colors.secondaryText }]}>
-              Your meeting with {partnerName}
-            </Text>
-
-            <View style={styles.ratingSection}>
-              <Text style={[styles.ratingLabel, { color: colors.text }]}>
-                Rate your experience
-              </Text>
-              <View style={styles.starsContainer}>{renderStars1()}</View>
-            </View>
-
-            <Text style={[styles.partnerText, { color: colors.secondaryText }]}>
-              {coffeePlace}
-            </Text>
-
-            <View style={styles.ratingSection}>
-              <Text style={[styles.ratingLabel, { color: colors.text }]}>
-                Rate the Cafe
-              </Text>
-              <View style={styles.starsContainer}>{renderStars2()}</View>
-            </View>
-
-            <View style={styles.feedbackSection}>
-              <Text style={[styles.feedbackLabel, { color: colors.text }]}>
-                Tell us more about your experience (optional)
-              </Text>
-              <TextInput
-                style={[
-                  styles.feedbackInput,
-                  {
-                    color: colors.text,
-                    backgroundColor: colors.card,
-                    borderColor: colors.border,
-                  },
-                ]}
-                placeholder="Share your thoughts about the meeting..."
-                placeholderTextColor={colors.secondaryText}
-                value={feedbackText}
-                onChangeText={setFeedbackText}
-                multiline
-                numberOfLines={4}
-                textAlignVertical="top"
-                maxLength={500}
-                onFocus={() => {
-                  setTimeout(() => {
-                    scrollViewRef.current?.scrollToEnd({ animated: true });
-                  }, 300);
-                }}
-              />
-            </View>
-
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity
-                style={[styles.cancelButton, { borderColor: colors.border }]}
-                onPress={() => {
-                  onClose();
-                  resetForm();
-                }}
-              >
-                <Text style={[styles.cancelButtonText, { color: colors.text }]}>
-                  Skip
+              <View style={styles.modalHeader}>
+                <Text style={[styles.modalTitle, { color: colors.text }]}>
+                  How was your coffee chat?
                 </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.submitButton,
-                  { backgroundColor: colors.primary },
-                  submitting && styles.disabledButton,
-                ]}
-                onPress={handleSubmit}
-                disabled={submitting}
+                <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+                  <Ionicons name="close" size={24} color={colors.text} />
+                </TouchableOpacity>
+              </View>
+
+              <Text
+                style={[styles.partnerText, { color: colors.secondaryText }]}
               >
-                <Text style={styles.submitButtonText}>
-                  {submitting ? "Submitting..." : "Submit Feedback"}
+                Your meeting with {partnerName}
+              </Text>
+
+              <View style={styles.ratingSection}>
+                <Text style={[styles.ratingLabel, { color: colors.text }]}>
+                  Rate your experience
                 </Text>
-              </TouchableOpacity>
-            </View>
-          </ScrollView>
-        </View>
+                <View style={styles.starsContainer}>{renderStars1()}</View>
+              </View>
+
+              <Text
+                style={[styles.partnerText, { color: colors.secondaryText }]}
+              >
+                {coffeePlace}
+              </Text>
+
+              <View style={styles.ratingSection}>
+                <Text style={[styles.ratingLabel, { color: colors.text }]}>
+                  Rate the Cafe
+                </Text>
+                <View style={styles.starsContainer}>{renderStars2()}</View>
+              </View>
+
+              <View style={styles.feedbackSection}>
+                <Text style={[styles.feedbackLabel, { color: colors.text }]}>
+                  Tell us more about your experience (optional)
+                </Text>
+                <TextInput
+                  style={[
+                    styles.feedbackInput,
+                    {
+                      color: colors.text,
+                      backgroundColor: colors.card,
+                      borderColor: colors.border,
+                    },
+                  ]}
+                  placeholder="Share your thoughts about the meeting..."
+                  placeholderTextColor={colors.secondaryText}
+                  value={feedbackText}
+                  onChangeText={setFeedbackText}
+                  multiline
+                  numberOfLines={4}
+                  textAlignVertical="top"
+                  maxLength={500}
+                  onFocus={() => {
+                    setTimeout(() => {
+                      scrollViewRef.current?.scrollToEnd({ animated: true });
+                    }, 300);
+                  }}
+                />
+              </View>
+
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity
+                  style={[styles.cancelButton, { borderColor: colors.border }]}
+                  onPress={() => {
+                    onClose();
+                    resetForm();
+                  }}
+                >
+                  <Text
+                    style={[styles.cancelButtonText, { color: colors.text }]}
+                  >
+                    Skip
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.submitButton,
+                    { backgroundColor: colors.primary },
+                    submitting && styles.disabledButton,
+                  ]}
+                  onPress={handleSubmit}
+                  disabled={submitting}
+                >
+                  <Text style={styles.submitButtonText}>
+                    {submitting ? "Submitting..." : "Submit Feedback"}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
+          </View>
         </KeyboardAvoidingView>
       </View>
     </Modal>
