@@ -106,7 +106,45 @@ export const feedbackService = {
     }
   },
 
-  
+  // Mark feedback as requested to avoid showing multiple times
+  async markFeedbackRequested(matchId: string, userId: string): Promise<void> {
+    try {
+      const { error } = await supabase.from("feedback").insert([
+        {
+          match_id: matchId,
+          user1_id: userId, 
+          created_at: new Date().toISOString(),
+        },
+      ]);
+
+      if (error) throw error;
+    } catch (error) {
+      console.error("Error marking feedback as requested:", error);
+    }
+  },
+
+  // Check if feedback was already requested for this match
+  async isFeedbackAlreadyRequested(matchId: string): Promise<boolean> {
+    try {
+      const { data, error } = await supabase
+        .from("feedback")
+        .select("match_id")
+        .eq("match_id", matchId)
+        .single();
+
+      if (error && error.code === "PGRST116") {
+        // No rows returned, feedback not requested yet
+        return false;
+      }
+
+      if (error) throw error;
+
+      return !!data;
+    } catch (error) {
+      console.error("Error checking feedback request status:", error);
+      return true; // Assume already requested to avoid spam
+    }
+  },
 
   // Submit feedback with new schema
   async submitFeedback(
