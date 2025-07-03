@@ -49,25 +49,62 @@ export default function FeedbackModal({
   // Check if feedback has already been given when modal opens
   useEffect(() => {
     const checkExistingFeedback = async () => {
-      if (!visible || !user?.id || !matchId) return;
+      if (!visible || !user?.id || !matchId) {
+        console.log("🚫 Feedback check skipped - missing data:", {
+          visible,
+          userId: user?.id,
+          matchId
+        });
+        return;
+      }
 
       try {
         setCheckingFeedback(true);
+        
+        console.log("🔍 Starting feedback check with:");
+        console.log("  - User ID:", user.id);
+        console.log("  - Match ID:", matchId);
+        console.log("  - Is your test case?", user.id === "f9a0c2c3-9c0c-4a46-accc-cbb48d54e439" && matchId === "25");
 
         const { data, error } = await supabase
           .from("feedback")
-          .select("feedback_id")
+          .select("*")
           .eq("match_id", matchId)
           .eq("user1_id", user.id);
 
+        console.log("📋 Raw Supabase response:");
+        console.log("  - Data:", JSON.stringify(data, null, 2));
+        console.log("  - Error:", error);
+        console.log("  - Data type:", typeof data);
+        console.log("  - Data is array:", Array.isArray(data));
+        console.log("  - Data length:", data?.length);
+
         if (error) {
+          console.log("❌ Supabase error occurred:", error);
           throw error;
         }
+        
         const hasGivenFeedback = data && data.length > 0;
-        console.log("HERE!!!!", hasGivenFeedback);
-        console.log("HERE!!!!", matchId);
-        console.log("HERE!!!!", user.id);
-        console.log("Feedback data:", data);
+        console.log("🎯 Final result:");
+        console.log("  - hasGivenFeedback:", hasGivenFeedback);
+        console.log("  - Calculation: data && data.length > 0 =", data, "&&", data?.length, "> 0 =", hasGivenFeedback);
+
+        // Let's also check if there's ANY feedback for this match_id regardless of user
+        const { data: allMatchFeedback, error: allError } = await supabase
+          .from("feedback")
+          .select("*")
+          .eq("match_id", matchId);
+        
+        console.log("🔍 All feedback for match_id", matchId, ":", JSON.stringify(allMatchFeedback, null, 2));
+
+        // Check if there's feedback with your user ID in user2_id column
+        const { data: user2Feedback, error: user2Error } = await supabase
+          .from("feedback")
+          .select("*")
+          .eq("match_id", matchId)
+          .eq("user2_id", user.id);
+        
+        console.log("🔍 Feedback with your ID in user2_id:", JSON.stringify(user2Feedback, null, 2));
 
         setFeedbackAlreadyGiven(hasGivenFeedback);
 
@@ -84,7 +121,7 @@ export default function FeedbackModal({
           );
         }
       } catch (error) {
-        console.error("Error checking existing feedback:", error);
+        console.error("❌ Error checking existing feedback:", error);
         // On error, allow the user to proceed (fail open)
         setFeedbackAlreadyGiven(false);
       } finally {
