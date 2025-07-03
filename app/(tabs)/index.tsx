@@ -569,23 +569,11 @@ export default function CircleChatsScreen() {
         await feedbackService.getEligibleMatchesForFeedback(user.id);
 
       if (eligibleMatches.length > 0) {
-        // Filter out matches that we've already requested feedback for
-        const newMatches = [];
-        for (const match of eligibleMatches) {
-          const alreadyRequested =
-            await feedbackService.isFeedbackAlreadyRequested(match.match_id);
-          if (!alreadyRequested) {
-            newMatches.push(match);
-          }
-        }
-
-        if (newMatches.length > 0) {
-          setFeedbackQueue(newMatches);
+        if (eligibleMatches.length > 0) {
+          setFeedbackQueue(eligibleMatches);
           // Show feedback modal for the first match
-          setCurrentFeedbackMatch(newMatches[0]);
+          setCurrentFeedbackMatch(eligibleMatches[0]);
           setShowFeedbackModal(true);
-          // Mark as requested to avoid showing again
-          await feedbackService.markFeedbackRequested(newMatches[0].match_id);
         }
       }
     } catch (error) {
@@ -610,7 +598,6 @@ export default function CircleChatsScreen() {
       setTimeout(() => {
         setCurrentFeedbackMatch(updatedQueue[0]);
         setShowFeedbackModal(true);
-        feedbackService.markFeedbackRequested(updatedQueue[0].match_id);
       }, 1000);
     } else {
       setCurrentFeedbackMatch(null);
