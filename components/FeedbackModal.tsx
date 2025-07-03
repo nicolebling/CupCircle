@@ -58,7 +58,7 @@ export default function FeedbackModal({
           .from("feedback")
           .select("feedback_id")
           .eq("match_id", matchId)
-          .eq("user1_id", "f9a0c2c3-9c0c-4a46-accc-cbb48d54e439");
+          .eq("user1_id", user.id);
 
         if (error) {
           throw error;
