@@ -205,6 +205,19 @@ export default function FeedbackModal({
         return;
       }
 
+      // Increment successful_chat column for the user
+      const { error: profileUpdateError } = await supabase
+        .from("profiles")
+        .update({ 
+          successful_chat: supabase.raw('successful_chat + 1')
+        })
+        .eq("id", user.id);
+
+      if (profileUpdateError) {
+        console.error("Error updating successful_chat count:", profileUpdateError);
+        // Don't show error to user since feedback was submitted successfully
+      }
+
       Alert.alert(
         "Thank You!",
         "Your feedback has been submitted successfully.",
