@@ -107,12 +107,12 @@ export const feedbackService = {
   },
 
   // Mark feedback as requested to avoid showing multiple times
-  async markFeedbackRequested(matchId: string): Promise<void> {
+  async markFeedbackRequested(matchId: string, userId: string): Promise<void> {
     try {
       const { error } = await supabase.from("feedback").insert([
         {
           match_id: matchId,
-          user_id: user.id, 
+          user_id: userId, 
           created_at: new Date().toISOString(),
         },
       ]);
