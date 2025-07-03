@@ -60,11 +60,10 @@ export default function FeedbackModal({
           .eq("match_id", matchId)
           .eq("user1_id", user.id);
 
-        if (error && error.code !== "PGRST116") {
-          // PGRST116 means no rows found, which is expected if no feedback given
+        if (error) {
           throw error;
         }
-        const hasGivenFeedback = !!data;
+        const hasGivenFeedback = data && data.length > 0;
         console.log("HERE!!!!", hasGivenFeedback);
         console.log("HERE!!!!", matchId);
         console.log("HERE!!!!", user.id);
