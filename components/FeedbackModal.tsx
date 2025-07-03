@@ -42,39 +42,7 @@ export default function FeedbackModal({
   const [cafeRating, setCafeRating] = useState<number>(0);
   const [feedbackText, setFeedbackText] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [feedbackAlreadyExists, setFeedbackAlreadyExists] = useState(false);
-  const [checkingExisting, setCheckingExisting] = useState(true);
   const scrollViewRef = React.useRef<ScrollView>(null);
-
-  // Check if feedback already exists for this match
-  React.useEffect(() => {
-    const checkExistingFeedback = async () => {
-      if (!visible || !user?.id || !matchId) return;
-      
-      try {
-        setCheckingExisting(true);
-        const { data, error } = await supabase
-          .from("feedback")
-          .select("feedback_id")
-          .eq("match_id", matchId)
-          .eq("user1_id", user.id)
-          .single();
-
-        if (error && error.code !== "PGRST116") {
-          throw error;
-        }
-
-        setFeedbackAlreadyExists(!!data);
-      } catch (error) {
-        console.error("Error checking existing feedback:", error);
-        setFeedbackAlreadyExists(false);
-      } finally {
-        setCheckingExisting(false);
-      }
-    };
-
-    checkExistingFeedback();
-  }, [visible, matchId, user?.id]);
 
   const handleStarPress1 = (selectedRating: number) => {
     setUserRating(selectedRating);
@@ -85,14 +53,6 @@ export default function FeedbackModal({
   };
 
   const handleSubmit = async () => {
-    if (feedbackAlreadyExists) {
-      Alert.alert(
-        "Feedback Already Submitted",
-        "You have already provided feedback for this coffee chat.",
-      );
-      return;
-    }
-
     if (userRating === 0 || cafeRating === 0) {
       Alert.alert(
         "Rating Required",
@@ -158,8 +118,6 @@ export default function FeedbackModal({
     setUserRating(0);
     setCafeRating(0);
     setFeedbackText("");
-    setFeedbackAlreadyExists(false);
-    setCheckingExisting(true);
   };
 
   const renderStars1 = () => {
@@ -229,38 +187,12 @@ export default function FeedbackModal({
             >
               <View style={styles.modalHeader}>
                 <Text style={[styles.modalTitle, { color: colors.text }]}>
-                  {feedbackAlreadyExists ? "Feedback Already Submitted" : "How was your coffee chat?"}
+                  How was your coffee chat?
                 </Text>
                 <TouchableOpacity onPress={onClose} style={styles.closeButton}>
                   <Ionicons name="close" size={24} color={colors.text} />
                 </TouchableOpacity>
               </View>
-
-              {checkingExisting && (
-                <View style={styles.loadingContainer}>
-                  <Text style={[styles.loadingText, { color: colors.secondaryText }]}>
-                    Checking feedback status...
-                  </Text>
-                </View>
-              )}
-
-              {feedbackAlreadyExists && !checkingExisting && (
-                <View style={styles.alreadySubmittedContainer}>
-                  <Ionicons name="checkmark-circle" size={64} color={colors.primary} />
-                  <Text style={[styles.alreadySubmittedText, { color: colors.text }]}>
-                    Thank you! You've already provided feedback for this coffee chat with {partnerName}.
-                  </Text>
-                  <TouchableOpacity
-                    style={[styles.okButton, { backgroundColor: colors.primary }]}
-                    onPress={onClose}
-                  >
-                    <Text style={styles.okButtonText}>OK</Text>
-                  </TouchableOpacity>
-                </View>
-              )}
-
-              {!feedbackAlreadyExists && !checkingExisting && (
-                <>
 
               <Text
                 style={[styles.partnerText, { color: colors.secondaryText }]}
@@ -345,8 +277,6 @@ export default function FeedbackModal({
                   </Text>
                 </TouchableOpacity>
               </View>
-              )}
-            </ScrollView>
             </ScrollView>
           </View>
         </KeyboardAvoidingView>
@@ -454,35 +384,5 @@ const styles = StyleSheet.create({
   },
   disabledButton: {
     opacity: 0.6,
-  },
-  loadingContainer: {
-    alignItems: "center",
-    padding: 24,
-  },
-  loadingText: {
-    fontSize: 16,
-    fontFamily: "K2D-Regular",
-  },
-  alreadySubmittedContainer: {
-    alignItems: "center",
-    padding: 24,
-  },
-  alreadySubmittedText: {
-    fontSize: 16,
-    fontFamily: "K2D-Regular",
-    textAlign: "center",
-    marginTop: 16,
-    marginBottom: 24,
-  },
-  okButton: {
-    paddingHorizontal: 32,
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: "center",
-  },
-  okButtonText: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontFamily: "K2D-Medium",
   },
 });
