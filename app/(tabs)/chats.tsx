@@ -33,6 +33,7 @@ interface Conversation {
     text: string;
     timestamp: string;
     isRead: boolean;
+    isRead: boolean;
   };
   unreadCount: number;
 }
