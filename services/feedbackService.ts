@@ -112,6 +112,7 @@ export const feedbackService = {
       const { error } = await supabase.from("feedback").insert([
         {
           match_id: matchId,
+          user_id: user.id, 
           created_at: new Date().toISOString(),
         },
       ]);
