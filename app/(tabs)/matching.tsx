@@ -160,16 +160,10 @@ export default function MatchingScreen() {
 
   // Function to handle subscription button press
   const handleSubscribe = () => {
-    setShowSubscriptionCard(false);
     console.log("Triggering paywall from subscription card");
     Superwall.shared.register({
       placement: 'matching',
     });
-  };
-
-  // Function to close subscription card
-  const handleCloseSubscriptionCard = () => {
-    setShowSubscriptionCard(false);
   };
 
   // Define checkUserAvailability outside of useFocusEffect
@@ -178,6 +172,23 @@ export default function MatchingScreen() {
     setIsLoading(true);
 
     try {
+      // First check successful_chat count
+      const { data: profileData, error: profileError } = await supabase
+        .from("profiles")
+        .select("successful_chat")
+        .eq("id", user.id)
+        .single();
+
+      if (profileError) {
+        console.error("Error fetching successful_chat count:", profileError);
+      }
+
+      // If user has successful_chat = 1, don't fetch profiles
+      if (profileData?.successful_chat === 1) {
+        setIsLoading(false);
+        return;
+      }
+
       const { data, error } = await supabase
         .from("availability")
         .select("*")
@@ -751,25 +762,30 @@ export default function MatchingScreen() {
           </View>
         </View>
       ) : (
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-          keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
-          style={{ flex: 1 }}
-        >
-          <ScrollView
-            ref={scrollViewRef}
-            style={{ flex: 1, width: "100%", padding: 16 }}
-            contentContainerStyle={{
-              flexGrow: 1,
-              paddingBottom: 120, // Extra padding for keyboard space
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-            keyboardShouldPersistTaps="handled"
-            showsVerticalScrollIndicator={false}
+        {showSubscriptionCard ? (
+          <View style={[styles.cardsContainer, { justifyContent: "center" }]}>
+            <SubscriptionCard onSubscribe={handleSubscribe} />
+          </View>
+        ) : (
+          <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
+            style={{ flex: 1 }}
           >
-            <View style={[styles.cardsContainer, { width: "100%" }]}>
-              {isLoading ? (
+            <ScrollView
+              ref={scrollViewRef}
+              style={{ flex: 1, width: "100%", padding: 16 }}
+              contentContainerStyle={{
+                flexGrow: 1,
+                paddingBottom: 120, // Extra padding for keyboard space
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}
+            >
+              <View style={[styles.cardsContainer, { width: "100%" }]}>
+                {isLoading ? (
                 <View style={styles.loadingContainer}>
                   <LogoAnimation size={120} />
                   {/* <Text style={[styles.loadingText, { color: colors.text }]}>
@@ -1215,9 +1231,9 @@ export default function MatchingScreen() {
                 </View>
               )}
             </View>
-          </ScrollView>
-        </KeyboardAvoidingView>
-      )}
+            </ScrollView>
+          </KeyboardAvoidingView>
+        )}
 
       {/* Filter Modal */}
       <Modal
@@ -1373,12 +1389,7 @@ export default function MatchingScreen() {
         </View>
       </Modal>
 
-      {/* Subscription Card */}
-      <SubscriptionCard
-        visible={showSubscriptionCard}
-        onSubscribe={handleSubscribe}
-        onClose={handleCloseSubscriptionCard}
-      />
+      
 
       {/* Match Animation Modal */}
       {/* <Modal visible={matchAnimation} transparent={true} animationType="fade">
