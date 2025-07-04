@@ -768,10 +768,6 @@ export default function MatchingScreen() {
             </TouchableOpacity>
           </View>
         </View>
-      ) : showSubscriptionCard ? (
-        <View style={[styles.cardsContainer, { justifyContent: "center", position: "absolute", top: 0, left: 0, right: 0, bottom: 0, zIndex: 1000 }]}>
-          <SubscriptionCard onSubscribe={handleSubscribe} />
-        </View>
       ) : (
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -791,7 +787,9 @@ export default function MatchingScreen() {
             showsVerticalScrollIndicator={false}
           >
             <View style={[styles.cardsContainer, { width: "100%" }]}>
-              {isLoading ? (
+              {showSubscriptionCard ? (
+                <SubscriptionCard onSubscribe={handleSubscribe} />
+              ) : isLoading ? (
                 <View style={styles.loadingContainer}>
                   <LogoAnimation size={120} />
                   {/* <Text style={[styles.loadingText, { color: colors.text }]}>
@@ -800,8 +798,6 @@ export default function MatchingScreen() {
                 </View>
               ) : !hasAvailability ? (
                 renderNoAvailabilityMessage()
-              ) : showSubscriptionCard ? (
-                null
               ) : profiles.length === 0 ? (
                 <View
                   style={[
