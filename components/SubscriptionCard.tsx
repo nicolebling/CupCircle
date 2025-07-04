@@ -34,9 +34,9 @@ export default function SubscriptionCard({
     >
       <View style={styles.modalOverlay}>
         <View style={[styles.cardContainer, { backgroundColor: colors.card }]}>
-          <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+          {/* <TouchableOpacity style={styles.closeButton} onPress={onClose}>
             <Ionicons name="close" size={24} color={colors.secondaryText} />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
           <View style={styles.iconContainer}>
             <Ionicons name="cafe" size={48} color={colors.primary} />
@@ -57,11 +57,11 @@ export default function SubscriptionCard({
             <Text style={styles.subscribeButtonText}>Subscribe</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.laterButton} onPress={onClose}>
+          {/* <TouchableOpacity style={styles.laterButton} onPress={onClose}>
             <Text style={[styles.laterButtonText, { color: colors.secondaryText }]}>
               Maybe later
             </Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
       </View>
     </Modal>
