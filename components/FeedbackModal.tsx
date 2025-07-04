@@ -322,7 +322,7 @@ export default function FeedbackModal({
               <Text style={styles.actionButtonText}>
                 {feedbackAlreadyGiven && !checkingFeedback
                   ? "Already submitted feedback for this coffee chat."
-                  : "Give Feedback"}
+                  : "Your feedback is important to us."}
               </Text>
 
               {!checkingFeedback && !feedbackAlreadyGiven && (
