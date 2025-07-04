@@ -142,36 +142,6 @@ export const feedbackService = {
     }
   },
 
-  // Check if any feedback record exists (including NULL records)
-  async hasAnyFeedbackRecord(matchId: string): Promise<boolean> {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-
-      if (!user) {
-        return true;
-      }
-
-      const { data, error } = await supabase
-        .from("feedback")
-        .select("match_id")
-        .eq("match_id", matchId)
-        .eq("user1_id", user.id)
-        .single();
-
-      if (error && error.code === "PGRST116") {
-        // No rows returned, no feedback record exists
-        return false;
-      }
-
-      if (error) throw error;
-
-      return !!data;
-    } catch (error) {
-      console.error("Error checking feedback record:", error);
-      return true;
-    }
-  },
-
   // Submit feedback with new schema
   async submitFeedback(
     matchId: string,

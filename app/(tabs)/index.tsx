@@ -231,35 +231,24 @@ export default function CircleChatsScreen() {
     return profiles[partnerId] || {};
   };
 
-  const checkFeedbackStatus = useCallback(async () => {
-    if (!user?.id) return;
-
+  const checkFeedbackStatus = async (matchIds: string[]) => {
     try {
-      const eligibleMatches = await feedbackService.getEligibleMatchesForFeedback(user.id);
+      const { data: existingFeedback, error } = await supabase
+        .from("feedback")
+        .select("match_id, user1_id")
+        .in("match_id", matchIds)
+        .eq("user1_id", user.id);
 
-      // Filter matches that haven't been shown as feedback prompts yet
-      const newMatches = eligibleMatches.filter(match => 
-        !feedbackGiven.has(match.match_id)
+      if (error) throw error;
+
+      const feedbackGivenSet = new Set(
+        existingFeedback?.map((f) => f.match_id) || [],
       );
-
-      // Further filter to only show matches that don't have ANY feedback record (including NULL records)
-      const matchesWithoutAnyRecord = [];
-      for (const match of newMatches) {
-        const hasAnyRecord = await feedbackService.hasAnyFeedbackRecord(match.match_id);
-        if (!hasAnyRecord) {
-          matchesWithoutAnyRecord.push(match);
-        }
-      }
-
-      if (matchesWithoutAnyRecord.length > 0) {
-        setFeedbackQueue(matchesWithoutAnyRecord);
-        setCurrentFeedbackMatch(matchesWithoutAnyRecord[0]);
-        setShowFeedbackModal(true);
-      }
+      setFeedbackGiven(feedbackGivenSet);
     } catch (error) {
       console.error("Error checking feedback status:", error);
     }
-  }, [user?.id, feedbackGiven]);
+  };
 
   const renderChatCard = (chat) => {
     const isExpired = new Date(chat.meeting_date) < new Date();
@@ -423,51 +412,40 @@ export default function CircleChatsScreen() {
           )}
           {chat.status === "confirmed" && showPastChats && (
             <TouchableOpacity
-                style={[
-                  styles.actionButton,
-                  feedbackGiven.has(chat.match_id)
-                    ? { backgroundColor: colors.secondaryText }
-                    : { backgroundColor: colors.primary },
-                ]}
-                onPress={async () => {
-                  // If we already know feedback was given, don't allow click
-                  if (feedbackGiven.has(chat.match_id)) {
-                    Alert.alert(
-                      "Feedback Already Given",
-                      "You have already submitted feedback for this coffee chat.",
-                    );
-                    return;
-                  }
+              style={[
+                styles.actionButton,
+                feedbackGiven.has(chat.match_id)
+                  ? { backgroundColor: colors.secondaryText }
+                  : { backgroundColor: colors.primary },
+              ]}
+              onPress={async () => {
+                // If we already know feedback was given, don't allow click
+                if (feedbackGiven.has(chat.match_id)) {
+                  Alert.alert(
+                    "Feedback Already Given",
+                    "You have already submitted feedback for this coffee chat.",
+                  );
+                  return;
+                }
 
-                  // Double-check if actual feedback (not NULL) was already given
-                  const alreadyGiven = await feedbackService.isFeedbackAlreadyRequested(chat.match_id);
-                  if (alreadyGiven) {
-                    setFeedbackGiven(prev => new Set([...prev, chat.match_id]));
-                    Alert.alert(
-                      "Feedback Already Given",
-                      "You have already submitted feedback for this coffee chat.",
-                    );
-                    return;
-                  }
-
-                  const partnerProfile = getPartnerProfile(chat);
-                  setCurrentFeedbackMatch({
-                    match_id: chat.match_id,
-                    partner_name: partnerProfile.name || "Unknown",
-                    coffeePlace: chat.meeting_location.split("|||")[0],
-                    meeting_date: chat.meeting_date,
-                    start_time: chat.start_time,
-                  });
-                  setShowFeedbackModal(true);
-                }}
-                disabled={feedbackGiven.has(chat.match_id)}
-              >
-                <Text style={styles.actionButtonText}>
-                  {feedbackGiven.has(chat.match_id)
-                    ? "Feedback Given"
-                    : "Give Feedback"}
-                </Text>
-              </TouchableOpacity>
+                const partnerProfile = getPartnerProfile(chat);
+                setCurrentFeedbackMatch({
+                  match_id: chat.match_id,
+                  partner_name: partnerProfile.name || "Unknown",
+                  coffeePlace: chat.meeting_location.split("|||")[0],
+                  meeting_date: chat.meeting_date,
+                  start_time: chat.start_time,
+                });
+                setShowFeedbackModal(true);
+              }}
+              disabled={feedbackGiven.has(chat.match_id)}
+            >
+              <Text style={styles.actionButtonText}>
+                {feedbackGiven.has(chat.match_id)
+                  ? "Feedback Given"
+                  : "Give Feedback"}
+              </Text>
+            </TouchableOpacity>
           )}
           {chat.user2_id === user.id && chat.status === "pending" && (
             <>
@@ -619,7 +597,7 @@ export default function CircleChatsScreen() {
       setTimeout(() => {
         setCurrentFeedbackMatch(remainingQueue[0]);
         setShowFeedbackModal(true);
-
+        
       }, 500);
     } else {
       setCurrentFeedbackMatch(null);

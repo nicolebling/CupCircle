@@ -309,41 +309,7 @@ export default function FeedbackModal({
                       ? "Feedback Already Given"
                       : "How was your coffee chat?"}
                 </Text>
-                <TouchableOpacity onPress={async () => {
-                  try {
-                    // Insert NULL feedback when user closes modal
-                    const { data: matchData, error: matchError } = await supabase
-                      .from("matching")
-                      .select("user1_id, user2_id")
-                      .eq("match_id", matchId)
-                      .single();
-
-                    if (matchError) throw matchError;
-
-                    const partnerId = matchData.user1_id === user.id ? matchData.user2_id : matchData.user1_id;
-
-                    await supabase.from("feedback").insert([
-                      {
-                        match_id: matchId,
-                        user1_id: user.id,
-                        user2_id: partnerId,
-                        user_rating: null,
-                        cafe_rating: null,
-                        feedback_text: null,
-                        created_at: new Date().toISOString(),
-                      },
-                    ]);
-
-                    onSubmitSuccess();
-                    onClose();
-                    resetForm();
-                  } catch (error) {
-                    console.error("Error submitting empty feedback:", error);
-                    // Still close modal even if there's an error
-                    onClose();
-                    resetForm();
-                  }
-                }} style={styles.closeButton}>
+                <TouchableOpacity onPress={onClose} style={styles.closeButton}>
                   <Ionicons name="close" size={24} color={colors.text} />
                 </TouchableOpacity>
               </View>
@@ -356,7 +322,7 @@ export default function FeedbackModal({
               <Text style={styles.actionButtonText}>
                 {feedbackAlreadyGiven && !checkingFeedback
                   ? "Already submitted feedback for this coffee chat."
-                  : "Your insights drive our improvements."}
+                  : "Give Feedback"}
               </Text>
 
               {!checkingFeedback && !feedbackAlreadyGiven && (
