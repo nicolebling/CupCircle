@@ -430,6 +430,11 @@ export default function CircleChatsScreen() {
                 }
 
                 // Check if there's existing feedback with NULL values - if so, allow upsert
+                console.log("🔍 Checking for existing feedback record:", {
+                  match_id: chat.match_id,
+                  user1_id: user.id
+                });
+
                 const { data: existingFeedback, error } = await supabase
                   .from("feedback")
                   .select("match_id, user_rating, cafe_rating")
@@ -437,8 +442,22 @@ export default function CircleChatsScreen() {
                   .eq("user1_id", user.id)
                   .single();
 
+                console.log("📊 Existing feedback check result:", {
+                  existingFeedback,
+                  error: error?.code,
+                  hasExistingRecord: !!existingFeedback,
+                  userRatingIsNull: existingFeedback?.user_rating === null,
+                  cafeRatingIsNull: existingFeedback?.cafe_rating === null
+                });
+
                 const partnerProfile = getPartnerProfile(chat);
                 const isUpsert = existingFeedback && existingFeedback.user_rating === null && existingFeedback.cafe_rating === null;
+                
+                console.log("🎯 Upsert decision:", {
+                  isUpsert,
+                  reason: isUpsert ? "Found existing record with NULL ratings" : "No existing NULL record found"
+                });
+
                 setCurrentFeedbackMatch({
                   match_id: chat.match_id,
                   partner_name: partnerProfile.name || "Unknown",

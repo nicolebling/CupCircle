@@ -156,6 +156,13 @@ export default function FeedbackModal({
 
       if (isUpsert) {
         // Update existing NULL feedback record
+        console.log("🔄 UPSERT MODE: Updating existing NULL feedback record");
+        console.log("🔍 Looking for record with:", {
+          match_id: matchId,
+          user1_id: user.id,
+          message: "Finding record with NULL user_rating and cafe_rating"
+        });
+
         const { data: updateData, error: updateError } = await supabase
           .from("feedback")
           .update({
@@ -168,10 +175,32 @@ export default function FeedbackModal({
           .eq("user1_id", user.id)
           .select();
 
+        console.log("✅ Update operation completed:", {
+          updatedData: updateData,
+          updateError: updateError,
+          recordsUpdated: updateData?.length || 0
+        });
+
+        if (updateData && updateData.length > 0) {
+          console.log("📝 Successfully updated record:", updateData[0]);
+        } else {
+          console.log("⚠️ No records were updated - this might indicate the record doesn't exist or conditions weren't met");
+        }
+
         insertData = updateData;
         insertError = updateError;
       } else {
         // Insert new feedback record
+        console.log("➕ INSERT MODE: Creating new feedback record");
+        console.log("📝 Inserting new record with:", {
+          match_id: matchId,
+          user1_id: user.id,
+          user2_id: partnerId,
+          user_rating: userRating,
+          cafe_rating: cafeRating,
+          feedback_text: feedbackText.trim() || null
+        });
+
         const { data: newData, error: newError } = await supabase
           .from("feedback")
           .insert([
@@ -186,6 +215,12 @@ export default function FeedbackModal({
             },
           ])
           .select();
+
+        console.log("✅ Insert operation completed:", {
+          insertedData: newData,
+          insertError: newError,
+          recordsInserted: newData?.length || 0
+        });
 
         insertData = newData;
         insertError = newError;
