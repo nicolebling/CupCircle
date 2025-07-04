@@ -33,6 +33,7 @@ import IndustrySelector from "@/components/IndustrySelector";
 import ExperienceLevelSelector from "@/components/ExperienceLevelSelector";
 import InterestSelector from "@/components/InterestSelector";
 import LogoAnimation from "@/components/LogoAnimation";
+import SubscriptionCard from "@/components/SubscriptionCard";
 import Superwall from "expo-superwall/compat";
 
 // Define the profile type for better type checking
@@ -97,6 +98,7 @@ export default function MatchingScreen() {
   const [selectedCafe, setSelectedCafe] = useState("");
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
   const [hasMoreProfiles, setHasMoreProfiles] = useState(false);
+  const [showSubscriptionCard, setShowSubscriptionCard] = useState(false);
   const PROFILES_PER_PAGE = 10;
 
   // Refs for auto-scroll functionality
@@ -131,7 +133,7 @@ export default function MatchingScreen() {
     cardRotate.value = 0;
   }, [currentIndex]);
 
-  // Function to check successful_chat count and trigger paywall
+  // Function to check successful_chat count and show subscription card
   const checkAndTriggerPaywall = useCallback(async () => {
     if (!user?.id) return;
 
@@ -148,15 +150,27 @@ export default function MatchingScreen() {
       }
 
       if (profileData?.successful_chat === 1) {
-        console.log("Triggering paywall for successful_chat = 1");
-        Superwall.shared.register({
-          placement: 'matching',
-        });
+        console.log("Showing subscription card for successful_chat = 1");
+        setShowSubscriptionCard(true);
       }
     } catch (error) {
       console.error("Error checking successful_chat count:", error);
     }
   }, [user?.id]);
+
+  // Function to handle subscription button press
+  const handleSubscribe = () => {
+    setShowSubscriptionCard(false);
+    console.log("Triggering paywall from subscription card");
+    Superwall.shared.register({
+      placement: 'matching',
+    });
+  };
+
+  // Function to close subscription card
+  const handleCloseSubscriptionCard = () => {
+    setShowSubscriptionCard(false);
+  };
 
   // Define checkUserAvailability outside of useFocusEffect
   const checkUserAvailability = useCallback(async () => {
@@ -1358,6 +1372,13 @@ export default function MatchingScreen() {
           </View>
         </View>
       </Modal>
+
+      {/* Subscription Card */}
+      <SubscriptionCard
+        visible={showSubscriptionCard}
+        onSubscribe={handleSubscribe}
+        onClose={handleCloseSubscriptionCard}
+      />
 
       {/* Match Animation Modal */}
       {/* <Modal visible={matchAnimation} transparent={true} animationType="fade">
