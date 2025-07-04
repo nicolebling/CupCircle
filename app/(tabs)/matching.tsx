@@ -183,8 +183,30 @@ export default function MatchingScreen() {
         console.error("Error fetching successful_chat count:", profileError);
       }
 
-      // If user has successful_chat = 1, don't fetch profiles
+      // If user has successful_chat = 1, still check availability but don't fetch profiles
       if (profileData?.successful_chat === 1) {
+        // Still need to check if user has availability for proper UI state
+        const { data: availData, error: availError } = await supabase
+          .from("availability")
+          .select("*")
+          .eq("id", user.id);
+
+        if (!availError && availData && availData.length > 0) {
+          const now = new Date();
+          const futureAvailability = availData.filter((slot) => {
+            if (!slot.start_time) return false;
+            const slotDate = new Date(slot.date);
+            const [time, period] = slot.start_time.split(" ");
+            const [hours, minutes] = time.split(":");
+            let hour = parseInt(hours);
+            if (period === "PM" && hour !== 12) hour += 12;
+            if (period === "AM" && hour === 12) hour = 0;
+            slotDate.setHours(hour, parseInt(minutes), 0, 0);
+            return slotDate > now;
+          });
+          setHasAvailability(futureAvailability.length > 0);
+        }
+        
         setIsLoading(false);
         return;
       }
