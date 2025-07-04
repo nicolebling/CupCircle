@@ -419,10 +419,12 @@ export default function FeedbackModal({
                       .eq("user1_id", user.id)
                       .single();
 
-                    let shouldIncrementChat = false;
-
                     if (checkError && checkError.code === 'PGRST116') {
-                      // No existing record, create new NULL record - this is first time
+                      // No existing record - this is first time interaction
+                      // FIRST increment the successful_chat count
+                      await incrementSuccessfulChat();
+                      
+                      // THEN create the NULL record
                       const { data: insertData, error: insertError } = await supabase.from("feedback").insert([
                         {
                           match_id: matchId,
@@ -435,16 +437,12 @@ export default function FeedbackModal({
                         },
                       ]);
 
-                      if (!insertError && insertData) {
-                        shouldIncrementChat = true;
+                      if (insertError) {
+                        console.error("Error creating NULL feedback record:", insertError);
+                        // Note: We already incremented the count, so we don't rollback
                       }
                     }
                     // If record exists, don't increment (user already interacted before)
-
-                    // Increment successful_chat count if this was first-time interaction
-                    if (shouldIncrementChat) {
-                      await incrementSuccessfulChat();
-                    }
 
                     onSubmitSuccess();
                     onClose();
