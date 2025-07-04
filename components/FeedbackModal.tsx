@@ -127,7 +127,10 @@ export default function FeedbackModal({
         .eq("match_id", matchId)
         .single();
 
-      if (matchError) throw matchError;
+      if (matchError) {
+        console.error("Error fetching match data:", matchError);
+        throw matchError;
+      }
 
       // Determine the partner ID
       const partnerId =
@@ -135,26 +138,36 @@ export default function FeedbackModal({
           ? matchData.user2_id
           : matchData.user1_id;
 
-      console.log("Match data:", matchData);
-      console.log("Current user ID:", user.id);
-      console.log("Partner ID:", partnerId);
+      console.log("Submitting feedback:", {
+        match_id: matchId,
+        user1_id: user.id,
+        user2_id: partnerId,
+        user_rating: userRating,
+        cafe_rating: cafeRating,
+        feedback_text: feedbackText.trim()
+      });
 
-      // Insert feedback into database with both user IDs for complete tracking
-      const { error } = await supabase.from("feedback").insert([
-        {
-          match_id: matchId,
-          user1_id: user.id,
-          user2_id: partnerId,
-          user_rating: userRating,
-          cafe_rating: cafeRating,
-          feedback_text: feedbackText.trim(),
-          created_at: new Date().toISOString(),
-        },
-      ]);
+      // Insert feedback into database with proper error handling
+      const { data: insertData, error: insertError } = await supabase
+        .from("feedback")
+        .insert([
+          {
+            match_id: matchId,
+            user1_id: user.id,
+            user2_id: partnerId,
+            user_rating: userRating,
+            cafe_rating: cafeRating,
+            feedback_text: feedbackText.trim() || null,
+            created_at: new Date().toISOString(),
+          },
+        ])
+        .select();
 
-      if (error) {
-        if (error.code === "23505") {
-          // PostgreSQL unique_violation
+      if (insertError) {
+        console.error("Database insertion error:", insertError);
+        
+        if (insertError.code === "23505") {
+          // PostgreSQL unique_violation - feedback already exists
           setFeedbackAlreadyGiven(true);
           Alert.alert(
             "Feedback Already Given",
@@ -162,12 +175,14 @@ export default function FeedbackModal({
             [{ text: "OK", onPress: () => onClose() }],
           );
         } else {
-          console.error("Error submitting feedback:", error);
           Alert.alert("Error", "Failed to submit feedback. Please try again.");
         }
         return;
       }
 
+      console.log("Feedback submitted successfully:", insertData);
+
+      // Success - show confirmation and close modal
       Alert.alert(
         "Thank You!",
         "Your feedback has been submitted successfully.",
