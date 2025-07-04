@@ -769,7 +769,7 @@ export default function MatchingScreen() {
           </View>
         </View>
       ) : showSubscriptionCard ? (
-        <View style={[styles.cardsContainer, { justifyContent: "center" }]}>
+        <View style={[styles.cardsContainer, { justifyContent: "center", position: "absolute", top: 0, left: 0, right: 0, bottom: 0, zIndex: 1000 }]}>
           <SubscriptionCard onSubscribe={handleSubscribe} />
         </View>
       ) : (
@@ -1397,12 +1397,7 @@ export default function MatchingScreen() {
         </View>
       </Modal>
 
-      {/* Subscription Card - Show when successful_chat = 1 */}
-      {showSubscriptionCard && (
-        <View style={[styles.cardsContainer, { justifyContent: "center" }]}>
-          <SubscriptionCard onSubscribe={handleSubscribe} />
-        </View>
-      )}
+      
 
       {/* Match Animation Modal */}
       {/* <Modal visible={matchAnimation} transparent={true} animationType="fade">
