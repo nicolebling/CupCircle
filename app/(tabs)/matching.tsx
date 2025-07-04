@@ -167,10 +167,7 @@ export default function MatchingScreen() {
     });
   };
 
-  // Function to close subscription card
-  const handleCloseSubscriptionCard = () => {
-    setShowSubscriptionCard(false);
-  };
+  
 
   // Define checkUserAvailability outside of useFocusEffect
   const checkUserAvailability = useCallback(async () => {
@@ -1373,12 +1370,7 @@ export default function MatchingScreen() {
         </View>
       </Modal>
 
-      {/* Subscription Card */}
-      <SubscriptionCard
-        visible={showSubscriptionCard}
-        onSubscribe={handleSubscribe}
-        onClose={handleCloseSubscriptionCard}
-      />
+      
 
       {/* Match Animation Modal */}
       {/* <Modal visible={matchAnimation} transparent={true} animationType="fade">
