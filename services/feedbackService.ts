@@ -142,6 +142,37 @@ export const feedbackService = {
     }
   },
 
+  // Check if feedback exists but is incomplete (NULL values)
+  async hasFeedbackWithNullValues(matchId: string): Promise<boolean> {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) {
+        return false;
+      }
+
+      const { data, error } = await supabase
+        .from("feedback")
+        .select("match_id")
+        .eq("match_id", matchId)
+        .eq("user1_id", user.id)
+        .is("user_rating", null)
+        .is("cafe_rating", null)
+        .single();
+
+      if (error && error.code === "PGRST116") {
+        return false;
+      }
+
+      if (error) throw error;
+
+      return !!data;
+    } catch (error) {
+      console.error("Error checking null feedback status:", error);
+      return false;
+    }
+  },
+
   // Submit feedback with new schema
   async submitFeedback(
     matchId: string,

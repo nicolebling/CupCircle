@@ -25,6 +25,7 @@ interface FeedbackModalProps {
   partnerName: string;
   coffeePlace: string;
   onSubmitSuccess: () => void;
+  isUpsert?: boolean;
 }
 
 export default function FeedbackModal({
@@ -34,6 +35,7 @@ export default function FeedbackModal({
   partnerName,
   coffeePlace,
   onSubmitSuccess,
+  isUpsert = false,
 }: FeedbackModalProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
@@ -146,24 +148,48 @@ export default function FeedbackModal({
         user2_id: partnerId,
         user_rating: userRating,
         cafe_rating: cafeRating,
-        feedback_text: feedbackText.trim()
+        feedback_text: feedbackText.trim(),
+        isUpsert
       });
 
-      // Insert feedback into database with proper error handling
-      const { data: insertData, error: insertError } = await supabase
-        .from("feedback")
-        .insert([
-          {
-            match_id: matchId,
-            user1_id: user.id,
-            user2_id: partnerId,
+      let insertData, insertError;
+
+      if (isUpsert) {
+        // Update existing NULL feedback record
+        const { data: updateData, error: updateError } = await supabase
+          .from("feedback")
+          .update({
             user_rating: userRating,
             cafe_rating: cafeRating,
             feedback_text: feedbackText.trim() || null,
             created_at: new Date().toISOString(),
-          },
-        ])
-        .select();
+          })
+          .eq("match_id", matchId)
+          .eq("user1_id", user.id)
+          .select();
+
+        insertData = updateData;
+        insertError = updateError;
+      } else {
+        // Insert new feedback record
+        const { data: newData, error: newError } = await supabase
+          .from("feedback")
+          .insert([
+            {
+              match_id: matchId,
+              user1_id: user.id,
+              user2_id: partnerId,
+              user_rating: userRating,
+              cafe_rating: cafeRating,
+              feedback_text: feedbackText.trim() || null,
+              created_at: new Date().toISOString(),
+            },
+          ])
+          .select();
+
+        insertData = newData;
+        insertError = newError;
+      }
 
       if (insertError) {
         console.error("Database insertion error:", insertError);
@@ -309,7 +335,41 @@ export default function FeedbackModal({
                       ? "Feedback Already Given"
                       : "How was your coffee chat?"}
                 </Text>
-                <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+                <TouchableOpacity onPress={async () => {
+                  try {
+                    // Submit empty feedback when user closes modal with X
+                    const { data: matchData, error: matchError } = await supabase
+                      .from("matching")
+                      .select("user1_id, user2_id")
+                      .eq("match_id", matchId)
+                      .single();
+
+                    if (matchError) throw matchError;
+
+                    const partnerId = matchData.user1_id === user.id ? matchData.user2_id : matchData.user1_id;
+
+                    await supabase.from("feedback").insert([
+                      {
+                        match_id: matchId,
+                        user1_id: user.id,
+                        user2_id: partnerId,
+                        user_rating: null,
+                        cafe_rating: null,
+                        feedback_text: null,
+                        created_at: new Date().toISOString(),
+                      },
+                    ]);
+
+                    onSubmitSuccess();
+                    onClose();
+                    resetForm();
+                  } catch (error) {
+                    console.error("Error submitting empty feedback:", error);
+                    // Even if there's an error, still close the modal
+                    onClose();
+                    resetForm();
+                  }
+                }} style={styles.closeButton}>
                   <Ionicons name="close" size={24} color={colors.text} />
                 </TouchableOpacity>
               </View>

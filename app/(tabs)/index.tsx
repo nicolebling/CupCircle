@@ -235,14 +235,15 @@ export default function CircleChatsScreen() {
     try {
       const { data: existingFeedback, error } = await supabase
         .from("feedback")
-        .select("match_id, user1_id")
+        .select("match_id, user1_id, user_rating, cafe_rating, feedback_text")
         .in("match_id", matchIds)
         .eq("user1_id", user.id);
 
       if (error) throw error;
 
+      // Only consider feedback as "given" if it has actual ratings (not NULL)
       const feedbackGivenSet = new Set(
-        existingFeedback?.map((f) => f.match_id) || [],
+        existingFeedback?.filter(f => f.user_rating !== null && f.cafe_rating !== null).map((f) => f.match_id) || [],
       );
       setFeedbackGiven(feedbackGivenSet);
     } catch (error) {
@@ -428,6 +429,14 @@ export default function CircleChatsScreen() {
                   return;
                 }
 
+                // Check if there's existing feedback with NULL values - if so, allow upsert
+                const { data: existingFeedback, error } = await supabase
+                  .from("feedback")
+                  .select("match_id, user_rating, cafe_rating")
+                  .eq("match_id", chat.match_id)
+                  .eq("user1_id", user.id)
+                  .single();
+
                 const partnerProfile = getPartnerProfile(chat);
                 setCurrentFeedbackMatch({
                   match_id: chat.match_id,
@@ -435,6 +444,7 @@ export default function CircleChatsScreen() {
                   coffeePlace: chat.meeting_location.split("|||")[0],
                   meeting_date: chat.meeting_date,
                   start_time: chat.start_time,
+                  isUpsert: existingFeedback && existingFeedback.user_rating === null && existingFeedback.cafe_rating === null,
                 });
                 setShowFeedbackModal(true);
               }}
