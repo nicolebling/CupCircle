@@ -77,6 +77,8 @@ export default function FeedbackModal({
         const hasGivenFeedback = data && data.length > 0;
 
 
+        setFeedbackAlreadyGiven(hasGivenFeedback);
+
         if (hasGivenFeedback) {
           Alert.alert(
             "Feedback Already Given",
@@ -88,10 +90,7 @@ export default function FeedbackModal({
               },
             ],
           );
-          return;
         }
-
-        setFeedbackAlreadyGiven(hasGivenFeedback);
       } catch (error) {
         console.error("❌ Error checking existing feedback:", error);
         // On error, allow the user to proceed (fail open)
