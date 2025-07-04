@@ -597,7 +597,7 @@ export default function CircleChatsScreen() {
       setTimeout(() => {
         setCurrentFeedbackMatch(remainingQueue[0]);
         setShowFeedbackModal(true);
-        feedbackService.markFeedbackRequested(remainingQueue[0].match_id);
+        
       }, 500);
     } else {
       setCurrentFeedbackMatch(null);
