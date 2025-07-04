@@ -56,13 +56,15 @@ export const feedbackService = {
         return [];
       }
 
-      // Check which matches already have feedback from this user
+      // Check which matches already have feedback from this user (with actual ratings, not NULL placeholders)
       const matchIds = eligibleMatches.map((match) => match.match_id);
       const { data: existingFeedback, error: feedbackError } = await supabase
         .from("feedback")
         .select("match_id")
         .in("match_id", matchIds)
-        .eq("user1_id", userId);
+        .eq("user1_id", userId)
+        .not("user_rating", "is", null)
+        .not("cafe_rating", "is", null);
 
       if (feedbackError) throw feedbackError;
 
@@ -106,63 +108,28 @@ export const feedbackService = {
     }
   },
 
-  // Mark feedback as requested to avoid showing multiple times
-  async markFeedbackRequested(matchId: string): Promise<void> {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        throw new Error("No authenticated user found");
-      }
+  
 
-      // Get the match details to find the partner
-      const { data: matchData, error: matchError } = await supabase
-        .from("matching")
-        .select("user1_id, user2_id")
-        .eq("match_id", matchId)
-        .single();
-
-      if (matchError) throw matchError;
-
-      // Determine the partner ID
-      const partnerId = matchData.user1_id === user.id ? matchData.user2_id : matchData.user1_id;
-
-      const { error } = await supabase.from("feedback").insert([
-        {
-          match_id: matchId,
-          user1_id: user.id, 
-          user2_id: partnerId,
-          created_at: new Date().toISOString(),
-        },
-      ]);
-
-      if (error) throw error;
-    } catch (error) {
-      console.error("Error marking feedback as requested:", error);
-    }
-  },
-
-  // Check if feedback was already requested for this match
+  // Check if feedback was already given for this match (with actual ratings)
   async isFeedbackAlreadyRequested(matchId: string): Promise<boolean> {
     try {
-
       const { data: { user } } = await supabase.auth.getUser();
 
       if (!user) {
-        return true; // No user, assume already requested
+        return true; // No user, assume already given
       }
 
-      
       const { data, error } = await supabase
         .from("feedback")
         .select("match_id")
         .eq("match_id", matchId)
         .eq("user1_id", user.id)
+        .not("user_rating", "is", null)
+        .not("cafe_rating", "is", null)
         .single();
 
-
       if (error && error.code === "PGRST116") {
-        // No rows returned, feedback not requested yet
+        // No rows returned, feedback not given yet
         return false;
       }
 
@@ -170,8 +137,8 @@ export const feedbackService = {
 
       return !!data;
     } catch (error) {
-      console.error("Error checking feedback request status:", error);
-      return true; // Assume already requested to avoid spam
+      console.error("Error checking feedback status:", error);
+      return true; // Assume already given to avoid spam
     }
   },
 

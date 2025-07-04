@@ -62,12 +62,14 @@ export default function FeedbackModal({
       try {
         setCheckingFeedback(true);
 
+        // Only check for existing feedback with actual ratings (not NULL placeholders)
         const { data, error } = await supabase
           .from("feedback")
           .select("*")
           .eq("match_id", matchId)
-          .eq("user1_id", user.id);
-
+          .eq("user1_id", user.id)
+          .not("user_rating", "is", null)
+          .not("cafe_rating", "is", null);
 
         if (error) {
           console.log("❌ Supabase error occurred:", error);
@@ -75,7 +77,7 @@ export default function FeedbackModal({
         }
 
         const hasGivenFeedback = data && data.length > 0;
-
+        console.log("✅ Feedback check result:", { hasGivenFeedback, recordCount: data?.length });
 
         setFeedbackAlreadyGiven(hasGivenFeedback);
       } catch (error) {

@@ -558,8 +558,6 @@ export default function CircleChatsScreen() {
           // Show feedback modal for the first match
           setCurrentFeedbackMatch(newMatches[0]);
           setShowFeedbackModal(true);
-          // Mark as requested to avoid showing again
-          await feedbackService.markFeedbackRequested(newMatches[0].match_id);
         }
       }
     } catch (error) {
@@ -584,7 +582,6 @@ export default function CircleChatsScreen() {
       setTimeout(() => {
         setCurrentFeedbackMatch(updatedQueue[0]);
         setShowFeedbackModal(true);
-        feedbackService.markFeedbackRequested(updatedQueue[0].match_id);
       }, 1000);
     } else {
       setCurrentFeedbackMatch(null);
