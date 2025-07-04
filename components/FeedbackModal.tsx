@@ -104,6 +104,24 @@ export default function FeedbackModal({
     setCafeRating(selectedRating);
   };
 
+  const incrementSuccessfulChat = async () => {
+    try {
+      // Increment successful_chat count for current user
+      const { error } = await supabase.rpc('increment_successful_chat', {
+        user_id: user.id
+      });
+
+      if (error) {
+        console.error("Error incrementing successful_chat:", error);
+        // Don't fail the whole operation if this fails
+      } else {
+        console.log("Successfully incremented successful_chat for user:", user.id);
+      }
+    } catch (error) {
+      console.error("Error incrementing successful_chat:", error);
+    }
+  };
+
   const handleSubmit = async () => {
     if (feedbackAlreadyGiven) {
       Alert.alert(
@@ -153,6 +171,7 @@ export default function FeedbackModal({
       });
 
       let insertData, insertError;
+      let shouldIncrementSuccessfulChat = false;
 
       if (isUpsert) {
         // Update existing NULL feedback record
@@ -183,6 +202,7 @@ export default function FeedbackModal({
 
         if (updateData && updateData.length > 0) {
           console.log("📝 Successfully updated record:", updateData[0]);
+           shouldIncrementSuccessfulChat = true; // This was a first-time feedback completion
         } else {
           console.log("⚠️ No records were updated - this might indicate the record doesn't exist or conditions weren't met");
         }
@@ -221,7 +241,10 @@ export default function FeedbackModal({
           insertError: newError,
           recordsInserted: newData?.length || 0
         });
-
+        
+        if (newData && newData.length > 0) {
+          shouldIncrementSuccessfulChat = true; // This is a first-time feedback submission
+        }
         insertData = newData;
         insertError = newError;
       }
@@ -244,6 +267,11 @@ export default function FeedbackModal({
       }
 
       console.log("Feedback submitted successfully:", insertData);
+
+      // Increment successful_chat count if this was a first-time feedback completion
+      if (shouldIncrementSuccessfulChat) {
+        await incrementSuccessfulChat();
+      }
 
       // Success - show confirmation and close modal
       Alert.alert(
@@ -383,7 +411,7 @@ export default function FeedbackModal({
 
                     const partnerId = matchData.user1_id === user.id ? matchData.user2_id : matchData.user1_id;
 
-                    await supabase.from("feedback").insert([
+                     const { data: insertData, error: insertError } = await supabase.from("feedback").insert([
                       {
                         match_id: matchId,
                         user1_id: user.id,
@@ -394,6 +422,11 @@ export default function FeedbackModal({
                         created_at: new Date().toISOString(),
                       },
                     ]);
+
+                    // Increment successful_chat count if feedback was inserted successfully
+                    if (!insertError && insertData) {
+                      await incrementSuccessfulChat();
+                    }
 
                     onSubmitSuccess();
                     onClose();
