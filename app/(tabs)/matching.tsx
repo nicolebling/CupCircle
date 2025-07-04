@@ -160,10 +160,16 @@ export default function MatchingScreen() {
 
   // Function to handle subscription button press
   const handleSubscribe = () => {
+    setShowSubscriptionCard(false);
     console.log("Triggering paywall from subscription card");
     Superwall.shared.register({
       placement: 'matching',
     });
+  };
+
+  // Function to close subscription card
+  const handleCloseSubscriptionCard = () => {
+    setShowSubscriptionCard(false);
   };
 
   // Define checkUserAvailability outside of useFocusEffect
@@ -172,45 +178,6 @@ export default function MatchingScreen() {
     setIsLoading(true);
 
     try {
-      // First check successful_chat count
-      const { data: profileData, error: profileError } = await supabase
-        .from("profiles")
-        .select("successful_chat")
-        .eq("id", user.id)
-        .single();
-
-      if (profileError) {
-        console.error("Error fetching successful_chat count:", profileError);
-      }
-
-      // If user has successful_chat = 1, still check availability but don't fetch profiles
-      if (profileData?.successful_chat === 1) {
-        // Still need to check if user has availability for proper UI state
-        const { data: availData, error: availError } = await supabase
-          .from("availability")
-          .select("*")
-          .eq("id", user.id);
-
-        if (!availError && availData && availData.length > 0) {
-          const now = new Date();
-          const futureAvailability = availData.filter((slot) => {
-            if (!slot.start_time) return false;
-            const slotDate = new Date(slot.date);
-            const [time, period] = slot.start_time.split(" ");
-            const [hours, minutes] = time.split(":");
-            let hour = parseInt(hours);
-            if (period === "PM" && hour !== 12) hour += 12;
-            if (period === "AM" && hour === 12) hour = 0;
-            slotDate.setHours(hour, parseInt(minutes), 0, 0);
-            return slotDate > now;
-          });
-          setHasAvailability(futureAvailability.length > 0);
-        }
-        
-        setIsLoading(false);
-        return;
-      }
-
       const { data, error } = await supabase
         .from("availability")
         .select("*")
@@ -782,10 +749,6 @@ export default function MatchingScreen() {
               <Text style={styles.refreshButtonText}>Adjust Filters</Text>
             </TouchableOpacity>
           </View>
-        </View>
-      ) : showSubscriptionCard ? (
-        <View style={[styles.cardsContainer, { justifyContent: "center" }]}>
-          <SubscriptionCard onSubscribe={handleSubscribe} />
         </View>
       ) : (
         <KeyboardAvoidingView
@@ -1410,7 +1373,12 @@ export default function MatchingScreen() {
         </View>
       </Modal>
 
-      
+      {/* Subscription Card */}
+      <SubscriptionCard
+        visible={showSubscriptionCard}
+        onSubscribe={handleSubscribe}
+        onClose={handleCloseSubscriptionCard}
+      />
 
       {/* Match Animation Modal */}
       {/* <Modal visible={matchAnimation} transparent={true} animationType="fade">
