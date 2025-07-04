@@ -5,59 +5,88 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
+  Modal,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
 type SubscriptionCardProps = {
+  visible: boolean;
   onSubscribe: () => void;
+  onClose: () => void;
 };
 
 export default function SubscriptionCard({
+  visible,
   onSubscribe,
+  onClose,
 }: SubscriptionCardProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
 
   return (
-    <View style={[styles.cardContainer, { backgroundColor: colors.card }]}>
-      <View style={styles.iconContainer}>
-        <Ionicons name="cafe" size={48} color={colors.primary} />
+    <Modal
+      visible={visible}
+      transparent={true}
+      animationType="fade"
+      onRequestClose={onClose}
+    >
+      <View style={styles.modalOverlay}>
+        <View style={[styles.cardContainer, { backgroundColor: colors.card }]}>
+          <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+            <Ionicons name="close" size={24} color={colors.secondaryText} />
+          </TouchableOpacity>
+
+          <View style={styles.iconContainer}>
+            <Ionicons name="cafe" size={48} color={colors.primary} />
+          </View>
+
+          <Text style={[styles.title, { color: colors.text }]}>
+            Great Start!
+          </Text>
+
+          <Text style={[styles.description, { color: colors.secondaryText }]}>
+            One chat down, endless connections to go! Choose your plan to brew more opportunities.
+          </Text>
+
+          <TouchableOpacity
+            style={[styles.subscribeButton, { backgroundColor: colors.primary }]}
+            onPress={onSubscribe}
+          >
+            <Text style={styles.subscribeButtonText}>Subscribe</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.laterButton} onPress={onClose}>
+            <Text style={[styles.laterButtonText, { color: colors.secondaryText }]}>
+              Maybe later
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
-
-      <Text style={[styles.title, { color: colors.text }]}>
-        Great Start!
-      </Text>
-
-      <Text style={[styles.description, { color: colors.secondaryText }]}>
-        One chat down, endless connections to go! Choose your plan to brew more opportunities.
-      </Text>
-
-      <TouchableOpacity
-        style={[styles.subscribeButton, { backgroundColor: colors.primary }]}
-        onPress={onSubscribe}
-      >
-        <Text style={styles.subscribeButtonText}>Subscribe</Text>
-      </TouchableOpacity>
-    </View>
+    </Modal>
   );
 }
 
 const styles = StyleSheet.create({
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
   cardContainer: {
-    width: '90%',
+    width: '100%',
     maxWidth: 340,
-    borderRadius: 16,
+    borderRadius: 20,
     padding: 24,
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-    borderWidth: 1,
-    borderColor: '#DFDFDF',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 20,
+    elevation: 8,
   },
   closeButton: {
     position: 'absolute',
