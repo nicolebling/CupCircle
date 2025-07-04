@@ -70,12 +70,15 @@ export default function SubscriptionCard({
 
 const styles = StyleSheet.create({
   modalOverlay: {
-    flex: 1,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 70, // Leave space for tab bar (70px height)
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    paddingBottom: 90, // Add space for tab bar (70px height + 20px padding)
   },
   cardContainer: {
     width: '100%',
