@@ -167,7 +167,7 @@ export default function FeedbackModal({
 
       if (insertError) {
         console.error("Database insertion error:", insertError);
-        
+
         if (insertError.code === "23505") {
           // PostgreSQL unique_violation - feedback already exists
           setFeedbackAlreadyGiven(true);
@@ -405,26 +405,8 @@ export default function FeedbackModal({
                   <View style={styles.buttonContainer}>
                     <TouchableOpacity
                       style={[
-                        styles.cancelButton,
-                        { borderColor: colors.border },
-                      ]}
-                      onPress={() => {
-                        onClose();
-                        resetForm();
-                      }}
-                    >
-                      <Text
-                        style={[
-                          styles.cancelButtonText,
-                          { color: colors.text },
-                        ]}
-                      >
-                        Skip
-                      </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={[
                         styles.submitButton,
+                        styles.fullWidthButton,
                         { backgroundColor: colors.primary },
                         (submitting || feedbackAlreadyGiven) &&
                           styles.disabledButton,
@@ -578,4 +560,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
     lineHeight: 24,
   },
+  fullWidthButton: {
+    flex: 1, // Make the submit button take the full width
+  }
 });
