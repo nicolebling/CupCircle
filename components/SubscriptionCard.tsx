@@ -46,17 +46,18 @@ export default function SubscriptionCard({
 
 const styles = StyleSheet.create({
   cardContainer: {
-    width: '100%',
+    width: '90%',
     maxWidth: 340,
-    borderRadius: 20,
+    borderRadius: 16,
     padding: 24,
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.15,
-    shadowRadius: 20,
-    elevation: 8,
-    alignSelf: 'center',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+    borderWidth: 1,
+    borderColor: '#DFDFDF',
   },
   closeButton: {
     position: 'absolute',

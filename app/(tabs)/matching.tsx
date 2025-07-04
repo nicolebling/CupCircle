@@ -229,6 +229,24 @@ export default function MatchingScreen() {
   const fetchProfiles = async () => {
     setIsLoading(true);
     try {
+      // Check if user has successful_chat = 1, if so, don't load profiles
+      const { data: profileData, error: profileError } = await supabase
+        .from("profiles")
+        .select("successful_chat")
+        .eq("id", user?.id)
+        .single();
+
+      if (profileError) {
+        console.error("Error fetching user profile:", profileError);
+      }
+
+      if (profileData?.successful_chat === 1) {
+        // Don't fetch profiles, just set loading to false and return
+        setProfiles([]);
+        setIsLoading(false);
+        return;
+      }
+
       //console.log("Fetching profiles for users with availability");
 
       // Fetch all active and past meetings with the current user
@@ -749,6 +767,10 @@ export default function MatchingScreen() {
               <Text style={styles.refreshButtonText}>Adjust Filters</Text>
             </TouchableOpacity>
           </View>
+        </View>
+      ) : showSubscriptionCard ? (
+        <View style={[styles.cardsContainer, { justifyContent: "center" }]}>
+          <SubscriptionCard onSubscribe={handleSubscribe} />
         </View>
       ) : (
         <KeyboardAvoidingView
@@ -1373,8 +1395,12 @@ export default function MatchingScreen() {
         </View>
       </Modal>
 
-      {/* Subscription Card */}
-      <SubscriptionCard onSubscribe={handleSubscribe} />
+      {/* Subscription Card - Show when successful_chat = 1 */}
+      {showSubscriptionCard && (
+        <View style={[styles.cardsContainer, { justifyContent: "center" }]}>
+          <SubscriptionCard onSubscribe={handleSubscribe} />
+        </View>
+      )}
 
       {/* Match Animation Modal */}
       {/* <Modal visible={matchAnimation} transparent={true} animationType="fade">
