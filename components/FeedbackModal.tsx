@@ -78,19 +78,6 @@ export default function FeedbackModal({
 
 
         setFeedbackAlreadyGiven(hasGivenFeedback);
-
-        if (hasGivenFeedback) {
-          Alert.alert(
-            "Feedback Already Given",
-            "You have already provided feedback for this meeting.",
-            [
-              {
-                text: "OK",
-                onPress: () => onClose(),
-              },
-            ],
-          );
-        }
       } catch (error) {
         console.error("❌ Error checking existing feedback:", error);
         // On error, allow the user to proceed (fail open)
