@@ -411,20 +411,38 @@ export default function FeedbackModal({
 
                     const partnerId = matchData.user1_id === user.id ? matchData.user2_id : matchData.user1_id;
 
-                     const { data: insertData, error: insertError } = await supabase.from("feedback").insert([
-                      {
-                        match_id: matchId,
-                        user1_id: user.id,
-                        user2_id: partnerId,
-                        user_rating: null,
-                        cafe_rating: null,
-                        feedback_text: null,
-                        created_at: new Date().toISOString(),
-                      },
-                    ]);
+                    // Check if feedback record already exists
+                    const { data: existingFeedback, error: checkError } = await supabase
+                      .from("feedback")
+                      .select("match_id, user_rating, cafe_rating")
+                      .eq("match_id", matchId)
+                      .eq("user1_id", user.id)
+                      .single();
 
-                    // Increment successful_chat count if feedback was inserted successfully
-                    if (!insertError && insertData) {
+                    let shouldIncrementChat = false;
+
+                    if (checkError && checkError.code === 'PGRST116') {
+                      // No existing record, create new NULL record - this is first time
+                      const { data: insertData, error: insertError } = await supabase.from("feedback").insert([
+                        {
+                          match_id: matchId,
+                          user1_id: user.id,
+                          user2_id: partnerId,
+                          user_rating: null,
+                          cafe_rating: null,
+                          feedback_text: null,
+                          created_at: new Date().toISOString(),
+                        },
+                      ]);
+
+                      if (!insertError && insertData) {
+                        shouldIncrementChat = true;
+                      }
+                    }
+                    // If record exists, don't increment (user already interacted before)
+
+                    // Increment successful_chat count if this was first-time interaction
+                    if (shouldIncrementChat) {
                       await incrementSuccessfulChat();
                     }
 
