@@ -1037,7 +1037,6 @@ export default function MatchingScreen() {
                                 );
                               },
                             )}
-                          </                               )}
                           </View>
                         </View>
                       )}
