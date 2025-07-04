@@ -152,13 +152,6 @@ export default function FeedbackModal({
 
       if (existingFeedback && existingFeedback.length > 0) {
         setFeedbackAlreadyGiven(true);
-        console.log("123", setFeedbackAlreadyGiven);
-        Alert.alert(
-          "Feedback Already Given",
-          "You have already provided feedback for this meeting.",
-          [{ text: "OK", onPress: () => onClose() }],
-        );
-        // setFeedbackAlreadyGiven(true);
         return;
       }
 
