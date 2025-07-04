@@ -33,7 +33,6 @@ import IndustrySelector from "@/components/IndustrySelector";
 import ExperienceLevelSelector from "@/components/ExperienceLevelSelector";
 import InterestSelector from "@/components/InterestSelector";
 import LogoAnimation from "@/components/LogoAnimation";
-import Superwall from "expo-superwall/compat";
 
 // Define the profile type for better type checking
 interface Profile {
@@ -131,33 +130,6 @@ export default function MatchingScreen() {
     cardRotate.value = 0;
   }, [currentIndex]);
 
-  // Function to check successful_chat count and trigger paywall
-  const checkAndTriggerPaywall = useCallback(async () => {
-    if (!user?.id) return;
-
-    try {
-      const { data: profileData, error } = await supabase
-        .from("profiles")
-        .select("successful_chat")
-        .eq("id", user.id)
-        .single();
-
-      if (error) {
-        console.error("Error fetching successful_chat count:", error);
-        return;
-      }
-
-      if (profileData?.successful_chat === 1) {
-        console.log("Triggering paywall for successful_chat = 1");
-        Superwall.shared.register({
-          placement: 'matching',
-        });
-      }
-    } catch (error) {
-      console.error("Error checking successful_chat count:", error);
-    }
-  }, [user?.id]);
-
   // Define checkUserAvailability outside of useFocusEffect
   const checkUserAvailability = useCallback(async () => {
     if (!user) return;
@@ -208,8 +180,7 @@ export default function MatchingScreen() {
   useFocusEffect(
     useCallback(() => {
       checkUserAvailability();
-      checkAndTriggerPaywall();
-    }, [checkUserAvailability, checkAndTriggerPaywall]),
+    }, [checkUserAvailability]),
   );
 
   const fetchProfiles = async () => {
