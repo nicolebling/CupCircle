@@ -302,13 +302,10 @@ export default function FeedbackModal({
                   <LoadingLogoAnimation />
                 </View>
               )}
-              <Text style={styles.actionButtonText}>
-                {feedbackAlreadyGiven && !checkingFeedback
-                  ? "Already submitted feedback for this coffee chat."
-                  : "Give Feedback"}
-              </Text>
 
               {!checkingFeedback && !feedbackAlreadyGiven && (
+                <>
+                  <Text style={styles.actionButtonText}>Give Feedback</Text>
                 <>
                   <Text
                     style={[
@@ -426,6 +423,7 @@ export default function FeedbackModal({
                   </View>
                 </>
               )}
+            </ScrollView>
             </ScrollView>
           </View>
         </KeyboardAvoidingView>
