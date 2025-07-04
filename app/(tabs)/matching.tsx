@@ -761,31 +761,30 @@ export default function MatchingScreen() {
             </TouchableOpacity>
           </View>
         </View>
+      ) : showSubscriptionCard ? (
+        <View style={[styles.cardsContainer, { justifyContent: "center" }]}>
+          <SubscriptionCard onSubscribe={handleSubscribe} />
+        </View>
       ) : (
-        {showSubscriptionCard ? (
-          <View style={[styles.cardsContainer, { justifyContent: "center" }]}>
-            <SubscriptionCard onSubscribe={handleSubscribe} />
-          </View>
-        ) : (
-          <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-            keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
-            style={{ flex: 1 }}
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
+          style={{ flex: 1 }}
+        >
+          <ScrollView
+            ref={scrollViewRef}
+            style={{ flex: 1, width: "100%", padding: 16 }}
+            contentContainerStyle={{
+              flexGrow: 1,
+              paddingBottom: 120, // Extra padding for keyboard space
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
           >
-            <ScrollView
-              ref={scrollViewRef}
-              style={{ flex: 1, width: "100%", padding: 16 }}
-              contentContainerStyle={{
-                flexGrow: 1,
-                paddingBottom: 120, // Extra padding for keyboard space
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-              keyboardShouldPersistTaps="handled"
-              showsVerticalScrollIndicator={false}
-            >
-              <View style={[styles.cardsContainer, { width: "100%" }]}>
-                {isLoading ? (
+            <View style={[styles.cardsContainer, { width: "100%" }]}>
+              {isLoading ? (
                 <View style={styles.loadingContainer}>
                   <LogoAnimation size={120} />
                   {/* <Text style={[styles.loadingText, { color: colors.text }]}>
@@ -1231,9 +1230,9 @@ export default function MatchingScreen() {
                 </View>
               )}
             </View>
-            </ScrollView>
-          </KeyboardAvoidingView>
-        )}
+          </ScrollView>
+        </KeyboardAvoidingView>
+      )}
 
       {/* Filter Modal */}
       <Modal
