@@ -438,13 +438,14 @@ export default function CircleChatsScreen() {
                   .single();
 
                 const partnerProfile = getPartnerProfile(chat);
+                const isUpsert = existingFeedback && existingFeedback.user_rating === null && existingFeedback.cafe_rating === null;
                 setCurrentFeedbackMatch({
                   match_id: chat.match_id,
                   partner_name: partnerProfile.name || "Unknown",
                   coffeePlace: chat.meeting_location.split("|||")[0],
                   meeting_date: chat.meeting_date,
                   start_time: chat.start_time,
-                  isUpsert: existingFeedback && existingFeedback.user_rating === null && existingFeedback.cafe_rating === null,
+                  isUpsert: isUpsert,
                 });
                 setShowFeedbackModal(true);
               }}
