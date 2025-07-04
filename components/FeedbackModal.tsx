@@ -162,10 +162,11 @@ export default function FeedbackModal({
             user_rating: userRating,
             cafe_rating: cafeRating,
             feedback_text: feedbackText.trim() || null,
-            created_at: new Date().toISOString(),
           })
           .eq("match_id", matchId)
           .eq("user1_id", user.id)
+          .is("user_rating", null)
+          .is("cafe_rating", null)
           .select();
 
         insertData = updateData;
