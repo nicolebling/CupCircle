@@ -428,28 +428,6 @@ export default function CircleChatsScreen() {
                   return;
                 }
 
-                // Check database one more time to be sure
-                const { data: existingFeedback, error } = await supabase
-                  .from("feedback")
-                  .select("feedback_id")
-                  .eq("match_id", chat.match_id)
-                  .eq("user1_id", user.id);
-
-                if (error) {
-                  console.error("Error checking feedback:", error);
-                  Alert.alert(
-                    "Error",
-                    "There was an error checking feedback status.",
-                  );
-                  return;
-                }
-
-                if (existingFeedback && existingFeedback.length > 0) {
-                  // Update local state to reflect that feedback was given
-                  setFeedbackGiven(prev => new Set([...prev, chat.match_id]));
-                  return;
-                }
-
                 const partnerProfile = getPartnerProfile(chat);
                 setCurrentFeedbackMatch({
                   match_id: chat.match_id,
