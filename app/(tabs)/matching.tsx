@@ -789,46 +789,48 @@ export default function MatchingScreen() {
             <View style={[styles.cardsContainer, { width: "100%" }]}>
               {showSubscriptionCard ? (
                 <SubscriptionCard onSubscribe={handleSubscribe} />
-              ) : isLoading ? (
-                <View style={styles.loadingContainer}>
-                  <LogoAnimation size={120} />
-                  {/* <Text style={[styles.loadingText, { color: colors.text }]}>
-                    Brewing your circle......
-                  </Text> */}
-                </View>
-              ) : !hasAvailability ? (
-                renderNoAvailabilityMessage()
-              ) : profiles.length === 0 ? (
-                <View
-                  style={[
-                    styles.noMoreCard,
-                    { backgroundColor: colors.card, borderColor: colors.border },
-                  ]}
-                >
-                  <Ionicons name="people" size={48} color={colors.primary} />
-                  <Text style={[styles.noMoreText, { color: colors.text }]}>
-                    No matches available
-                  </Text>
-                  <Text
-                    style={[
-                      styles.checkBackText,
-                      { color: colors.secondaryText },
-                    ]}
-                  >
-                    A quiet week on the circle. Check back as new coffee times
-                    fill in!
-                  </Text>
-                  <TouchableOpacity
-                    style={[
-                      styles.refreshButton,
-                      { backgroundColor: colors.primary },
-                    ]}
-                    onPress={openFilterModal}
-                  >
-                    <Text style={styles.refreshButtonText}>Adjust Filters</Text>
-                  </TouchableOpacity>
-                </View>
-              ) : currentIndex < profiles.length ? (
+              ) : (
+                <>
+                  {isLoading ? (
+                    <View style={styles.loadingContainer}>
+                      <LogoAnimation size={120} />
+                      {/* <Text style={[styles.loadingText, { color: colors.text }]}>
+                        Brewing your circle......
+                      </Text> */}
+                    </View>
+                  ) : !hasAvailability ? (
+                    renderNoAvailabilityMessage()
+                  ) : profiles.length === 0 ? (
+                    <View
+                      style={[
+                        styles.noMoreCard,
+                        { backgroundColor: colors.card, borderColor: colors.border },
+                      ]}
+                    >
+                      <Ionicons name="people" size={48} color={colors.primary} />
+                      <Text style={[styles.noMoreText, { color: colors.text }]}>
+                        No matches available
+                      </Text>
+                      <Text
+                        style={[
+                          styles.checkBackText,
+                          { color: colors.secondaryText },
+                        ]}
+                      >
+                        A quiet week on the circle. Check back as new coffee times
+                        fill in!
+                      </Text>
+                      <TouchableOpacity
+                        style={[
+                          styles.refreshButton,
+                          { backgroundColor: colors.primary },
+                        ]}
+                        onPress={openFilterModal}
+                      >
+                        <Text style={styles.refreshButtonText}>Adjust Filters</Text>
+                      </TouchableOpacity>
+                    </View>
+                  ) : currentIndex < profiles.length ? (
                 <>
                   <Animated.View
                     style={[styles.animatedCardContainer, cardAnimatedStyle]}
@@ -1191,7 +1193,7 @@ export default function MatchingScreen() {
                     </TouchableOpacity>
                   </View>
                 </>
-              ) : (
+               : (
                 <View
                   style={[
                     styles.noMoreCard,
@@ -1233,6 +1235,8 @@ export default function MatchingScreen() {
                     </Text>
                   </TouchableOpacity>
                 </View>
+              )}
+                </>
               )}
             </View>
           </ScrollView>
