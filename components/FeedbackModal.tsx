@@ -202,7 +202,8 @@ export default function FeedbackModal({
 
         if (updateData && updateData.length > 0) {
           console.log("📝 Successfully updated record:", updateData[0]);
-           shouldIncrementSuccessfulChat = true; // This was a first-time feedback completion
+          // Do NOT increment successful_chat in upsert mode - it was already incremented when NULL record was created
+          shouldIncrementSuccessfulChat = false;
         } else {
           console.log("⚠️ No records were updated - this might indicate the record doesn't exist or conditions weren't met");
         }
