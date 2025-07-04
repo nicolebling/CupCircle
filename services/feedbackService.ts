@@ -145,11 +145,21 @@ export const feedbackService = {
   // Check if feedback was already requested for this match
   async isFeedbackAlreadyRequested(matchId: string): Promise<boolean> {
     try {
+
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) {
+        return true; // No user, assume already requested
+      }
+
+      
       const { data, error } = await supabase
         .from("feedback")
         .select("match_id")
         .eq("match_id", matchId)
+        .eq("user1_id", user.id)
         .single();
+
 
       if (error && error.code === "PGRST116") {
         // No rows returned, feedback not requested yet
