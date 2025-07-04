@@ -75,6 +75,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
+    paddingBottom: 90, // Add space for tab bar (70px height + 20px padding)
   },
   cardContainer: {
     width: '100%',
