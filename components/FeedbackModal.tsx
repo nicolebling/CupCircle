@@ -133,28 +133,6 @@ export default function FeedbackModal({
     try {
       setSubmitting(true);
 
-      // Final check if feedback already exists before submitting
-      const { data: existingFeedback, error: checkError } = await supabase
-        .from("feedback")
-        .select("feedback_id")
-        .eq("match_id", matchId)
-        .eq("user1_id", user.id)
-        .limit(1);
-
-      if (checkError) {
-        console.error("Error checking existing feedback:", checkError);
-        Alert.alert(
-          "Error",
-          "Failed to verify feedback status. Please try again.",
-        );
-        return;
-      }
-
-      if (existingFeedback && existingFeedback.length > 0) {
-        setFeedbackAlreadyGiven(true);
-        return;
-      }
-
       // Get the match details to find the partner
       const { data: matchData, error: matchError } = await supabase
         .from("matching")
