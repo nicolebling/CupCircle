@@ -339,7 +339,7 @@ export default function FeedbackModal({
               )}
               <Text style={styles.actionButtonText}>
                 {feedbackAlreadyGiven && !checkingFeedback
-                  ? "Feedback Given"
+                  ? "You have already submitted feedback for this coffee chat."
                   : "Give Feedback"}
               </Text>
 
@@ -509,8 +509,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   actionButtonText: {
-    color: "#FFFFFF",
-    fontFamily: "K2D-Medium",
+    fontFamily: "K2D-Regular",
     fontSize: 14,
   },
   ratingSection: {
