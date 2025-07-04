@@ -1037,6 +1037,7 @@ export default function MatchingScreen() {
                                 );
                               },
                             )}
+                          </                               )}
                           </View>
                         </View>
                       )}
@@ -1374,11 +1375,7 @@ export default function MatchingScreen() {
       </Modal>
 
       {/* Subscription Card */}
-      <SubscriptionCard
-        visible={showSubscriptionCard}
-        onSubscribe={handleSubscribe}
-        onClose={handleCloseSubscriptionCard}
-      />
+      <SubscriptionCard onSubscribe={handleSubscribe} />
 
       {/* Match Animation Modal */}
       {/* <Modal visible={matchAnimation} transparent={true} animationType="fade">

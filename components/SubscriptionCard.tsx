@@ -5,81 +5,46 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Modal,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
 type SubscriptionCardProps = {
-  visible: boolean;
   onSubscribe: () => void;
-  onClose: () => void;
 };
 
 export default function SubscriptionCard({
-  visible,
   onSubscribe,
-  onClose,
 }: SubscriptionCardProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
 
   return (
-    <Modal
-      visible={visible}
-      transparent={true}
-      animationType="fade"
-      onRequestClose={onClose}
-    >
-      <View style={styles.modalOverlay}>
-        <View style={[styles.cardContainer, { backgroundColor: colors.card }]}>
-          {/* <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-            <Ionicons name="close" size={24} color={colors.secondaryText} />
-          </TouchableOpacity> */}
-
-          <View style={styles.iconContainer}>
-            <Ionicons name="cafe" size={48} color={colors.primary} />
-          </View>
-
-          <Text style={[styles.title, { color: colors.text }]}>
-            Great Start!
-          </Text>
-
-          <Text style={[styles.description, { color: colors.secondaryText }]}>
-            One chat down, endless connections to go! Choose your plan to brew more opportunities.
-          </Text>
-
-          <TouchableOpacity
-            style={[styles.subscribeButton, { backgroundColor: colors.primary }]}
-            onPress={onSubscribe}
-          >
-            <Text style={styles.subscribeButtonText}>Subscribe</Text>
-          </TouchableOpacity>
-
-          {/* <TouchableOpacity style={styles.laterButton} onPress={onClose}>
-            <Text style={[styles.laterButtonText, { color: colors.secondaryText }]}>
-              Maybe later
-            </Text>
-          </TouchableOpacity> */}
-        </View>
+    <View style={[styles.cardContainer, { backgroundColor: colors.card }]}>
+      <View style={styles.iconContainer}>
+        <Ionicons name="cafe" size={48} color={colors.primary} />
       </View>
-    </Modal>
+
+      <Text style={[styles.title, { color: colors.text }]}>
+        Great Start!
+      </Text>
+
+      <Text style={[styles.description, { color: colors.secondaryText }]}>
+        One chat down, endless connections to go! Choose your plan to brew more opportunities.
+      </Text>
+
+      <TouchableOpacity
+        style={[styles.subscribeButton, { backgroundColor: colors.primary }]}
+        onPress={onSubscribe}
+      >
+        <Text style={styles.subscribeButtonText}>Subscribe</Text>
+      </TouchableOpacity>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  modalOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 70, // Leave space for tab bar (70px height)
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
   cardContainer: {
     width: '100%',
     maxWidth: 340,
@@ -91,6 +56,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.15,
     shadowRadius: 20,
     elevation: 8,
+    alignSelf: 'center',
   },
   closeButton: {
     position: 'absolute',
