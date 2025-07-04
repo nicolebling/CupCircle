@@ -749,6 +749,7 @@ export default function CircleChatsScreen() {
           partnerName={currentFeedbackMatch.partner_name}
           coffeePlace={currentFeedbackMatch.coffeePlace}
           onSubmitSuccess={handleFeedbackSubmitSuccess}
+          isUpsert={currentFeedbackMatch.isUpsert}
         />
       )}
     </ScrollView>

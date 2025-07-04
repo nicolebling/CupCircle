@@ -6,6 +6,7 @@ export interface FeedbackEligibleMatch {
   meeting_date: string;
   start_time: string;
   coffeePlace: string;
+  isUpsert?: boolean;
 }
 
 export const feedbackService = {
