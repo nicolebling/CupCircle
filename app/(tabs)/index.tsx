@@ -447,6 +447,10 @@ export default function CircleChatsScreen() {
                 if (existingFeedback && existingFeedback.length > 0) {
                   // Update local state to reflect that feedback was given
                   setFeedbackGiven(prev => new Set([...prev, chat.match_id]));
+                  Alert.alert(
+                    "Feedback Already Given",
+                    "You have already submitted feedback for this coffee chat.",
+                  );
                   return;
                 }
 
