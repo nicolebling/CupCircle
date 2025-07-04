@@ -800,7 +800,7 @@ export default function MatchingScreen() {
                 </View>
               ) : !hasAvailability ? (
                 renderNoAvailabilityMessage()
-              ) : profiles.length === 0 ? (
+              ) : profiles.length === 0 && !showSubscriptionCard ? (
                 <View
                   style={[
                     styles.noMoreCard,
