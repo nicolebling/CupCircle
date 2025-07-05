@@ -162,34 +162,8 @@ export default function MatchingScreen() {
   const handleSubscribe = () => {
     setShowSubscriptionCard(false);
     console.log("Triggering paywall from subscription card");
-    
-    // Set up event listeners for paywall events
-    const paywallCloseListener = () => {
-      console.log("Paywall closed without subscription, showing subscription card again");
-      setShowSubscriptionCard(true);
-    };
-
-    const paywallPurchaseListener = () => {
-      console.log("User successfully subscribed!");
-      // Keep subscription card hidden after successful purchase
-      setShowSubscriptionCard(false);
-    };
-
-    // Add event listeners (if supported by Superwall)
-    Superwall.shared.addEventListener?.('paywallClose', paywallCloseListener);
-    Superwall.shared.addEventListener?.('paywallPurchase', paywallPurchaseListener);
-
     Superwall.shared.register({
       placement: 'matching',
-      feature: () => {
-        // This feature callback runs when user successfully subscribes
-        console.log("User successfully subscribed from feature callback!");
-        setShowSubscriptionCard(false);
-        
-        // Clean up event listeners
-        Superwall.shared.removeEventListener?.('paywallClose', paywallCloseListener);
-        Superwall.shared.removeEventListener?.('paywallPurchase', paywallPurchaseListener);
-      }
     });
   };
 

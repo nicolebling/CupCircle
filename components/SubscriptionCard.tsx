@@ -21,9 +21,8 @@ export default function SubscriptionCard({
   const colors = Colors[colorScheme];
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
-        <View style={styles.content}>
+    <View style={[styles.container, { backgroundColor: colors.card, borderColor: colors.border }]}>
+      <View style={styles.content}>
         <View style={styles.iconContainer}>
           <Ionicons name="cafe" size={64} color={colors.primary} />
         </View>
@@ -46,7 +45,6 @@ export default function SubscriptionCard({
         <Text style={[styles.footerText, { color: colors.secondaryText }]}>
           Continue exploring profiles and connecting
         </Text>
-        </View>
       </View>
     </View>
   );
@@ -62,22 +60,13 @@ const styles = StyleSheet.create({
     zIndex: 1000,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
-  },
-  card: {
-    width: '100%',
-    maxWidth: 340,
-    borderRadius: 24,
     borderWidth: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
   },
   content: {
+    width: '90%',
+    maxWidth: 340,
     alignItems: 'center',
-    padding: 32,
+    paddingHorizontal: 32,
   },
   iconContainer: {
     width: 100,
