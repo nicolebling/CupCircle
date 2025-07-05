@@ -1371,7 +1371,12 @@ export default function MatchingScreen() {
           </View>
         </View>
       </Modal>
-        </>
+
+      {/* Subscription Card */}
+      {showSubscriptionCard && (
+        <SubscriptionCard
+          onSubscribe={handleSubscribe}
+        />
       )}
 
       {/* Match Animation Modal */}
