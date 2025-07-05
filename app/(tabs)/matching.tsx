@@ -1372,7 +1372,7 @@ export default function MatchingScreen() {
         </View>
       </Modal>
 
-      {/* Subscription Card */}
+      {/* Subscription Card - Full Screen Overlay */}
       {showSubscriptionCard && (
         <SubscriptionCard
           onSubscribe={handleSubscribe}
