@@ -1039,8 +1039,7 @@ export default function MatchingScreen() {
                             )}
                           </View>
                         </View>
-                      )}
-                    {profiles[currentIndex].availabilitySlots &&
+                      )}{profiles[currentIndex].availabilitySlots &&
                       profiles[currentIndex].availabilitySlots.length > 0 && (
                         <View
                           style={[
@@ -1372,13 +1371,8 @@ export default function MatchingScreen() {
           </View>
         </View>
       </Modal>
-
-      {/* Subscription Card */}
-      <SubscriptionCard
-        visible={showSubscriptionCard}
-        onSubscribe={handleSubscribe}
-        onClose={handleCloseSubscriptionCard}
-      />
+        </>
+      )}
 
       {/* Match Animation Modal */}
       {/* <Modal visible={matchAnimation} transparent={true} animationType="fade">

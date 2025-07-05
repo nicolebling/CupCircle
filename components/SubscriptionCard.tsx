@@ -5,136 +5,110 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Modal,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
 type SubscriptionCardProps = {
-  visible: boolean;
   onSubscribe: () => void;
-  onClose: () => void;
 };
 
 export default function SubscriptionCard({
-  visible,
   onSubscribe,
-  onClose,
 }: SubscriptionCardProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
 
   return (
-    <Modal
-      visible={visible}
-      transparent={true}
-      animationType="fade"
-      onRequestClose={onClose}
-    >
-      <View style={styles.modalOverlay}>
-        <View style={[styles.cardContainer, { backgroundColor: colors.card }]}>
-          <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-            <Ionicons name="close" size={24} color={colors.secondaryText} />
-          </TouchableOpacity>
-
-          <View style={styles.iconContainer}>
-            <Ionicons name="cafe" size={48} color={colors.primary} />
-          </View>
-
-          <Text style={[styles.title, { color: colors.text }]}>
-            Great Start!
-          </Text>
-
-          <Text style={[styles.description, { color: colors.secondaryText }]}>
-            One chat down, endless connections to go! Choose your plan to brew more opportunities.
-          </Text>
-
-          <TouchableOpacity
-            style={[styles.subscribeButton, { backgroundColor: colors.primary }]}
-            onPress={onSubscribe}
-          >
-            <Text style={styles.subscribeButtonText}>Subscribe</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.laterButton} onPress={onClose}>
-            <Text style={[styles.laterButtonText, { color: colors.secondaryText }]}>
-              Maybe later
-            </Text>
-          </TouchableOpacity>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={[styles.cardContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
+        <View style={styles.iconContainer}>
+          <Ionicons name="cafe" size={64} color={colors.primary} />
         </View>
+
+        <Text style={[styles.title, { color: colors.text }]}>
+          Great Start!
+        </Text>
+
+        <Text style={[styles.description, { color: colors.secondaryText }]}>
+          One chat down, endless connections to go! Choose your plan to brew more opportunities.
+        </Text>
+
+        <TouchableOpacity
+          style={[styles.subscribeButton, { backgroundColor: colors.primary }]}
+          onPress={onSubscribe}
+        >
+          <Text style={styles.subscribeButtonText}>Subscribe Now</Text>
+        </TouchableOpacity>
+
+        <Text style={[styles.footerText, { color: colors.secondaryText }]}>
+          Continue exploring profiles and connecting with professionals
+        </Text>
       </View>
-    </Modal>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  modalOverlay: {
+  container: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: 16,
   },
   cardContainer: {
     width: '100%',
     maxWidth: 340,
-    borderRadius: 20,
-    padding: 24,
+    borderRadius: 16,
+    borderWidth: 1,
+    padding: 32,
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.15,
-    shadowRadius: 20,
-    elevation: 8,
-  },
-  closeButton: {
-    position: 'absolute',
-    top: 16,
-    right: 16,
-    padding: 4,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
   },
   iconContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
     backgroundColor: 'rgba(249, 116, 21, 0.1)',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 24,
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontFamily: 'K2D-Bold',
     textAlign: 'center',
-    marginBottom: 12,
+    marginBottom: 16,
   },
   description: {
-    fontSize: 16,
+    fontSize: 18,
     fontFamily: 'K2D-Regular',
     textAlign: 'center',
-    lineHeight: 24,
-    marginBottom: 28,
+    lineHeight: 26,
+    marginBottom: 32,
   },
   subscribeButton: {
     width: '100%',
-    height: 50,
-    borderRadius: 25,
+    height: 56,
+    borderRadius: 28,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 16,
   },
   subscribeButtonText: {
     color: 'white',
-    fontSize: 16,
+    fontSize: 18,
     fontFamily: 'K2D-SemiBold',
   },
-  laterButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-  },
-  laterButtonText: {
+  footerText: {
     fontSize: 14,
-    fontFamily: 'K2D-Medium',
+    fontFamily: 'K2D-Regular',
+    textAlign: 'center',
+    lineHeight: 20,
   },
 });
