@@ -19,45 +19,70 @@ export const notificationService = {
   async registerForPushNotificationsAsync(): Promise<string | null> {
     let token;
 
+    console.log('📱 Device check:', { 
+      isDevice: Device.isDevice, 
+      platform: Platform.OS,
+      deviceName: Device.deviceName 
+    });
+
     if (Platform.OS === 'android') {
+      console.log('🤖 Setting up Android notification channel...');
       await Notifications.setNotificationChannelAsync('default', {
         name: 'default',
         importance: Notifications.AndroidImportance.MAX,
         vibrationPattern: [0, 250, 250, 250],
         lightColor: '#FF231F7C',
       });
+      console.log('✅ Android notification channel configured');
     }
 
     if (Device.isDevice) {
+      console.log('🔍 Checking notification permissions...');
       const { status: existingStatus } = await Notifications.getPermissionsAsync();
+      console.log('📋 Existing permission status:', existingStatus);
+      
       let finalStatus = existingStatus;
       
       if (existingStatus !== 'granted') {
+        console.log('🙋 Requesting notification permissions...');
         const { status } = await Notifications.requestPermissionsAsync();
         finalStatus = status;
+        console.log('📝 Permission request result:', status);
       }
       
       if (finalStatus !== 'granted') {
+        console.log('❌ Notification permissions denied:', finalStatus);
         alert('Failed to get push token for push notification!');
         return null;
       }
       
+      console.log('✅ Notification permissions granted');
+      
       try {
         const projectId = Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId;
+        console.log('🆔 Project ID check:', { projectId, hasProjectId: !!projectId });
+        
         if (!projectId) {
+          console.log('❌ No project ID found in Constants');
           throw new Error('Project ID not found');
         }
         
-        token = (await Notifications.getExpoPushTokenAsync({
+        console.log('🎫 Generating Expo push token...');
+        const tokenResult = await Notifications.getExpoPushTokenAsync({
           projectId,
-        })).data;
+        });
+        token = tokenResult.data;
         
-        console.log('Push token:', token);
+        console.log('🎯 Push token generated successfully:', { 
+          token: token?.substring(0, 20) + '...', 
+          fullLength: token?.length 
+        });
       } catch (e) {
-        console.error('Error getting push token:', e);
+        console.error('❌ Error getting push token:', e);
         return null;
       }
     } else {
+      console.log('❌ Not a physical device - push notifications unavailable');
       alert('Must use physical device for Push Notifications');
       return null;
     }
@@ -68,15 +93,39 @@ export const notificationService = {
   // Save push token to user profile
   async savePushToken(userId: string, token: string) {
     try {
-      const { error } = await supabase
+      console.log('💾 Saving push token to database:', { 
+        userId, 
+        tokenPreview: token?.substring(0, 20) + '...',
+        tokenLength: token?.length 
+      });
+
+      const { data, error } = await supabase
         .from('profiles')
         .update({ push_token: token })
-        .eq('id', userId);
+        .eq('id', userId)
+        .select('id, push_token');
 
-      if (error) throw error;
-      console.log('Push token saved successfully');
+      if (error) {
+        console.log('❌ Database error saving push token:', error);
+        throw error;
+      }
+
+      console.log('✅ Push token saved successfully:', { 
+        updatedData: data,
+        recordsUpdated: data?.length || 0 
+      });
+
+      // Verify the token was actually saved
+      if (data && data.length > 0) {
+        console.log('🔍 Verification - Token saved in DB:', { 
+          savedToken: data[0].push_token?.substring(0, 20) + '...',
+          tokensMatch: data[0].push_token === token 
+        });
+      } else {
+        console.log('⚠️ Warning: No records were updated - user profile may not exist');
+      }
     } catch (error) {
-      console.error('Error saving push token:', error);
+      console.error('❌ Error saving push token:', error);
     }
   },
 

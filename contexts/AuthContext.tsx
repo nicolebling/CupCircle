@@ -155,12 +155,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
         // Register for push notifications
         try {
+          console.log('🔔 Starting push notification registration for user:', data.user.id);
           const token = await notificationService.registerForPushNotificationsAsync();
+          console.log('🎯 Push token registration result:', { token, hasToken: !!token });
+          
           if (token) {
+            console.log('💾 Attempting to save push token to database...');
             await notificationService.savePushToken(data.user.id, token);
+            console.log('✅ Push token save operation completed');
+          } else {
+            console.log('❌ No push token received - skipping save operation');
           }
         } catch (error) {
-          console.error("Failed to register for push notifications:", error);
+          console.error("❌ Failed to register for push notifications:", error);
         }
 
         router.replace("/profile-setup");
