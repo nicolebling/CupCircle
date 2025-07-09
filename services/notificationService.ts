@@ -132,6 +132,8 @@ export const notificationService = {
   // Send push notification to specific user
   async sendPushNotification(recipientUserId: string, title: string, body: string, data?: any) {
     try {
+      console.log('📤 Attempting to send notification to user:', recipientUserId);
+      
       // Get recipient's push token
       const { data: profile, error } = await supabase
         .from('profiles')
@@ -139,8 +141,38 @@ export const notificationService = {
         .eq('id', recipientUserId)
         .single();
 
-      if (error || !profile?.push_token) {
-        console.log('No push token found for user:', recipientUserId);
+      console.log('🔍 Push token lookup result:', {
+        userId: recipientUserId,
+        hasProfile: !!profile,
+        hasToken: !!profile?.push_token,
+        error: error?.message,
+        errorCode: error?.code
+      });
+
+      if (error) {
+        console.log('❌ Database error fetching push token:', error);
+        return;
+      }
+
+      if (!profile?.push_token) {
+        console.log('❌ No push token found for user:', recipientUserId);
+        
+        // Check if profile exists at all
+        const { data: profileCheck, error: profileError } = await supabase
+          .from('profiles')
+          .select('id, name, push_token')
+          .eq('id', recipientUserId)
+          .single();
+          
+        if (profileError) {
+          console.log('❌ Profile does not exist for user:', recipientUserId, profileError);
+        } else {
+          console.log('⚠️ Profile exists but no push token:', {
+            profileId: profileCheck.id,
+            profileName: profileCheck.name,
+            hasToken: !!profileCheck.push_token
+          });
+        }
         return;
       }
 

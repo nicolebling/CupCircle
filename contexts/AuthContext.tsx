@@ -163,6 +163,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
             console.log('💾 Attempting to save push token to database...');
             await notificationService.savePushToken(data.user.id, token);
             console.log('✅ Push token save operation completed');
+            
+            // Verify the token was saved by reading it back
+            console.log('🔍 Verifying token was saved - fetching from database...');
+            const { data: verifyData, error: verifyError } = await supabase
+              .from('profiles')
+              .select('push_token')
+              .eq('id', data.user.id)
+              .single();
+            
+            if (verifyError) {
+              console.log('❌ Error verifying push token save:', verifyError);
+            } else {
+              console.log('✅ Token verification result:', {
+                hasTokenInDB: !!verifyData?.push_token,
+                tokenMatch: verifyData?.push_token === token,
+                dbTokenPreview: verifyData?.push_token?.substring(0, 20) + '...'
+              });
+            }
           } else {
             console.log('❌ No push token received - skipping save operation');
           }
