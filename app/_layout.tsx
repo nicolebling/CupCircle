@@ -18,6 +18,8 @@ import { Text, TextInput } from "react-native";
 import Colors from "@/constants/Colors";
 import CustomSplashScreen from "@/components/CustomSplashScreen";
 import Superwall from "expo-superwall/compat";
+import * as Notifications from 'expo-notifications';
+import { router } from 'expo-router';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();

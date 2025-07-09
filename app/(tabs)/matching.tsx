@@ -15,7 +15,12 @@ import {
   Alert,
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
+import { useAuth } from "@/contexts/AuthContext";
+import { useColorScheme } from "@/hooks/useColorScheme";
 import Colors from "@/constants/Colors";
+import { supabase } from "@/lib/supabase";
+import { notificationService } from "@/services/notificationService";
+import { useRouter } from "expo-router"; // Import useRouter
 import ProfileCard from "@/components/ProfileCard";
 import { Ionicons } from "@expo/vector-icons";
 import Animated, {
@@ -25,16 +30,12 @@ import Animated, {
   Easing,
 } from "react-native-reanimated";
 import { format } from "date-fns";
-import { supabase } from "@/lib/supabase";
-import { useAuth } from "@/contexts/AuthContext";
-import { useColorScheme } from "@/hooks/useColorScheme";
-import { useRouter } from "expo-router"; // Import useRouter
+import Superwall from "expo-superwall/compat";
 import IndustrySelector from "@/components/IndustrySelector";
 import ExperienceLevelSelector from "@/components/ExperienceLevelSelector";
 import InterestSelector from "@/components/InterestSelector";
 import LogoAnimation from "@/components/LogoAnimation";
 import SubscriptionCard from "@/components/SubscriptionCard";
-import Superwall from "expo-superwall/compat";
 
 // Define the profile type for better type checking
 interface Profile {
@@ -1144,6 +1145,15 @@ export default function MatchingScreen() {
                           // Move to next profile
                           if (currentIndex < profiles.length - 1) {
                             setCurrentIndex(currentIndex + 1);
+                          }
+
+                          // Send push notification
+                          if (currentProfile.id) {
+                            await notificationService.sendPushNotification(
+                              currentProfile.id,
+                              "Coffee Chat Request",
+                              `${user?.name} has sent you a coffee chat request!`,
+                            );
                           }
                         } catch (error) {
                           //console.error("Error sending match request:", error);

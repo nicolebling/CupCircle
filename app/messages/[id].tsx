@@ -29,6 +29,7 @@ import { Image } from "react-native";
 import ProfileCard from "@/components/ProfileCard";
 import { cacheService } from "@/services/cacheService";
 import LogoAnimation from "@/components/LogoAnimation";
+import { notificationService } from "@/services/notificationService";
 
 type Message = {
   id: string;
@@ -453,6 +454,17 @@ export default function MessageScreen() {
           prevMessages.filter((msg) => msg.id !== tempId),
         );
         throw error;
+      }
+
+      // Send push notification to recipient
+      try {
+        await notificationService.sendNewMessageNotification(
+          partner?.id,
+          user?.name || 'Someone',
+          newMessage.trim()
+        );
+      } catch (notifError) {
+        console.error('Error sending message notification:', notifError);
       }
 
       console.log("Message sent successfully:", data);

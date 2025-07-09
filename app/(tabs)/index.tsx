@@ -12,9 +12,9 @@ import {
 } from "react-native";
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import { Ionicons } from "@expo/vector-icons";
-import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/contexts/AuthContext";
+import { notificationService } from "@/services/notificationService";
 import { useRouter, useNavigation } from "expo-router";
 import ProfileCard from "@/components/ProfileCard";
 import { format, addDays, isPast, isToday, parseISO } from "date-fns";
@@ -452,7 +452,7 @@ export default function CircleChatsScreen() {
 
                 const partnerProfile = getPartnerProfile(chat);
                 const isUpsert = existingFeedback && existingFeedback.user_rating === null && existingFeedback.cafe_rating === null;
-                
+
                 console.log("🎯 Upsert decision:", {
                   isUpsert,
                   reason: isUpsert ? "Found existing record with NULL ratings" : "No existing NULL record found"
@@ -627,7 +627,7 @@ export default function CircleChatsScreen() {
       setTimeout(() => {
         setCurrentFeedbackMatch(remainingQueue[0]);
         setShowFeedbackModal(true);
-        
+
       }, 500);
     } else {
       setCurrentFeedbackMatch(null);

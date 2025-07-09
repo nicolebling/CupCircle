@@ -8,6 +8,7 @@ import Superwall, {
   LogLevel,
   LogScope,
 } from "expo-superwall/compat";
+import { notificationService } from "../services/notificationService";
 
 type User = {
   id: string;
@@ -150,6 +151,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           console.log("Superwall user identified:", data.user.id);
         } catch (error) {
           console.error("Failed to identify user with Superwall:", error);
+        }
+
+        // Register for push notifications
+        try {
+          const token = await notificationService.registerForPushNotificationsAsync();
+          if (token) {
+            await notificationService.savePushToken(data.user.id, token);
+          }
+        } catch (error) {
+          console.error("Failed to register for push notifications:", error);
         }
 
         router.replace("/profile-setup");
