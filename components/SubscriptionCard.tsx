@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   description: {
-    fontSize: 18,
+    fontSize: 16,
     fontFamily: 'K2D-Regular',
     textAlign: 'center',
     lineHeight: 26,
