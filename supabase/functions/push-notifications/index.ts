@@ -26,7 +26,7 @@ Deno.serve(async (req) => {
   const payload: WebhookPayload = await req.json()
   const { data } = await supabase
     .from('profiles')
-    .select('expo_push_token')
+    .select('push_token')
     .eq('id', payload.record.user_id)
     .single()
 
@@ -37,7 +37,7 @@ Deno.serve(async (req) => {
       Authorization: `Bearer ${Deno.env.get('EXPO_ACCESS_TOKEN')}`,
     },
     body: JSON.stringify({
-      to: data?.expo_push_token,
+      to: data?.push_token,
       sound: 'default',
       body: payload.record.body,
     }),

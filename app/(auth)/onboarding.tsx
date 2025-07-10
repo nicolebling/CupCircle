@@ -137,6 +137,24 @@ export default function OnboardingScreen() {
         id: user?.id
       };
       await updateUser(profileDataWithId);
+      
+      // Register for push notifications now that profile is complete
+      try {
+        console.log('🔔 Registering for push notifications...');
+        const { notificationService } = require('@/services/notificationService');
+        const pushToken = await notificationService.registerForPushNotificationsAsync();
+        
+        if (pushToken) {
+          await notificationService.savePushToken(user?.id, pushToken);
+          console.log('✅ Push token saved successfully');
+        } else {
+          console.log('⚠️ Could not get push token');
+        }
+      } catch (error) {
+        console.error('❌ Failed to register for push notifications:', error);
+        // Don't block the user flow if push notifications fail
+      }
+      
       router.replace('/(tabs)/matching');
     } catch (error) {
       console.error('Failed to save profile', error);
