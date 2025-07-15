@@ -32,21 +32,41 @@ export const geoUtils = {
       }
 
       const query = encodeURIComponent(`${cafeName} ${address}`);
-      const response = await fetch(
-        `https://maps.googleapis.com/maps/api/geocoding/json?address=${query}&key=${apiKey}`
-      );
+      const url = `https://maps.googleapis.com/maps/api/geocoding/json?address=${query}&key=${apiKey}`;
+      
+      console.log('Making geocoding request for:', cafeName, address);
+      
+      const response = await fetch(url);
+      
+      // Check if response is ok
+      if (!response.ok) {
+        console.error('Geocoding API request failed:', response.status, response.statusText);
+        return null;
+      }
+      
+      // Check if response is JSON
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        console.error('API response is not JSON, content-type:', contentType);
+        const text = await response.text();
+        console.error('Response text:', text.substring(0, 200));
+        return null;
+      }
       
       const data = await response.json();
       
       if (data.status === 'OK' && data.results.length > 0) {
         const location = data.results[0].geometry.location;
+        console.log('Successfully geocoded:', cafeName, '→', location);
         return {
           latitude: location.lat,
           longitude: location.lng
         };
+      } else {
+        console.warn('Geocoding failed for:', cafeName, 'Status:', data.status);
+        return null;
       }
       
-      return null;
     } catch (error) {
       console.error('Error geocoding cafe:', error);
       return null;
