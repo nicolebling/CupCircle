@@ -28,6 +28,7 @@ import ExperienceLevelSelector from "@/components/ExperienceLevelSelector";
 import NeighborhoodSelector from "@/components/NeighborhoodSelector";
 import CafeSelector from "@/components/CafeSelector";
 import { decode } from "base64-arraybuffer";
+import { geoUtils } from "@/utils/geoUtils";
 
 type ProfileFormProps = {
   userId: string;
@@ -254,6 +255,22 @@ export default function ProfileForm({
       setLoading(true);
       setError("");
 
+      let centroidLat = null;
+      let centroidLng = null;
+
+      // Calculate centroid if user has selected cafes
+      if (favoriteCafes && favoriteCafes.length > 0) {
+        console.log("Calculating centroid for cafes:", favoriteCafes);
+        const centroid = await geoUtils.getCafesCentroid(favoriteCafes);
+        if (centroid) {
+          centroidLat = centroid.latitude;
+          centroidLng = centroid.longitude;
+          console.log("Calculated centroid:", { centroidLat, centroidLng });
+        } else {
+          console.log("Could not calculate centroid for cafes");
+        }
+      }
+
       const profileData = {
         id: userId,
         name,
@@ -273,6 +290,8 @@ export default function ProfileForm({
         employment: employmentHistory,
         career_transitions: careerTransitions,
         updated_at: new Date(),
+        centroid_lat: centroidLat,
+        centroid_long: centroidLng,
       };
 
       const { data, error } = await supabase
