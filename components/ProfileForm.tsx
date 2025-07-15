@@ -108,10 +108,16 @@ export default function ProfileForm({
               latitude: centroid.latitude, 
               longitude: centroid.longitude 
             });
+            
+            // Auto-update centroid in database
+            await updateCentroidInDatabase(centroid.latitude, centroid.longitude);
           } else {
             setCentroidLat(null);
             setCentroidLng(null);
             console.log("Could not calculate centroid - cleared values");
+            
+            // Clear centroid in database
+            await updateCentroidInDatabase(null, null);
           }
         } catch (error) {
           console.error("Error calculating centroid:", error);
@@ -123,6 +129,9 @@ export default function ProfileForm({
         setCentroidLat(null);
         setCentroidLng(null);
         console.log("No cafes selected - cleared centroid");
+        
+        // Clear centroid in database
+        await updateCentroidInDatabase(null, null);
       }
     };
 
@@ -367,6 +376,29 @@ export default function ProfileForm({
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const updateCentroidInDatabase = async (lat: number | null, lng: number | null) => {
+    try {
+      console.log("Updating centroid in database:", { lat, lng });
+      
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          centroid_lat: lat,
+          centroid_long: lng,
+          updated_at: new Date(),
+        })
+        .eq("id", userId);
+
+      if (error) {
+        console.error("Error updating centroid in database:", error);
+      } else {
+        console.log("Successfully updated centroid in database");
+      }
+    } catch (error) {
+      console.error("Error updating centroid in database:", error);
     }
   };
 
