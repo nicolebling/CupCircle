@@ -68,6 +68,8 @@ export default function ProfileForm({
   const [favoriteCafes, setFavoriteCafes] = useState<string[]>([]);
   const [interests, setInterests] = useState<string[]>([]);
   const [error, setError] = useState("");
+  const [centroidLat, setCentroidLat] = useState<number | null>(null);
+  const [centroidLng, setCentroidLng] = useState<number | null>(null);
   const [employmentHistory, setEmploymentHistory] = useState<
     Array<{
       company: string;
@@ -91,6 +93,41 @@ export default function ProfileForm({
       fetchProfile();
     }
   }, [userId, isNewUser]);
+
+  // Calculate centroid whenever cafes change
+  useEffect(() => {
+    const calculateCentroid = async () => {
+      if (favoriteCafes && favoriteCafes.length > 0) {
+        console.log("Recalculating centroid for cafes:", favoriteCafes);
+        try {
+          const centroid = await geoUtils.getCafesCentroid(favoriteCafes);
+          if (centroid) {
+            setCentroidLat(centroid.latitude);
+            setCentroidLng(centroid.longitude);
+            console.log("Updated centroid:", { 
+              latitude: centroid.latitude, 
+              longitude: centroid.longitude 
+            });
+          } else {
+            setCentroidLat(null);
+            setCentroidLng(null);
+            console.log("Could not calculate centroid - cleared values");
+          }
+        } catch (error) {
+          console.error("Error calculating centroid:", error);
+          setCentroidLat(null);
+          setCentroidLng(null);
+        }
+      } else {
+        // No cafes selected, clear centroid
+        setCentroidLat(null);
+        setCentroidLng(null);
+        console.log("No cafes selected - cleared centroid");
+      }
+    };
+
+    calculateCentroid();
+  }, [favoriteCafes]); // Recalculate whenever favoriteCafes changes
 
   const fetchProfile = async () => {
     try {
@@ -121,6 +158,8 @@ export default function ProfileForm({
         setFavoriteCafes(data.favorite_cafes || []);
         setInterests(data.interests || []);
         setAvatar(data.photo_url || "");
+        setCentroidLat(data.centroid_lat || null);
+        setCentroidLng(data.centroid_long || null);
 
         // Handle employment data
         let employmentData = [];
@@ -255,21 +294,12 @@ export default function ProfileForm({
       setLoading(true);
       setError("");
 
-      let centroidLat = null;
-      let centroidLng = null;
-
-      // Calculate centroid if user has selected cafes
-      if (favoriteCafes && favoriteCafes.length > 0) {
-        console.log("Calculating centroid for cafes:", favoriteCafes);
-        const centroid = await geoUtils.getCafesCentroid(favoriteCafes);
-        if (centroid) {
-          centroidLat = centroid.latitude;
-          centroidLng = centroid.longitude;
-          console.log("Calculated centroid:", { centroidLat, centroidLng });
-        } else {
-          console.log("Could not calculate centroid for cafes");
-        }
-      }
+      // Use the pre-calculated centroid values
+      console.log("Saving profile with centroid:", { 
+        centroidLat, 
+        centroidLng,
+        cafesCount: favoriteCafes?.length || 0 
+      });
 
       const profileData = {
         id: userId,
