@@ -33,6 +33,8 @@ export default function OnboardingScreen() {
     industry_categories: [],
     interests: [],
     favorite_cafes: [],
+    centroid_lat: null,
+    centroid_long: null,
   });
 
   const handleNext = () => {
@@ -117,6 +119,14 @@ export default function OnboardingScreen() {
     if (step > 1) {
       setStep(step - 1);
     }
+  };
+
+  const handleCentroidChange = (centroid: { latitude: number; longitude: number } | null) => {
+    setProfileData(prev => ({
+      ...prev,
+      centroid_lat: centroid?.latitude || null,
+      centroid_long: centroid?.longitude || null,
+    }));
   };
 
   const handleSubmit = async () => {
@@ -369,6 +379,7 @@ export default function OnboardingScreen() {
             <CafeSelector
               selected={profileData.favorite_cafes}
               onChange={(cafes) => setProfileData({ ...profileData, favorite_cafes: cafes })}
+              onCentroidChange={handleCentroidChange}
               isDark={false}
             />
           </View>

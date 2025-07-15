@@ -94,49 +94,24 @@ export default function ProfileForm({
     }
   }, [userId, isNewUser]);
 
-  // Calculate centroid whenever cafes change
-  useEffect(() => {
-    const calculateCentroid = async () => {
-      if (favoriteCafes && favoriteCafes.length > 0) {
-        console.log("Recalculating centroid for cafes:", favoriteCafes);
-        try {
-          const centroid = await geoUtils.getCafesCentroid(favoriteCafes);
-          if (centroid) {
-            setCentroidLat(centroid.latitude);
-            setCentroidLng(centroid.longitude);
-            console.log("Updated centroid:", { 
-              latitude: centroid.latitude, 
-              longitude: centroid.longitude 
-            });
-            
-            // Auto-update centroid in database
-            await updateCentroidInDatabase(centroid.latitude, centroid.longitude);
-          } else {
-            setCentroidLat(null);
-            setCentroidLng(null);
-            console.log("Could not calculate centroid - cleared values");
-            
-            // Clear centroid in database
-            await updateCentroidInDatabase(null, null);
-          }
-        } catch (error) {
-          console.error("Error calculating centroid:", error);
-          setCentroidLat(null);
-          setCentroidLng(null);
-        }
-      } else {
-        // No cafes selected, clear centroid
-        setCentroidLat(null);
-        setCentroidLng(null);
-        console.log("No cafes selected - cleared centroid");
-        
-        // Clear centroid in database
-        await updateCentroidInDatabase(null, null);
-      }
-    };
-
-    calculateCentroid();
-  }, [favoriteCafes]); // Recalculate whenever favoriteCafes changes
+  // Handle centroid updates from CafeSelector
+  const handleCentroidChange = async (centroid: { latitude: number; longitude: number } | null) => {
+    if (centroid) {
+      setCentroidLat(centroid.latitude);
+      setCentroidLng(centroid.longitude);
+      console.log("Updated centroid:", centroid);
+      
+      // Auto-update centroid in database
+      await updateCentroidInDatabase(centroid.latitude, centroid.longitude);
+    } else {
+      setCentroidLat(null);
+      setCentroidLng(null);
+      console.log("Cleared centroid");
+      
+      // Clear centroid in database
+      await updateCentroidInDatabase(null, null);
+    }
+  };
 
   const fetchProfile = async () => {
     try {
@@ -704,6 +679,7 @@ export default function ProfileForm({
               <CafeSelector
                 selected={favoriteCafes}
                 onChange={setFavoriteCafes}
+                onCentroidChange={handleCentroidChange}
                 isDark={isDark}
               />
             </View>

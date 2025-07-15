@@ -20,6 +20,7 @@ import LogoAnimation from "@/components/LogoAnimation";
 interface CafeSelectorProps {
   selected: string[];
   onChange: (cafes: string[]) => void;
+  onCentroidChange?: (centroid: { latitude: number; longitude: number } | null) => void;
   maxSelections?: number;
   isDark?: boolean;
 }
@@ -27,9 +28,61 @@ interface CafeSelectorProps {
 export default function CafeSelector({
   selected = [],
   onChange,
+  onCentroidChange,
   maxSelections = 3,
   isDark = false,
 }: CafeSelectorProps) {
+  
+  // Calculate centroid from cafe coordinates
+  const calculateCentroid = (cafes: string[]): { latitude: number; longitude: number } | null => {
+    if (cafes.length === 0) return null;
+    
+    const coordinates: Array<{ latitude: number; longitude: number }> = [];
+    
+    for (const cafe of cafes) {
+      const parts = cafe.split("|||");
+      if (parts.length >= 4) {
+        const lng = parseFloat(parts[2]);
+        const lat = parseFloat(parts[3]);
+        
+        if (!isNaN(lat) && !isNaN(lng)) {
+          coordinates.push({ latitude: lat, longitude: lng });
+        }
+      }
+    }
+    
+    if (coordinates.length === 0) return null;
+    
+    // For 1 cafe: use its coordinates
+    if (coordinates.length === 1) {
+      return coordinates[0];
+    }
+    
+    // For 2 cafes: calculate midpoint
+    if (coordinates.length === 2) {
+      return {
+        latitude: (coordinates[0].latitude + coordinates[1].latitude) / 2,
+        longitude: (coordinates[0].longitude + coordinates[1].longitude) / 2
+      };
+    }
+    
+    // For 3 cafes: calculate centroid of triangle
+    const totalLat = coordinates.reduce((sum, coord) => sum + coord.latitude, 0);
+    const totalLng = coordinates.reduce((sum, coord) => sum + coord.longitude, 0);
+    
+    return {
+      latitude: totalLat / coordinates.length,
+      longitude: totalLng / coordinates.length
+    };
+  };
+  
+  // Update centroid whenever selected cafes change
+  useEffect(() => {
+    if (onCentroidChange) {
+      const centroid = calculateCentroid(selected);
+      onCentroidChange(centroid);
+    }
+  }, [selected, onCentroidChange]);
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const [modalVisible, setModalVisible] = useState(false);
@@ -106,7 +159,7 @@ export default function CafeSelector({
   const handleSelect = (place: any) => {
     if (!selected.includes(place)) {
       if (selected.length < maxSelections) {
-        const cafeString = `${place.name}|||${place.vicinity}`;
+        const cafeString = `${place.name}|||${place.vicinity}|||${place.geometry.location.lng}|||${place.geometry.location.lat}`;
         const updatedSelection = [...selected, cafeString];
         onChange(updatedSelection);
       } else {
@@ -531,9 +584,7 @@ export default function CafeSelector({
 
             <View style={styles.selectedCafes}>
               {selected.map((cafe, index) => {
-                const [cafeName, cafeAddress, cafe_long, cafe_lat] = cafe
-                  ? cafe.split("|||")
-                  : ["", "", ""];
+                const [cafeName, cafeAddress] = cafe.split("|||");
                 return (
                   <View
                     key={index}
