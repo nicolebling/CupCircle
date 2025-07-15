@@ -32,7 +32,7 @@ export const geoUtils = {
       }
 
       const query = encodeURIComponent(`${cafeName} ${address}`);
-      const url = `https://maps.googleapis.com/maps/api/geocoding/json?address=${query}&key=${apiKey}`;
+      const url = `https://maps.googleapis.com/maps/api/geocoding/json?address=${query}&key=${process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY}`;
       
       console.log('Making geocoding request for:', cafeName, address);
       

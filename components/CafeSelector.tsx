@@ -531,9 +531,9 @@ export default function CafeSelector({
 
             <View style={styles.selectedCafes}>
               {selected.map((cafe, index) => {
-                const [cafeName, cafeAddress] = cafe
+                const [cafeName, cafeAddress, cafe_long, cafe_lat] = cafe
                   ? cafe.split("|||")
-                  : ["", ""];
+                  : ["", "", ""];
                 return (
                   <View
                     key={index}
