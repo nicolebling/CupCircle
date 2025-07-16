@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, SafeAreaView, ScrollView, KeyboardAvoidingView, Platform, Image, Alert } from 'react-native';
 import { router } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
@@ -121,13 +121,13 @@ export default function OnboardingScreen() {
     }
   };
 
-  const handleCentroidChange = (centroid: { latitude: number; longitude: number } | null) => {
+  const handleCentroidChange = useCallback((centroid: { latitude: number; longitude: number } | null) => {
     setProfileData(prev => ({
       ...prev,
       centroid_lat: centroid?.latitude || null,
       centroid_long: centroid?.longitude || null,
     }));
-  };
+  }, []);
 
   const handleSubmit = async () => {
     setLoading(true);
