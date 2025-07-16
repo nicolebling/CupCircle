@@ -36,6 +36,7 @@ import ExperienceLevelSelector from "@/components/ExperienceLevelSelector";
 import InterestSelector from "@/components/InterestSelector";
 import LogoAnimation from "@/components/LogoAnimation";
 import SubscriptionCard from "@/components/SubscriptionCard";
+import { geoUtils } from "@/utils/geoUtils";
 
 // Define the profile type for better type checking
 interface Profile {
@@ -231,6 +232,21 @@ export default function MatchingScreen() {
     setIsLoading(true);
     try {
       //console.log("Fetching profiles for users with availability");
+
+      // Get current user's location from their favorite cafes for KNN sorting
+      let userLocation = null;
+      if (user?.id) {
+        const { data: currentUserProfile, error: userProfileError } = await supabase
+          .from("profiles")
+          .select("favorite_cafes")
+          .eq("id", user.id)
+          .single();
+
+        if (!userProfileError && currentUserProfile?.favorite_cafes) {
+          userLocation = await geoUtils.getUserLocationFromCafes(currentUserProfile.favorite_cafes);
+          console.log("User location for KNN:", userLocation);
+        }
+      }
 
       // Fetch all active and past meetings with the current user
       // This includes pending, pending_acceptance, and confirmed status
@@ -539,16 +555,20 @@ export default function MatchingScreen() {
 
       // console.log("Formatted profiles:", formattedProfiles.length);
 
+      // Apply KNN sorting: Sort profiles by distance from user location (nearest to farthest)
+      const sortedProfiles = await geoUtils.sortProfilesByDistance(formattedProfiles, userLocation);
+      console.log("Profiles sorted by distance using KNN. User location:", userLocation);
+
       // Store all profiles and set pagination
-      setAllProfiles(formattedProfiles);
+      setAllProfiles(sortedProfiles);
 
       // Check if there are more than PROFILES_PER_PAGE profiles
-      if (formattedProfiles.length > PROFILES_PER_PAGE) {
+      if (sortedProfiles.length > PROFILES_PER_PAGE) {
         // Only show first page of profiles
-        setProfiles(formattedProfiles.slice(0, PROFILES_PER_PAGE));
+        setProfiles(sortedProfiles.slice(0, PROFILES_PER_PAGE));
         setHasMoreProfiles(true);
       } else {
-        setProfiles(formattedProfiles);
+        setProfiles(sortedProfiles);
         setHasMoreProfiles(false);
       }
 
@@ -819,6 +839,33 @@ export default function MatchingScreen() {
                       profile={profiles[currentIndex]}
                       isNewUser={false}
                     />
+                    {/* Distance indicator */}
+                    {profiles[currentIndex]?.distance !== undefined && profiles[currentIndex].distance !== Infinity && (
+                      <View
+                        style={[
+                          styles.distanceContainer,
+                          {
+                            backgroundColor: colors.card,
+                            borderColor: colors.border,
+                          },
+                        ]}
+                      >
+                        <Ionicons
+                          name="location-outline"
+                          size={16}
+                          color={colors.primary}
+                        />
+                        <Text
+                          style={[
+                            styles.distanceText,
+                            { color: colors.secondaryText },
+                          ]}
+                        >
+                          ~{profiles[currentIndex].distance.toFixed(1)} km away
+                        </Text>
+                      </View>
+                    )}
+
                     {profiles[currentIndex] &&
                       profiles[currentIndex].favorite_cafes &&
                       profiles[currentIndex].favorite_cafes.length > 0 &&
@@ -1854,5 +1901,21 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     fontSize: 12,
     fontFamily: "K2D-Regular",
+  },
+  distanceContainer: {
+    width: "100%",
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 12,
+    marginTop: 8,
+    marginBottom: 4,
+    borderWidth: 1,
+  },
+  distanceText: {
+    marginLeft: 6,
+    fontSize: 12,
+    fontFamily: "K2D-Medium",
   },
 });
