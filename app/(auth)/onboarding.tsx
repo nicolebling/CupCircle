@@ -140,37 +140,43 @@ export default function OnboardingScreen() {
         setLoading(false);
         return;
       }
+      
       const { firstName, lastName, ...profileDataWithoutNames } = profileData;
       const profileDataWithId = {
         ...profileDataWithoutNames,
         name: `${firstName} ${lastName}`,
         id: user?.id
       };
+      
+      // Save profile first
       await updateUser(profileDataWithId);
       
-      // Register for push notifications now that profile is complete
-      try {
-        console.log('🔔 [ONBOARDING] Starting push notification registration...');
-        console.log('🔔 [ONBOARDING] User ID:', user?.id);
-        const { notificationService } = require('@/services/notificationService');
-        
-        console.log('🔔 [ONBOARDING] Calling registerForPushNotificationsAsync...');
-        const pushToken = await notificationService.registerForPushNotificationsAsync();
-        console.log('🔔 [ONBOARDING] Registration result:', { hasToken: !!pushToken });
-        
-        if (pushToken) {
-          console.log('🔔 [ONBOARDING] Token received, saving to database...');
-          await notificationService.savePushToken(user?.id, pushToken);
-          console.log('✅ [ONBOARDING] Push token saved successfully');
-        } else {
-          console.log('⚠️ [ONBOARDING] Could not get push token - no token returned');
+      // Register for push notifications in background - don't await to avoid blocking
+      setTimeout(async () => {
+        try {
+          console.log('🔔 [ONBOARDING] Starting push notification registration...');
+          console.log('🔔 [ONBOARDING] User ID:', user?.id);
+          const { notificationService } = require('@/services/notificationService');
+          
+          console.log('🔔 [ONBOARDING] Calling registerForPushNotificationsAsync...');
+          const pushToken = await notificationService.registerForPushNotificationsAsync();
+          console.log('🔔 [ONBOARDING] Registration result:', { hasToken: !!pushToken });
+          
+          if (pushToken) {
+            console.log('🔔 [ONBOARDING] Token received, saving to database...');
+            await notificationService.savePushToken(user?.id, pushToken);
+            console.log('✅ [ONBOARDING] Push token saved successfully');
+          } else {
+            console.log('⚠️ [ONBOARDING] Could not get push token - no token returned');
+          }
+        } catch (error) {
+          console.error('❌ [ONBOARDING] Failed to register for push notifications:', error);
+          console.error('❌ [ONBOARDING] Error stack:', error.stack);
+          // Don't block the user flow if push notifications fail
         }
-      } catch (error) {
-        console.error('❌ [ONBOARDING] Failed to register for push notifications:', error);
-        console.error('❌ [ONBOARDING] Error stack:', error.stack);
-        // Don't block the user flow if push notifications fail
-      }
+      }, 100);
       
+      // Navigate immediately after profile save
       router.replace('/(tabs)/matching');
     } catch (error) {
       console.error('Failed to save profile', error);
