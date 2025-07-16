@@ -155,21 +155,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
         // Register for push notifications
         try {
-          console.log('🔔 [AUTH] Starting push notification registration for user:', data.user.id);
-          console.log('🔔 [AUTH] User email:', data.user.email);
-          
+          console.log('🔔 Starting push notification registration for user:', data.user.id);
           const token = await notificationService.registerForPushNotificationsAsync();
-          console.log('🎯 [AUTH] Push token registration result:', { hasToken: !!token });
+          console.log('🎯 Push token registration result:', { token, hasToken: !!token });
           
           if (token) {
-            console.log('💾 [AUTH] Token received, attempting to save to database...');
-            console.log('💾 [AUTH] Token preview:', token.substring(0, 30) + '...');
-            
+            console.log('💾 Attempting to save push token to database...');
             await notificationService.savePushToken(data.user.id, token);
-            console.log('✅ [AUTH] Push token save operation completed');
+            console.log('✅ Push token save operation completed');
             
             // Verify the token was saved by reading it back
-            console.log('🔍 [AUTH] Verifying token was saved - fetching from database...');
+            console.log('🔍 Verifying token was saved - fetching from database...');
             const { data: verifyData, error: verifyError } = await supabase
               .from('profiles')
               .select('push_token')
@@ -177,22 +173,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
               .single();
             
             if (verifyError) {
-              console.log('❌ [AUTH] Error verifying push token save:', verifyError);
-              console.log('❌ [AUTH] Verify error details:', JSON.stringify(verifyError, null, 2));
+              console.log('❌ Error verifying push token save:', verifyError);
             } else {
-              console.log('✅ [AUTH] Token verification result:', {
+              console.log('✅ Token verification result:', {
                 hasTokenInDB: !!verifyData?.push_token,
                 tokenMatch: verifyData?.push_token === token,
                 dbTokenPreview: verifyData?.push_token?.substring(0, 20) + '...'
               });
             }
           } else {
-            console.log('❌ [AUTH] No push token received - skipping save operation');
+            console.log('❌ No push token received - skipping save operation');
           }
         } catch (error) {
-          console.error("❌ [AUTH] Failed to register for push notifications:", error);
-          console.error("❌ [AUTH] Error details:", JSON.stringify(error, null, 2));
-          console.error("❌ [AUTH] Error stack:", error.stack);
+          console.error("❌ Failed to register for push notifications:", error);
         }
 
         router.replace("/profile-setup");
