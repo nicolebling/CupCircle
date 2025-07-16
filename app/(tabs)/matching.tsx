@@ -230,7 +230,7 @@ export default function MatchingScreen() {
     try {
       const { data, error } = await supabase
         .from("profiles")
-        .select("centroid_lat, centroid_long")
+        .select("centroid_lat, centroid_long, favorite_cafes")
         .eq("id", user.id)
         .single();
 
@@ -240,10 +240,57 @@ export default function MatchingScreen() {
       }
 
       if (data?.centroid_lat && data?.centroid_long) {
+        console.log("Found user centroid:", data.centroid_lat, data.centroid_long);
         setUserCentroid({
           latitude: data.centroid_lat,
           longitude: data.centroid_long
         });
+      } else {
+        console.log("User centroid not found, trying to calculate from favorite cafes");
+        
+        // Try to calculate centroid from favorite cafes
+        if (data?.favorite_cafes && data.favorite_cafes.length > 0) {
+          const coordinates: Array<{ latitude: number; longitude: number }> = [];
+          
+          for (const cafe of data.favorite_cafes) {
+            const parts = cafe.split("|||");
+            if (parts.length >= 4) {
+              const lng = parseFloat(parts[2]);
+              const lat = parseFloat(parts[3]);
+              
+              if (!isNaN(lat) && !isNaN(lng)) {
+                coordinates.push({ latitude: lat, longitude: lng });
+              }
+            }
+          }
+          
+          if (coordinates.length > 0) {
+            const centroid = geoUtils.calculateCentroid(coordinates);
+            console.log("Calculated user centroid from cafes:", centroid);
+            setUserCentroid(centroid);
+            
+            // Update the database with the calculated centroid
+            const { error: updateError } = await supabase
+              .from("profiles")
+              .update({ 
+                centroid_lat: centroid.latitude, 
+                centroid_long: centroid.longitude 
+              })
+              .eq("id", user.id);
+            
+            if (updateError) {
+              console.error("Error updating user centroid:", updateError);
+            } else {
+              console.log("Updated user centroid in database");
+            }
+          } else {
+            console.log("No valid cafe coordinates found for user");
+            setUserCentroid(null);
+          }
+        } else {
+          console.log("User has no favorite cafes, cannot calculate centroid");
+          setUserCentroid(null);
+        }
       }
     } catch (error) {
       console.error("Error fetching user centroid:", error);
@@ -573,14 +620,29 @@ export default function MatchingScreen() {
       if (userCentroid) {
         console.log(`User centroid: ${userCentroid.latitude}, ${userCentroid.longitude}`);
         console.log(`Filter max distance: ${filterMaxDistance} miles`);
-        console.log(`Profiles before distance filtering: ${formattedProfiles.length}`);
+        console.log(`Profiles before distance sorting: ${formattedProfiles.length}`);
+        
+        // Log profile centroids before sorting
+        formattedProfiles.forEach(profile => {
+          if (profile.centroid_lat && profile.centroid_long) {
+            console.log(`Profile ${profile.name}: ${profile.centroid_lat}, ${profile.centroid_long}`);
+          } else {
+            console.log(`Profile ${profile.name}: No centroid data`);
+          }
+        });
         
         formattedProfiles = geoUtils.sortProfilesByDistance(userCentroid, formattedProfiles);
         
+        // Log sorted profiles with distances
+        formattedProfiles.forEach((profile, index) => {
+          console.log(`${index + 1}. ${profile.name}: ${profile.distance ? profile.distance.toFixed(2) + ' miles' : 'No distance'}`);
+        });
+        
         // Apply distance filter if set
         if (filterMaxDistance !== null) {
+          const beforeFilterCount = formattedProfiles.length;
           formattedProfiles = geoUtils.filterProfilesByDistance(formattedProfiles, filterMaxDistance);
-          console.log(`Profiles after distance filtering: ${formattedProfiles.length}`);
+          console.log(`Profiles after distance filtering (${filterMaxDistance} miles): ${formattedProfiles.length} (filtered out ${beforeFilterCount - formattedProfiles.length})`);
         }
       } else {
         console.log("No user centroid available for distance filtering");
