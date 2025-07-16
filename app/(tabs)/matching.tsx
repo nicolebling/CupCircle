@@ -14,6 +14,7 @@ import {
   Keyboard,
   Alert,
 } from "react-native";
+import Slider from "@react-native-community/slider";
 import { useFocusEffect } from "@react-navigation/native";
 import { useAuth } from "@/contexts/AuthContext";
 import { useColorScheme } from "@/hooks/useColorScheme";
@@ -36,6 +37,7 @@ import ExperienceLevelSelector from "@/components/ExperienceLevelSelector";
 import InterestSelector from "@/components/InterestSelector";
 import LogoAnimation from "@/components/LogoAnimation";
 import SubscriptionCard from "@/components/SubscriptionCard";
+import { geoUtils } from "@/utils/geoUtils";
 
 // Define the profile type for better type checking
 interface Profile {
@@ -93,6 +95,8 @@ export default function MatchingScreen() {
   >([]);
   const [filterInterests, setFilterInterests] = useState<string[]>([]);
   const [filterKeyword, setFilterKeyword] = useState("");
+  const [filterMaxDistance, setFilterMaxDistance] = useState<number>(50); // Default 50km
+  const [userCentroid, setUserCentroid] = useState<{ latitude: number; longitude: number } | null>(null);
   const [matchAnimation, setMatchAnimation] = useState(false);
   const [hasAvailability, setHasAvailability] = useState(false);
   const [messageText, setMessageText] = useState("");
@@ -219,12 +223,40 @@ export default function MatchingScreen() {
     }
   }, [user, fetchProfiles]);
 
+  // Fetch user's centroid for distance calculations
+  const fetchUserCentroid = useCallback(async () => {
+    if (!user?.id) return;
+
+    try {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("centroid_lat, centroid_long")
+        .eq("id", user.id)
+        .single();
+
+      if (error) {
+        console.error("Error fetching user centroid:", error);
+        return;
+      }
+
+      if (data?.centroid_lat && data?.centroid_long) {
+        setUserCentroid({
+          latitude: data.centroid_lat,
+          longitude: data.centroid_long
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching user centroid:", error);
+    }
+  }, [user?.id]);
+
   // Use useFocusEffect to run check when screen comes into focus
   useFocusEffect(
     useCallback(() => {
       checkUserAvailability();
       checkAndTriggerPaywall();
-    }, [checkUserAvailability, checkAndTriggerPaywall]),
+      fetchUserCentroid();
+    }, [checkUserAvailability, checkAndTriggerPaywall, fetchUserCentroid]),
   );
 
   const fetchProfiles = async () => {
@@ -324,10 +356,10 @@ export default function MatchingScreen() {
         return;
       }
 
-      // Fetch profiles for users with availability in next 7 days
+      // Fetch profiles for users with availability in next 7 days (including centroid data)
       const { data: profilesData, error: profilesError } = await supabase
         .from("profiles")
-        .select("*")
+        .select("*, centroid_lat, centroid_long")
         .in("id", userIds);
 
       if (profilesError) {
@@ -404,7 +436,7 @@ export default function MatchingScreen() {
       }
 
       // Map profiles to the format expected by ProfileCard
-      const formattedProfiles = profilesData
+      let formattedProfiles = profilesData
         .filter((profile) => {
           // First check if profile has availability
           const hasAvailability = userAvailabilityMap[profile.id]?.length > 0;
@@ -536,6 +568,16 @@ export default function MatchingScreen() {
 
           return formattedProfile;
         });
+
+      // Apply KNN sorting by distance if user has centroid
+      if (userCentroid) {
+        formattedProfiles = geoUtils.sortProfilesByDistance(userCentroid, formattedProfiles);
+        
+        // Apply distance filter if set
+        if (filterMaxDistance !== null) {
+          formattedProfiles = geoUtils.filterProfilesByDistance(formattedProfiles, filterMaxDistance);
+        }
+      }
 
       // console.log("Formatted profiles:", formattedProfiles.length);
 
@@ -1350,6 +1392,34 @@ export default function MatchingScreen() {
                 isDark={false}
                 viewSelectionTracker={false}
               />
+
+              <Text style={[styles.filterLabel, { color: colors.text }]}>
+                Distance Range
+              </Text>
+              <View style={styles.distanceContainer}>
+                <Text style={[styles.distanceLabel, { color: colors.secondaryText }]}>
+                  Within {filterMaxDistance}km
+                </Text>
+                <Slider
+                  style={styles.distanceSlider}
+                  minimumValue={1}
+                  maximumValue={100}
+                  value={filterMaxDistance}
+                  onValueChange={setFilterMaxDistance}
+                  step={1}
+                  minimumTrackTintColor={colors.primary}
+                  maximumTrackTintColor={colors.border}
+                  thumbStyle={{ backgroundColor: colors.primary }}
+                />
+                <View style={styles.distanceLabels}>
+                  <Text style={[styles.distanceEndLabel, { color: colors.secondaryText }]}>
+                    1km
+                  </Text>
+                  <Text style={[styles.distanceEndLabel, { color: colors.secondaryText }]}>
+                    100km
+                  </Text>
+                </View>
+              </View>
             </ScrollView>
             <View style={styles.modalFooter}>
               <TouchableOpacity
@@ -1363,6 +1433,7 @@ export default function MatchingScreen() {
                   setFilterIndustries([]);
                   setFilterExperienceLevels([]);
                   setFilterInterests([]);
+                  setFilterMaxDistance(50);
                 }}
               >
                 <Text style={{ color: colors.text }}>Clear All</Text>
@@ -1854,5 +1925,27 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     fontSize: 12,
     fontFamily: "K2D-Regular",
+  },
+  distanceContainer: {
+    marginBottom: 16,
+  },
+  distanceLabel: {
+    fontFamily: "K2D-Medium",
+    fontSize: 14,
+    marginBottom: 8,
+    textAlign: "center",
+  },
+  distanceSlider: {
+    width: "100%",
+    height: 40,
+  },
+  distanceLabels: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: -8,
+  },
+  distanceEndLabel: {
+    fontFamily: "K2D-Regular",
+    fontSize: 12,
   },
 });
