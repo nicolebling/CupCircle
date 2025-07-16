@@ -85,12 +85,26 @@ export const geoUtils = {
     maxDistance: number
   ): Array<any> {
     if (maxDistance === null || maxDistance === undefined) {
+      console.log("No max distance filter applied");
       return profiles;
     }
     
-    return profiles.filter(profile => 
-      profile.distance !== null && profile.distance <= maxDistance
-    );
+    console.log(`Filtering profiles by max distance: ${maxDistance} miles`);
+    
+    const filteredProfiles = profiles.filter(profile => {
+      if (profile.distance === null || profile.distance === undefined) {
+        console.log(`Profile ${profile.name} has no distance data - excluding`);
+        return false;
+      }
+      
+      const withinDistance = profile.distance <= maxDistance;
+      console.log(`Profile ${profile.name}: ${profile.distance.toFixed(2)} miles - ${withinDistance ? 'included' : 'excluded'}`);
+      
+      return withinDistance;
+    });
+    
+    console.log(`Filtered ${profiles.length} profiles down to ${filteredProfiles.length} within ${maxDistance} miles`);
+    return filteredProfiles;
   },
 
   

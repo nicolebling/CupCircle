@@ -571,12 +571,19 @@ export default function MatchingScreen() {
 
       // Apply KNN sorting by distance if user has centroid
       if (userCentroid) {
+        console.log(`User centroid: ${userCentroid.latitude}, ${userCentroid.longitude}`);
+        console.log(`Filter max distance: ${filterMaxDistance} miles`);
+        console.log(`Profiles before distance filtering: ${formattedProfiles.length}`);
+        
         formattedProfiles = geoUtils.sortProfilesByDistance(userCentroid, formattedProfiles);
         
         // Apply distance filter if set
         if (filterMaxDistance !== null) {
           formattedProfiles = geoUtils.filterProfilesByDistance(formattedProfiles, filterMaxDistance);
+          console.log(`Profiles after distance filtering: ${formattedProfiles.length}`);
         }
+      } else {
+        console.log("No user centroid available for distance filtering");
       }
 
       // console.log("Formatted profiles:", formattedProfiles.length);
