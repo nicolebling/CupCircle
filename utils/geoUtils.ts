@@ -22,9 +22,9 @@ export const geoUtils = {
     };
   },
 
-  // Calculate distance between two points using Haversine formula (in kilometers)
+  // Calculate distance between two points using Haversine formula (in miles)
   calculateDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
-    const R = 6371; // Earth's radius in kilometers
+    const R = 3959; // Earth's radius in miles
     const dLat = this.toRadians(lat2 - lat1);
     const dLng = this.toRadians(lng2 - lng1);
     

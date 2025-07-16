@@ -95,7 +95,7 @@ export default function MatchingScreen() {
   >([]);
   const [filterInterests, setFilterInterests] = useState<string[]>([]);
   const [filterKeyword, setFilterKeyword] = useState("");
-  const [filterMaxDistance, setFilterMaxDistance] = useState<number>(50); // Default 50km
+  const [filterMaxDistance, setFilterMaxDistance] = useState<number>(25); // Default 25 miles
   const [userCentroid, setUserCentroid] = useState<{ latitude: number; longitude: number } | null>(null);
   const [matchAnimation, setMatchAnimation] = useState(false);
   const [hasAvailability, setHasAvailability] = useState(false);
@@ -1398,12 +1398,12 @@ export default function MatchingScreen() {
               </Text>
               <View style={styles.distanceContainer}>
                 <Text style={[styles.distanceLabel, { color: colors.secondaryText }]}>
-                  Within {filterMaxDistance}km
+                  Within {filterMaxDistance} miles
                 </Text>
                 <Slider
                   style={styles.distanceSlider}
                   minimumValue={1}
-                  maximumValue={100}
+                  maximumValue={50}
                   value={filterMaxDistance}
                   onValueChange={setFilterMaxDistance}
                   step={1}
@@ -1413,10 +1413,10 @@ export default function MatchingScreen() {
                 />
                 <View style={styles.distanceLabels}>
                   <Text style={[styles.distanceEndLabel, { color: colors.secondaryText }]}>
-                    1km
+                    1 mile
                   </Text>
                   <Text style={[styles.distanceEndLabel, { color: colors.secondaryText }]}>
-                    100km
+                    50 miles
                   </Text>
                 </View>
               </View>
@@ -1433,7 +1433,7 @@ export default function MatchingScreen() {
                   setFilterIndustries([]);
                   setFilterExperienceLevels([]);
                   setFilterInterests([]);
-                  setFilterMaxDistance(50);
+                  setFilterMaxDistance(25);
                 }}
               >
                 <Text style={{ color: colors.text }}>Clear All</Text>
