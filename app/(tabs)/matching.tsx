@@ -95,7 +95,7 @@ export default function MatchingScreen() {
   >([]);
   const [filterInterests, setFilterInterests] = useState<string[]>([]);
   const [filterKeyword, setFilterKeyword] = useState("");
-  const [filterMaxDistance, setFilterMaxDistance] = useState<number>(25); // Default 25 miles
+  const [filterMaxDistance, setFilterMaxDistance] = useState<number>(50); // Default 50 miles
   const [userCentroid, setUserCentroid] = useState<{ latitude: number; longitude: number } | null>(null);
   const [matchAnimation, setMatchAnimation] = useState(false);
   const [hasAvailability, setHasAvailability] = useState(false);
@@ -1470,7 +1470,7 @@ export default function MatchingScreen() {
               </Text>
               <View style={styles.distanceContainer}>
                 <Text style={[styles.distanceLabel, { color: colors.secondaryText }]}>
-                  Within {filterMaxDistance} miles
+                  Within {Math.round(filterMaxDistance)} miles
                 </Text>
                 <Slider
                   style={styles.distanceSlider}
@@ -1505,7 +1505,7 @@ export default function MatchingScreen() {
                   setFilterIndustries([]);
                   setFilterExperienceLevels([]);
                   setFilterInterests([]);
-                  setFilterMaxDistance(25);
+                  setFilterMaxDistance(50);
                 }}
               >
                 <Text style={{ color: colors.text }}>Clear All</Text>
