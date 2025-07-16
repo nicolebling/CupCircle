@@ -21,6 +21,17 @@ import Superwall from "expo-superwall/compat";
 import * as Notifications from 'expo-notifications';
 import { router } from 'expo-router';
 
+// Suppress animation warnings in development
+if (__DEV__) {
+  const originalWarn = console.warn;
+  console.warn = (...args) => {
+    if (args[0]?.includes?.('onAnimatedValueUpdate')) {
+      return;
+    }
+    originalWarn.apply(console, args);
+  };
+}
+
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 

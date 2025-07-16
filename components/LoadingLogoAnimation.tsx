@@ -38,6 +38,12 @@ export default function LoadingLogoAnimation() {
 
     return () => {
       isMounted.current = false;
+      
+      // Remove all listeners first
+      rotateAnim1.removeAllListeners();
+      rotateAnim2.removeAllListeners();
+      
+      // Stop animations
       rotate1.stop();
       rotate2.stop();
       
