@@ -150,18 +150,24 @@ export default function OnboardingScreen() {
       
       // Register for push notifications now that profile is complete
       try {
-        console.log('🔔 Registering for push notifications...');
+        console.log('🔔 [ONBOARDING] Starting push notification registration...');
+        console.log('🔔 [ONBOARDING] User ID:', user?.id);
         const { notificationService } = require('@/services/notificationService');
+        
+        console.log('🔔 [ONBOARDING] Calling registerForPushNotificationsAsync...');
         const pushToken = await notificationService.registerForPushNotificationsAsync();
+        console.log('🔔 [ONBOARDING] Registration result:', { hasToken: !!pushToken });
         
         if (pushToken) {
+          console.log('🔔 [ONBOARDING] Token received, saving to database...');
           await notificationService.savePushToken(user?.id, pushToken);
-          console.log('✅ Push token saved successfully');
+          console.log('✅ [ONBOARDING] Push token saved successfully');
         } else {
-          console.log('⚠️ Could not get push token');
+          console.log('⚠️ [ONBOARDING] Could not get push token - no token returned');
         }
       } catch (error) {
-        console.error('❌ Failed to register for push notifications:', error);
+        console.error('❌ [ONBOARDING] Failed to register for push notifications:', error);
+        console.error('❌ [ONBOARDING] Error stack:', error.stack);
         // Don't block the user flow if push notifications fail
       }
       
