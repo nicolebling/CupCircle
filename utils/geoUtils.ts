@@ -24,6 +24,7 @@ export const geoUtils = {
 
   // Calculate distance between two points using Haversine formula (in miles)
   calculateDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
+    console.log("HEREeeeeee", lat1, lng1, lat2, lng2);
     const R = 3959; // Earth's radius in miles
     const dLat = this.toRadians(lat2 - lat1);
     const dLng = this.toRadians(lng2 - lng1);
