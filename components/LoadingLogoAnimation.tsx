@@ -40,10 +40,14 @@ export default function LoadingLogoAnimation() {
       isMounted.current = false;
       rotate1.stop();
       rotate2.stop();
-      rotateAnim1.stopAnimation();
-      rotateAnim2.stopAnimation();
-      rotateAnim1.setValue(0);
-      rotateAnim2.setValue(0);
+      
+      // Clear any pending animations and reset values
+      rotateAnim1.stopAnimation(() => {
+        rotateAnim1.setValue(0);
+      });
+      rotateAnim2.stopAnimation(() => {
+        rotateAnim2.setValue(0);
+      });
     };
   }, [rotateAnim1, rotateAnim2]);
 
