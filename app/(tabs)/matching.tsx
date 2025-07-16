@@ -611,6 +611,9 @@ export default function MatchingScreen() {
             career_transitions: profile.career_transitions || [],
             // Add the user's availability slots
             availabilitySlots: userAvailabilityMap[profile.id] || [],
+            // Add centroid data for distance calculations
+            centroid_lat: profile.centroid_lat,
+            centroid_long: profile.centroid_long,
           };
 
           return formattedProfile;
