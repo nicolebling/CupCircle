@@ -77,10 +77,10 @@ export default function OnboardingScreen() {
   const uploadImage = async (uri: string) => {
     try {
       setLoading(true);
-
+      
       const response = await fetch(uri);
       const blob = await response.blob();
-
+      
       const reader = new FileReader();
       const base64Promise = new Promise((resolve) => {
         reader.onload = () => {
@@ -102,7 +102,7 @@ export default function OnboardingScreen() {
       if (uploadError) throw uploadError;
 
       const { data } = supabase.storage.from("photos").getPublicUrl(filePath);
-
+      
       setProfileData({
         ...profileData,
         photo_url: data.publicUrl
@@ -147,35 +147,25 @@ export default function OnboardingScreen() {
         id: user?.id
       };
       await updateUser(profileDataWithId);
-
-      // Navigate immediately after profile save
-      router.replace('/(tabs)/matching');
-
-      // Register for push notifications after navigation to avoid blocking
-      // Use a Promise that doesn't block the main flow
-      Promise.resolve().then(async () => {
-        try {
-          console.log('🔔 [ONBOARDING] Starting push notification registration...');
-          console.log('🔔 [ONBOARDING] User ID:', user?.id);
-          const { notificationService } = require('@/services/notificationService');
-
-          console.log('🔔 [ONBOARDING] Calling registerForPushNotificationsAsync...');
-          const pushToken = await notificationService.registerForPushNotificationsAsync();
-          console.log('🔔 [ONBOARDING] Registration result:', { hasToken: !!pushToken });
-
-          if (pushToken) {
-            console.log('🔔 [ONBOARDING] Token received, saving to database...');
-            await notificationService.savePushToken(user?.id, pushToken);
-            console.log('✅ [ONBOARDING] Push token saved successfully');
-          } else {
-            console.log('⚠️ [ONBOARDING] Could not get push token - no token returned');
-          }
-        } catch (error) {
-          console.error('❌ [ONBOARDING] Failed to register for push notifications:', error);
-          console.error('❌ [ONBOARDING] Error stack:', error.stack);
-          // Don't block the user flow if push notifications fail
+      
+      // Register for push notifications now that profile is complete
+      try {
+        console.log('🔔 Registering for push notifications...');
+        const { notificationService } = require('@/services/notificationService');
+        const pushToken = await notificationService.registerForPushNotificationsAsync();
+        
+        if (pushToken) {
+          await notificationService.savePushToken(user?.id, pushToken);
+          console.log('✅ Push token saved successfully');
+        } else {
+          console.log('⚠️ Could not get push token');
         }
-      });
+      } catch (error) {
+        console.error('❌ Failed to register for push notifications:', error);
+        // Don't block the user flow if push notifications fail
+      }
+      
+      router.replace('/(tabs)/matching');
     } catch (error) {
       console.error('Failed to save profile', error);
       alert('Failed to save profile information. Please try again.');
@@ -352,7 +342,7 @@ export default function OnboardingScreen() {
             </View>
           );
 
-
+       
 
         case 10:
           return (
