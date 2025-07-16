@@ -14,8 +14,11 @@ export default function LogoAnimation({ showText = false, size = 96, showSubtitl
   const colors = Colors[colorScheme];
   const rotateAnim1 = useRef(new Animated.Value(0)).current;
   const rotateAnim2 = useRef(new Animated.Value(0)).current;
+  const isMounted = useRef(true);
 
   useEffect(() => {
+    isMounted.current = true;
+    
     const rotate1 = Animated.loop(
       Animated.timing(rotateAnim1, {
         toValue: 1,
@@ -34,12 +37,17 @@ export default function LogoAnimation({ showText = false, size = 96, showSubtitl
       })
     );
 
-    rotate1.start();
-    rotate2.start();
+    if (isMounted.current) {
+      rotate1.start();
+      rotate2.start();
+    }
 
     return () => {
+      isMounted.current = false;
       rotate1.stop();
       rotate2.stop();
+      rotateAnim1.stopAnimation();
+      rotateAnim2.stopAnimation();
       rotateAnim1.setValue(0);
       rotateAnim2.setValue(0);
     };
