@@ -31,6 +31,9 @@
       },
       "config": {
         "googleMapsApiKey": "AIzaSyDYiKrt8lG2X2HxF4DUqVqIFi4wpGo6Aec"
+      },
+      "entitlements": {
+        "aps-environment": "development"
       }
     },
     "android": {
@@ -78,6 +81,14 @@
           "ios": {
             "deploymentTarget": "15.1"
           }
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/icon.png",
+          "color": "#ffffff",
+          "defaultChannel": "default"
         }
       ],
       "expo-web-browser"
