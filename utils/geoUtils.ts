@@ -7,26 +7,6 @@ export interface CafeCoordinates {
 }
 
 export const geoUtils = {
-  // Calculate distance between two points using Haversine formula
-  calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
-    const R = 6371; // Earth's radius in kilometers
-    const dLat = this.toRadians(lat2 - lat1);
-    const dLon = this.toRadians(lon2 - lon1);
-    
-    const a = 
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(this.toRadians(lat1)) * Math.cos(this.toRadians(lat2)) *
-      Math.sin(dLon / 2) * Math.sin(dLon / 2);
-    
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c; // Distance in kilometers
-  },
-
-  // Convert degrees to radians
-  toRadians(degrees: number): number {
-    return degrees * (Math.PI / 180);
-  },
-
   // Calculate centroid from an array of coordinates
   calculateCentroid(coordinates: Array<{ latitude: number; longitude: number }>): { latitude: number; longitude: number } {
     if (coordinates.length === 0) {
@@ -114,66 +94,6 @@ export const geoUtils = {
       return this.calculateCentroid(coordinates);
     } catch (error) {
       console.error('Error calculating cafes centroid:', error);
-      return null;
-    }
-  },
-
-  // KNN: Sort profiles by distance from user location
-  async sortProfilesByDistance(
-    profiles: any[], 
-    userLocation: { latitude: number; longitude: number } | null
-  ): Promise<any[]> {
-    if (!userLocation || profiles.length === 0) {
-      return profiles; // Return unsorted if no user location
-    }
-
-    // Calculate distance for each profile and add it to the profile object
-    const profilesWithDistance = await Promise.all(
-      profiles.map(async (profile) => {
-        let profileLocation = null;
-        let distance = Infinity; // Default to infinity if no location found
-
-        try {
-          // Try to get location from profile's favorite cafes centroid
-          if (profile.favorite_cafes && profile.favorite_cafes.length > 0) {
-            profileLocation = await this.getCafesCentroid(profile.favorite_cafes);
-          }
-
-          // If we have both locations, calculate distance
-          if (profileLocation) {
-            distance = this.calculateDistance(
-              userLocation.latitude,
-              userLocation.longitude,
-              profileLocation.latitude,
-              profileLocation.longitude
-            );
-          }
-        } catch (error) {
-          console.error('Error calculating distance for profile:', profile.id, error);
-        }
-
-        return {
-          ...profile,
-          distance: distance,
-          profileLocation: profileLocation
-        };
-      })
-    );
-
-    // Sort by distance (nearest first)
-    return profilesWithDistance.sort((a, b) => a.distance - b.distance);
-  },
-
-  // Get user location from their favorite cafes
-  async getUserLocationFromCafes(userCafes: string[]): Promise<{ latitude: number; longitude: number } | null> {
-    if (!userCafes || userCafes.length === 0) {
-      return null;
-    }
-
-    try {
-      return await this.getCafesCentroid(userCafes);
-    } catch (error) {
-      console.error('Error getting user location from cafes:', error);
       return null;
     }
   }
