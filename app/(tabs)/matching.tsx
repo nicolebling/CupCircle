@@ -1500,12 +1500,15 @@ export default function MatchingScreen() {
                   styles.clearButton,
                   { borderColor: colors.border },
                 ]}
-                onPress={() => {
+                onPress={async () => {
                   setFilterKeyword("");
                   setFilterIndustries([]);
                   setFilterExperienceLevels([]);
                   setFilterInterests([]);
                   setFilterMaxDistance(50);
+                  // Also refresh profiles to reset distance ordering
+                  setCurrentIndex(0);
+                  await fetchProfiles();
                 }}
               >
                 <Text style={{ color: colors.text }}>Clear All</Text>
