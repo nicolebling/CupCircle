@@ -401,6 +401,7 @@ export default function AvailabilityScreen() {
 
   const handleDateSelect = (date: Date) => {
     setSelectedDate(date);
+    setSelectedTimes([]); // Clear selected times when switching dates
   };
 
   const SkeletonAvailabilityItem = () => (
