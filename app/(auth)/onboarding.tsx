@@ -46,31 +46,42 @@ export default function OnboardingScreen() {
   };
 
   const requestPermission = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== "granted") {
-      Alert.alert(
-        "Permission Required",
-        "Please enable media library access in settings.",
-      );
+    try {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert(
+          "Permission Required",
+          "Please enable media library access in settings to upload photos.",
+        );
+        return false;
+      }
+      return true;
+    } catch (error) {
+      console.error("Error requesting permissions:", error);
+      Alert.alert("Error", "Failed to request permissions. Please try again.");
       return false;
     }
-    return true;
   };
 
   const pickImage = async () => {
-    const hasPermission = await requestPermission();
-    if (!hasPermission) return;
+    try {
+      const hasPermission = await requestPermission();
+      if (!hasPermission) return;
 
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaType.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.8,
-      base64: true,
-    });
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+        base64: false, // Changed to false to avoid memory issues
+      });
 
-    if (!result.canceled && result.assets && result.assets.length > 0) {
-      uploadImage(result.assets[0].uri);
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        await uploadImage(result.assets[0].uri);
+      }
+    } catch (error) {
+      console.error("Error picking image:", error);
+      Alert.alert("Error", "Failed to pick image. Please try again.");
     }
   };
 
@@ -78,35 +89,38 @@ export default function OnboardingScreen() {
     try {
       setLoading(true);
       
+      // Create form data for file upload
+      const formData = new FormData();
+      const filename = `${user?.id}/${Date.now()}.jpg`;
+      
+      // Create file object from URI
+      formData.append('file', {
+        uri: uri,
+        type: 'image/jpeg',
+        name: filename,
+      } as any);
+
+      // Upload directly from URI
       const response = await fetch(uri);
       const blob = await response.blob();
       
-      const reader = new FileReader();
-      const base64Promise = new Promise((resolve) => {
-        reader.onload = () => {
-          const base64 = reader.result?.toString().split(",")[1];
-          resolve(base64);
-        };
-      });
-      reader.readAsDataURL(blob);
-      const base64Data = await base64Promise;
-
-      const filePath = `${user?.id}/${Date.now()}.png`;
-
       const { error: uploadError } = await supabase.storage
         .from("photos")
-        .upload(filePath, decode(base64Data as string), {
-          contentType: "image/png",
+        .upload(filename, blob, {
+          contentType: "image/jpeg",
+          upsert: true,
         });
 
       if (uploadError) throw uploadError;
 
-      const { data } = supabase.storage.from("photos").getPublicUrl(filePath);
+      const { data } = supabase.storage.from("photos").getPublicUrl(filename);
       
-      setProfileData({
-        ...profileData,
+      setProfileData(prev => ({
+        ...prev,
         photo_url: data.publicUrl
-      });
+      }));
+      
+      console.log("✅ Image uploaded successfully:", data.publicUrl);
     } catch (error) {
       console.error("Error uploading image:", error);
       Alert.alert("Error", "Failed to upload image. Please try again.");
