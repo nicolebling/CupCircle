@@ -1,9 +1,15 @@
 
 {
   "cli": {
-    "version": ">= 5.9.1"
+    "version": ">= 5.9.1",
+    "appVersionSource": "local"
   },
   "build": {
+    "production": {
+      "ios": {
+        "buildType": "release"
+      }
+    },
     "development": {
       "developmentClient": true,
       "distribution": "internal"

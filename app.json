@@ -27,7 +27,8 @@
         "NSLocationWhenInUseUsageDescription": "This app requires location access to function properly.",
         "NSLocationAlwaysUsageDescription": "This app needs location access even in the background.",
         "NSPhotoLibraryUsageDescription": "We need access to your photo library to upload images.",
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "UIBackgroundModes": ["fetch", "remote-notification"]
       },
       "config": {
         "googleMapsApiKey": "AIzaSyDYiKrt8lG2X2HxF4DUqVqIFi4wpGo6Aec"
