@@ -46,81 +46,67 @@ export default function OnboardingScreen() {
   };
 
   const requestPermission = async () => {
-    try {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== "granted") {
-        Alert.alert(
-          "Permission Required",
-          "Please enable media library access in settings to upload photos.",
-        );
-        return false;
-      }
-      return true;
-    } catch (error) {
-      console.error("Error requesting permissions:", error);
-      Alert.alert("Error", "Failed to request permissions. Please try again.");
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert(
+        "Permission Required",
+        "Please enable media library access in settings.",
+      );
       return false;
     }
+    return true;
   };
 
   const pickImage = async () => {
-    try {
-      const hasPermission = await requestPermission();
-      if (!hasPermission) return;
+    const hasPermission = await requestPermission();
+    if (!hasPermission) return;
 
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [1, 1],
-        quality: 0.8,
-        base64: false, // Changed to false to avoid memory issues
-      });
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+      base64: true,
+    });
 
-      if (!result.canceled && result.assets && result.assets.length > 0) {
-        await uploadImage(result.assets[0].uri);
-      }
-    } catch (error) {
-      console.error("Error picking image:", error);
-      Alert.alert("Error", "Failed to pick image. Please try again.");
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      uploadImage(result.assets[0].uri);
     }
   };
 
   const uploadImage = async (uri: string) => {
     try {
       setLoading(true);
-      
-      // Create form data for file upload
-      const formData = new FormData();
-      const filename = `${user?.id}/${Date.now()}.jpg`;
-      
-      // Create file object from URI
-      formData.append('file', {
-        uri: uri,
-        type: 'image/jpeg',
-        name: filename,
-      } as any);
 
-      // Upload directly from URI
       const response = await fetch(uri);
       const blob = await response.blob();
-      
+
+      const reader = new FileReader();
+      const base64Promise = new Promise((resolve) => {
+        reader.onload = () => {
+          const base64 = reader.result?.toString().split(",")[1];
+          resolve(base64);
+        };
+      });
+      reader.readAsDataURL(blob);
+      const base64Data = await base64Promise;
+
+      const filePath = `${user?.id}/${Date.now()}.png`;
+
       const { error: uploadError } = await supabase.storage
         .from("photos")
-        .upload(filename, blob, {
-          contentType: "image/jpeg",
-          upsert: true,
+        .upload(filePath, decode(base64Data as string), {
+          contentType: "image/png",
         });
 
       if (uploadError) throw uploadError;
 
-      const { data } = supabase.storage.from("photos").getPublicUrl(filename);
-      
-      setProfileData(prev => ({
-        ...prev,
+      const { data } = supabase.storage.from("photos").getPublicUrl(filePath);
+
+      setProfileData({
+        ...profileData,
         photo_url: data.publicUrl
-      }));
-      
-      console.log("✅ Image uploaded successfully:", data.publicUrl);
+      });
     } catch (error) {
       console.error("Error uploading image:", error);
       Alert.alert("Error", "Failed to upload image. Please try again.");
@@ -161,13 +147,13 @@ export default function OnboardingScreen() {
         id: user?.id
       };
       await updateUser(profileDataWithId);
-      
+
       // Register for push notifications now that profile is complete
       try {
         console.log('🔔 Registering for push notifications...');
         const { notificationService } = require('@/services/notificationService');
         const pushToken = await notificationService.registerForPushNotificationsAsync();
-        
+
         if (pushToken) {
           await notificationService.savePushToken(user?.id, pushToken);
           console.log('✅ Push token saved successfully');
@@ -178,7 +164,7 @@ export default function OnboardingScreen() {
         console.error('❌ Failed to register for push notifications:', error);
         // Don't block the user flow if push notifications fail
       }
-      
+
       router.replace('/(tabs)/matching');
     } catch (error) {
       console.error('Failed to save profile', error);
@@ -356,7 +342,7 @@ export default function OnboardingScreen() {
             </View>
           );
 
-       
+
 
         case 10:
           return (

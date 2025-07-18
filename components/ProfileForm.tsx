@@ -100,14 +100,14 @@ export default function ProfileForm({
       setCentroidLat(centroid.latitude);
       setCentroidLng(centroid.longitude);
       console.log("Updated centroid:", centroid);
-      
+
       // Auto-update centroid in database
       await updateCentroidInDatabase(centroid.latitude, centroid.longitude);
     } else {
       setCentroidLat(null);
       setCentroidLng(null);
       console.log("Cleared centroid");
-      
+
       // Clear centroid in database
       await updateCentroidInDatabase(null, null);
     }
@@ -205,7 +205,7 @@ export default function ProfileForm({
     if (!hasPermission) return;
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaType.Images,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [1, 1],
       quality: 0.8,
@@ -357,7 +357,7 @@ export default function ProfileForm({
   const updateCentroidInDatabase = async (lat: number | null, lng: number | null) => {
     try {
       console.log("Updating centroid in database:", { lat, lng });
-      
+
       const { error } = await supabase
         .from("profiles")
         .update({
