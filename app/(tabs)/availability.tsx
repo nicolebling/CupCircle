@@ -129,6 +129,11 @@ export default function AvailabilityScreen() {
   };
 
   const handleAddSlot = async () => {
+    if (selectedTimes.length === 0) {
+      Alert.alert("No Time Selected", "Please select at least one time slot.");
+      return;
+    }
+
     // Format the selected date consistently for comparison
     const selectedDateString = format(selectedDate, "yyyy-MM-dd");
 
@@ -148,42 +153,59 @@ export default function AvailabilityScreen() {
       return `${hours}:${minutes}`;
     };
 
-    // Check for overlap time slots
-    const newStart = new Date(
-      `1970-01-01T${to24Hour(selectedTime)}:00`,
-    ).getTime();
-    const newEnd = new Date(
-      `1970-01-01T${to24Hour(calculateEndTime(selectedTime))}:00`,
-    ).getTime();
-
-    const hasOverlap = timeSlots.some((slot) => {
-      if (format(new Date(slot.date), "yyyy-MM-dd") !== selectedDateString)
-        return false;
-      const slotStart = new Date(
-        `1970-01-01T${to24Hour(slot.startTime)}:00`,
+    // Check for overlaps for all selected times
+    const overlappingTimes = [];
+    for (const selectedTime of selectedTimes) {
+      const newStart = new Date(
+        `1970-01-01T${to24Hour(selectedTime)}:00`,
       ).getTime();
-      const slotEnd = new Date(
-        `1970-01-01T${to24Hour(slot.endTime)}:00`,
+      const newEnd = new Date(
+        `1970-01-01T${to24Hour(calculateEndTime(selectedTime))}:00`,
       ).getTime();
-      return newStart < slotEnd && newEnd > slotStart;
-    });
 
-    if (hasOverlap) {
+      const hasOverlap = timeSlots.some((slot) => {
+        if (format(new Date(slot.date), "yyyy-MM-dd") !== selectedDateString)
+          return false;
+        const slotStart = new Date(
+          `1970-01-01T${to24Hour(slot.startTime)}:00`,
+        ).getTime();
+        const slotEnd = new Date(
+          `1970-01-01T${to24Hour(slot.endTime)}:00`,
+        ).getTime();
+        return newStart < slotEnd && newEnd > slotStart;
+      });
+
+      if (hasOverlap) {
+        overlappingTimes.push(selectedTime);
+      }
+    }
+
+    if (overlappingTimes.length > 0) {
       Alert.alert(
         "Duplicate Time Slots",
-        "The time slot you choose is already existed.",
+        `The following time slots already exist: ${overlappingTimes.join(", ")}`,
       );
       return;
     }
 
-    const endTime = calculateEndTime(selectedTime);
-    const result = await createSlot(selectedDate, selectedTime, endTime);
-    if (result) {
+    // Create all selected time slots
+    try {
+      setIsLoading(true);
+      for (const selectedTime of selectedTimes) {
+        const endTime = calculateEndTime(selectedTime);
+        await createSlot(selectedDate, selectedTime, endTime);
+      }
       await getUserAvailability();
+      setSelectedTimes([]);
+    } catch (error) {
+      console.error("Error creating time slots:", error);
+      Alert.alert("Error", "Failed to create some time slots. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const [selectedTime, setSelectedTime] = useState("10:00 AM");
+  const [selectedTimes, setSelectedTimes] = useState<string[]>([]);
 
   // Generate next 7 days for calendar, filtering out current day if past 4 PM
   const now = new Date();
@@ -432,9 +454,15 @@ export default function AvailabilityScreen() {
         visible={showAddSlot}
         transparent={true}
         animationType="slide"
-        onRequestClose={() => setShowAddSlot(false)}
+        onRequestClose={() => {
+          setShowAddSlot(false);
+          setSelectedTimes([]);
+        }}
       >
-        <TouchableWithoutFeedback onPress={() => setShowAddSlot(false)}>
+        <TouchableWithoutFeedback onPress={() => {
+          setShowAddSlot(false);
+          setSelectedTimes([]);
+        }}>
           <View style={styles.modalOverlay}>
             <TouchableWithoutFeedback onPress={() => {}}>
               <View
@@ -447,7 +475,10 @@ export default function AvailabilityScreen() {
                   <Text style={[styles.modalTitle, { color: colors.text }]}>
                     Add Availability
                   </Text>
-                  <TouchableOpacity onPress={() => setShowAddSlot(false)}>
+                  <TouchableOpacity onPress={() => {
+                    setShowAddSlot(false);
+                    setSelectedTimes([]);
+                  }}>
                     <Ionicons name="close" size={24} color={colors.text} />
                   </TouchableOpacity>
                 </View>
@@ -533,7 +564,15 @@ export default function AvailabilityScreen() {
                   <Text
                     style={[styles.timeSelectorLabel, { color: colors.text }]}
                   >
-                    Select Start Time (30-minute duration)
+                    Select Time Slots (30-minute duration each)
+                  </Text>
+                  <Text
+                    style={[
+                      styles.multiSelectHint,
+                      { color: colors.secondaryText },
+                    ]}
+                  >
+                    Tap multiple times to select/deselect slots
                   </Text>
 
                   <View style={styles.timePickerContainer}>
@@ -541,7 +580,7 @@ export default function AvailabilityScreen() {
                       horizontal
                       data={availableTimes}
                       renderItem={({ item }) => {
-                        const isSelectedTime = selectedTime === item;
+                        const isSelectedTime = selectedTimes.includes(item);
 
                         const isTimeTaken = timeSlots.some(
                           (slot) =>
@@ -590,6 +629,18 @@ export default function AvailabilityScreen() {
                           );
                         });
 
+                        const handleTimeSelection = () => {
+                          if (isTimeTaken || isPastTime || isAlreadyAdded) return;
+                          
+                          if (isSelectedTime) {
+                            // Remove from selection
+                            setSelectedTimes(selectedTimes.filter(time => time !== item));
+                          } else {
+                            // Add to selection
+                            setSelectedTimes([...selectedTimes, item]);
+                          }
+                        };
+
                         return (
                           <TouchableOpacity
                             style={[
@@ -600,12 +651,7 @@ export default function AvailabilityScreen() {
                               (isTimeTaken || isPastTime || isAlreadyAdded) &&
                                 styles.disabledTime,
                             ]}
-                            onPress={() =>
-                              !isTimeTaken &&
-                              !isPastTime &&
-                              !isAlreadyAdded &&
-                              setSelectedTime(item)
-                            }
+                            onPress={handleTimeSelection}
                             disabled={
                               isTimeTaken || isPastTime || isAlreadyAdded
                             }
@@ -621,6 +667,11 @@ export default function AvailabilityScreen() {
                             >
                               {item}
                             </Text>
+                            {isSelectedTime && (
+                              <View style={styles.selectedIndicator}>
+                                <Ionicons name="checkmark" size={12} color="white" />
+                              </View>
+                            )}
                           </TouchableOpacity>
                         );
                       }}
@@ -630,27 +681,67 @@ export default function AvailabilityScreen() {
                     />
                   </View>
 
-                  <Text
-                    style={[
-                      styles.endTimeText,
-                      { color: colors.secondaryText },
-                    ]}
-                  >
-                    End Time: {calculateEndTime(selectedTime)}
-                  </Text>
+                  {selectedTimes.length > 0 && (
+                    <View style={styles.selectedTimesContainer}>
+                      <Text
+                        style={[
+                          styles.selectedTimesLabel,
+                          { color: colors.text },
+                        ]}
+                      >
+                        Selected Times ({selectedTimes.length}):
+                      </Text>
+                      <View style={styles.selectedTimesList}>
+                        {selectedTimes.map((time) => (
+                          <View
+                            key={time}
+                            style={[
+                              styles.selectedTimeChip,
+                              { backgroundColor: colors.primary },
+                            ]}
+                          >
+                            <Text style={styles.selectedTimeChipText}>
+                              {time} - {calculateEndTime(time)}
+                            </Text>
+                            <TouchableOpacity
+                              onPress={() =>
+                                setSelectedTimes(
+                                  selectedTimes.filter((t) => t !== time)
+                                )
+                              }
+                              style={styles.removeTimeButton}
+                            >
+                              <Ionicons name="close" size={14} color="white" />
+                            </TouchableOpacity>
+                          </View>
+                        ))}
+                      </View>
+                    </View>
+                  )}
 
                   <TouchableOpacity
                     style={[
                       styles.saveButton,
-                      { backgroundColor: colors.primary },
+                      { 
+                        backgroundColor: selectedTimes.length > 0 ? colors.primary : colors.border,
+                        opacity: selectedTimes.length > 0 ? 1 : 0.5 
+                      },
                     ]}
                     onPress={() => {
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                      handleAddSlot();
-                      setShowAddSlot(false);
+                      if (selectedTimes.length > 0) {
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                        handleAddSlot();
+                        setShowAddSlot(false);
+                      }
                     }}
+                    disabled={selectedTimes.length === 0}
                   >
-                    <Text style={styles.saveButtonText}>Save Time Slot</Text>
+                    <Text style={[
+                      styles.saveButtonText,
+                      { color: selectedTimes.length > 0 ? "white" : colors.secondaryText }
+                    ]}>
+                      Save {selectedTimes.length > 0 ? `${selectedTimes.length} Time Slot${selectedTimes.length > 1 ? 's' : ''}` : 'Time Slots'}
+                    </Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -924,6 +1015,59 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     fontSize: 16,
     color: "white",
+  },
+  multiSelectHint: {
+    fontFamily: "K2D-Regular",
+    fontSize: 12,
+    marginBottom: 8,
+    fontStyle: "italic",
+  },
+  selectedIndicator: {
+    position: "absolute",
+    top: -2,
+    right: -2,
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    backgroundColor: "rgba(255, 255, 255, 0.3)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  selectedTimesContainer: {
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  selectedTimesLabel: {
+    fontFamily: "K2D-Medium",
+    fontSize: 14,
+    marginBottom: 8,
+  },
+  selectedTimesList: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  selectedTimeChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    marginBottom: 4,
+  },
+  selectedTimeChipText: {
+    fontFamily: "K2D-Regular",
+    fontSize: 12,
+    color: "white",
+    marginRight: 6,
+  },
+  removeTimeButton: {
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    backgroundColor: "rgba(255, 255, 255, 0.3)",
+    alignItems: "center",
+    justifyContent: "center",
   },
   skeletonCard: {
     margin: 16,
