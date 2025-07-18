@@ -129,13 +129,21 @@ export default function AvailabilityScreen() {
   };
 
   const handleAddSlot = async () => {
-    if (selectedTimes.length === 0) {
+    // Combine current selections with multi-date selections
+    const currentDateKey = format(selectedDate, 'yyyy-MM-dd');
+    let allSelections = { ...multiDateSelections };
+    
+    if (selectedTimes.length > 0) {
+      allSelections[currentDateKey] = selectedTimes;
+    }
+
+    // Check if there are any selections at all
+    const totalSelections = Object.values(allSelections).reduce((total, times) => total + times.length, 0);
+    
+    if (totalSelections === 0) {
       Alert.alert("No Time Selected", "Please select at least one time slot.");
       return;
     }
-
-    // Format the selected date consistently for comparison
-    const selectedDateString = format(selectedDate, "yyyy-MM-dd");
 
     // Helper function to convert 12-hour time to 24-hour format
     const to24Hour = (time12h) => {
@@ -153,50 +161,65 @@ export default function AvailabilityScreen() {
       return `${hours}:${minutes}`;
     };
 
-    // Check for overlaps for all selected times
-    const overlappingTimes = [];
-    for (const selectedTime of selectedTimes) {
-      const newStart = new Date(
-        `1970-01-01T${to24Hour(selectedTime)}:00`,
-      ).getTime();
-      const newEnd = new Date(
-        `1970-01-01T${to24Hour(calculateEndTime(selectedTime))}:00`,
-      ).getTime();
-
-      const hasOverlap = timeSlots.some((slot) => {
-        if (format(new Date(slot.date), "yyyy-MM-dd") !== selectedDateString)
-          return false;
-        const slotStart = new Date(
-          `1970-01-01T${to24Hour(slot.startTime)}:00`,
+    // Check for overlaps across all dates
+    const overlappingSlots = [];
+    for (const [dateKey, times] of Object.entries(allSelections)) {
+      for (const selectedTime of times) {
+        const newStart = new Date(
+          `1970-01-01T${to24Hour(selectedTime)}:00`,
         ).getTime();
-        const slotEnd = new Date(
-          `1970-01-01T${to24Hour(slot.endTime)}:00`,
+        const newEnd = new Date(
+          `1970-01-01T${to24Hour(calculateEndTime(selectedTime))}:00`,
         ).getTime();
-        return newStart < slotEnd && newEnd > slotStart;
-      });
 
-      if (hasOverlap) {
-        overlappingTimes.push(selectedTime);
+        const hasOverlap = timeSlots.some((slot) => {
+          if (format(new Date(slot.date), "yyyy-MM-dd") !== dateKey)
+            return false;
+          const slotStart = new Date(
+            `1970-01-01T${to24Hour(slot.startTime)}:00`,
+          ).getTime();
+          const slotEnd = new Date(
+            `1970-01-01T${to24Hour(slot.endTime)}:00`,
+          ).getTime();
+          return newStart < slotEnd && newEnd > slotStart;
+        });
+
+        if (hasOverlap) {
+          overlappingSlots.push(`${format(new Date(dateKey), 'MMM d')}: ${selectedTime}`);
+        }
       }
     }
 
-    if (overlappingTimes.length > 0) {
+    if (overlappingSlots.length > 0) {
       Alert.alert(
         "Duplicate Time Slots",
-        `The following time slots already exist: ${overlappingTimes.join(", ")}`,
+        `The following time slots already exist:\n${overlappingSlots.join('\n')}`,
       );
       return;
     }
 
-    // Create all selected time slots
+    // Create all selected time slots across all dates
     try {
       setIsLoading(true);
-      for (const selectedTime of selectedTimes) {
-        const endTime = calculateEndTime(selectedTime);
-        await createSlot(selectedDate, selectedTime, endTime);
+      let totalCreated = 0;
+      
+      for (const [dateKey, times] of Object.entries(allSelections)) {
+        const date = new Date(dateKey);
+        for (const selectedTime of times) {
+          const endTime = calculateEndTime(selectedTime);
+          await createSlot(date, selectedTime, endTime);
+          totalCreated++;
+        }
       }
+      
       await getUserAvailability();
       setSelectedTimes([]);
+      setMultiDateSelections({});
+      
+      Alert.alert(
+        "Success", 
+        `Successfully created ${totalCreated} time slot${totalCreated > 1 ? 's' : ''} across ${Object.keys(allSelections).length} date${Object.keys(allSelections).length > 1 ? 's' : ''}.`
+      );
     } catch (error) {
       console.error("Error creating time slots:", error);
       Alert.alert("Error", "Failed to create some time slots. Please try again.");
@@ -206,6 +229,7 @@ export default function AvailabilityScreen() {
   };
 
   const [selectedTimes, setSelectedTimes] = useState<string[]>([]);
+  const [multiDateSelections, setMultiDateSelections] = useState<Record<string, string[]>>({});
 
   // Generate next 7 days for calendar, filtering out current day if past 4 PM
   const now = new Date();
@@ -400,8 +424,20 @@ export default function AvailabilityScreen() {
   });
 
   const handleDateSelect = (date: Date) => {
+    // Save current selections for the previous date
+    if (selectedTimes.length > 0) {
+      const dateKey = format(selectedDate, 'yyyy-MM-dd');
+      setMultiDateSelections(prev => ({
+        ...prev,
+        [dateKey]: selectedTimes
+      }));
+    }
+    
     setSelectedDate(date);
-    setSelectedTimes([]); // Clear selected times when switching dates
+    
+    // Load selections for the new date
+    const newDateKey = format(date, 'yyyy-MM-dd');
+    setSelectedTimes(multiDateSelections[newDateKey] || []);
   };
 
   const SkeletonAvailabilityItem = () => (
@@ -458,11 +494,13 @@ export default function AvailabilityScreen() {
         onRequestClose={() => {
           setShowAddSlot(false);
           setSelectedTimes([]);
+          setMultiDateSelections({});
         }}
       >
         <TouchableWithoutFeedback onPress={() => {
           setShowAddSlot(false);
           setSelectedTimes([]);
+          setMultiDateSelections({});
         }}>
           <View style={styles.modalOverlay}>
             <TouchableWithoutFeedback onPress={() => {}}>
@@ -479,6 +517,7 @@ export default function AvailabilityScreen() {
                   <TouchableOpacity onPress={() => {
                     setShowAddSlot(false);
                     setSelectedTimes([]);
+                    setMultiDateSelections({});
                   }}>
                     <Ionicons name="close" size={24} color={colors.text} />
                   </TouchableOpacity>
@@ -640,6 +679,17 @@ export default function AvailabilityScreen() {
                             // Add to selection
                             setSelectedTimes([...selectedTimes, item]);
                           }
+                          
+                          // Update multi-date selections immediately
+                          const currentDateKey = format(selectedDate, 'yyyy-MM-dd');
+                          const updatedTimes = isSelectedTime 
+                            ? selectedTimes.filter(time => time !== item)
+                            : [...selectedTimes, item];
+                            
+                          setMultiDateSelections(prev => ({
+                            ...prev,
+                            [currentDateKey]: updatedTimes
+                          }));
                         };
 
                         return (
@@ -682,7 +732,7 @@ export default function AvailabilityScreen() {
                     />
                   </View>
 
-                  {selectedTimes.length > 0 && (
+                  {(selectedTimes.length > 0 || Object.keys(multiDateSelections).length > 0) && (
                     <View style={styles.selectedTimesContainer}>
                       <Text
                         style={[
@@ -690,7 +740,7 @@ export default function AvailabilityScreen() {
                           { color: colors.text },
                         ]}
                       >
-                        Selected Times ({selectedTimes.length}):
+                        Selected Times for {format(selectedDate, 'MMM d')} ({selectedTimes.length}):
                       </Text>
                       <View style={styles.selectedTimesList}>
                         {selectedTimes.map((time) => (
@@ -717,6 +767,19 @@ export default function AvailabilityScreen() {
                           </View>
                         ))}
                       </View>
+                      
+                      {Object.keys(multiDateSelections).length > 0 && (
+                        <View style={styles.otherDatesContainer}>
+                          <Text style={[styles.otherDatesLabel, { color: colors.secondaryText }]}>
+                            Other Dates ({Object.values(multiDateSelections).reduce((total, times) => total + times.length, 0)} slots):
+                          </Text>
+                          {Object.entries(multiDateSelections).map(([dateKey, times]) => (
+                            <Text key={dateKey} style={[styles.otherDateText, { color: colors.secondaryText }]}>
+                              {format(new Date(dateKey), 'MMM d')}: {times.length} slot{times.length > 1 ? 's' : ''}
+                            </Text>
+                          ))}
+                        </View>
+                      )}
                     </View>
                   )}
 
@@ -724,24 +787,30 @@ export default function AvailabilityScreen() {
                     style={[
                       styles.saveButton,
                       { 
-                        backgroundColor: selectedTimes.length > 0 ? colors.primary : colors.border,
-                        opacity: selectedTimes.length > 0 ? 1 : 0.5 
+                        backgroundColor: (selectedTimes.length > 0 || Object.keys(multiDateSelections).length > 0) ? colors.primary : colors.border,
+                        opacity: (selectedTimes.length > 0 || Object.keys(multiDateSelections).length > 0) ? 1 : 0.5 
                       },
                     ]}
                     onPress={() => {
-                      if (selectedTimes.length > 0) {
+                      const totalSelections = selectedTimes.length + Object.values(multiDateSelections).reduce((total, times) => total + times.length, 0);
+                      if (totalSelections > 0) {
                         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                         handleAddSlot();
                         setShowAddSlot(false);
                       }
                     }}
-                    disabled={selectedTimes.length === 0}
+                    disabled={selectedTimes.length === 0 && Object.keys(multiDateSelections).length === 0}
                   >
                     <Text style={[
                       styles.saveButtonText,
-                      { color: selectedTimes.length > 0 ? "white" : colors.secondaryText }
+                      { color: (selectedTimes.length > 0 || Object.keys(multiDateSelections).length > 0) ? "white" : colors.secondaryText }
                     ]}>
-                      Save {selectedTimes.length > 0 ? `${selectedTimes.length} Time Slot${selectedTimes.length > 1 ? 's' : ''}` : 'Time Slots'}
+                      {(() => {
+                        const totalSelections = selectedTimes.length + Object.values(multiDateSelections).reduce((total, times) => total + times.length, 0);
+                        const totalDates = Object.keys(multiDateSelections).length + (selectedTimes.length > 0 ? 1 : 0);
+                        if (totalSelections === 0) return 'Save Time Slots';
+                        return `Save ${totalSelections} Slot${totalSelections > 1 ? 's' : ''} (${totalDates} Date${totalDates > 1 ? 's' : ''})`;
+                      })()}
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -1069,6 +1138,22 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255, 255, 255, 0.3)",
     alignItems: "center",
     justifyContent: "center",
+  },
+  otherDatesContainer: {
+    marginTop: 12,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: "rgba(0,0,0,0.1)",
+  },
+  otherDatesLabel: {
+    fontFamily: "K2D-Medium",
+    fontSize: 12,
+    marginBottom: 4,
+  },
+  otherDateText: {
+    fontFamily: "K2D-Regular",
+    fontSize: 11,
+    marginBottom: 2,
   },
   skeletonCard: {
     margin: 16,
