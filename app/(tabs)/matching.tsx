@@ -1274,6 +1274,7 @@ export default function MatchingScreen() {
                           alert(
                             "Failed to send match request. Please try again.",
                           );
+                          return; // Exit early on error
                         }
                       }}
                       style={[
