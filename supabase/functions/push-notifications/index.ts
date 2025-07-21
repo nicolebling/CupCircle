@@ -6,9 +6,7 @@ console.log('Hello from Functions!')
 interface Notification {
   id: string
   user_id: string
-  title: string
   body: string
-  metadata?: Record<string, any>
 }
 
 interface WebhookPayload {
@@ -40,9 +38,8 @@ Deno.serve(async (req) => {
     },
     body: JSON.stringify({
       to: data?.push_token,
-      title: payload.record.title,
-      body: payload.record.body,
       sound: 'default',
+      body: payload.record.body,
     }),
   }).then((res) => res.json())
 
