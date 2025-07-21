@@ -215,8 +215,16 @@ export default function OnboardingScreen() {
               placeholder="Headline (Max 25 characters)"
               placeholderTextColor={colors.secondaryText}
               value={profileData.occupation}
-              onChangeText={(text) => setProfileData({ ...profileData, occupation: text })}
+              onChangeText={(text) => {
+                if (text.length <= 25) {
+                  setProfileData({ ...profileData, occupation: text });
+                }
+              }}
+              maxLength={25}
             />
+            <Text style={[styles.characterCount, { color: colors.secondaryText }]}>
+              {profileData.occupation.length}/25 characters
+            </Text>
           </View>
         );
 
@@ -537,6 +545,12 @@ const styles = StyleSheet.create({
   },
   loadingIcon: {
     marginLeft: 8,
+  },
+  characterCount: {
+    fontSize: 12,
+    fontFamily: 'K2D-Regular',
+    marginTop: -8,
+    marginBottom: 16,
   },
   photoContainer: {
     alignItems: 'center',
