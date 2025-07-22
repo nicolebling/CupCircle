@@ -77,7 +77,7 @@ export const notificationService = {
       console.error("Error saving push token:", error);
     }
   },
-
+  
   // Instead of sending directly, create notification in DB
   async createNotification(
     recipientUserId: string,
