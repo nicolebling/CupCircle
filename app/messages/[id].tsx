@@ -460,7 +460,7 @@ export default function MessageScreen() {
       try {
         await notificationService.sendNewMessageNotification(
           partner?.id,
-          user?.name || 'Someone',
+          user?.id,
           newMessage.trim()
         );
       } catch (notifError) {

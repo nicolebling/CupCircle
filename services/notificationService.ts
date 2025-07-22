@@ -148,16 +148,38 @@ export const notificationService = {
 
   async sendNewMessageNotification(
     recipientUserId: string,
-    senderName: string,
+    senderUserId: string,
     messagePreview: string,
   ) {
-    await this.createNotification(
-      recipientUserId,
-      `💬 Message from ${senderName}`,
-      messagePreview.length > 50
-        ? messagePreview.substring(0, 50) + "..."
-        : messagePreview,
-      { type: "new_message" },
-    );
+    try {
+      // Fetch sender name from profiles table
+      const { data: senderProfile, error } = await supabase
+        .from("profiles")
+        .select("name")
+        .eq("id", senderUserId)
+        .single();
+
+      const senderName = senderProfile?.name || "Someone";
+
+      await this.createNotification(
+        recipientUserId,
+        `💬 Message from ${senderName}`,
+        messagePreview.length > 50
+          ? messagePreview.substring(0, 50) + "..."
+          : messagePreview,
+        { type: "new_message" },
+      );
+    } catch (error) {
+      console.error("Error fetching sender name for notification:", error);
+      // Fallback notification with generic sender name
+      await this.createNotification(
+        recipientUserId,
+        `💬 New message`,
+        messagePreview.length > 50
+          ? messagePreview.substring(0, 50) + "..."
+          : messagePreview,
+        { type: "new_message" },
+      );
+    }
   },
 };
