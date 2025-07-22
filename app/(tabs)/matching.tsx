@@ -247,28 +247,28 @@ export default function MatchingScreen() {
         });
       } else {
         console.log("User centroid not found, trying to calculate from favorite cafes");
-        
+
         // Try to calculate centroid from favorite cafes
         if (data?.favorite_cafes && data.favorite_cafes.length > 0) {
           const coordinates: Array<{ latitude: number; longitude: number }> = [];
-          
+
           for (const cafe of data.favorite_cafes) {
             const parts = cafe.split("|||");
             if (parts.length >= 4) {
               const lng = parseFloat(parts[2]);
               const lat = parseFloat(parts[3]);
-              
+
               if (!isNaN(lat) && !isNaN(lng)) {
                 coordinates.push({ latitude: lat, longitude: lng });
               }
             }
           }
-          
+
           if (coordinates.length > 0) {
             const centroid = geoUtils.calculateCentroid(coordinates);
             console.log("Calculated user centroid from cafes:", centroid);
             setUserCentroid(centroid);
-            
+
             // Update the database with the calculated centroid
             const { error: updateError } = await supabase
               .from("profiles")
@@ -277,7 +277,7 @@ export default function MatchingScreen() {
                 centroid_long: centroid.longitude 
               })
               .eq("id", user.id);
-            
+
             if (updateError) {
               console.error("Error updating user centroid:", updateError);
             } else {
@@ -624,7 +624,7 @@ export default function MatchingScreen() {
         console.log(`User centroid: ${userCentroid.latitude}, ${userCentroid.longitude}`);
         console.log(`Filter max distance: ${filterMaxDistance} miles`);
         console.log(`Profiles before distance sorting: ${formattedProfiles.length}`);
-        
+
         // Log profile centroids before sorting
         formattedProfiles.forEach(profile => {
           if (profile.centroid_lat && profile.centroid_long) {
@@ -633,14 +633,14 @@ export default function MatchingScreen() {
             console.log(`Profile ${profile.name}: No centroid data`);
           }
         });
-        
+
         formattedProfiles = geoUtils.sortProfilesByDistance(userCentroid, formattedProfiles);
-        
+
         // Log sorted profiles with distances
         formattedProfiles.forEach((profile, index) => {
           console.log(`${index + 1}. ${profile.name}: ${profile.distance ? profile.distance.toFixed(2) + ' miles' : 'No distance'}`);
         });
-        
+
         // Apply distance filter if set
         if (filterMaxDistance !== null) {
           const beforeFilterCount = formattedProfiles.length;
@@ -1241,6 +1241,19 @@ export default function MatchingScreen() {
                             .select();
 
                           if (error) throw error;
+
+                          // Send coffee request notification
+                          if (currentProfile.id) {
+                            try {
+                              await notificationService.sendCoffeeRequestNotification(
+                                currentProfile.id,
+                                user?.id,
+                                selectedCafe || "a café"
+                              );
+                            } catch (notifError) {
+                              console.error('Error sending coffee request notification:', notifError);
+                            }
+                          }
 
                           alert("Match request sent successfully!");
                           // Clear selections after successful request

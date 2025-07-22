@@ -110,15 +110,35 @@ export const notificationService = {
   // Wrapper methods for specific events
   async sendCoffeeRequestNotification(
     recipientUserId: string,
-    senderName: string,
+    senderUserId: string,
     cafeName: string,
   ) {
-    await this.createNotification(
-      recipientUserId,
-      "☕ New Coffee Chat Request!",
-      `${senderName} wants to meet you at ${cafeName}`,
-      { type: "coffee_request" },
-    );
+    try {
+      // Fetch sender name from profiles table
+      const { data: senderProfile, error } = await supabase
+        .from("profiles")
+        .select("name")
+        .eq("id", senderUserId)
+        .single();
+
+      const senderName = senderProfile?.name || "Someone";
+
+      await this.createNotification(
+        recipientUserId,
+        "☕ New Coffee Chat Request!",
+        `${senderName} wants to meet you at ${cafeName}`,
+        { type: "coffee_request" },
+      );
+    } catch (error) {
+      console.error("Error fetching sender name for coffee request notification:", error);
+      // Fallback notification
+      await this.createNotification(
+        recipientUserId,
+        "☕ New Coffee Chat Request!",
+        `Someone wants to meet you at ${cafeName}`,
+        { type: "coffee_request" },
+      );
+    }
   },
 
   async sendCoffeeConfirmationNotification(
