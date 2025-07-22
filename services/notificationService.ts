@@ -138,9 +138,6 @@ export const notificationService = {
     recipientUserId: string,
     partnerName: string,
   ) {
-    try{
-      const {data: partnerProfile, error} = await supabase
-    }
     await this.createNotification(
       recipientUserId,
       "❌ Coffee Chat Cancelled",
