@@ -138,6 +138,9 @@ export const notificationService = {
     recipientUserId: string,
     partnerName: string,
   ) {
+    try{
+      const {data: partnerProfile, error} = await supabase
+    }
     await this.createNotification(
       recipientUserId,
       "❌ Coffee Chat Cancelled",
@@ -163,7 +166,7 @@ export const notificationService = {
 
       await this.createNotification(
         recipientUserId,
-        `💬 Message from ${senderName}`,
+        `${senderName}`,
         messagePreview.length > 50
           ? messagePreview.substring(0, 50) + "..."
           : messagePreview,
