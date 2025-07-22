@@ -81,6 +81,7 @@ export const notificationService = {
   // Instead of sending directly, create notification in DB
   async createNotification(
     recipientUserId: string,
+    
     title: string,
     body: string,
     metadata?: Record<string, any>,
@@ -152,7 +153,7 @@ export const notificationService = {
   ) {
     await this.createNotification(
       recipientUserId,
-      `💬 1234567890000000000000000000000Message from ${senderName}`,
+      `💬 Message from ${senderName}`,
       messagePreview.length > 50
         ? messagePreview.substring(0, 50) + "..."
         : messagePreview,

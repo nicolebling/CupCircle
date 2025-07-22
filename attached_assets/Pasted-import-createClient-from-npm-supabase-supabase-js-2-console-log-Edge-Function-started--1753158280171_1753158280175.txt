@@ -1,0 +1,93 @@
+import { createClient } from 'npm:@supabase/supabase-js@2';
+console.log('📡 Edge Function started');
+// Supabase client with Service Role key
+const supabase = createClient(Deno.env.get('SUPABASE_URL'), Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'));
+Deno.serve(async (req)=>{
+  try {
+    const payload = await req.json();
+    console.log('📥 Received webhook payload:', payload);
+    // Get the recipient's Expo push token from profiles
+    const { data: profile, error } = await supabase.from('profiles').select('push_token').eq('id', payload.record.user_id).single();
+    if (error) {
+      console.error('❌ Error fetching profile:', error);
+      return new Response(JSON.stringify({
+        error: error.message
+      }), {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+    }
+    if (!profile?.push_token) {
+      console.warn('⚠️ No push token found for user:', payload.record.user_id);
+      return new Response(JSON.stringify({
+        message: 'No push token found for user'
+      }), {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+    }
+    const expoAccessToken = Deno.env.get('EXPO_ACCESS_TOKEN');
+    if (!expoAccessToken) {
+      console.error('❌ Missing EXPO_ACCESS_TOKEN in environment variables');
+      return new Response(JSON.stringify({
+        error: 'Missing EXPO_ACCESS_TOKEN'
+      }), {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+    }
+    // 🆕 Dynamic sound based on metadata.type
+    let notificationSound = 'default';
+    switch(payload.record.metadata?.type){
+      case 'coffee_request':
+        notificationSound = 'ping.caf';
+        break;
+      case 'coffee_confirmed':
+        notificationSound = 'default';
+        break;
+      case 'coffee_cancelled':
+        notificationSound = 'glass.caf';
+        break;
+      default:
+        notificationSound = 'default';
+    }
+    // Send push notification using Expo Push API
+    const expoResponse = await fetch('https://exp.host/--/api/v2/push/send', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${expoAccessToken}`
+      },
+      body: JSON.stringify({
+        to: profile.push_token,
+        sound: notificationSound,
+        title: payload.record.title,
+        body: payload.record.body,
+        data: payload.record.metadata || {} // optional custom data
+      })
+    });
+    const result = await expoResponse.json();
+    console.log('📤 Expo Push API response:', result);
+    return new Response(JSON.stringify(result), {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+  } catch (err) {
+    console.error('❌ Unexpected error:', err);
+    return new Response(JSON.stringify({
+      error: 'Internal server error'
+    }), {
+      status: 500,
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+  }
+});
