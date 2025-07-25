@@ -22,7 +22,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.cupcircle.app",
+      "bundleIdentifier": "com.cupcircle.connect",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "This app requires location access to function properly.",
         "NSLocationAlwaysUsageDescription": "This app needs location access even in the background.",
