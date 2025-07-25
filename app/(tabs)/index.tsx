@@ -175,18 +175,17 @@ export default function CircleChatsScreen() {
 
         // Send confirmation notification to the other user
         if (chat && partnerProfile) {
-          const recipientUserId = chat.user1_id === user.id ? chat.user1_id : chat.user2_id;
-          // Only send to the person who originally sent the request (user1_id)
-          if (recipientUserId === chat.user1_id && user.id !== chat.user1_id) {
-            try {
-              await notificationService.sendCoffeeConfirmationNotification(
-                chat.user1_id,
-                user?.name || "Someone",
-                chat.meeting_location.split("|||")[0] || "the café"
-              );
-            } catch (notifError) {
-              console.error('Error sending coffee confirmation notification:', notifError);
-            }
+          // Get the correct recipient ID (the other user in the chat)
+          const recipientUserId = chat.user1_id === user.id ? chat.user2_id : chat.user1_id;
+          
+          try {
+            await notificationService.sendCoffeeConfirmationNotification(
+              recipientUserId,
+              user?.name || "Someone",
+              chat.meeting_location.split("|||")[0] || "the café"
+            );
+          } catch (notifError) {
+            console.error('Error sending coffee confirmation notification:', notifError);
           }
         }
 
