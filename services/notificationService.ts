@@ -143,27 +143,67 @@ export const notificationService = {
 
   async sendCoffeeConfirmationNotification(
     recipientUserId: string,
-    partnerName: string,
+    senderUserId: string,
     cafeName: string,
   ) {
-    await this.createNotification(
-      recipientUserId,
-      "✅ Coffee Chat Confirmed!",
-      `Your coffee chat with ${partnerName} at ${cafeName} is confirmed`,
-      { type: "coffee_confirmed" },
-    );
+    try {
+      // Fetch sender name from profiles table
+      const { data: senderProfile, error } = await supabase
+        .from("profiles")
+        .select("name")
+        .eq("id", senderUserId)
+        .single();
+
+      const senderName = senderProfile?.name || "Someone";
+
+      await this.createNotification(
+        recipientUserId,
+        "✅ Coffee Chat Confirmed!",
+        `Your coffee chat with ${senderName} at ${cafeName} is confirmed`,
+        { type: "coffee_confirmed" },
+      );
+    } catch (error) {
+      console.error("Error fetching sender name for coffee confirmation notification:", error);
+      // Fallback notification
+      await this.createNotification(
+        recipientUserId,
+        "✅ Coffee Chat Confirmed!",
+        `Your coffee chat at ${cafeName} is confirmed`,
+        { type: "coffee_confirmed" },
+      );
+    }
   },
 
   async sendCoffeeCancellationNotification(
     recipientUserId: string,
-    partnerName: string,
+    senderUserId: string,
   ) {
-    await this.createNotification(
-      recipientUserId,
-      "❌ Coffee Chat Cancelled",
-      `${partnerName} cancelled your coffee chat`,
-      { type: "coffee_cancelled" },
-    );
+    try {
+      // Fetch sender name from profiles table
+      const { data: senderProfile, error } = await supabase
+        .from("profiles")
+        .select("name")
+        .eq("id", senderUserId)
+        .single();
+
+      const senderName = senderProfile?.name || "Someone";
+
+      await this.createNotification(
+        recipientUserId,
+        "❌ Coffee Chat Cancelled",
+        `${senderName} cancelled your coffee chat`,
+        { type: "coffee_cancelled" },
+      );
+    } catch (error) {
+      console.error("Error fetching sender name for coffee cancellation notification:", error);
+      // Fallback notification
+      await this.createNotification(
+        recipientUserId,
+        "❌ Coffee Chat Cancelled",
+        "Your coffee chat has been cancelled",
+        { type: "coffee_cancelled" },
+      );
+    }
   },
 
   async sendNewMessageNotification(

@@ -181,7 +181,7 @@ export default function CircleChatsScreen() {
           try {
             await notificationService.sendCoffeeConfirmationNotification(
               recipientUserId,
-              user?.name || "Someone",
+              user.id,
               chat.meeting_location.split("|||")[0] || "the café"
             );
           } catch (notifError) {
@@ -219,7 +219,7 @@ export default function CircleChatsScreen() {
                   try {
                     await notificationService.sendCoffeeCancellationNotification(
                       partnerId,
-                      user?.name || "Someone"
+                      user.id
                     );
                   } catch (notifError) {
                     console.error('Error sending coffee cancellation notification:', notifError);
