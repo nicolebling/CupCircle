@@ -626,6 +626,7 @@ export default function ProfileForm({
             </View>
           </KeyboardAvoidingView>
 
+          <View style={styles.section}>
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isDark && styles.textDark]}>
                 Education
