@@ -21,9 +21,10 @@ type Props = {
   onChange: (transition: CareerTransition) => void;
   onDelete: () => void;
   isDark: boolean;
+  scrollViewRef?: React.RefObject<ScrollView>;
 };
 
-export default function CareerTransitionEntry({ transition, onChange, onDelete, isDark }: Props) {
+export default function CareerTransitionEntry({ transition, onChange, onDelete, isDark, scrollViewRef }: Props) {
   const colors = Colors[isDark ? 'dark' : 'light'];
   const [isEditing, setIsEditing] = useState(!transition?.position1);
   const [localTransition, setLocalTransition] = useState(() => ({
@@ -101,6 +102,11 @@ export default function CareerTransitionEntry({ transition, onChange, onDelete, 
           placeholderTextColor={colors.secondaryText}
           value={localTransition.position1}
           onChangeText={(value) => handleChange('position1', value)}
+          onFocus={() => {
+            setTimeout(() => {
+              scrollViewRef.current?.scrollToEnd({ animated: true });
+            }, 100);
+          }}
         />
       </View>
 
@@ -112,6 +118,11 @@ export default function CareerTransitionEntry({ transition, onChange, onDelete, 
           placeholderTextColor={colors.secondaryText}
           value={localTransition.position2}
           onChangeText={(value) => handleChange('position2', value)}
+          onFocus={() => {
+            setTimeout(() => {
+              scrollViewRef.current?.scrollToEnd({ animated: true });
+            }, 100);
+          }}
         />
       </View>
 

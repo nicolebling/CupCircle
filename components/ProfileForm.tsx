@@ -439,10 +439,13 @@ export default function ProfileForm({
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={styles.container}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
     >
       <ScrollView 
         showsVerticalScrollIndicator={false}
         ref={scrollViewRef}
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{ paddingBottom: 100 }}
       >
         <View style={styles.formContainer}>
           {error ? (
@@ -554,11 +557,7 @@ export default function ProfileForm({
 
           <View style={styles.divider} />
 
-          <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-            keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
-          >
-            <View style={styles.section}>
+          <View style={styles.section}>
               <View style={styles.inputGroup}>
                 <View style={styles.sectionHeader}>
                   <Text style={[styles.label, isDark && styles.textDark]}>
@@ -633,7 +632,6 @@ export default function ProfileForm({
                 ))}
               </View>
             </View>
-          </KeyboardAvoidingView>
 
           <View style={styles.inputGroup}>
             <Text style={[styles.label, isDark && styles.textDark]}>

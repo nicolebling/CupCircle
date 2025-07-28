@@ -138,6 +138,11 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
         placeholderTextColor={colors.secondaryText}
         value={localEmployment.company}
         onChangeText={(value) => handleChange('company', value)}
+        onFocus={() => {
+          setTimeout(() => {
+            scrollViewRef.current?.scrollToEnd({ animated: true });
+          }, 100);
+        }}
       />
 
       <View style={styles.positionContainer}>
@@ -148,6 +153,11 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
           placeholderTextColor={colors.secondaryText}
           value={localEmployment.position}
           onChangeText={(value) => handleChange('position', value)}
+          onFocus={() => {
+            setTimeout(() => {
+              scrollViewRef.current?.scrollToEnd({ animated: true });
+            }, 100);
+          }}
         />
       </View>
 
@@ -160,6 +170,11 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
             placeholderTextColor={colors.secondaryText}
             value={localEmployment.fromDate}
             onChangeText={(value) => handleChange('fromDate', value)}
+            onFocus={() => {
+              setTimeout(() => {
+                scrollViewRef.current?.scrollToEnd({ animated: true });
+              }, 100);
+            }}
           />
         </View>
 
@@ -172,6 +187,11 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
               placeholderTextColor={colors.secondaryText}
               value={localEmployment.toDate}
               onChangeText={(value) => handleChange('toDate', value)}
+              onFocus={() => {
+                setTimeout(() => {
+                  scrollViewRef.current?.scrollToEnd({ animated: true });
+                }, 100);
+              }}
             />
           ) : (
             <Text style={[styles.input, { backgroundColor: colors.input, color: colors.text, textAlignVertical: 'center' }]}>
