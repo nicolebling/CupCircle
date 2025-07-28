@@ -702,9 +702,8 @@ export default function ProfileForm({
             <Text style={styles.buttonText}>Save Profile</Text>
           )}
         </TouchableOpacity>
-      </View>
-    </ScrollView>
-  </KeyboardAvoidingView>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
