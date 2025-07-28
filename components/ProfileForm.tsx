@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -87,6 +87,8 @@ export default function ProfileForm({
   >([]);
 
   const [isEditing, setIsEditing] = useState(false);
+
+  const scrollViewRef = useRef<ScrollView>(null);
 
   useEffect(() => {
     if (!isNewUser) {
@@ -438,7 +440,10 @@ export default function ProfileForm({
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={styles.container}
     >
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        showsVerticalScrollIndicator={false}
+        ref={scrollViewRef}
+      >
         <View style={styles.formContainer}>
           {error ? (
             <View style={styles.errorContainer}>
@@ -576,6 +581,7 @@ export default function ProfileForm({
                     isDark={isDark}
                     isEditing={isEditing}
                     setIsEditing={setIsEditing}
+                    scrollViewRef={scrollViewRef}
                   />
                 ))}
               </View>
@@ -622,6 +628,7 @@ export default function ProfileForm({
                     );
                     }}
                     isDark={isDark}
+                    scrollViewRef={scrollViewRef}
                   />
                 ))}
               </View>

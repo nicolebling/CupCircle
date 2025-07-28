@@ -1,11 +1,19 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
 
 export type CareerTransition = {
   position1: string;
   position2: string;
+};
+
+type CareerTransitionEntryProps = {
+  transition: CareerTransition;
+  onChange: (transition: CareerTransition) => void;
+  onDelete: () => void;
+  isDark: boolean;
+  scrollViewRef?: React.RefObject<ScrollView>;
 };
 
 type Props = {
