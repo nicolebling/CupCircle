@@ -379,7 +379,11 @@ export default function ProfileCard({
             </Text>
           </View>
 
-          <View style={styles.divider} />
+          {/* Only show divider and Experience section if there's employment or career transition data */}
+          {((profile.employment && profile.employment.length > 0) || 
+            (profile.career_transitions && profile.career_transitions.length > 0)) && (
+            <View style={styles.divider} />
+          )}
 
           {/* Employment */}
           {profile.employment && profile.employment.length > 0 && (
@@ -716,12 +720,18 @@ export default function ProfileCard({
               </Text>
             </View>
 
-            <View style={styles.divider} />
+            {/* Only show divider and Professional Details section if there's employment, career transitions, education, or industry data */}
+            {((profile.employment && profile.employment.length > 0) || 
+              (profile.career_transitions && profile.career_transitions.length > 0) ||
+              profile.education ||
+              (profile.industry_categories && profile.industry_categories.length > 0)) && (
+              <View style={styles.divider} />
+            )}
 
             {/* Professional Details */}
             <View style={styles.section}>
               {/* Employment Section */}
-              {profile.employment && (
+              {profile.employment && profile.employment.length > 0 && (
                 <>
                   <Text
                     style={[
