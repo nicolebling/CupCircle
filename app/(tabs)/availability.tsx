@@ -129,7 +129,7 @@ export default function AvailabilityScreen() {
   };
 
   const handleAddSlot = async () => {
-    // Use format function for consistent date key generation
+    // Use format function for consistent date key generation****
     const currentDateKey = format(selectedDate, 'yyyy-MM-dd');
     let allSelections = { ...multiDateSelections };
     
@@ -437,7 +437,7 @@ export default function AvailabilityScreen() {
     
     setSelectedDate(date);
     
-    // Load selections for the new date using format function
+    // Load selections for the new date using format function*****
     const newDateKey = format(date, 'yyyy-MM-dd');
     setSelectedTimes(multiDateSelections[newDateKey] || []);
   };
