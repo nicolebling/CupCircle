@@ -549,7 +549,10 @@ export default function ProfileForm({
 
           <View style={styles.divider} />
 
-          <View style={styles.section}>
+          <KeyboardAvoidingView 
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            style={styles.section}
+          >
             <View style={styles.inputGroup}>
               <View style={styles.sectionHeader}>
                 <Text style={[styles.label, isDark && styles.textDark]}>
@@ -621,6 +624,7 @@ export default function ProfileForm({
                 />
               ))}
             </View>
+          </KeyboardAvoidingView>
 
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isDark && styles.textDark]}>
