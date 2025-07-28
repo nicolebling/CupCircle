@@ -129,8 +129,8 @@ export default function AvailabilityScreen() {
   };
 
   const handleAddSlot = async () => {
-    // Combine current selections with multi-date selections
-    const currentDateKey = format(selectedDate, 'yyyy-MM-dd');
+    // Combine current selections with multi-date selections using consistent date key
+    const currentDateKey = format(new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate()), 'yyyy-MM-dd');
     let allSelections = { ...multiDateSelections };
     
     if (selectedTimes.length > 0) {
@@ -424,9 +424,9 @@ export default function AvailabilityScreen() {
   });
 
   const handleDateSelect = (date: Date) => {
-    // Save current selections for the previous date
+    // Save current selections for the previous date using consistent date key
     if (selectedTimes.length > 0) {
-      const dateKey = format(selectedDate, 'yyyy-MM-dd');
+      const dateKey = format(new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate()), 'yyyy-MM-dd');
       setMultiDateSelections(prev => ({
         ...prev,
         [dateKey]: selectedTimes
@@ -435,8 +435,8 @@ export default function AvailabilityScreen() {
     
     setSelectedDate(date);
     
-    // Load selections for the new date
-    const newDateKey = format(date, 'yyyy-MM-dd');
+    // Load selections for the new date using consistent date key
+    const newDateKey = format(new Date(date.getFullYear(), date.getMonth(), date.getDate()), 'yyyy-MM-dd');
     setSelectedTimes(multiDateSelections[newDateKey] || []);
   };
 
@@ -672,20 +672,21 @@ export default function AvailabilityScreen() {
                         const handleTimeSelection = () => {
                           if (isTimeTaken || isPastTime || isAlreadyAdded) return;
                           
+                          // Create consistent date key using UTC to avoid timezone issues
+                          const currentDateKey = format(new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate()), 'yyyy-MM-dd');
+                          
+                          let updatedTimes;
                           if (isSelectedTime) {
                             // Remove from selection
-                            setSelectedTimes(selectedTimes.filter(time => time !== item));
+                            updatedTimes = selectedTimes.filter(time => time !== item);
+                            setSelectedTimes(updatedTimes);
                           } else {
                             // Add to selection
-                            setSelectedTimes([...selectedTimes, item]);
+                            updatedTimes = [...selectedTimes, item];
+                            setSelectedTimes(updatedTimes);
                           }
                           
-                          // Update multi-date selections immediately
-                          const currentDateKey = format(selectedDate, 'yyyy-MM-dd');
-                          const updatedTimes = isSelectedTime 
-                            ? selectedTimes.filter(time => time !== item)
-                            : [...selectedTimes, item];
-                            
+                          // Update multi-date selections immediately with consistent date key
                           setMultiDateSelections(prev => ({
                             ...prev,
                             [currentDateKey]: updatedTimes
