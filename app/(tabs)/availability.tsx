@@ -129,8 +129,8 @@ export default function AvailabilityScreen() {
   };
 
   const handleAddSlot = async () => {
-    // Combine current selections with multi-date selections using simple date key
-    const currentDateKey = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}`;
+    // Use format function for consistent date key generation
+    const currentDateKey = format(selectedDate, 'yyyy-MM-dd');
     let allSelections = { ...multiDateSelections };
     
     if (selectedTimes.length > 0) {
@@ -173,7 +173,7 @@ export default function AvailabilityScreen() {
         ).getTime();
 
         const hasOverlap = timeSlots.some((slot) => {
-          if (format(new Date(slot.date), "yyyy-MM-dd") !== dateKey)
+          if (format(slot.date, "yyyy-MM-dd") !== dateKey)
             return false;
           const slotStart = new Date(
             `1970-01-01T${to24Hour(slot.startTime)}:00`,
@@ -204,7 +204,9 @@ export default function AvailabilityScreen() {
       let totalCreated = 0;
       
       for (const [dateKey, times] of Object.entries(allSelections)) {
-        const date = new Date(dateKey);
+        // Parse the date key directly to avoid timezone issues
+        const [year, month, day] = dateKey.split('-');
+        const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day), 12, 0, 0);
         for (const selectedTime of times) {
           const endTime = calculateEndTime(selectedTime);
           await createSlot(date, selectedTime, endTime);
@@ -424,9 +426,9 @@ export default function AvailabilityScreen() {
   });
 
   const handleDateSelect = (date: Date) => {
-    // Save current selections for the previous date using simple date key
+    // Save current selections for the previous date using format function
     if (selectedTimes.length > 0) {
-      const dateKey = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}`;
+      const dateKey = format(selectedDate, 'yyyy-MM-dd');
       setMultiDateSelections(prev => ({
         ...prev,
         [dateKey]: selectedTimes
@@ -435,8 +437,8 @@ export default function AvailabilityScreen() {
     
     setSelectedDate(date);
     
-    // Load selections for the new date using simple date key
-    const newDateKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    // Load selections for the new date using format function
+    const newDateKey = format(date, 'yyyy-MM-dd');
     setSelectedTimes(multiDateSelections[newDateKey] || []);
   };
 
@@ -672,8 +674,8 @@ export default function AvailabilityScreen() {
                         const handleTimeSelection = () => {
                           if (isTimeTaken || isPastTime || isAlreadyAdded) return;
                           
-                          // Create simple date key to avoid timezone issues
-                          const currentDateKey = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}`;
+                          // Use format function for consistent date key
+                          const currentDateKey = format(selectedDate, 'yyyy-MM-dd');
                           
                           let updatedTimes;
                           if (isSelectedTime) {
@@ -686,7 +688,7 @@ export default function AvailabilityScreen() {
                             setSelectedTimes(updatedTimes);
                           }
                           
-                          // Update multi-date selections immediately with simple date key
+                          // Update multi-date selections immediately with format function
                           setMultiDateSelections(prev => ({
                             ...prev,
                             [currentDateKey]: updatedTimes
