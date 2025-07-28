@@ -140,7 +140,7 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
         onChangeText={(value) => handleChange('company', value)}
         onFocus={() => {
           setTimeout(() => {
-            scrollViewRef.current?.scrollToEnd({ animated: true });
+            scrollViewRef?.current?.scrollToEnd({ animated: true });
           }, 100);
         }}
       />
@@ -155,7 +155,7 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
           onChangeText={(value) => handleChange('position', value)}
           onFocus={() => {
             setTimeout(() => {
-              scrollViewRef.current?.scrollToEnd({ animated: true });
+              scrollViewRef?.current?.scrollToEnd({ animated: true });
             }, 100);
           }}
         />
@@ -172,7 +172,7 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
             onChangeText={(value) => handleChange('fromDate', value)}
             onFocus={() => {
               setTimeout(() => {
-                scrollViewRef.current?.scrollToEnd({ animated: true });
+                scrollViewRef?.current?.scrollToEnd({ animated: true });
               }, 100);
             }}
           />
@@ -189,7 +189,7 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
               onChangeText={(value) => handleChange('toDate', value)}
               onFocus={() => {
                 setTimeout(() => {
-                  scrollViewRef.current?.scrollToEnd({ animated: true });
+                  scrollViewRef?.current?.scrollToEnd({ animated: true });
                 }, 100);
               }}
             />

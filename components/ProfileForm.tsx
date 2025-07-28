@@ -683,7 +683,7 @@ export default function ProfileForm({
             />
           </View> */}
 
-          <View style={styles.inputGroup}>
+          <View style={[styles.inputGroup, styles.formContainer]}>
             <Text style={[styles.label, isDark && styles.textDark]}>
               Cafe Preferences
             </Text>
