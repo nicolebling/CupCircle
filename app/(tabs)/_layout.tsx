@@ -3,6 +3,7 @@ import { Tabs } from 'expo-router';
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
 import { View, TouchableOpacity } from "react-native";
+import { HapticTab } from '@/components/HapticTab';
 
 export default function TabLayout() {
   const colors = Colors.light;
@@ -29,7 +30,8 @@ export default function TabLayout() {
         },
         tabBarItemStyle: {
           paddingVertical: 8,
-        }
+        },
+        tabBarButton: HapticTab,
       }}
     >
 
