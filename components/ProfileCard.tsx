@@ -11,6 +11,7 @@ import {
   TextInput,
   SafeAreaView,
   Dimensions,
+  LinearGradient,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
@@ -276,327 +277,160 @@ export default function ProfileCard({
   // For matching view
   if (!isUserProfile && !isEditMode && !isOnboarding) {
     return (
-      <View
-        style={[
-          styles.card,
-          { backgroundColor: colors.card, borderColor: colors.border },
-        ]}
-      >
-        {/* Profile Photo */}
-        <View style={styles.imageContainer}>
-          {/* Added container */}
-          {profile.photo ? (
-            <Image source={{ uri: profile.photo }} style={styles.image} />
-          ) : (
-            <View
-              style={[
-                styles.image,
-                {
-                  backgroundColor: "#ededed",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  zIndex: 2,
-                },
-              ]}
-            >
-              <Ionicons name="person" size={60} color="#fff" />
-            </View>
-          )}
-          {profile.experience_level && (
-            <View
-              style={[
-                styles.decorativeCircle,
-                { borderColor: getCoffeeColor(profile.experience_level) },
-              ]}
-            />
-          )}
+      <View style={[styles.card, { backgroundColor: colors.background }]}>
+        {/* Hero Section with Gradient Background */}
+        <View style={styles.heroSection}>
+          <View style={styles.gradientOverlay} />
+
+          {/* Profile Photo */}
+          <View style={styles.photoWrapper}>
+            {profile.photo ? (
+              <Image source={{ uri: profile.photo }} style={styles.profileImage} />
+            ) : (
+              <View style={styles.placeholderImage}>
+                <Ionicons name="person" size={48} color="#fff" />
+              </View>
+            )}
+            {profile.experience_level && (
+              <View style={[styles.experienceBadge, { backgroundColor: getCoffeeColor(profile.experience_level) }]}>
+                <Text style={styles.experienceBadgeText}>{getCoffeeTheme(profile.experience_level)}</Text>
+              </View>
+            )}
+          </View>
         </View>
 
-        {/* Match badge - Edit for later */}
-        {/* {profile.matchedCafe && (
-          <View
-            style={[styles.matchBadge, { backgroundColor: colors.primary }]}
-          >
-            <Ionicons name="cafe" size={14} color="white" />
-            <Text style={styles.matchBadgeText}>Café Match</Text>
-          </View>
-        )} */}
+        {/* Content Section */}
+        <View style={styles.contentSection}>
+          {/* Header Info */}
+          <View style={styles.headerBlock}>
+            <Text style={[styles.nameText, { color: colors.text }]}>{profile.name}</Text>
+            <Text style={[styles.titleText, { color: colors.primary }]}>{profile.occupation}</Text>
 
-        <View style={styles.content}>
-          <View style={styles.headerContainer}>
-            <View style={styles.headerInfo}>
-              {/* Name */}
-              <Text style={[styles.name, { color: colors.text }]}>
-                {profile.name}
-                {/* {profile.age && <Text>({profile.age})</Text>} */}
-              </Text>
-
-              {/* Occupation / Headline */}
-              <View style={styles.positionContainer}>
-                <Text style={[styles.position, { color: colors.primary }]}>
-                  {profile.occupation}
-                </Text>
+            {profile.experience_level && (profile.employment?.length > 0 || profile.career_transitions?.length > 0) && (
+              <View style={styles.levelContainer}>
+                <View style={styles.levelDot} />
+                <Text style={[styles.levelText, { color: colors.secondaryText }]}>{profile.experience_level}</Text>
               </View>
+            )}
 
-              {/* Experience level */}
+            {profile.city && (
               <View style={styles.locationContainer}>
-                {profile.experience_level &&
-                  (profile.employment?.length > 0 ||
-                    profile.career_transitions?.length > 0) && (
-                    <Text
-                      style={[
-                        styles.experience,
-                        { color: colors.secondaryText },
-                      ]}
-                    >
-                      {profile.experience_level}
-                    </Text>
-                  )}
+                <Ionicons name="location" size={14} color={colors.secondaryText} />
+                <Text style={[styles.locationText, { color: colors.secondaryText }]}>{profile.city}</Text>
               </View>
+            )}
+          </View>
 
-              {/* Location */}
-              {profile.city && (
-                <View style={styles.locationContainer}>
-                  {/* <Ionicons
-                    name="location-outline"
-                    size={14}
-                    color={colors.secondaryText}
-                  /> */}
-                  <Text
-                    style={[styles.location, { color: colors.secondaryText }]}
-                  >
-                    {profile.city}
-                  </Text>
+          {/* Bio Section */}
+          <View style={styles.bioSection}>
+            <Text style={[styles.bioText, { color: colors.text }]}>{profile.bio}</Text>
+          </View>
+
+          {/* Professional Timeline */}
+          {((profile.employment && profile.employment.length > 0) || 
+            (profile.career_transitions && profile.career_transitions.length > 0)) && (
+            <View style={styles.timelineSection}>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>Experience</Text>
+
+              {profile.employment && profile.employment.length > 0 && (
+                <View style={styles.timeline}>
+                  {profile.employment.map((jobString, index) => {
+                    const job = typeof jobString === "string" ? JSON.parse(jobString) : jobString;
+                    return (
+                      <View key={index} style={styles.timelineItem}>
+                        <View style={styles.timelineIndicator}>
+                          <View style={[styles.timelineDot, { backgroundColor: colors.primary }]} />
+                          {index < profile.employment.length - 1 && (
+                            <View style={[styles.timelineLine, { backgroundColor: colors.border }]} />
+                          )}
+                        </View>
+                        <View style={styles.timelineContent}>
+                          <Text style={[styles.jobTitle, { color: colors.text }]}>{job.position}</Text>
+                          <Text style={[styles.companyText, { color: colors.primary }]}>{job.company}</Text>
+                          <Text style={[styles.dateText, { color: colors.secondaryText }]}>
+                            {job.fromDate} - {job.toDate}
+                          </Text>
+                        </View>
+                      </View>
+                    );
+                  })}
+                </View>
+              )}
+
+              {/* Career Transitions */}
+              {profile.career_transitions && profile.career_transitions.length > 0 && (
+                <View style={styles.transitionsSection}>
+                  <Text style={[styles.subsectionTitle, { color: colors.secondaryText }]}>Career Transitions</Text>
+                  {profile.career_transitions.map((transitionString, index) => {
+                    const transition = JSON.parse(transitionString);
+                    return (
+                      <View key={index} style={styles.transitionItem}>
+                        <Text style={[styles.transitionText, { color: colors.text }]}>
+                          {transition.position1}
+                        </Text>
+                        <Ionicons name="arrow-forward" size={16} color={colors.primary} style={styles.transitionArrow} />
+                        <Text style={[styles.transitionText, { color: colors.text }]}>
+                          {transition.position2}
+                        </Text>
+                      </View>
+                    );
+                  })}
                 </View>
               )}
             </View>
-          </View>
-
-          {/* Bio */}
-          <View style={styles.bioContainer}>
-            <Text style={[styles.bioText, { color: colors.text }]}>
-              {profile.bio}
-            </Text>
-          </View>
-
-          {/* Only show divider and Experience section if there's employment or career transition data */}
-          {((profile.employment && profile.employment.length > 0) || 
-            (profile.career_transitions && profile.career_transitions.length > 0)) && (
-            <View style={styles.divider} />
           )}
-
-          {/* Employment */}
-          {profile.employment && profile.employment.length > 0 && (
-            <>
-              <Text style={[styles.label, { color: colors.secondaryText }]}>
-                Experience
-              </Text>
-              {profile.employment.map((jobString, index) => {
-                const job =
-                  typeof jobString === "string"
-                    ? JSON.parse(jobString)
-                    : jobString;
-                return (
-                  <View key={index} style={styles.employmentContainer}>
-                    <View style={styles.timelineDot} />
-                    <View style={styles.employmentCard}>
-                      <Text
-                        style={[
-                          styles.position,
-                          { color: colors.text, fontSize: 16, marginBottom: 4 },
-                        ]}
-                      >
-                        {job.position}
-                      </Text>
-                      <Text
-                        style={[
-                          styles.companyName,
-                          { color: colors.text, fontSize: 14 },
-                        ]}
-                      >
-                        {job.company}
-                      </Text>
-                      <Text
-                        style={[
-                          styles.dateRange,
-                          {
-                            color: colors.secondaryText,
-                            fontSize: 14,
-                            marginTop: 4,
-                          },
-                        ]}
-                      >
-                        {job.fromDate} - {job.toDate}
-                      </Text>
-                    </View>
-                    {index < profile.employment.length - 1 && (
-                      <View
-                        style={[
-                          styles.timelineLine,
-                          { backgroundColor: colors.border },
-                        ]}
-                      />
-                    )}
-                  </View>
-                );
-              })}
-            </>
-          )}
-
-          {/* Career Transitions */}
-          {profile.career_transitions &&
-            profile.career_transitions.length > 0 && (
-              <>
-                <Text
-                  style={[
-                    styles.label,
-                    {
-                      color: colors.secondaryText,
-                      marginTop: 24,
-                      marginBottom: 16,
-                    },
-                  ]}
-                >
-                  Career Transitions
-                </Text>
-                <View>
-                  {profile.career_transitions.map(
-                    (transitionString, index) => {
-                      const transition = JSON.parse(transitionString);
-                      return (
-                        <View
-                          key={index}
-                          style={styles.transitionContainer}
-                        >
-                          <View style={styles.transitionCard}>
-                            <View style={styles.transitionText}>
-                              <Text
-                                style={[
-                                  styles.position,
-                                  { color: colors.text },
-                                ]}
-                              >
-                                {transition.position1}
-                              </Text>
-                              <Ionicons
-                                name="arrow-forward"
-                                size={20}
-                                color={colors.primary}
-                                style={styles.transitionArrow}
-                              />
-                              <Text
-                                style={[
-                                  styles.position,
-                                  { color: colors.text },
-                                ]}
-                              >
-                                {transition.position2}
-                              </Text>
-                            </View>
-                          </View>
-                        </View>
-                      );
-                    },
-                  )}
-                </View>
-              </>
-            )}
 
           {/* Education */}
           {profile.education && (
-            <>
-              <Text style={[styles.label, { color: colors.secondaryText }]}>
-                Education
-              </Text>
-              <Text style={[styles.value, { color: colors.text }]}>
-                {profile.education}
-              </Text>
-            </>
+            <View style={styles.infoSection}>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>Education</Text>
+              <Text style={[styles.infoText, { color: colors.secondaryText }]}>{profile.education}</Text>
+            </View>
           )}
 
           {/* Industries */}
-          {profile.industry_categories &&
-            profile.industry_categories.length > 0 && (
-              <>
-                <Text style={[styles.label, { color: colors.secondaryText }]}>
-                  Industries
-                </Text>
-                <View style={styles.interestsContainer}>
-                  {profile.industry_categories.map((industry, index) => (
-                    <View
-                      key={index}
-                      style={[
-                        styles.tag,
-                        {
-                          backgroundColor: "transparent",
-                          borderWidth: 1,
-                          borderColor: colors.text,
-                        },
-                      ]}
-                    >
-                      <Text
-                        style={[styles.tagText, { color: colors.text }]}
-                      >
-                        {industry}
-                      </Text>
-                    </View>
-                  ))}
-                </View>
-              </>
-            )}
+          {profile.industry_categories && profile.industry_categories.length > 0 && (
+            <View style={styles.tagSection}>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>Industries</Text>
+              <View style={styles.tagGrid}>
+                {profile.industry_categories.map((industry, index) => (
+                  <View key={index} style={[styles.modernTag, { borderColor: colors.primary }]}>
+                    <Text style={[styles.tagText, { color: colors.primary }]}>{industry}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          )}
 
           {/* Interests */}
-          <Text style={[styles.label, { color: colors.secondaryText }]}>
-            Interests
-          </Text>
-          <View style={styles.interestsContainer}>
-            {profile.interests &&
-              profile.interests.slice(0, 5).map((interest, index) => (
-                <View
-                  key={index}
-                  style={[
-                    styles.tag,
-                    {
-                      backgroundColor: "transparent",
-                      borderWidth: 1,
-                      borderColor: colors.text,
-                    },
-                  ]}
-                >
-                  <Text
-                    style={[styles.tagText, { color: colors.text }]}
-                  >
-                    {interest}
-                  </Text>
+          <View style={styles.tagSection}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Interests</Text>
+            <View style={styles.tagGrid}>
+              {profile.interests && profile.interests.slice(0, 6).map((interest, index) => (
+                <View key={index} style={[styles.modernTag, { backgroundColor: colors.primary + '15', borderColor: colors.primary }]}>
+                  <Text style={[styles.tagText, { color: colors.primary }]}>{interest}</Text>
                 </View>
               ))}
+            </View>
           </View>
-
         </View>
 
+        {/* Action Buttons */}
         {onLike && onSkip && (
-          <View style={styles.buttonsContainer}>
+          <View style={styles.actionSection}>
             <TouchableOpacity
               onPress={handlePrevious}
-              style={[
-                styles.actionButton,
-                styles.likeButton,
-                { backgroundColor: "#FFF" },
-              ]}
+              style={[styles.actionButton, { backgroundColor: colors.input }]}
               disabled={currentIndex === 0}
             >
-              <Ionicons name="arrow-back" size={24} color="#64748B" />
+              <Ionicons name="arrow-back" size={24} color={colors.text} />
             </TouchableOpacity>
 
             <TouchableOpacity
               onPress={onLike}
-              style={[
-                styles.actionButton,
-                styles.likeButton,
-                { backgroundColor: "#FFF" },
-              ]}
+              style={[styles.primaryActionButton, { backgroundColor: colors.primary }]}
             >
-              <Ionicons name="arrow-forward" size={24} color="#64748B" />
+              <Ionicons name="arrow-forward" size={24} color="#fff" />
             </TouchableOpacity>
           </View>
         )}
@@ -608,438 +442,174 @@ export default function ProfileCard({
   if (isUserProfile && !isEditMode && !isOnboarding) {
     return (
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
-        <View
-          style={[
-            styles.userCard,
-            {
-              backgroundColor: colors.card,
-              borderColor: colors.border,
-              padding: 0,
-              paddingTop: 16,
-            },
-          ]}
-        >
-          {/* Profile Photo */}
-          <View style={[styles.imageContainer, { marginTop: 32 }]}>
-            {/* Added container */}
-            {profile.photo_url ? (
-              <Image
-                source={{ uri: profile.photo_url }}
-                style={[styles.image, { marginTop: 0 }]}
-                resizeMode="cover"
-              />
-            ) : (
-              <View
-                style={[
-                  styles.image,
-                  {
-                    backgroundColor: "#ededed",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    marginTop: 0,
-                  },
-                ]}
-              >
-                <Ionicons name="person" size={60} color="#fff" />
-              </View>
-            )}
-            {profile.experience_level && (
-              <View
-                style={[
-                  styles.decorativeCircle,
-                  { borderColor: getCoffeeColor(profile.experience_level) },
-                ]}
-              />
-            )}
+        <View style={[styles.userProfileContainer, { backgroundColor: colors.background }]}>
+          {/* Enhanced Hero Section */}
+          <View style={styles.userHeroSection}>
+            <View style={styles.heroGradient} />
+
+            {/* Profile Photo */}
+            <View style={styles.userPhotoWrapper}>
+              {profile.photo_url ? (
+                <Image source={{ uri: profile.photo_url }} style={styles.userProfileImage} />
+              ) : (
+                <View style={styles.userPlaceholderImage}>
+                  <Ionicons name="person" size={60} color="#fff" />
+                </View>
+              )}
+              {profile.experience_level && (
+                <View style={[styles.userExperienceBadge, { backgroundColor: getCoffeeColor(profile.experience_level) }]}>
+                  <Text style={styles.userExperienceBadgeText}>{getCoffeeTheme(profile.experience_level)}</Text>
+                </View>
+              )}
+            </View>
           </View>
 
-          <View style={{ padding: 16 }}>
-            <View style={styles.headerContainer}>
-              <View style={styles.headerInfo}>
-                <Text
-                  style={[
-                    styles.name,
-                    { color: colors.text, textAlign: "center" },
-                  ]}
-                >
-                  {profile.name}
-                </Text>
+          <View style={styles.userContentSection}>
+            {/* Header */}
+            <View style={styles.userHeaderBlock}>
+              <Text style={[styles.userNameText, { color: colors.text }]}>{profile.name}</Text>
+              <Text style={[styles.userTitleText, { color: colors.primary }]}>{profile.occupation}</Text>
 
-                <View
-                  style={[
-                    styles.positionContainer,
-                    { justifyContent: "center" },
-                  ]}
-                >
-                  <Text style={[styles.position, { color: colors.primary,  }]}>
-                    {profile.occupation}
-                  </Text>
+              {profile.experience_level && (profile.employment?.length > 0 || profile.career_transitions?.length > 0) && (
+                <View style={styles.userLevelContainer}>
+                  <View style={[styles.userLevelDot, { backgroundColor: colors.primary }]} />
+                  <Text style={[styles.userLevelText, { color: colors.secondaryText }]}>{profile.experience_level}</Text>
                 </View>
+              )}
 
-                {/* Experience Level */}
-                <View style={styles.locationContainer}>
-                  {profile.experience_level &&
-                    (profile.employment?.length > 0 ||
-                      profile.career_transitions?.length > 0) && (
-                      <Text
-                        style={[
-                          styles.experience,
-                          { color: colors.secondaryText },
-                        ]}
-                      >
-                        {profile.experience_level}
-                      </Text>
-                    )}
+              {profile.city && (
+                <View style={styles.userLocationContainer}>
+                  <Ionicons name="location" size={16} color={colors.secondaryText} />
+                  <Text style={[styles.userLocationText, { color: colors.secondaryText }]}>{profile.city}</Text>
                 </View>
-
-                {profile.city && (
-                  <View
-                    style={[
-                      styles.locationContainer,
-                      { justifyContent: "center" },
-                    ]}
-                  >
-                    {/* <Ionicons
-                      name="location-outline"
-                      size={14}
-                      color={colors.secondaryText}
-                    /> */}
-                    <Text
-                      style={[styles.location, { color: colors.secondaryText }]}
-                    >
-                      {profile.city}
-                    </Text>
-                  </View>
-                )}
-              </View>
+              )}
             </View>
 
-            <View style={styles.bioContainer}>
-              <Text style={[styles.bioText, { color: colors.text }]}>
-                {profile.bio}
-              </Text>
+            {/* Bio */}
+            <View style={styles.userBioSection}>
+              <Text style={[styles.userBioText, { color: colors.text }]}>{profile.bio}</Text>
             </View>
 
-            {/* Only show divider and Professional Details section if there's employment, career transitions, education, or industry data */}
+            {/* Professional Details */}
             {((profile.employment && profile.employment.length > 0) || 
               (profile.career_transitions && profile.career_transitions.length > 0) ||
               profile.education ||
               (profile.industry_categories && profile.industry_categories.length > 0)) && (
-              <View style={styles.divider} />
-            )}
+              <View style={styles.professionalSection}>
+                <Text style={[styles.userSectionTitle, { color: colors.text }]}>Professional Details</Text>
 
-            {/* Professional Details */}
-            <View style={styles.section}>
-              {/* Employment Section */}
-              {profile.employment && profile.employment.length > 0 && (
-                <>
-                  <Text
-                    style={[
-                      styles.label,
-                      { color: colors.secondaryText, marginBottom: 16 },
-                    ]}
-                  >
-                    Experience
-                  </Text>
-                  <View>
-                    {/* Added View to wrap timeline */}
-                    {Array.isArray(profile.employment) ? (
-                      profile.employment.map((jobString, index) => {
-                        // Parse each job entry from string to object
-                        const job = JSON.parse(jobString);
-                        return (
-                          <View key={index} style={styles.employmentContainer}>
-                            <View style={styles.timelineDot} />
-                            <View style={styles.employmentCard}>
-                              <Text
-                                style={[
-                                  styles.position,
-                                  {
-                                    color: colors.text,
-                                    fontSize: 16,
-                                    marginBottom: 4,
-                                  },
-                                ]}
-                              >
-                                {job.position}
-                              </Text>
-                              <Text
-                                style={[
-                                  styles.companyName,
-                                  { color: colors.text, fontSize: 14 },
-                                ]}
-                              >
-                                {job.company}
-                              </Text>
-                              <Text
-                                style={[
-                                  styles.dateRange,
-                                  {
-                                    color: colors.secondaryText,
-                                    fontSize: 14,
-                                    marginTop: 4,
-                                  },
-                                ]}
-                              >
-                                {job.fromDate} - {job.toDate}
-                              </Text>
-                            </View>
-                            {index < profile.employment.length - 1 && (
-                              <View style={styles.timelineLine} />
-                            )}
-                          </View>
-                        );
-                      })
-                    ) : (
-                      <Text style={{ color: "red" }}>
-                        Employment data is not an array!
-                      </Text>
-                    )}
-                  </View>
-                </>
-              )}
-
-              {/* Career Transitions Section */}
-              {profile.career_transitions &&
-                profile.career_transitions.length > 0 && (
-                  <>
-                    <Text
-                      style={[
-                        styles.label,
-                        {
-                          color: colors.secondaryText,
-                          marginTop: 24,
-                          marginBottom: 16,
-                        },
-                      ]}
-                    >
-                      Career Transitions
-                    </Text>
-                    <View>
-                      {profile.career_transitions.map(
-                        (transitionString, index) => {
-                          const transition = JSON.parse(transitionString);
+                {/* Employment Timeline */}
+                {profile.employment && profile.employment.length > 0 && (
+                  <View style={styles.userTimelineSection}>
+                    <Text style={[styles.userSubsectionTitle, { color: colors.secondaryText }]}>Experience</Text>
+                    <View style={styles.userTimeline}>
+                      {Array.isArray(profile.employment) ? (
+                        profile.employment.map((jobString, index) => {
+                          const job = JSON.parse(jobString);
                           return (
-                            <View
-                              key={index}
-                              style={styles.transitionContainer}
-                            >
-                              <View style={styles.transitionCard}>
-                                <View style={styles.transitionText}>
-                                  <Text
-                                    style={[
-                                      styles.position,
-                                      { color: colors.text },
-                                    ]}
-                                  >
-                                    {transition.position1}
-                                  </Text>
-                                  <Ionicons
-                                    name="arrow-forward"
-                                    size={20}
-                                    color={colors.primary}
-                                    style={styles.transitionArrow}
-                                  />
-                                  <Text
-                                    style={[
-                                      styles.position,
-                                      { color: colors.text },
-                                    ]}
-                                  >
-                                    {transition.position2}
-                                  </Text>
-                                </View>
+                            <View key={index} style={styles.userTimelineItem}>
+                              <View style={styles.userTimelineIndicator}>
+                                <View style={[styles.userTimelineDot, { backgroundColor: colors.primary }]} />
+                                {index < profile.employment.length - 1 && (
+                                  <View style={[styles.userTimelineLine, { backgroundColor: colors.border }]} />
+                                )}
+                              </View>
+                              <View style={styles.userTimelineContent}>
+                                <Text style={[styles.userJobTitle, { color: colors.text }]}>{job.position}</Text>
+                                <Text style={[styles.userCompanyText, { color: colors.primary }]}>{job.company}</Text>
+                                <Text style={[styles.userDateText, { color: colors.secondaryText }]}>
+                                  {job.fromDate} - {job.toDate}
+                                </Text>
                               </View>
                             </View>
                           );
-                        },
+                        })
+                      ) : (
+                        <Text style={{ color: "red" }}>Employment data is not an array!</Text>
                       )}
                     </View>
-                  </>
+                  </View>
                 )}
 
-              {/* Education */}
-              {profile.education && (
-                <>
-                  <Text style={[styles.label, { color: colors.secondaryText }]}>
-                    Education
-                  </Text>
-                  <Text style={[styles.value, { color: colors.text }]}>
-                    {profile.education}
-                  </Text>
-                </>
-              )}
-
-              {/* Industry Categories */}
-              {profile.industry_categories &&
-                profile.industry_categories.length > 0 && (
-                  <>
-                    <Text
-                      style={[styles.label, { color: colors.secondaryText }]}
-                    >
-                      Industries
-                    </Text>
-                    <View style={styles.tagsContainer}>
-                      {profile.industry_categories.map((industry, index) => (
-                        <View
-                          key={index}
-                          style={[
-                            styles.tag,
-                            {
-                              backgroundColor: "transparent",
-                              borderWidth: 1,
-                              borderColor: colors.text,
-                            },
-                          ]}
-                        >
-                          <Text
-                            style={[styles.tagText, { color: colors.text}]}
-                          >
-                            {industry}
-                          </Text>
-                        </View>
-                      ))}
-                    </View>
-                  </>
-                )}
-
-              {/* Interests */}
-              {profile.interests && profile.interests.length > 0 && (
-                <View style={styles.section}>
-                  <Text style={[styles.label, { color: colors.secondaryText }]}>
-                    Interests
-                  </Text>
-                  <View style={styles.tagsContainer}>
-                    {profile.interests.map((interest, index) => (
-                      <View
-                        key={index}
-                        style={[
-                          styles.tag,
-                          {
-                            backgroundColor: "transparent",
-                            borderWidth: 1,
-                            borderColor: colors.text,
-                          },
-                        ]}
-                      >
-                        <Text
-                          style={[styles.tagText, { color: colors.text }]}
-                        >
-                          {interest}
-                        </Text>
-                      </View>
-                    ))}
-                  </View>
-                </View>
-              )}
-            </View>
-
-            <View style={styles.divider} />
-
-            {/* Location */}
-            <View style={styles.section}>
-              {/* <Text style={[styles.sectionTitle, { color: colors.text }]}>
-                Location Preferences
-              </Text>
-
-              {profile.neighborhoods && profile.neighborhoods.length > 0 && (
-                <>
-                  <Text style={[styles.label, { color: colors.secondaryText }]}>
-                    Neighborhoods
-                  </Text>
-                  <View style={styles.tagsContainer}>
-                    {profile.neighborhoods.map((neighborhood, index) => (
-                      <View
-                        key={index}
-                        style={[
-                          styles.tag,
-                          {
-                            backgroundColor: "transparent",
-                            borderWidth: 1,
-                            borderColor: colors.primary,
-                          },
-                        ]}
-                      >
-                        <Text
-                          style={[styles.tagText, { color: colors.primary }]}
-                        >
-                          {neighborhood}
-                        </Text>
-                      </View>
-                    ))}
-                  </View>
-                </>
-              )} */}
-
-              {profile.favorite_cafes && profile.favorite_cafes.length > 0 && (
-                <>
-                  <Text style={[styles.label, { color: colors.secondaryText }]}>
-                    Cafe Preferences
-                  </Text>
-                  <View style={styles.tagsContainer}>
-                    {profile.favorite_cafes.map((cafe, index) => {
-                      const [cafeName, cafeAddress] = cafe
-                        ? cafe.split("|||")
-                        : ["", ""];
+                {/* Career Transitions */}
+                {profile.career_transitions && profile.career_transitions.length > 0 && (
+                  <View style={styles.userTransitionsSection}>
+                    <Text style={[styles.userSubsectionTitle, { color: colors.secondaryText }]}>Career Transitions</Text>
+                    {profile.career_transitions.map((transitionString, index) => {
+                      const transition = JSON.parse(transitionString);
                       return (
-                        <View
-                          key={index}
-                          style={[
-                            styles.tag,
-                            {
-                              backgroundColor: "transparent",
-                              borderWidth: 1,
-                              borderColor: colors.text,
-                              flexDirection: "column",
-                              alignItems: "flex-start",
-                              padding: 8,
-                            },
-                          ]}
-                        >
-                          <View
-                            style={{
-                              flexDirection: "row",
-                              alignItems: "center",
-                              marginBottom: 4,
-                            }}
-                          >
-                            {/* <Ionicons
-                              name="cafe"
-                              size={12}
-                              color={colors.primary}
-                              style={{ marginRight: 4 }}
-                            /> */}
-                            <Text
-                              style={[
-                                styles.tagText,
-                                {
-                                  color: colors.text,
-                                  fontFamily: "K2D-Medium",
-                                },
-                              ]}
-                            >
-                              {cafeName}
-                            </Text>
-                          </View>
-                          <Text
-                            style={[
-                              styles.tagText,
-                              {
-                                color: colors.secondaryText,
-                                fontSize: 12,
-                                fontFamily: "K2D-Regular",
-                              },
-                            ]}
-                          >
-                            {cafeAddress}
+                        <View key={index} style={styles.userTransitionItem}>
+                          <Text style={[styles.userTransitionText, { color: colors.text }]}>
+                            {transition.position1}
+                          </Text>
+                          <Ionicons name="arrow-forward" size={18} color={colors.primary} style={styles.userTransitionArrow} />
+                          <Text style={[styles.userTransitionText, { color: colors.text }]}>
+                            {transition.position2}
                           </Text>
                         </View>
                       );
                     })}
                   </View>
-                </>
-              )}
-            </View>
+                )}
+
+                {/* Education */}
+                {profile.education && (
+                  <View style={styles.userEducationSection}>
+                    <Text style={[styles.userSubsectionTitle, { color: colors.secondaryText }]}>Education</Text>
+                    <Text style={[styles.userEducationText, { color: colors.text }]}>{profile.education}</Text>
+                  </View>
+                )}
+
+                {/* Industry Categories */}
+                {profile.industry_categories && profile.industry_categories.length > 0 && (
+                  <View style={styles.userTagSection}>
+                    <Text style={[styles.userSubsectionTitle, { color: colors.secondaryText }]}>Industries</Text>
+                    <View style={styles.userTagGrid}>
+                      {profile.industry_categories.map((industry, index) => (
+                        <View key={index} style={[styles.userModernTag, { borderColor: colors.primary }]}>
+                          <Text style={[styles.userTagText, { color: colors.primary }]}>{industry}</Text>
+                        </View>
+                      ))}
+                    </View>
+                  </View>
+                )}
+              </View>
+            )}
+
+            {/* Interests */}
+            {profile.interests && profile.interests.length > 0 && (
+              <View style={styles.userInterestsSection}>
+                <Text style={[styles.userSectionTitle, { color: colors.text }]}>Interests</Text>
+                <View style={styles.userTagGrid}>
+                  {profile.interests.map((interest, index) => (
+                    <View key={index} style={[styles.userModernTag, { backgroundColor: colors.primary + '15', borderColor: colors.primary }]}>
+                      <Text style={[styles.userTagText, { color: colors.primary }]}>{interest}</Text>
+                    </View>
+                  ))}
+                </View>
+              </View>
+            )}
+
+            {/* Cafe Preferences */}
+            {profile.favorite_cafes && profile.favorite_cafes.length > 0 && (
+              <View style={styles.userCafeSection}>
+                <Text style={[styles.userSectionTitle, { color: colors.text }]}>Cafe Preferences</Text>
+                <View style={styles.cafeGrid}>
+                  {profile.favorite_cafes.map((cafe, index) => {
+                    const [cafeName, cafeAddress] = cafe ? cafe.split("|||") : ["", ""];
+                    return (
+                      <View key={index} style={[styles.cafeCard, { backgroundColor: colors.input, borderColor: colors.border }]}>
+                        <View style={styles.cafeHeader}>
+                          <Ionicons name="cafe" size={20} color={colors.primary} />
+                          <Text style={[styles.cafeName, { color: colors.text }]}>{cafeName}</Text>
+                        </View>
+                        <Text style={[styles.cafeAddress, { color: colors.secondaryText }]}>{cafeAddress}</Text>
+                      </View>
+                    );
+                  })}
+                </View>
+              </View>
+            )}
           </View>
         </View>
       </ScrollView>
@@ -1071,482 +641,597 @@ export default function ProfileCard({
 }
 
 const styles = StyleSheet.create({
-  transitionContainer: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    marginBottom: 32,
-    position: "relative",
-  },
-  transitionCard: {
-    flex: 1,
-  },
-  transitionText: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    flexWrap: "wrap",
-  },
-  arrow: {
-    marginHorizontal: 8,
-  },
-  position: {
-    fontSize: 16,
-    fontFamily: "K2D-Regular",
-    flexShrink: 1,
-  },
-  position2Long: {
-    marginTop: 8,
-    width: "100%",
-  },
-  transitionArrowLong: {
-    alignSelf: "flex-start",
-    marginTop: 8,
-  },
-  employmentCard: {
-    marginBottom: 16,
-  },
-  employmentContainer: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    marginBottom: 32,
-    position: "relative",
-  },
-  timelineDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: Colors.light.primary,
-    marginRight: 16,
-    marginTop: 6,
-  },
-  timelineLine: {
-    width: 1,
-    position: "absolute",
-    left: 3.5,
-    top: 24,
-    bottom: -24,
-    backgroundColor: "#ccc",
-  },
-  employmentHeader: {
-    marginBottom: 4,
-  },
-  companyName: {
-    fontFamily: "K2D-Regular",
-    fontSize: 14,
-    color: "#666",
-  },
-  position: {
-    fontFamily: "K2D-Medium",
-    fontSize: 16,
-  },
-  dateRange: {
-    fontFamily: "K2D-Regular",
-    fontSize: 14,
-    color: "#666",
-  },
-  // Common styles
+  // Matching card styles
   card: {
-    width: width - 32,
-    borderRadius: 16,
-    borderWidth: 1,
+    width: width - 40,
+    borderRadius: 24,
     overflow: "hidden",
-    margin: 16,
+    margin: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.12,
+    shadowRadius: 24,
+    elevation: 8,
+  },
+
+  heroSection: {
+    height: 280,
+    position: "relative",
+    backgroundColor: "#F97415",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  gradientOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(249, 116, 21, 0.8)",
+  },
+
+  photoWrapper: {
+    position: "relative",
+    alignItems: "center",
+  },
+
+  profileImage: {
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    borderWidth: 4,
+    borderColor: "#fff",
+  },
+
+  placeholderImage: {
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 4,
+    borderColor: "#fff",
+  },
+
+  experienceBadge: {
+    position: "absolute",
+    bottom: -8,
+    paddingHorizontal: 16,
+    paddingVertical: 6,
+    borderRadius: 20,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 2,
+    elevation: 3,
   },
-  userCard: {
-    borderRadius: 16,
-    borderWidth: 1,
-    overflow: "hidden",
-    marginBottom: 16,
-    margin: 16,
+
+  experienceBadgeText: {
+    color: "#fff",
+    fontSize: 12,
+    fontFamily: "K2D-SemiBold",
   },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+
+  contentSection: {
+    padding: 24,
+  },
+
+  headerBlock: {
     alignItems: "center",
     marginBottom: 24,
   },
-  title: {
-    fontFamily: "K2D-Bold",
-    fontSize: 24,
-  },
 
-  // Matching card styles
-  image: {
-    width: (width - 32) * 0.6, // 60% of original width
-    height: (width - 32) * 0.6, // Keep 1:1 ratio
-    resizeMode: "cover",
-    borderRadius: ((width - 32) * 0.6) / 2, // Makes the image circular
-    alignSelf: "center", // Center the image
-    zIndex: 2,
-  },
-  imageContainer: {
-    position: "relative",
-    marginTop: 40,
-    alignItems: "center",
-  },
-  content: {
-    padding: 16,
-  },
-  nameRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 8,
-  },
-  name: {
+  nameText: {
+    fontSize: 28,
     fontFamily: "K2D-Bold",
-    fontSize: 24,
-  },
-  locationContainer: {
-    marginTop: 8,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  location: {
-    fontFamily: "K2D-Regular",
-    fontSize: 14,
-    marginLeft: 4,
-  },
-  matchBadge: {
-    position: "absolute",
-    top: 16,
-    right: 16,
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 16,
-  },
-  matchBadgeText: {
-    fontFamily: "K2D-Medium",
-    fontSize: 12,
-    color: "white",
-    marginLeft: 4,
-  },
-  occupationBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 16,
-    alignSelf: "flex-start",
-    marginBottom: 16,
-  },
-  occupationIcon: {
-    marginRight: 6,
-  },
-  occupation: {
-    fontFamily: "K2D-Medium",
-    fontSize: 14,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: "#DFDFDF",
-    marginBottom: 16,
-  },
-  sectionTitle: {
-    fontFamily: "K2D-SemiBold",
-    fontSize: 16,
+    textAlign: "center",
     marginBottom: 4,
   },
-  sectionText: {
-    fontFamily: "K2D-Regular",
-    fontSize: 14,
-    marginBottom: 16,
-    lineHeight: 20,
+
+  titleText: {
+    fontSize: 18,
+    fontFamily: "K2D-Medium",
+    textAlign: "center",
+    marginBottom: 12,
   },
-  interestsContainer: {
+
+  levelContainer: {
     flexDirection: "row",
-    flexWrap: "wrap",
-    marginBottom: 16,
-  },
-  interestTag: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-    marginRight: 8,
+    alignItems: "center",
     marginBottom: 8,
   },
-  interestText: {
+
+  levelDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: "#F97415",
+    marginRight: 8,
+  },
+
+  levelText: {
+    fontSize: 14,
     fontFamily: "K2D-Medium",
-    fontSize: 12,
   },
-  buttonsContainer: {
+
+  locationContainer: {
     flexDirection: "row",
-    padding: 16,
-    justifyContent: "center",
-    color: "#FFF",
+    alignItems: "center",
   },
+
+  locationText: {
+    fontSize: 14,
+    fontFamily: "K2D-Regular",
+    marginLeft: 4,
+  },
+
+  bioSection: {
+    marginBottom: 32,
+  },
+
+  bioText: {
+    fontSize: 16,
+    fontFamily: "K2D-Regular",
+    lineHeight: 24,
+    textAlign: "center",
+  },
+
+  timelineSection: {
+    marginBottom: 32,
+  },
+
+  sectionTitle: {
+    fontSize: 20,
+    fontFamily: "K2D-Bold",
+    marginBottom: 20,
+  },
+
+  timeline: {
+    paddingLeft: 20,
+  },
+
+  timelineItem: {
+    flexDirection: "row",
+    marginBottom: 24,
+  },
+
+  timelineIndicator: {
+    width: 20,
+    alignItems: "center",
+    marginRight: 16,
+  },
+
+  timelineDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    marginBottom: 8,
+  },
+
+  timelineLine: {
+    width: 2,
+    flex: 1,
+  },
+
+  timelineContent: {
+    flex: 1,
+  },
+
+  jobTitle: {
+    fontSize: 16,
+    fontFamily: "K2D-SemiBold",
+    marginBottom: 4,
+  },
+
+  companyText: {
+    fontSize: 15,
+    fontFamily: "K2D-Medium",
+    marginBottom: 4,
+  },
+
+  dateText: {
+    fontSize: 13,
+    fontFamily: "K2D-Regular",
+  },
+
+  transitionsSection: {
+    marginTop: 24,
+  },
+
+  subsectionTitle: {
+    fontSize: 16,
+    fontFamily: "K2D-SemiBold",
+    marginBottom: 16,
+  },
+
+  transitionItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: "rgba(249, 116, 21, 0.05)",
+    borderRadius: 12,
+  },
+
+  transitionText: {
+    fontSize: 14,
+    fontFamily: "K2D-Medium",
+    flex: 1,
+  },
+
+  transitionArrow: {
+    marginHorizontal: 12,
+  },
+
+  infoSection: {
+    marginBottom: 32,
+  },
+
+  infoText: {
+    fontSize: 15,
+    fontFamily: "K2D-Regular",
+    lineHeight: 22,
+  },
+
+  tagSection: {
+    marginBottom: 32,
+  },
+
+  tagGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+
+  modernTag: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1.5,
+  },
+
+  tagText: {
+    fontSize: 13,
+    fontFamily: "K2D-Medium",
+  },
+
+  actionSection: {
+    flexDirection: "row",
+    padding: 24,
+    justifyContent: "center",
+    gap: 16,
+  },
+
   actionButton: {
     width: 60,
     height: 60,
     borderRadius: 30,
     justifyContent: "center",
     alignItems: "center",
-    marginHorizontal: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+
+  primaryActionButton: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#F97415",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+
+  // User profile styles
+  userProfileContainer: {
+    flex: 1,
+  },
+
+  userHeroSection: {
+    height: 200,
+    position: "relative",
+    backgroundColor: "#F97415",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  heroGradient: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(249, 116, 21, 0.9)",
+  },
+
+  userPhotoWrapper: {
+    position: "relative",
+    alignItems: "center",
+    marginTop: 40,
+  },
+
+  userProfileImage: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    borderWidth: 4,
+    borderColor: "#fff",
+  },
+
+  userPlaceholderImage: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 4,
+    borderColor: "#fff",
+  },
+
+  userExperienceBadge: {
+    position: "absolute",
+    bottom: -8,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 16,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 2,
-  },
-  skipButton: {
-    // Styles specific to skip button
-  },
-  likeButton: {
-    // Styles specific to like button
+    elevation: 3,
   },
 
-  // User profile styles
-  photoContainer: {
+  userExperienceBadgeText: {
+    color: "#fff",
+    fontSize: 11,
+    fontFamily: "K2D-SemiBold",
+  },
+
+  userContentSection: {
+    padding: 24,
+    marginTop: -20,
+    backgroundColor: "inherit",
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+  },
+
+  userHeaderBlock: {
     alignItems: "center",
     marginBottom: 24,
-    position: "relative",
   },
-  profilePhoto: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    marginBottom: 16,
-    justifyContent: "center",
-    alignItems: "center",
-    overflow: "hidden",
+
+  userNameText: {
+    fontSize: 32,
+    fontFamily: "K2D-Bold",
+    textAlign: "center",
+    marginBottom: 6,
   },
-  uploadButton: {
-    position: "absolute",
-    bottom: 0,
-    right: "35%",
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  section: {
-    marginBottom: 24,
-  },
-  label: {
+
+  userTitleText: {
+    fontSize: 20,
     fontFamily: "K2D-Medium",
-    fontSize: 14,
+    textAlign: "center",
+    marginBottom: 12,
+  },
+
+  userLevelContainer: {
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 8,
   },
-  value: { fontFamily: "K2D-Regular", fontSize: 16, marginBottom: 16 },
-  tagsContainer: {
+
+  userLevelDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    marginRight: 8,
+  },
+
+  userLevelText: {
+    fontSize: 15,
+    fontFamily: "K2D-Medium",
+  },
+
+  userLocationContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  userLocationText: {
+    fontSize: 15,
+    fontFamily: "K2D-Regular",
+    marginLeft: 6,
+  },
+
+  userBioSection: {
+    marginBottom: 32,
+  },
+
+  userBioText: {
+    fontSize: 17,
+    fontFamily: "K2D-Regular",
+    lineHeight: 26,
+    textAlign: "center",
+  },
+
+  professionalSection: {
+    marginBottom: 32,
+  },
+
+  userSectionTitle: {
+    fontSize: 24,
+    fontFamily: "K2D-Bold",
+    marginBottom: 24,
+  },
+
+  userTimelineSection: {
+    marginBottom: 24,
+  },
+
+  userSubsectionTitle: {
+    fontSize: 18,
+    fontFamily: "K2D-SemiBold",
+    marginBottom: 16,
+  },
+
+  userTimeline: {
+    paddingLeft: 24,
+  },
+
+  userTimelineItem: {
+    flexDirection: "row",
+    marginBottom: 24,
+  },
+
+  userTimelineIndicator: {
+    width: 24,
+    alignItems: "center",
+    marginRight: 20,
+  },
+
+  userTimelineDot: {
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    marginBottom: 8,
+  },
+
+  userTimelineLine: {
+    width: 2,
+    flex: 1,
+  },
+
+  userTimelineContent: {
+    flex: 1,
+  },
+
+  userJobTitle: {
+    fontSize: 18,
+    fontFamily: "K2D-SemiBold",
+    marginBottom: 4,
+  },
+
+  userCompanyText: {
+    fontSize: 16,
+    fontFamily: "K2D-Medium",
+    marginBottom: 6,
+  },
+
+  userDateText: {
+    fontSize: 14,
+    fontFamily: "K2D-Regular",
+  },
+
+  userTransitionsSection: {
+    marginBottom: 24,
+  },
+
+  userTransitionItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    backgroundColor: "rgba(249, 116, 21, 0.08)",
+    borderRadius: 16,
+  },
+
+  userTransitionText: {
+    fontSize: 16,
+    fontFamily: "K2D-Medium",
+    flex: 1,
+  },
+
+  userTransitionArrow: {
+    marginHorizontal: 16,
+  },
+
+  userEducationSection: {
+    marginBottom: 24,
+  },
+
+  userEducationText: {
+    fontSize: 16,
+    fontFamily: "K2D-Regular",
+    lineHeight: 24,
+  },
+
+  userTagSection: {
+    marginBottom: 24,
+  },
+
+  userTagGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    marginBottom: 16,
+    gap: 10,
   },
-  tag: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-    marginRight: 8,
-    marginBottom: 8,
-    borderWidth: 1,
-    backgroundColor: "transparent",
+
+  userModernTag: {
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    borderRadius: 24,
+    borderWidth: 1.5,
   },
-  tagText: {
-    fontFamily: "K2D-Medium",
-    fontSize: 12,
-    marginRight: 4,
-  },
-  input: {
-    height: 48,
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    marginBottom: 16,
-    fontFamily: "K2D-Regular",
-    fontSize: 16,
-  },
-  textArea: {
-    minHeight: 100,
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingTop: 12,
-    marginBottom: 8,
-    fontFamily: "K2D-Regular",
-    fontSize: 16,
-    textAlignVertical: "top",
-  },
-  characterCount: {
-    fontFamily: "K2D-Regular",
-    fontSize: 12,
-    alignSelf: "flex-end",
-    marginBottom: 16,
-  },
-  buttonContainer: {
-    marginBottom: 24,
-    position: "relative",
-  },
-  saveButton: {
-    height: 50,
-  },
-  spinner: {
-    position: "absolute",
-    right: 20,
-    top: 15,
-  },
-  errorText: {
-    color: "red",
-    fontFamily: "K2D-Regular",
-    fontSize: 12,
-    marginTop: -12,
-    marginBottom: 16,
-  },
-  errorSummary: {
-    backgroundColor: "#FFEBEE",
-    padding: 16,
-    borderRadius: 8,
-    marginBottom: 16,
-  },
-  errorSummaryText: {
-    color: "red",
-    fontFamily: "K2D-Medium",
+
+  userTagText: {
     fontSize: 14,
-  },
-  coffeeExperienceContainer: {
-    marginBottom: 16,
-  },
-  coffeeBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 16,
-    alignSelf: "flex-start",
-    marginTop: 4,
-  },
-  coffeeBadgeText: {
     fontFamily: "K2D-Medium",
-    fontSize: 12,
-    marginLeft: 4,
   },
-  tagInput: {
+
+  userInterestsSection: {
+    marginBottom: 32,
+  },
+
+  userCafeSection: {
+    marginBottom: 32,
+  },
+
+  cafeGrid: {
+    gap: 12,
+  },
+
+  cafeCard: {
+    padding: 16,
+    borderRadius: 16,
+    borderWidth: 1,
+  },
+
+  cafeHeader: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 16,
+    marginBottom: 8,
   },
-  avatarContainer: {
-    alignItems: "center",
-    marginBottom: 30,
-  },
-  avatarWrapper: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: "#f0f0f0",
-    justifyContent: "center",
-    alignItems: "center",
-    overflow: "hidden",
-  },
-  avatarPlaceholder: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: "#f0f0f0",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  avatarText: {
-    marginTop: 10,
-    color: "#0097FB",
+
+  cafeName: {
     fontSize: 16,
+    fontFamily: "K2D-SemiBold",
+    marginLeft: 8,
   },
-  textDark: {
-    color: "#fff",
+
+  cafeAddress: {
+    fontSize: 14,
+    fontFamily: "K2D-Regular",
+    lineHeight: 20,
   },
+
+  // Common styles
+  container: {
+    flex: 1,
+  },
+
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-  },
-  loadingText: {
-    marginTop: 10,
-    fontSize: 16,
-    color: "#666",
-  },
-  inputGroup: {
-    marginBottom: 20,
-  },
-  container: {
-    flex: 1,
-  },
-  settingsButton: {
-    position: "absolute",
-    top: 16,
-    right: 16,
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  headerContainer: {
-    flexDirection: "column",
-    alignItems: "center",
-    marginBottom: 16,
-    marginTop: 16,
-  },
-  photoContainer: {
-    marginBottom: 16,
-    alignItems: "center",
-  },
-  profilePhoto: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-  },
-  headerInfo: {
-    width: "100%",
-    alignItems: "center",
-  },
-  positionContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-
-    marginTop: 8,
-  },
-  position: {
-    fontFamily: "K2D-Medium",
-    fontSize: 16,
-  },
-  experience: {
-    fontFamily: "K2D-Regular",
-    fontSize: 14,
-    marginLeft: 8,
-  },
-  bioContainer: {
-    marginBottom: 16,
-    marginTop: 22,
-  },
-  bioText: {
-    fontFamily: "K2D-Regular",
-    fontSize: 14,
-    lineHeight: 20,
-  },
-  transitionArrow: {
-    marginHorizontal: 8,
-  },
-  decorativeCircle: {
-    position: "absolute",
-    width: (width - 32) * 0.6 + 20, // 8px larger on each side, was +16
-    height: (width - 32) * 0.6 + 20,
-    borderRadius: ((width - 32) * 0.6 + 16) / 2,
-    borderWidth: 6,
-    backgroundColor: "transparent",
-    top: -10, //was -8
-    zIndex: 1,
-    shadowColor: "#FFF",
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 5,
-    overflow: "visible",
   },
 });
