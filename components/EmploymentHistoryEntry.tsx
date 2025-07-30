@@ -141,8 +141,11 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
         onChangeText={(value) => handleChange('company', value)}
         onFocus={() => {
           setTimeout(() => {
-            scrollViewRef?.current?.scrollToEnd({ animated: true });
-          }, 100);
+            scrollViewRef?.current?.scrollTo({ 
+              y: scrollViewRef?.current?.contentOffset?.y + 200, 
+              animated: true 
+            });
+          }, 200);
         }}
       />
 
@@ -156,8 +159,11 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
           onChangeText={(value) => handleChange('position', value)}
           onFocus={() => {
             setTimeout(() => {
-              scrollViewRef?.current?.scrollToEnd({ animated: true });
-            }, 100);
+              scrollViewRef?.current?.scrollTo({ 
+                y: scrollViewRef?.current?.contentOffset?.y + 200, 
+                animated: true 
+              });
+            }, 200);
           }}
         />
       </View>
@@ -173,8 +179,11 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
             onChangeText={(value) => handleChange('fromDate', value)}
             onFocus={() => {
               setTimeout(() => {
-                scrollViewRef?.current?.scrollToEnd({ animated: true });
-              }, 100);
+                scrollViewRef?.current?.scrollTo({ 
+                  y: scrollViewRef?.current?.contentOffset?.y + 200, 
+                  animated: true 
+                });
+              }, 200);
             }}
           />
         </View>
@@ -190,8 +199,11 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
               onChangeText={(value) => handleChange('toDate', value)}
               onFocus={() => {
                 setTimeout(() => {
-                  scrollViewRef?.current?.scrollToEnd({ animated: true });
-                }, 100);
+                  scrollViewRef?.current?.scrollTo({ 
+                    y: scrollViewRef?.current?.contentOffset?.y + 200, 
+                    animated: true 
+                  });
+                }, 200);
               }}
             />
           ) : (

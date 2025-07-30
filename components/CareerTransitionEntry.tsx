@@ -104,8 +104,11 @@ export default function CareerTransitionEntry({ transition, onChange, onDelete, 
           onChangeText={(value) => handleChange('position1', value)}
           onFocus={() => {
             setTimeout(() => {
-              scrollViewRef.current?.scrollToEnd({ animated: true });
-            }, 100);
+              scrollViewRef?.current?.scrollTo({ 
+                y: scrollViewRef?.current?.contentOffset?.y + 200, 
+                animated: true 
+              });
+            }, 200);
           }}
         />
       </View>
@@ -120,8 +123,11 @@ export default function CareerTransitionEntry({ transition, onChange, onDelete, 
           onChangeText={(value) => handleChange('position2', value)}
           onFocus={() => {
             setTimeout(() => {
-              scrollViewRef.current?.scrollToEnd({ animated: true });
-            }, 100);
+              scrollViewRef?.current?.scrollTo({ 
+                y: scrollViewRef?.current?.contentOffset?.y + 200, 
+                animated: true 
+              });
+            }, 200);
           }}
         />
       </View>
@@ -196,7 +202,7 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   saveButton: {
-    
+
     marginTop: 16,
     paddingVertical: 8,
     paddingHorizontal: 16,
