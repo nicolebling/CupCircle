@@ -233,18 +233,14 @@ export default function AvailabilityScreen() {
   const [selectedTimes, setSelectedTimes] = useState<string[]>([]);
   const [multiDateSelections, setMultiDateSelections] = useState<Record<string, string[]>>({});
 
-  // Generate next 7 days for calendar, filtering out current day if past 4 PM
+  // Generate next 7 days for calendar, starting from tomorrow if past 4 PM
   const now = new Date();
   const isPast4PM = now.getHours() >= 16; // 16 is 4 PM in 24-hour format
+  const startOffset = isPast4PM ? 1 : 0; // Start from tomorrow if past 4 PM
 
   const next7Days = Array.from({ length: 7 }, (_, i) => {
-    const date = addDays(new Date(), i);
-    // If it's today and past 4 PM, return null
-    if (i === 0 && isPast4PM) {
-      return null;
-    }
-    return date;
-  }).filter(Boolean); // Remove null values
+    return addDays(new Date(), i + startOffset);
+  });
 
   // Available time slots (30-minute increments from 9:30 AM to 4:00 PM)
   const availableTimes = [
