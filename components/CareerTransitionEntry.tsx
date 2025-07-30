@@ -1,5 +1,5 @@
-import React, { useState, useRef } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
 
@@ -8,56 +8,20 @@ export type CareerTransition = {
   position2: string;
 };
 
-type CareerTransitionEntryProps = {
-  transition: CareerTransition;
-  onChange: (transition: CareerTransition) => void;
-  onDelete: () => void;
-  isDark: boolean;
-  scrollViewRef?: React.RefObject<ScrollView>;
-};
-
 type Props = {
   transition: CareerTransition;
   onChange: (transition: CareerTransition) => void;
   onDelete: () => void;
   isDark: boolean;
-  scrollViewRef?: React.RefObject<ScrollView>;
 };
 
-export default function CareerTransitionEntry({ transition, onChange, onDelete, isDark, scrollViewRef }: Props) {
+export default function CareerTransitionEntry({ transition, onChange, onDelete, isDark }: Props) {
   const colors = Colors[isDark ? 'dark' : 'light'];
   const [isEditing, setIsEditing] = useState(!transition?.position1);
   const [localTransition, setLocalTransition] = useState(() => ({
     position1: transition?.position1 || '',
     position2: transition?.position2 || '',
   }));
-
-  // Refs for measuring input positions
-  const containerRef = useRef<View>(null);
-  const position1InputRef = useRef<View>(null);
-  const position2InputRef = useRef<View>(null);
-
-  const handleInputFocus = (inputRef: React.RefObject<View>) => {
-    setTimeout(() => {
-      if (containerRef.current && inputRef.current && scrollViewRef?.current) {
-        // Measure the container position
-        containerRef.current.measureInWindow((containerX, containerY) => {
-          // Measure the input position relative to container
-          inputRef.current?.measureInWindow((inputX, inputY) => {
-            // Calculate scroll position to center the input with some offset
-            const screenHeight = 800; // Approximate screen height
-            const keyboardHeight = 300; // Approximate keyboard height
-            const targetY = inputY - (screenHeight - keyboardHeight) / 3;
-            
-            scrollViewRef.current?.scrollTo({
-              y: Math.max(0, targetY),
-              animated: true
-            });
-          });
-        });
-      }
-    }, 100);
-  };
 
   const handleChange = (field: string, value: string) => {
     setLocalTransition(prev => ({
@@ -113,7 +77,7 @@ export default function CareerTransitionEntry({ transition, onChange, onDelete, 
   }
 
   return (
-    <View ref={containerRef} style={[styles.container, { backgroundColor: colors.input }]}>
+    <View style={[styles.container, { backgroundColor: colors.input }]}>
       <View style={styles.header}>
         <Text style={[styles.label, { color: colors.secondaryText }]}>Career Transition</Text>
         <TouchableOpacity onPress={onDelete} style={styles.deleteButton}>
@@ -123,30 +87,24 @@ export default function CareerTransitionEntry({ transition, onChange, onDelete, 
 
       <View style={styles.inputContainer}>
         <Text style={[styles.label, { color: colors.secondaryText }]}>Previous position</Text>
-        <View ref={position1InputRef}>
-          <TextInput
-            style={[styles.input, { backgroundColor: colors.input, color: colors.text }]}
-            placeholder=""
-            placeholderTextColor={colors.secondaryText}
-            value={localTransition.position1}
-            onChangeText={(value) => handleChange('position1', value)}
-            onFocus={() => handleInputFocus(position1InputRef)}
-          />
-        </View>
+        <TextInput
+          style={[styles.input, { backgroundColor: colors.input, color: colors.text }]}
+          placeholder=""
+          placeholderTextColor={colors.secondaryText}
+          value={localTransition.position1}
+          onChangeText={(value) => handleChange('position1', value)}
+        />
       </View>
 
       <View style={styles.inputContainer}>
         <Text style={[styles.label, { color: colors.secondaryText }]}>New position</Text>
-        <View ref={position2InputRef}>
-          <TextInput
-            style={[styles.input, { backgroundColor: colors.input, color: colors.text }]}
-            placeholder=""
-            placeholderTextColor={colors.secondaryText}
-            value={localTransition.position2}
-            onChangeText={(value) => handleChange('position2', value)}
-            onFocus={() => handleInputFocus(position2InputRef)}
-          />
-        </View>
+        <TextInput
+          style={[styles.input, { backgroundColor: colors.input, color: colors.text }]}
+          placeholder=""
+          placeholderTextColor={colors.secondaryText}
+          value={localTransition.position2}
+          onChangeText={(value) => handleChange('position2', value)}
+        />
       </View>
 
       <TouchableOpacity
@@ -219,7 +177,7 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   saveButton: {
-
+    
     marginTop: 16,
     paddingVertical: 8,
     paddingHorizontal: 16,

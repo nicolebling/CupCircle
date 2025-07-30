@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -87,8 +87,6 @@ export default function ProfileForm({
   >([]);
 
   const [isEditing, setIsEditing] = useState(false);
-
-  const scrollViewRef = useRef<ScrollView>(null);
 
   useEffect(() => {
     if (!isNewUser) {
@@ -439,14 +437,8 @@ export default function ProfileForm({
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={styles.container}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
     >
-      <ScrollView 
-        showsVerticalScrollIndicator={false}
-        ref={scrollViewRef}
-        keyboardShouldPersistTaps="handled"
-        contentContainerStyle={{ paddingBottom: 100 }}
-      >
+      <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.formContainer}>
           {error ? (
             <View style={styles.errorContainer}>
@@ -558,145 +550,141 @@ export default function ProfileForm({
           <View style={styles.divider} />
 
           <View style={styles.section}>
-              <View style={styles.inputGroup}>
-                <View style={styles.sectionHeader}>
-                  <Text style={[styles.label, isDark && styles.textDark]}>
-                    Employment (Optional)
-                  </Text>
-                  <TouchableOpacity onPress={addEmploymentEntry}>
-                    <Ionicons
-                      name="add-circle"
-                      size={24}
-                      color={colors.primary}
-                    />
-                  </TouchableOpacity>
-                </View>
-                {employmentHistory.map((employment, index) => (
-                  <EmploymentHistoryEntry
-                    key={index}
-                    employment={employment}
-                    onChange={(updated) => updateEmploymentEntry(index, updated)}
-                    onDelete={() => deleteEmploymentEntry(index)}
-                    isDark={isDark}
-                    isEditing={isEditing}
-                    setIsEditing={setIsEditing}
-                    scrollViewRef={scrollViewRef}
+            <View style={styles.inputGroup}>
+              <View style={styles.sectionHeader}>
+                <Text style={[styles.label, isDark && styles.textDark]}>
+                  Employment (Optional)
+                </Text>
+                <TouchableOpacity onPress={addEmploymentEntry}>
+                  <Ionicons
+                    name="add-circle"
+                    size={24}
+                    color={colors.primary}
                   />
-                ))}
+                </TouchableOpacity>
               </View>
-
-              <View style={styles.inputGroup}>
-                <View style={styles.sectionHeader}>
-                  <Text style={[styles.label, isDark && styles.textDark]}>
-                    Career Transitions (Optional)
-                  </Text>
-                  <TouchableOpacity
-                    onPress={() => {
-                      if (careerTransitions.length >= 3) {
-                        Alert.alert(
-                          "Maximum Entries Reached",
-                          "You can only add up to 3 career transition entries.",
-                        );
-                        return;
-                      }
-                      setCareerTransitions((prev) => [
-                        ...prev,
-                        { position1: "", position2: "" },
-                      ]);
-                    }}
-                  >
-                    <Ionicons
-                      name="add-circle"
-                      size={24}
-                      color={colors.primary}
-                    />
-                  </TouchableOpacity>
-                </View>
-                {careerTransitions.map((transition, index) => (
-                  <CareerTransitionEntry
-                    key={index}
-                    transition={transition}
-                    onChange={(updated) => {
-                      const newTransitions = [...careerTransitions];
-                      newTransitions[index] = updated;
-                      setCareerTransitions(newTransitions);
-                    }}
-                    onDelete={() => {
-                      setCareerTransitions((prev) =>
-                        prev.filter((_, i) => i !== index),
-                    );
-                    }}
-                    isDark={isDark}
-                    scrollViewRef={scrollViewRef}
-                  />
-                ))}
-              </View>
+              {employmentHistory.map((employment, index) => (
+                <EmploymentHistoryEntry
+                  key={index}
+                  employment={employment}
+                  onChange={(updated) => updateEmploymentEntry(index, updated)}
+                  onDelete={() => deleteEmploymentEntry(index)}
+                  isDark={isDark}
+                  isEditing={isEditing}
+                  setIsEditing={setIsEditing}
+                />
+              ))}
             </View>
 
-          <View style={styles.inputGroup}>
-            <Text style={[styles.label, isDark && styles.textDark]}>
-              Education
-            </Text>
-            <TextInput
-              style={[styles.input, isDark && styles.inputDark]}
-              value={education}
-              onChangeText={setEducation}
-              placeholder="Your educational background"
-              placeholderTextColor={isDark ? "#999" : "#777"}
-            />
+            <View style={styles.inputGroup}>
+              <View style={styles.sectionHeader}>
+                <Text style={[styles.label, isDark && styles.textDark]}>
+                  Career Transitions (Optional)
+                </Text>
+                <TouchableOpacity
+                  onPress={() => {
+                    if (careerTransitions.length >= 3) {
+                      Alert.alert(
+                        "Maximum Entries Reached",
+                        "You can only add up to 3 career transition entries.",
+                      );
+                      return;
+                    }
+                    setCareerTransitions((prev) => [
+                      ...prev,
+                      { position1: "", position2: "" },
+                    ]);
+                  }}
+                >
+                  <Ionicons
+                    name="add-circle"
+                    size={24}
+                    color={colors.primary}
+                  />
+                </TouchableOpacity>
+              </View>
+              {careerTransitions.map((transition, index) => (
+                <CareerTransitionEntry
+                  key={index}
+                  transition={transition}
+                  onChange={(updated) => {
+                    const newTransitions = [...careerTransitions];
+                    newTransitions[index] = updated;
+                    setCareerTransitions(newTransitions);
+                  }}
+                  onDelete={() => {
+                    setCareerTransitions((prev) =>
+                      prev.filter((_, i) => i !== index),
+                    );
+                  }}
+                  isDark={isDark}
+                />
+              ))}
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={[styles.label, isDark && styles.textDark]}>
+                Education
+              </Text>
+              <TextInput
+                style={[styles.input, isDark && styles.inputDark]}
+                value={education}
+                onChangeText={setEducation}
+                placeholder="Your educational background"
+                placeholderTextColor={isDark ? "#999" : "#777"}
+              />
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={[styles.label, isDark && styles.textDark]}>
+                Industry
+              </Text>
+              <IndustrySelector
+                selected={industryCategories}
+                onChange={setIndustryCategories}
+                isDark={isDark}
+              />
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={[styles.label, isDark && styles.textDark]}>
+                Interests
+              </Text>
+              <InterestSelector
+                selected={interests}
+                onChange={setInterests}
+                isDark={isDark}
+              />
+            </View>
           </View>
 
-          <View style={styles.inputGroup}>
-            <Text style={[styles.label, isDark && styles.textDark]}>
-              Industry
-            </Text>
-            <IndustrySelector
-              selected={industryCategories}
-              onChange={setIndustryCategories}
-              isDark={isDark}
-            />
+          <View style={styles.divider} />
+
+          <View style={styles.section}>
+            {/* <View style={styles.inputGroup}>
+              <Text style={[styles.label, isDark && styles.textDark]}>
+                Favorite Neighborhoods
+              </Text>
+              <NeighborhoodSelector
+                selected={neighborhoods}
+                onChange={setNeighborhoods}
+                isDark={isDark}
+              />
+            </View> */}
+
+            <View style={styles.inputGroup}>
+              <Text style={[styles.label, isDark && styles.textDark]}>
+                Cafe Preferences
+              </Text>
+              <CafeSelector
+                selected={favoriteCafes}
+                onChange={setFavoriteCafes}
+                onCentroidChange={handleCentroidChange}
+                isDark={isDark}
+              />
+            </View>
           </View>
 
-          <View style={styles.inputGroup}>
-            <Text style={[styles.label, isDark && styles.textDark]}>
-              Interests
-            </Text>
-            <InterestSelector
-              selected={interests}
-              onChange={setInterests}
-              isDark={isDark}
-            />
-          </View>
-        </View>
-
-        <View style={styles.divider} />
-
-        <View style={styles.section}>
-          {/* <View style={styles.inputGroup}>
-            <Text style={[styles.label, isDark && styles.textDark]}>
-              Favorite Neighborhoods
-            </Text>
-            <NeighborhoodSelector
-              selected={neighborhoods}
-              onChange={setNeighborhoods}
-              isDark={isDark}
-            />
-          </View> */}
-
-          <View style={[styles.inputGroup, styles.formContainer]}>
-            <Text style={[styles.label, isDark && styles.textDark]}>
-              Cafe Preferences
-            </Text>
-            <CafeSelector
-              selected={favoriteCafes}
-              onChange={setFavoriteCafes}
-              onCentroidChange={handleCentroidChange}
-              isDark={isDark}
-            />
-          </View>
-        </View>
-
-        <View style={styles.formContainer}>
           <TouchableOpacity
             style={styles.button}
             onPress={saveProfile}
