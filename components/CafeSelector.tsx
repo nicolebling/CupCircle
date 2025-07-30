@@ -157,18 +157,26 @@ export default function CafeSelector({
   }, []); // Remove initialRegion dependency to prevent loops
 
   const handleSelect = (place: any) => {
-    if (!selected.includes(place)) {
-      if (selected.length < maxSelections) {
-        const cafeString = `${place.name}|||${place.vicinity}|||${place.geometry.location.lng}|||${place.geometry.location.lat}`;
-        const updatedSelection = [...selected, cafeString];
-        onChange(updatedSelection);
-      } else {
-        Alert.alert(
-          "Maximum cafes selected",
-          "You've already added 3 cafes. Please remove one to add another.",
-          [{ text: "OK" }],
-        );
-      }
+    const cafeString = `${place.name}|||${place.vicinity}|||${place.geometry.location.lng}|||${place.geometry.location.lat}`;
+    
+    if (selected.includes(cafeString)) {
+      Alert.alert(
+        "Cafe already selected",
+        "You've already selected this cafe. Please choose a different one.",
+        [{ text: "OK" }],
+      );
+      return;
+    }
+    
+    if (selected.length < maxSelections) {
+      const updatedSelection = [...selected, cafeString];
+      onChange(updatedSelection);
+    } else {
+      Alert.alert(
+        "Maximum cafes selected",
+        "You've already added 3 cafes. Please remove one to add another.",
+        [{ text: "OK" }],
+      );
     }
   };
 
