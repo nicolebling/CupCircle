@@ -142,10 +142,10 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
         onFocus={() => {
           setTimeout(() => {
             scrollViewRef?.current?.scrollTo({ 
-              y: scrollViewRef?.current?.contentOffset?.y + 200, 
+              y: 300, 
               animated: true 
             });
-          }, 200);
+          }, 300);
         }}
       />
 
@@ -160,10 +160,10 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
           onFocus={() => {
             setTimeout(() => {
               scrollViewRef?.current?.scrollTo({ 
-                y: scrollViewRef?.current?.contentOffset?.y + 200, 
+                y: 400, 
                 animated: true 
               });
-            }, 200);
+            }, 300);
           }}
         />
       </View>
@@ -180,10 +180,10 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
             onFocus={() => {
               setTimeout(() => {
                 scrollViewRef?.current?.scrollTo({ 
-                  y: scrollViewRef?.current?.contentOffset?.y + 200, 
+                  y: 500, 
                   animated: true 
                 });
-              }, 200);
+              }, 300);
             }}
           />
         </View>
@@ -200,10 +200,10 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
               onFocus={() => {
                 setTimeout(() => {
                   scrollViewRef?.current?.scrollTo({ 
-                    y: scrollViewRef?.current?.contentOffset?.y + 200, 
+                    y: 500, 
                     animated: true 
                   });
-                }, 200);
+                }, 300);
               }}
             />
           ) : (

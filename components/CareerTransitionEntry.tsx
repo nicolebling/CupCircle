@@ -105,10 +105,10 @@ export default function CareerTransitionEntry({ transition, onChange, onDelete, 
           onFocus={() => {
             setTimeout(() => {
               scrollViewRef?.current?.scrollTo({ 
-                y: scrollViewRef?.current?.contentOffset?.y + 200, 
+                y: 400, 
                 animated: true 
               });
-            }, 200);
+            }, 300);
           }}
         />
       </View>
@@ -124,10 +124,10 @@ export default function CareerTransitionEntry({ transition, onChange, onDelete, 
           onFocus={() => {
             setTimeout(() => {
               scrollViewRef?.current?.scrollTo({ 
-                y: scrollViewRef?.current?.contentOffset?.y + 200, 
+                y: 400, 
                 animated: true 
               });
-            }, 200);
+            }, 300);
           }}
         />
       </View>
