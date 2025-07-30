@@ -15,9 +15,10 @@ type Props = {
   onChange: (employment: Employment) => void;
   onDelete: () => void;
   isDark: boolean;
+  scrollViewRef?: React.RefObject<ScrollView>;
 };
 
-export default function EmploymentHistoryEntry({ employment, onChange, onDelete, isDark}: Props) {
+export default function EmploymentHistoryEntry({ employment, onChange, onDelete, isDark, scrollViewRef}: Props) {
   const colors = Colors[isDark ? 'dark' : 'light'];
   const [isEditing, setIsEditing] = useState(!employment?.company);
   const [localEmployment, setLocalEmployment] = useState(() => ({

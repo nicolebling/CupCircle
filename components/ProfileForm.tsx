@@ -696,17 +696,19 @@ export default function ProfileForm({
           </View>
         </View>
 
-        <TouchableOpacity
-          style={styles.button}
-          onPress={saveProfile}
-          disabled={loading}
-        >
-          {loading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.buttonText}>Save Profile</Text>
-          )}
-        </TouchableOpacity>
+        <View style={styles.formContainer}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={saveProfile}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.buttonText}>Save Profile</Text>
+            )}
+          </TouchableOpacity>
+        </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
