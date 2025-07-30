@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
@@ -28,6 +28,35 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
     toDate: employment?.toDate || ''
   }));
   const [isPresentJob, setIsPresentJob] = useState(employment?.toDate === 'Present');
+  
+  // Refs for measuring input positions
+  const containerRef = useRef<View>(null);
+  const companyInputRef = useRef<View>(null);
+  const positionInputRef = useRef<View>(null);
+  const fromDateInputRef = useRef<View>(null);
+  const toDateInputRef = useRef<View>(null);
+
+  const handleInputFocus = (inputRef: React.RefObject<View>) => {
+    setTimeout(() => {
+      if (containerRef.current && inputRef.current && scrollViewRef?.current) {
+        // Measure the container position
+        containerRef.current.measureInWindow((containerX, containerY) => {
+          // Measure the input position relative to container
+          inputRef.current?.measureInWindow((inputX, inputY) => {
+            // Calculate scroll position to center the input with some offset
+            const screenHeight = 800; // Approximate screen height
+            const keyboardHeight = 300; // Approximate keyboard height
+            const targetY = inputY - (screenHeight - keyboardHeight) / 3;
+            
+            scrollViewRef.current?.scrollTo({
+              y: Math.max(0, targetY),
+              animated: true
+            });
+          });
+        });
+      }
+    }, 100);
+  };
 
   const handleChange = (field, value) => {
     if ((field === 'fromDate' || field === 'toDate') && value.length === 2 && !value.includes('/')) {
@@ -125,7 +154,7 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.input }]}>
+    <View ref={containerRef} style={[styles.container, { backgroundColor: colors.input }]}>
       <View style={styles.header}>
         <Text style={[styles.label, { color: colors.secondaryText }]}>Company</Text>
         <TouchableOpacity onPress={onDelete} style={styles.deleteButton}>
@@ -133,79 +162,59 @@ export default function EmploymentHistoryEntry({ employment, onChange, onDelete,
         </TouchableOpacity>
       </View>
 
-      <TextInput
-        style={[styles.input, styles.fullWidthInput, { backgroundColor: colors.input, color: colors.text }]}
-        placeholder="Company"
-        placeholderTextColor={colors.secondaryText}
-        value={localEmployment.company}
-        onChangeText={(value) => handleChange('company', value)}
-        onFocus={() => {
-          setTimeout(() => {
-            scrollViewRef?.current?.scrollTo({ 
-              y: 300, 
-              animated: true 
-            });
-          }, 300);
-        }}
-      />
+      <View ref={companyInputRef}>
+        <TextInput
+          style={[styles.input, styles.fullWidthInput, { backgroundColor: colors.input, color: colors.text }]}
+          placeholder="Company"
+          placeholderTextColor={colors.secondaryText}
+          value={localEmployment.company}
+          onChangeText={(value) => handleChange('company', value)}
+          onFocus={() => handleInputFocus(companyInputRef)}
+        />
+      </View>
 
       <View style={styles.positionContainer}>
         <Text style={[styles.label, { color: colors.secondaryText }]}>Position</Text>
-        <TextInput
-          style={[styles.input, styles.fullWidthInput, { backgroundColor: colors.input, color: colors.text }]}
-          placeholder="Position"
-          placeholderTextColor={colors.secondaryText}
-          value={localEmployment.position}
-          onChangeText={(value) => handleChange('position', value)}
-          onFocus={() => {
-            setTimeout(() => {
-              scrollViewRef?.current?.scrollTo({ 
-                y: 400, 
-                animated: true 
-              });
-            }, 300);
-          }}
-        />
+        <View ref={positionInputRef}>
+          <TextInput
+            style={[styles.input, styles.fullWidthInput, { backgroundColor: colors.input, color: colors.text }]}
+            placeholder="Position"
+            placeholderTextColor={colors.secondaryText}
+            value={localEmployment.position}
+            onChangeText={(value) => handleChange('position', value)}
+            onFocus={() => handleInputFocus(positionInputRef)}
+          />
+        </View>
       </View>
 
       <View style={styles.datesRow}>
         <View style={styles.dateField}>
           <Text style={[styles.label, { color: colors.secondaryText }]}>From</Text>
-          <TextInput
-            style={[styles.input, { backgroundColor: colors.input, color: colors.text }]}
-            placeholder="MM/YYYY"
-            placeholderTextColor={colors.secondaryText}
-            value={localEmployment.fromDate}
-            onChangeText={(value) => handleChange('fromDate', value)}
-            onFocus={() => {
-              setTimeout(() => {
-                scrollViewRef?.current?.scrollTo({ 
-                  y: 500, 
-                  animated: true 
-                });
-              }, 300);
-            }}
-          />
+          <View ref={fromDateInputRef}>
+            <TextInput
+              style={[styles.input, { backgroundColor: colors.input, color: colors.text }]}
+              placeholder="MM/YYYY"
+              placeholderTextColor={colors.secondaryText}
+              value={localEmployment.fromDate}
+              onChangeText={(value) => handleChange('fromDate', value)}
+              onFocus={() => handleInputFocus(fromDateInputRef)}
+            />
+          </View>
         </View>
 
         <View style={[styles.dateField, { marginLeft: 12 }]}>
           <Text style={[styles.label, { color: colors.secondaryText }]}>To</Text>
           {!isPresentJob ? (
-            <TextInput
-              style={[styles.input, { backgroundColor: colors.input, color: colors.text }]}
-              placeholder="MM/YYYY"
-              placeholderTextColor={colors.secondaryText}
-              value={localEmployment.toDate}
-              onChangeText={(value) => handleChange('toDate', value)}
-              onFocus={() => {
-                setTimeout(() => {
-                  scrollViewRef?.current?.scrollTo({ 
-                    y: 500, 
-                    animated: true 
-                  });
-                }, 300);
-              }}
-            />
+            <View ref={toDateInputRef}>
+              <TextInput
+                style={[styles.input, { backgroundColor: colors.input, color: colors.text }]}
+                placeholder="MM/YYYY"
+                placeholderTextColor={colors.secondaryText}
+                value={localEmployment.toDate}
+                onChangeText={(value) => handleChange('toDate', value)}
+                onFocus={() => handleInputFocus(toDateInputRef)}
+              />
+            </View>
           ) : (
             <Text style={[styles.input, { backgroundColor: colors.input, color: colors.text, textAlignVertical: 'center' }]}>
               Present
