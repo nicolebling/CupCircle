@@ -122,7 +122,7 @@ export default function ProfileScreen() {
         <View style={{ flexDirection: 'row' }}>
           <TouchableOpacity
             onPress={handleEdit}
-            style={{ marginRight: isEditMode ? 23 : 15 }}
+            style={{ marginRight: isEditMode ? 23 : 25 }}
           >
             <Ionicons
               name={isEditMode ? "close" : "create-outline"}
