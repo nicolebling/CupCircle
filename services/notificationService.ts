@@ -78,58 +78,19 @@ export const notificationService = {
     }
   },
   
-  // Check if user wants this type of notification
-  async checkNotificationPreference(userId: string, notificationType: string): Promise<boolean> {
-    try {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("notification_settings, notifications_enabled")
-        .eq("id", userId)
-        .single();
-
-      if (error || !data) {
-        console.error("Error checking notification preference:", error);
-        return true; // Default to allowing notifications
-      }
-
-      // If notifications are completely disabled
-      if (!data.notifications_enabled) {
-        return false;
-      }
-
-      // Check specific notification type preference
-      if (data.notification_settings && typeof data.notification_settings === 'object') {
-        return data.notification_settings[notificationType] !== false;
-      }
-
-      return true; // Default to allowing notifications
-    } catch (error) {
-      console.error("Error checking notification preference:", error);
-      return true; // Default to allowing notifications
-    }
-  },
-
   // Instead of sending directly, create notification in DB
   async createNotification(
     recipientUserId: string,
+    
     title: string,
     body: string,
-    notificationType: string,
     metadata?: Record<string, any>,
   ) {
     try {
-      // Check if user wants this type of notification
-      const shouldSend = await this.checkNotificationPreference(recipientUserId, notificationType);
-      if (!shouldSend) {
-        console.log(`🔕 Notification skipped - user disabled ${notificationType} notifications`);
-        return;
-      }
-
       const { error } = await supabase.from("notifications").insert({
         user_id: recipientUserId,
         title,
         body,
-        type: notificationType,
         metadata: metadata || {},
       });
 
@@ -166,7 +127,6 @@ export const notificationService = {
         recipientUserId,
         "☕ New Coffee Chat Request!",
         `${senderName} wants to meet you at ${cafeName}`,
-        "coffee_requests",
         { type: "coffee_request" },
       );
     } catch (error) {
@@ -176,7 +136,6 @@ export const notificationService = {
         recipientUserId,
         "☕ New Coffee Chat Request!",
         `Someone wants to meet you at ${cafeName}`,
-        "coffee_requests",
         { type: "coffee_request" },
       );
     }
@@ -201,7 +160,6 @@ export const notificationService = {
         recipientUserId,
         "✅ Coffee Chat Confirmed!",
         `Your coffee chat with ${senderName} at ${cafeName} is confirmed`,
-        "coffee_updates",
         { type: "coffee_confirmed" },
       );
     } catch (error) {
@@ -211,7 +169,6 @@ export const notificationService = {
         recipientUserId,
         "✅ Coffee Chat Confirmed!",
         `Your coffee chat at ${cafeName} is confirmed`,
-        "coffee_updates",
         { type: "coffee_confirmed" },
       );
     }
@@ -235,7 +192,6 @@ export const notificationService = {
         recipientUserId,
         "❌ Coffee Chat Cancelled",
         `${senderName} cancelled your coffee chat`,
-        "coffee_updates",
         { type: "coffee_cancelled" },
       );
     } catch (error) {
@@ -245,7 +201,6 @@ export const notificationService = {
         recipientUserId,
         "❌ Coffee Chat Cancelled",
         "Your coffee chat has been cancelled",
-        "coffee_updates",
         { type: "coffee_cancelled" },
       );
     }
@@ -272,7 +227,6 @@ export const notificationService = {
         messagePreview.length > 50
           ? messagePreview.substring(0, 50) + "..."
           : messagePreview,
-        "messages",
         { type: "new_message" },
       );
     } catch (error) {
@@ -284,23 +238,8 @@ export const notificationService = {
         messagePreview.length > 50
           ? messagePreview.substring(0, 50) + "..."
           : messagePreview,
-        "messages",
         { type: "new_message" },
       );
     }
-  },
-
-  async sendSystemUpdateNotification(
-    recipientUserId: string,
-    title: string,
-    message: string,
-  ) {
-    await this.createNotification(
-      recipientUserId,
-      title,
-      message,
-      "system_updates",
-      { type: "system_update" },
-    );
   },
 };
