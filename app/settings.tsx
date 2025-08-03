@@ -21,6 +21,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { openBrowserAsync } from "expo-web-browser";
 import Superwall, { LogLevel } from "expo-superwall/compat";
 import { supabase } from "@/lib/supabase";
+import { notificationService } from "@/services/notificationService";
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -38,8 +39,70 @@ export default function SettingsScreen() {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const handleNotificationsToggle = () => {
-    setNotifications(!notifications);
+  const handleNotificationsToggle = async () => {
+    const newNotificationState = !notifications;
+    
+    try {
+      if (!user?.id) {
+        Alert.alert("Error", "User not found. Please try again.");
+        return;
+      }
+
+      let pushToken = null;
+
+      // If enabling notifications, register for push notifications
+      if (newNotificationState) {
+        pushToken = await notificationService.registerForPushNotificationsAsync();
+        if (!pushToken) {
+          Alert.alert(
+            "Permission Required",
+            "Push notification permission is required to enable notifications.",
+            [{ text: "OK" }]
+          );
+          return;
+        }
+      }
+
+      // Update the notification preference and push token in the database
+      const updateData: any = { 
+        notifications_enabled: newNotificationState 
+      };
+      
+      if (pushToken) {
+        updateData.push_token = pushToken;
+      } else if (!newNotificationState) {
+        // Clear push token when disabling notifications
+        updateData.push_token = null;
+      }
+
+      const { error } = await supabase
+        .from("profiles")
+        .update(updateData)
+        .eq("id", user.id);
+
+      if (error) {
+        console.error("Error updating notification preference:", error);
+        Alert.alert("Error", "Failed to update notification settings. Please try again.");
+        return;
+      }
+
+      // Update local state
+      setNotifications(newNotificationState);
+      
+      // Show success alert
+      const statusMessage = newNotificationState ? "enabled" : "disabled";
+      Alert.alert(
+        "Notifications Updated",
+        `Push notifications have been ${statusMessage}.`,
+        [{ text: "OK" }]
+      );
+
+      console.log(`Notifications ${statusMessage} for user ${user.id}`);
+      
+    } catch (error) {
+      console.error("Error toggling notifications:", error);
+      Alert.alert("Error", "An unexpected error occurred. Please try again.");
+    }
   };
 
   const handleLogout = async () => {
@@ -113,6 +176,34 @@ export default function SettingsScreen() {
     setShowNewPassword(false);
     setShowConfirmPassword(false);
   };
+
+  // Load user's notification preference
+  React.useEffect(() => {
+    const loadNotificationPreference = async () => {
+      if (!user?.id) return;
+
+      try {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("notifications_enabled")
+          .eq("id", user.id)
+          .single();
+
+        if (error) {
+          console.error("Error loading notification preference:", error);
+          return;
+        }
+
+        if (data && typeof data.notifications_enabled === 'boolean') {
+          setNotifications(data.notifications_enabled);
+        }
+      } catch (error) {
+        console.error("Error fetching notification preference:", error);
+      }
+    };
+
+    loadNotificationPreference();
+  }, [user?.id]);
 
   React.useEffect(() => {
     const initializeSuperwall = async () => {
