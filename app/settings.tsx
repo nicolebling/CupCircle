@@ -289,6 +289,36 @@ export default function SettingsScreen() {
 
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>
+              Cafes
+            </Text>
+
+            <TouchableOpacity
+              style={[styles.settingItem, { borderColor: colors.border }]}
+              onPress={() =>
+                openBrowserAsync("https://cupcircle.co/cafes")
+              }
+            >
+              <View style={styles.settingContent}>
+                <Ionicons
+                  name="cafe-outline"
+                  size={22}
+                  color={colors.text}
+                />
+                <Text style={[styles.settingText, { color: colors.text }]}>
+                  Cafe Recommendations
+                </Text>
+              </View>
+              <Ionicons
+                name="chevron-forward"
+                size={20}
+                color={colors.secondaryText}
+              />
+            </TouchableOpacity>
+          </View>
+          
+
+          <View style={styles.section}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>
               Preferences
             </Text>
 
@@ -311,33 +341,6 @@ export default function SettingsScreen() {
                 ios_backgroundColor={colors.border}
               />
             </View>
-
-            {/* Dark mode - future implementation */}
-            {/* <View style={[styles.settingItem, { borderColor: colors.border }]}>
-            <View style={styles.settingContent}>
-              <Ionicons name="moon-outline" size={22} color={colors.text} />
-              <Text style={[styles.settingText, { color: colors.text }]}>
-                Dark Mode
-              </Text>
-            </View>
-            <TouchableOpacity
-              style={[
-                styles.toggle,
-                darkMode
-                  ? { backgroundColor: colors.primary }
-                  : { backgroundColor: colors.border },
-              ]}
-              onPress={handleDarkModeToggle}
-            >
-              <View
-                style={[
-                  styles.toggleKnob,
-                  darkMode ? { right: 2 } : { left: 2 },
-                  { backgroundColor: "white" },
-                ]}
-              />
-            </TouchableOpacity>
-          </View> */}
           </View>
 
           <View style={styles.section}>
@@ -348,7 +351,7 @@ export default function SettingsScreen() {
             <TouchableOpacity
               style={[styles.settingItem, { borderColor: colors.border }]}
               onPress={() =>
-                openBrowserAsync("https://www.cupcircle.co/support")
+                openBrowserAsync("https://cupcircle.co/contact-us")
               }
             >
               <View style={styles.settingContent}>
@@ -371,7 +374,30 @@ export default function SettingsScreen() {
             <TouchableOpacity
               style={[styles.settingItem, { borderColor: colors.border }]}
               onPress={() =>
-                openBrowserAsync("https://www.cupcircle.co/terms-of-service")
+                openBrowserAsync("https://cupcircle.co/faq")
+              }
+            >
+              <View style={styles.settingContent}>
+                <Ionicons
+                  name="chatbubbles-outline"
+                  size={22}
+                  color={colors.text}
+                />
+                <Text style={[styles.settingText, { color: colors.text }]}>
+                  FAQ
+                </Text>
+              </View>
+              <Ionicons
+                name="chevron-forward"
+                size={20}
+                color={colors.secondaryText}
+              />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.settingItem, { borderColor: colors.border }]}
+              onPress={() =>
+                openBrowserAsync("https://cupcircle.co/terms-of-service")
               }
             >
               <View style={styles.settingContent}>
@@ -394,7 +420,7 @@ export default function SettingsScreen() {
             <TouchableOpacity
               style={[styles.settingItem, { borderColor: colors.border }]}
               onPress={() =>
-                openBrowserAsync("https://www.cupcircle.co/privacy-policy")
+                openBrowserAsync("https://cupcircle.co/privacy-policy")
               }
             >
               <View style={styles.settingContent}>
