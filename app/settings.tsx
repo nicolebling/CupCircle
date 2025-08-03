@@ -30,7 +30,12 @@ export default function SettingsScreen() {
   const colors = Colors[colorScheme ?? "light"];
   const { signOut, user } = useAuth();
 
-  const [notifications, setNotifications] = React.useState(true);
+  const [notificationSettings, setNotificationSettings] = React.useState({
+    coffee_requests: true,
+    coffee_updates: true,
+    messages: true,
+    system_updates: true,
+  });
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -39,19 +44,23 @@ export default function SettingsScreen() {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const handleNotificationsToggle = async () => {
-    const newNotificationState = !notifications;
-    
+  const handleNotificationToggle = async (notificationType: string, newValue: boolean) => {
     try {
       if (!user?.id) {
         Alert.alert("Error", "User not found. Please try again.");
         return;
       }
 
-      let pushToken = null;
+      const updatedSettings = {
+        ...notificationSettings,
+        [notificationType]: newValue
+      };
 
-      // If enabling notifications, register for push notifications
-      if (newNotificationState) {
+      let pushToken = null;
+      const anyNotificationEnabled = Object.values(updatedSettings).some(enabled => enabled);
+
+      // If any notification is enabled, ensure we have push token
+      if (anyNotificationEnabled) {
         pushToken = await notificationService.registerForPushNotificationsAsync();
         if (!pushToken) {
           Alert.alert(
@@ -63,15 +72,15 @@ export default function SettingsScreen() {
         }
       }
 
-      // Update the notification preference and push token in the database
+      // Update the notification preferences in the database
       const updateData: any = { 
-        notifications_enabled: newNotificationState 
+        notification_settings: updatedSettings,
+        notifications_enabled: anyNotificationEnabled
       };
       
       if (pushToken) {
         updateData.push_token = pushToken;
-      } else if (!newNotificationState) {
-        // Clear push token when disabling notifications
+      } else if (!anyNotificationEnabled) {
         updateData.push_token = null;
       }
 
@@ -81,26 +90,33 @@ export default function SettingsScreen() {
         .eq("id", user.id);
 
       if (error) {
-        console.error("Error updating notification preference:", error);
+        console.error("Error updating notification preferences:", error);
         Alert.alert("Error", "Failed to update notification settings. Please try again.");
         return;
       }
 
       // Update local state
-      setNotifications(newNotificationState);
+      setNotificationSettings(updatedSettings);
       
       // Show success alert
-      const statusMessage = newNotificationState ? "enabled" : "disabled";
+      const notificationNames = {
+        coffee_requests: "Coffee Chat Requests",
+        coffee_updates: "Coffee Chat Updates", 
+        messages: "Messages",
+        system_updates: "System Updates"
+      };
+      
+      const statusMessage = newValue ? "enabled" : "disabled";
       Alert.alert(
-        "Notifications Updated",
-        `Push notifications have been ${statusMessage}.`,
+        "Notification Updated",
+        `${notificationNames[notificationType]} notifications have been ${statusMessage}.`,
         [{ text: "OK" }]
       );
 
-      console.log(`Notifications ${statusMessage} for user ${user.id}`);
+      console.log(`${notificationNames[notificationType]} notifications ${statusMessage} for user ${user.id}`);
       
     } catch (error) {
-      console.error("Error toggling notifications:", error);
+      console.error("Error toggling notification:", error);
       Alert.alert("Error", "An unexpected error occurred. Please try again.");
     }
   };
@@ -177,32 +193,32 @@ export default function SettingsScreen() {
     setShowConfirmPassword(false);
   };
 
-  // Load user's notification preference
+  // Load user's notification preferences
   React.useEffect(() => {
-    const loadNotificationPreference = async () => {
+    const loadNotificationPreferences = async () => {
       if (!user?.id) return;
 
       try {
         const { data, error } = await supabase
           .from("profiles")
-          .select("notifications_enabled")
+          .select("notification_settings, notifications_enabled")
           .eq("id", user.id)
           .single();
 
         if (error) {
-          console.error("Error loading notification preference:", error);
+          console.error("Error loading notification preferences:", error);
           return;
         }
 
-        if (data && typeof data.notifications_enabled === 'boolean') {
-          setNotifications(data.notifications_enabled);
+        if (data && data.notification_settings) {
+          setNotificationSettings(data.notification_settings);
         }
       } catch (error) {
-        console.error("Error fetching notification preference:", error);
+        console.error("Error fetching notification preferences:", error);
       }
     };
 
-    loadNotificationPreference();
+    loadNotificationPreferences();
   }, [user?.id]);
 
   React.useEffect(() => {
@@ -292,20 +308,104 @@ export default function SettingsScreen() {
               Preferences
             </Text>
 
+            {/* Coffee Chat Requests */}
             <View style={[styles.settingItem, { borderColor: colors.border }]}>
               <View style={styles.settingContent}>
                 <Ionicons
-                  name="notifications-outline"
+                  name="cafe-outline"
                   size={22}
                   color={colors.text}
                 />
-                <Text style={[styles.settingText, { color: colors.text }]}>
-                  Notifications
-                </Text>
+                <View style={styles.notificationTextContainer}>
+                  <Text style={[styles.settingText, { color: colors.text }]}>
+                    Coffee Chat Requests
+                  </Text>
+                  <Text style={[styles.settingSubtext, { color: colors.secondaryText }]}>
+                    When someone wants to meet you
+                  </Text>
+                </View>
               </View>
               <Switch
-                value={notifications}
-                onValueChange={handleNotificationsToggle}
+                value={notificationSettings.coffee_requests}
+                onValueChange={(value) => handleNotificationToggle('coffee_requests', value)}
+                trackColor={{ false: colors.border, true: colors.primary }}
+                thumbColor={Platform.OS === 'ios' ? undefined : 'white'}
+                ios_backgroundColor={colors.border}
+              />
+            </View>
+
+            {/* Coffee Chat Updates */}
+            <View style={[styles.settingItem, { borderColor: colors.border }]}>
+              <View style={styles.settingContent}>
+                <Ionicons
+                  name="checkmark-circle-outline"
+                  size={22}
+                  color={colors.text}
+                />
+                <View style={styles.notificationTextContainer}>
+                  <Text style={[styles.settingText, { color: colors.text }]}>
+                    Coffee Chat Updates
+                  </Text>
+                  <Text style={[styles.settingSubtext, { color: colors.secondaryText }]}>
+                    Confirmations and cancellations
+                  </Text>
+                </View>
+              </View>
+              <Switch
+                value={notificationSettings.coffee_updates}
+                onValueChange={(value) => handleNotificationToggle('coffee_updates', value)}
+                trackColor={{ false: colors.border, true: colors.primary }}
+                thumbColor={Platform.OS === 'ios' ? undefined : 'white'}
+                ios_backgroundColor={colors.border}
+              />
+            </View>
+
+            {/* Messages */}
+            <View style={[styles.settingItem, { borderColor: colors.border }]}>
+              <View style={styles.settingContent}>
+                <Ionicons
+                  name="chatbubble-outline"
+                  size={22}
+                  color={colors.text}
+                />
+                <View style={styles.notificationTextContainer}>
+                  <Text style={[styles.settingText, { color: colors.text }]}>
+                    Messages
+                  </Text>
+                  <Text style={[styles.settingSubtext, { color: colors.secondaryText }]}>
+                    New chat messages
+                  </Text>
+                </View>
+              </View>
+              <Switch
+                value={notificationSettings.messages}
+                onValueChange={(value) => handleNotificationToggle('messages', value)}
+                trackColor={{ false: colors.border, true: colors.primary }}
+                thumbColor={Platform.OS === 'ios' ? undefined : 'white'}
+                ios_backgroundColor={colors.border}
+              />
+            </View>
+
+            {/* System Updates */}
+            <View style={[styles.settingItem, { borderColor: colors.border }]}>
+              <View style={styles.settingContent}>
+                <Ionicons
+                  name="information-circle-outline"
+                  size={22}
+                  color={colors.text}
+                />
+                <View style={styles.notificationTextContainer}>
+                  <Text style={[styles.settingText, { color: colors.text }]}>
+                    System Updates
+                  </Text>
+                  <Text style={[styles.settingSubtext, { color: colors.secondaryText }]}>
+                    Important app announcements
+                  </Text>
+                </View>
+              </View>
+              <Switch
+                value={notificationSettings.system_updates}
+                onValueChange={(value) => handleNotificationToggle('system_updates', value)}
                 trackColor={{ false: colors.border, true: colors.primary }}
                 thumbColor={Platform.OS === 'ios' ? undefined : 'white'}
                 ios_backgroundColor={colors.border}
@@ -589,6 +689,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginLeft: 12,
     fontFamily: "K2D-Regular",
+  },
+  notificationTextContainer: {
+    marginLeft: 12,
+    flex: 1,
+  },
+  settingSubtext: {
+    fontSize: 13,
+    fontFamily: "K2D-Regular",
+    marginTop: 2,
   },
   
   logoutButton: {
