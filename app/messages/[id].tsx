@@ -12,6 +12,8 @@ import {
   ActivityIndicator,
   ScrollView,
   Modal,
+  Linking,
+  Alert,
 } from "react-native";
 import {
   useLocalSearchParams,
@@ -499,6 +501,48 @@ export default function MessageScreen() {
       return "Yesterday";
     } else {
       return date.toLocaleDateString();
+    }
+  };
+
+  // Open Google Maps for a specific cafe
+  const openCafeInMaps = (cafeString: string) => {
+    const [cafeName, cafeAddress, longitude, latitude] = cafeString.split("|||");
+    
+    if (latitude && longitude) {
+      // Use coordinates for more accurate location
+      const url = Platform.select({
+        ios: `maps:0,0?q=${latitude},${longitude}`,
+        android: `geo:0,0?q=${latitude},${longitude}(${encodeURIComponent(cafeName)})`,
+      });
+      
+      Linking.canOpenURL(url).then((supported) => {
+        if (supported) {
+          Linking.openURL(url);
+        } else {
+          // Fallback to Google Maps web
+          const webUrl = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
+          Linking.openURL(webUrl);
+        }
+      });
+    } else if (cafeAddress) {
+      // Fallback to address search
+      const query = encodeURIComponent(`${cafeName} ${cafeAddress}`);
+      const url = Platform.select({
+        ios: `maps:0,0?q=${query}`,
+        android: `geo:0,0?q=${query}`,
+      });
+      
+      Linking.canOpenURL(url).then((supported) => {
+        if (supported) {
+          Linking.openURL(url);
+        } else {
+          // Fallback to Google Maps web
+          const webUrl = `https://www.google.com/maps/search/?api=1&query=${query}`;
+          Linking.openURL(webUrl);
+        }
+      });
+    } else {
+      Alert.alert("Location Error", "Unable to open location for this cafe.");
     }
   };
 
