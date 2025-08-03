@@ -497,15 +497,15 @@ export default function ProfileForm({
 
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isDark && styles.textDark]}>
-                Headline
+                Headline (Max 35 characters)
               </Text>
               <TextInput
                 style={[styles.input, isDark && styles.inputDark]}
                 value={occupation}
                 onChangeText={setOccupation}
-                placeholder="Headline (Max 25 characters)"
+                placeholder="eg. Strategist open to mentoring"
                 placeholderTextColor={isDark ? "#999" : "#777"}
-                maxLength={25}
+                maxLength={35}
               />
             </View>
 

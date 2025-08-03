@@ -209,21 +209,21 @@ export default function OnboardingScreen() {
         return (
           <View style={styles.formSection}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>A headline for your profile</Text>
-            <Text style={[styles.sectionSubtitle, { color: colors.secondaryText }]}>This could be your job title, passion, or just something that describes you best.</Text>
+            <Text style={[styles.sectionSubtitle, { color: colors.secondaryText }]}>This could be your job title, passion, or just something that describes you best. (Max 35 characters)</Text>
             <TextInput
               style={[styles.input, { backgroundColor: colors.card, color: colors.text, borderColor: colors.border }]}
-              placeholder="Headline (Max 25 characters)"
+              placeholder="eg. Strategist open to mentoring"
               placeholderTextColor={colors.secondaryText}
               value={profileData.occupation}
               onChangeText={(text) => {
-                if (text.length <= 25) {
+                if (text.length <= 35) {
                   setProfileData({ ...profileData, occupation: text });
                 }
               }}
-              maxLength={25}
+              maxLength={35}
             />
             <Text style={[styles.characterCount, { color: colors.secondaryText }]}>
-              {profileData.occupation.length}/25 characters
+              {profileData.occupation.length}/35 characters
             </Text>
           </View>
         );
