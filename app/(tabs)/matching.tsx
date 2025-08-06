@@ -104,6 +104,7 @@ export default function MatchingScreen() {
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
   const [hasMoreProfiles, setHasMoreProfiles] = useState(false);
   const [showSubscriptionCard, setShowSubscriptionCard] = useState(false);
+  const [paywallDismissed, setPaywallDismissed] = useState(false);
   const PROFILES_PER_PAGE = 10;
 
   // Refs for auto-scroll functionality
@@ -143,6 +144,10 @@ export default function MatchingScreen() {
     if (!user?.id) return;
 
     try {
+      // Check if user is subscribed
+      const isSubscribed = await Superwall.shared.isUserSubscribed();
+      console.log("User subscription status:", isSubscribed);
+
       const { data: profileData, error } = await supabase
         .from("profiles")
         .select("successful_chat")
@@ -154,27 +159,57 @@ export default function MatchingScreen() {
         return;
       }
 
-      if (profileData?.successful_chat === 1) {
-        console.log("Showing subscription card for successful_chat = 1");
+      console.log("Profile data:", profileData);
+      console.log("Paywall dismissed:", paywallDismissed);
+
+      // Show subscription card if:
+      // 1. User has 1+ successful chats AND is not subscribed
+      // 2. User previously dismissed the paywall without subscribing
+      if (!isSubscribed && (profileData?.successful_chat >= 1 || paywallDismissed)) {
+        console.log("Showing subscription card - successful_chat:", profileData?.successful_chat, "dismissed:", paywallDismissed);
         setShowSubscriptionCard(true);
       }
     } catch (error) {
       console.error("Error checking successful_chat count:", error);
     }
-  }, [user?.id]);
+  }, [user?.id, paywallDismissed]);
 
   // Function to handle subscription button press
-  const handleSubscribe = () => {
+  const handleSubscribe = async () => {
     setShowSubscriptionCard(false);
     console.log("Triggering paywall from subscription card");
-    Superwall.shared.register({
-      placement: 'matching',
-    });
+    
+    try {
+      const result = await Superwall.shared.register({
+        placement: 'matching',
+      });
+      
+      console.log("Paywall result:", result);
+      
+      // Check subscription status after paywall interaction
+      const isSubscribed = await Superwall.shared.isUserSubscribed();
+      
+      if (!isSubscribed) {
+        // User dismissed paywall without subscribing
+        console.log("User dismissed paywall without subscribing");
+        setPaywallDismissed(true);
+      } else {
+        console.log("User successfully subscribed");
+        setPaywallDismissed(false);
+      }
+    } catch (error) {
+      console.error("Error handling paywall:", error);
+      // Assume user dismissed without subscribing if there's an error
+      setPaywallDismissed(true);
+    }
   };
 
   // Function to close subscription card
   const handleCloseSubscriptionCard = () => {
     setShowSubscriptionCard(false);
+    // Mark as dismissed if user closes without subscribing
+    setPaywallDismissed(true);
+    console.log("Subscription card dismissed by user");
   };
 
   // Define checkUserAvailability outside of useFocusEffect
@@ -1546,6 +1581,7 @@ export default function MatchingScreen() {
       {showSubscriptionCard && (
         <SubscriptionCard
           onSubscribe={handleSubscribe}
+          onClose={handleCloseSubscriptionCard}
         />
       )}
 
