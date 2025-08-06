@@ -42,8 +42,6 @@ type AuthContextType = {
   signOut: () => Promise<void>;
   fetchProfile: () => Promise<Profile | null>;
   updateUser: (userData: Partial<Profile>) => Promise<void>;
-  identifyUserWithSuperwall: (userId: string, options?: any) => Promise<void>;
-  resetSuperwallUser: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -79,20 +77,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       // Identify user with Superwall if session exists
       if (session?.user) {
         try {
-          console.log("🔗 Identifying user with Superwall:", session.user.id);
           await Superwall.shared.identify({ userId: session.user.id });
-          console.log("✅ Superwall user identified from existing session:", session.user.id);
+          console.log(
+            "Superwall user identified from existing session:",
+            session.user.id,
+          );
         } catch (error) {
-          console.error("❌ Failed to identify user with Superwall from session:", error);
-        }
-      } else {
-        // Reset Superwall when no session exists
-        try {
-          console.log("🔄 Resetting Superwall user (no session)");
-          await Superwall.shared.reset();
-          console.log("✅ Superwall user reset completed");
-        } catch (error) {
-          console.error("❌ Failed to reset Superwall user:", error);
+          console.error(
+            "Failed to identify user with Superwall from session:",
+            error,
+          );
         }
       }
 
@@ -101,29 +95,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("🔄 Auth state change:", event, session?.user?.id || "no user");
-      
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
 
       // Handle Superwall user identification based on auth state
       if (session?.user) {
         try {
-          console.log("🔗 Identifying user with Superwall on auth change:", session.user.id);
           await Superwall.shared.identify({ userId: session.user.id });
-          console.log("✅ Superwall user identified on auth state change:", session.user.id);
+          console.log(
+            "Superwall user identified on auth state change:",
+            session.user.id,
+          );
         } catch (error) {
-          console.error("❌ Failed to identify user with Superwall on auth state change:", error);
+          console.error(
+            "Failed to identify user with Superwall on auth state change:",
+            error,
+          );
         }
       } else {
-        // Reset Superwall when user signs out or session expires
         try {
-          console.log("🔄 Resetting Superwall user on auth change");
           await Superwall.shared.reset();
-          console.log("✅ Superwall user reset on auth state change");
+          console.log("Superwall user reset on auth state change");
         } catch (error) {
-          console.error("❌ Failed to reset Superwall user on auth state change:", error);
+          console.error(
+            "Failed to reset Superwall user on auth state change:",
+            error,
+          );
         }
       }
 
@@ -147,18 +145,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         setUser(data.user);
         setSession(data.session);
 
-        // Identify user with Superwall with additional options
+        // Identify user with Superwall
         try {
-          console.log("🔗 Identifying user with Superwall during sign in:", data.user.id);
-          await Superwall.shared.identify({ 
-            userId: data.user.id,
-            options: {
-              email: data.user.email
-            }
-          });
-          console.log("✅ Superwall user identified during sign in:", data.user.id);
+          await Superwall.shared.identify({ userId: data.user.id });
+          console.log("Superwall user identified:", data.user.id);
         } catch (error) {
-          console.error("❌ Failed to identify user with Superwall during sign in:", error);
+          console.error("Failed to identify user with Superwall:", error);
         }
 
         // Register for push notifications
@@ -223,19 +215,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         setUser(data.user);
         setSession(data.session);
 
-        // Identify user with Superwall with additional options
+        // Identify user with Superwall
         try {
-          console.log("🔗 Identifying new user with Superwall during signup:", data.user.id);
-          await Superwall.shared.identify({ 
-            userId: data.user.id,
-            options: {
-              email: data.user.email,
-              name: name
-            }
-          });
-          console.log("✅ Superwall user identified during signup:", data.user.id);
+          await Superwall.shared.identify({ userId: data.user.id });
+          console.log("Superwall user identified during signup:", data.user.id);
         } catch (error) {
-          console.error("❌ Failed to identify user with Superwall during signup:", error);
+          console.error(
+            "Failed to identify user with Superwall during signup:",
+            error,
+          );
         }
 
         router.replace("/profile-setup");
@@ -252,27 +240,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       setLoading(true);
 
-      // Reset Superwall user identification first
-      try {
-        console.log("🔄 Resetting Superwall user on logout");
-        await Superwall.shared.reset();
-        console.log("✅ Superwall user reset completed on logout");
-      } catch (error) {
-        console.error("❌ Failed to reset Superwall user on logout:", error);
-      }
-
       // Add small delay for visual feedback
       await new Promise((resolve) => setTimeout(resolve, 300));
 
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
 
-      // Update state before navigation
+      router.replace("/(auth)/login");
+
+      // Reset Superwall user identification
+      try {
+        await Superwall.shared.reset();
+        console.log("Superwall user reset on logout");
+      } catch (error) {
+        console.error("Failed to reset Superwall user:", error);
+      }
+
+      // Update state after navigation starts
       setSession(null);
       setProfile(null);
       setUser(null);
-
-      router.replace("/(auth)/login");
 
       // Small delay before completing
       await new Promise((resolve) => setTimeout(resolve, 200));
@@ -331,30 +318,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  // Utility function to manually identify user with Superwall
-  const identifyUserWithSuperwall = async (userId: string, options?: any) => {
-    try {
-      console.log("🔗 Manually identifying user with Superwall:", userId);
-      await Superwall.shared.identify({ userId, options });
-      console.log("✅ Manual Superwall user identification successful:", userId);
-    } catch (error) {
-      console.error("❌ Manual Superwall user identification failed:", error);
-      throw error;
-    }
-  };
-
-  // Utility function to manually reset Superwall user
-  const resetSuperwallUser = async () => {
-    try {
-      console.log("🔄 Manually resetting Superwall user");
-      await Superwall.shared.reset();
-      console.log("✅ Manual Superwall user reset successful");
-    } catch (error) {
-      console.error("❌ Manual Superwall user reset failed:", error);
-      throw error;
-    }
-  };
-
   return (
     <AuthContext.Provider
       value={{
@@ -367,8 +330,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         signOut,
         fetchProfile,
         updateUser,
-        identifyUserWithSuperwall,
-        resetSuperwallUser,
       }}
     >
       {children}
