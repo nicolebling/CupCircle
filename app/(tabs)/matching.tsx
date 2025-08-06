@@ -149,7 +149,9 @@ export default function MatchingScreen() {
       console.log("Subscription status:", subscriptionStatus);
 
       let isPaidUser = false;
-      switch (subscriptionStatus) {
+      // subscriptionStatus is an object with a status property
+      const status = subscriptionStatus?.status?.toLowerCase();
+      switch (status) {
         case 'active':
           console.log("User has active subscription");
           isPaidUser = true;
