@@ -12,26 +12,16 @@ import { useColorScheme } from '@/hooks/useColorScheme';
 
 type SubscriptionCardProps = {
   onSubscribe: () => void;
-  onClose?: () => void;
 };
 
 export default function SubscriptionCard({
   onSubscribe,
-  onClose,
 }: SubscriptionCardProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
 
   return (
     <View style={[styles.container, { backgroundColor: colors.card, borderColor: colors.border }]}>
-      {onClose && (
-        <TouchableOpacity 
-          style={styles.closeButton} 
-          onPress={onClose}
-        >
-          <Ionicons name="close" size={24} color={colors.text} />
-        </TouchableOpacity>
-      )}
       <View style={styles.content}>
         <View style={styles.iconContainer}>
           <Ionicons name="cafe" size={64} color={colors.primary} />
@@ -71,18 +61,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-  },
-  closeButton: {
-    position: 'absolute',
-    top: 60,
-    right: 20,
-    zIndex: 1001,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(0,0,0,0.1)',
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   content: {
     width: '90%',
