@@ -20,6 +20,13 @@ export default function SubscriptionCard({
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
 
+  console.log("🎪 [PAYWALL DEBUG] SubscriptionCard component rendered");
+
+  const handleSubscribePress = () => {
+    console.log("🎯 [PAYWALL DEBUG] Subscribe button pressed in SubscriptionCard");
+    onSubscribe();
+  };
+
   return (
     <View style={[styles.container, { backgroundColor: colors.card, borderColor: colors.border }]}>
       <View style={styles.content}>
@@ -37,7 +44,7 @@ export default function SubscriptionCard({
 
         <TouchableOpacity
           style={[styles.subscribeButton, { backgroundColor: colors.primary }]}
-          onPress={onSubscribe}
+          onPress={handleSubscribePress}
         >
           <Text style={styles.subscribeButtonText}>Subscribe Now</Text>
         </TouchableOpacity>

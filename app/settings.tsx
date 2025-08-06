@@ -268,9 +268,15 @@ export default function SettingsScreen() {
             <TouchableOpacity
               style={[styles.settingItem, { borderColor: colors.border }]}
               onPress={() => {
-                Superwall.shared.register({
-                  placement: 'subscription_onPress',
-                });
+                console.log("⚙️ [PAYWALL DEBUG] Settings - Manage Subscription pressed");
+                try {
+                  Superwall.shared.register({
+                    placement: 'subscription_onPress',
+                  });
+                  console.log("✅ [PAYWALL DEBUG] Settings - Superwall.shared.register called with 'subscription_onPress'");
+                } catch (error) {
+                  console.error("❌ [PAYWALL DEBUG] Settings - Error calling Superwall:", error);
+                }
               }}
             >
               <View style={styles.settingContent}>

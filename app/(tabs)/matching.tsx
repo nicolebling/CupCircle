@@ -104,6 +104,11 @@ export default function MatchingScreen() {
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
   const [hasMoreProfiles, setHasMoreProfiles] = useState(false);
   const [showSubscriptionCard, setShowSubscriptionCard] = useState(false);
+
+  // Add logging for subscription card state changes
+  useEffect(() => {
+    console.log("🎪 [PAYWALL DEBUG] showSubscriptionCard state changed to:", showSubscriptionCard);
+  }, [showSubscriptionCard]);
   const PROFILES_PER_PAGE = 10;
 
   // Refs for auto-scroll functionality
@@ -140,9 +145,18 @@ export default function MatchingScreen() {
 
   // Function to check successful_chat count and show subscription card
   const checkAndTriggerPaywall = useCallback(async () => {
-    if (!user?.id) return;
+    console.log("🔍 [PAYWALL DEBUG] checkAndTriggerPaywall called");
+    
+    if (!user?.id) {
+      console.log("❌ [PAYWALL DEBUG] No user ID found, skipping paywall check");
+      return;
+    }
+
+    console.log("👤 [PAYWALL DEBUG] User ID:", user.id);
 
     try {
+      console.log("📊 [PAYWALL DEBUG] Fetching user profile data...");
+      
       const { data: profileData, error } = await supabase
         .from("profiles")
         .select("successful_chat")
@@ -150,26 +164,40 @@ export default function MatchingScreen() {
         .single();
 
       if (error) {
-        console.error("Error fetching successful_chat count:", error);
+        console.error("❌ [PAYWALL DEBUG] Error fetching successful_chat count:", error);
         return;
       }
 
+      console.log("📋 [PAYWALL DEBUG] Profile data retrieved:", profileData);
+      console.log("💬 [PAYWALL DEBUG] Successful chat count:", profileData?.successful_chat);
+
       if (profileData?.successful_chat === 1) {
-        console.log("Showing subscription card for successful_chat = 1");
+        console.log("✅ [PAYWALL DEBUG] Condition met! Showing subscription card for successful_chat = 1");
         setShowSubscriptionCard(true);
+      } else {
+        console.log("🚫 [PAYWALL DEBUG] Condition not met. successful_chat =", profileData?.successful_chat, "(need exactly 1)");
       }
     } catch (error) {
-      console.error("Error checking successful_chat count:", error);
+      console.error("💥 [PAYWALL DEBUG] Exception in checkAndTriggerPaywall:", error);
     }
   }, [user?.id]);
 
   // Function to handle subscription button press
   const handleSubscribe = () => {
+    console.log("🎯 [PAYWALL DEBUG] handleSubscribe called");
+    console.log("🎪 [PAYWALL DEBUG] Hiding subscription card");
     setShowSubscriptionCard(false);
-    console.log("Triggering paywall from subscription card");
-    Superwall.shared.register({
-      placement: 'matching',
-    });
+    
+    console.log("🚀 [PAYWALL DEBUG] Triggering Superwall paywall with placement 'matching'");
+    
+    try {
+      Superwall.shared.register({
+        placement: 'matching',
+      });
+      console.log("✅ [PAYWALL DEBUG] Superwall.shared.register called successfully");
+    } catch (error) {
+      console.error("❌ [PAYWALL DEBUG] Error calling Superwall.shared.register:", error);
+    }
   };
 
   // Function to close subscription card
@@ -300,6 +328,7 @@ export default function MatchingScreen() {
   // Use useFocusEffect to run check when screen comes into focus
   useFocusEffect(
     useCallback(() => {
+      console.log("👁️ [PAYWALL DEBUG] Matching screen focused - running checks");
       checkUserAvailability();
       checkAndTriggerPaywall();
       fetchUserCentroid();
