@@ -305,7 +305,7 @@ export default function SettingsScreen() {
                   color={colors.text}
                 />
                 <Text style={[styles.settingText, { color: colors.text }]}>
-                  Cafe Recommendations
+                  Cafe Spotlight
                 </Text>
               </View>
               <Ionicons
