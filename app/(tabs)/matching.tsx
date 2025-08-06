@@ -144,9 +144,9 @@ export default function MatchingScreen() {
     if (!user?.id) return;
 
     try {
-      // Get subscription status from useUser hook (more reliable)
-      const { superwallSubscriptionStatus } = useAuth();
-      console.log("Subscription status:", superwallSubscriptionStatus);
+      // Get subscription status directly from Superwall
+      const subscriptionStatus = await Superwall.shared.getSubscriptionStatus();
+      console.log("Subscription status:", subscriptionStatus);
 
       let isPaidUser = false;
       // Check subscription status from the useUser hook
