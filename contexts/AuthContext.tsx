@@ -37,11 +37,13 @@ type AuthContextType = {
   session: Session | null;
   profile: Profile | null;
   loading: boolean;
-  signUp: (email: string, password: string, name: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string, name: string) => Promise<void>;
   signOut: () => Promise<void>;
   fetchProfile: () => Promise<Profile | null>;
   updateUser: (userData: Partial<Profile>) => Promise<void>;
+  superwallUser: any;
+  superwallSubscriptionStatus: any;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -53,6 +55,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [superwallUser, setSuperwallUser] = useState<any>(null);
+  const [superwallSubscriptionStatus, setSuperwallSubscriptionStatus] = useState<any>(null);
+
 
   // Initialize Superwall logging
   // useEffect(() => {
@@ -82,6 +87,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
             "Superwall user identified from existing session:",
             session.user.id,
           );
+          // Fetch Superwall user and subscription status
+          const swUser = await Superwall.shared.getUser();
+          setSuperwallUser(swUser);
+          const swSubscriptionStatus = await Superwall.shared.getSubscriptionStatus();
+          setSuperwallSubscriptionStatus(swSubscriptionStatus);
         } catch (error) {
           console.error(
             "Failed to identify user with Superwall from session:",
@@ -107,6 +117,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
             "Superwall user identified on auth state change:",
             session.user.id,
           );
+           // Fetch Superwall user and subscription status
+          const swUser = await Superwall.shared.getUser();
+          setSuperwallUser(swUser);
+          const swSubscriptionStatus = await Superwall.shared.getSubscriptionStatus();
+          setSuperwallSubscriptionStatus(swSubscriptionStatus);
         } catch (error) {
           console.error(
             "Failed to identify user with Superwall on auth state change:",
@@ -117,6 +132,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         try {
           await Superwall.shared.reset();
           console.log("Superwall user reset on auth state change");
+          setSuperwallUser(null);
+          setSuperwallSubscriptionStatus(null);
         } catch (error) {
           console.error(
             "Failed to reset Superwall user on auth state change:",
@@ -149,6 +166,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         try {
           await Superwall.shared.identify({ userId: data.user.id });
           console.log("Superwall user identified:", data.user.id);
+          // Fetch Superwall user and subscription status
+          const swUser = await Superwall.shared.getUser();
+          setSuperwallUser(swUser);
+          const swSubscriptionStatus = await Superwall.shared.getSubscriptionStatus();
+          setSuperwallSubscriptionStatus(swSubscriptionStatus);
         } catch (error) {
           console.error("Failed to identify user with Superwall:", error);
         }
@@ -158,12 +180,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           console.log('🔔 Starting push notification registration for user:', data.user.id);
           const token = await notificationService.registerForPushNotificationsAsync();
           console.log('🎯 Push token registration result:', { token, hasToken: !!token });
-          
+
           if (token) {
             console.log('💾 Attempting to save push token to database...');
             await notificationService.savePushToken(data.user.id, token);
             console.log('✅ Push token save operation completed');
-            
+
             // Verify the token was saved by reading it back
             console.log('🔍 Verifying token was saved - fetching from database...');
             const { data: verifyData, error: verifyError } = await supabase
@@ -171,7 +193,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
               .select('push_token')
               .eq('id', data.user.id)
               .single();
-            
+
             if (verifyError) {
               console.log('❌ Error verifying push token save:', verifyError);
             } else {
@@ -219,6 +241,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         try {
           await Superwall.shared.identify({ userId: data.user.id });
           console.log("Superwall user identified during signup:", data.user.id);
+          // Fetch Superwall user and subscription status
+          const swUser = await Superwall.shared.getUser();
+          setSuperwallUser(swUser);
+          const swSubscriptionStatus = await Superwall.shared.getSubscriptionStatus();
+          setSuperwallSubscriptionStatus(swSubscriptionStatus);
         } catch (error) {
           console.error(
             "Failed to identify user with Superwall during signup:",
@@ -252,6 +279,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       try {
         await Superwall.shared.reset();
         console.log("Superwall user reset on logout");
+        setSuperwallUser(null);
+        setSuperwallSubscriptionStatus(null);
       } catch (error) {
         console.error("Failed to reset Superwall user:", error);
       }
@@ -325,11 +354,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         session,
         profile,
         loading,
-        signUp,
         signIn,
+        signUp,
         signOut,
         fetchProfile,
         updateUser,
+        superwallUser,
+        superwallSubscriptionStatus,
       }}
     >
       {children}
