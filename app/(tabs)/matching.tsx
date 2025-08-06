@@ -104,6 +104,7 @@ export default function MatchingScreen() {
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
   const [hasMoreProfiles, setHasMoreProfiles] = useState(false);
   const [showSubscriptionCard, setShowSubscriptionCard] = useState(false);
+  const [isPaidUser, setIsPaidUser] = useState(false);
   const PROFILES_PER_PAGE = 10;
 
   // Refs for auto-scroll functionality
@@ -138,11 +139,33 @@ export default function MatchingScreen() {
     cardRotate.value = 0;
   }, [currentIndex]);
 
-  // Function to check successful_chat count and show subscription card
-  const checkAndTriggerPaywall = useCallback(async () => {
+  // Function to check subscription status and successful_chat count
+  const checkSubscriptionAndPaywall = useCallback(async () => {
     if (!user?.id) return;
 
     try {
+      // Get subscription status from Superwall
+      const subscriptionStatus = await Superwall.shared.getSubscriptionStatus();
+      console.log("Subscription status:", subscriptionStatus);
+
+      let isPaidUser = false;
+      switch (subscriptionStatus) {
+        case 'active':
+          console.log("User has active subscription");
+          isPaidUser = true;
+          break;
+        case 'inactive':
+          console.log("User is on free plan");
+          isPaidUser = false;
+          break;
+        case 'unknown':
+        default:
+          console.log("User subscription status is unknown/inactive");
+          isPaidUser = false;
+          break;
+      }
+
+      // Get successful_chat count
       const { data: profileData, error } = await supabase
         .from("profiles")
         .select("successful_chat")
@@ -154,12 +177,22 @@ export default function MatchingScreen() {
         return;
       }
 
-      if (profileData?.successful_chat === 1) {
-        console.log("Showing subscription card for successful_chat = 1");
+      const successfulChatCount = profileData?.successful_chat || 0;
+      console.log("Successful chat count:", successfulChatCount);
+
+      // Store subscription status in state
+      setIsPaidUser(isPaidUser);
+
+      // Logic: If user has 1 successful chat and is NOT subscribed, show subscription card
+      if (successfulChatCount === 1 && !isPaidUser) {
+        console.log("Showing subscription card for non-subscribed user with 1 successful chat");
         setShowSubscriptionCard(true);
+      } else {
+        setShowSubscriptionCard(false);
       }
+
     } catch (error) {
-      console.error("Error checking successful_chat count:", error);
+      console.error("Error checking subscription status and successful_chat count:", error);
     }
   }, [user?.id]);
 
@@ -170,6 +203,11 @@ export default function MatchingScreen() {
     Superwall.shared.register({
       placement: 'matching',
     });
+    
+    // Refresh subscription status after paywall interaction
+    setTimeout(() => {
+      checkSubscriptionAndPaywall();
+    }, 2000);
   };
 
   // Function to close subscription card
@@ -301,9 +339,9 @@ export default function MatchingScreen() {
   useFocusEffect(
     useCallback(() => {
       checkUserAvailability();
-      checkAndTriggerPaywall();
+      checkSubscriptionAndPaywall();
       fetchUserCentroid();
-    }, [checkUserAvailability, checkAndTriggerPaywall, fetchUserCentroid]),
+    }, [checkUserAvailability, checkSubscriptionAndPaywall, fetchUserCentroid]),
   );
 
   const fetchProfiles = async () => {
@@ -797,43 +835,53 @@ export default function MatchingScreen() {
     <SafeAreaView
       style={[styles.container, { backgroundColor: colors.background }]}
     >
-      {!isLoading &&
-        profiles.length > 0 &&
-        hasAvailability &&
-        currentIndex < profiles.length && (
-          <View style={styles.navigationFloating}>
-            {currentIndex > 0 && (
-              <TouchableOpacity
-                onPress={handlePrevious}
-                style={[styles.floatingButton, styles.leftButton]}
-              >
-                <Ionicons name="arrow-back" size={24} color={colors.primary} />
-              </TouchableOpacity>
-            )}
+      {/* Show subscription card if user has 1 successful chat and is not subscribed */}
+      {showSubscriptionCard && (
+        <SubscriptionCard
+          onSubscribe={handleSubscribe}
+        />
+      )}
 
-            <TouchableOpacity
-              onPress={() => {
-                if (currentIndex === profiles.length - 1) {
-                  Alert.alert(
-                    "End of the list",
-                    "You've reached the end of the list. Check back later for more connections.",
-                  );
-                } else {
-                  handleNext(); // move to next profile
-                }
-              }}
-              style={[
-                styles.floatingButton,
-                styles.rightButton,
-                {
-                  opacity: currentIndex === profiles.length - 1 ? 0.5 : 1,
-                },
-              ]}
-            >
-              <Ionicons name="arrow-forward" size={24} color={colors.primary} />
-            </TouchableOpacity>
-          </View>
-        )}
+      {/* Only show matching content if user is subscribed OR has not reached the paywall trigger */}
+      {!showSubscriptionCard && (
+        <>
+          {!isLoading &&
+            profiles.length > 0 &&
+            hasAvailability &&
+            currentIndex < profiles.length && (
+              <View style={styles.navigationFloating}>
+                {currentIndex > 0 && (
+                  <TouchableOpacity
+                    onPress={handlePrevious}
+                    style={[styles.floatingButton, styles.leftButton]}
+                  >
+                    <Ionicons name="arrow-back" size={24} color={colors.primary} />
+                  </TouchableOpacity>
+                )}
+
+                <TouchableOpacity
+                  onPress={() => {
+                    if (currentIndex === profiles.length - 1) {
+                      Alert.alert(
+                        "End of the list",
+                        "You've reached the end of the list. Check back later for more connections.",
+                      );
+                    } else {
+                      handleNext(); // move to next profile
+                    }
+                  }}
+                  style={[
+                    styles.floatingButton,
+                    styles.rightButton,
+                    {
+                      opacity: currentIndex === profiles.length - 1 ? 0.5 : 1,
+                    },
+                  ]}
+                >
+                  <Ionicons name="arrow-forward" size={24} color={colors.primary} />
+                </TouchableOpacity>
+              </View>
+            )}
       {!isLoading && !hasAvailability ? (
         renderNoAvailabilityMessage()
       ) : !isLoading && profiles.length === 0 ? (
@@ -1542,11 +1590,7 @@ export default function MatchingScreen() {
         </View>
       </Modal>
 
-      {/* Subscription Card - Full Screen Overlay */}
-      {showSubscriptionCard && (
-        <SubscriptionCard
-          onSubscribe={handleSubscribe}
-        />
+      </>
       )}
 
       {/* Match Animation Modal */}
