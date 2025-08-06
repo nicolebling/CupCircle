@@ -143,12 +143,6 @@ export default function MatchingScreen() {
     if (!user?.id) return;
 
     try {
-      // Force unsubscribed status for development testing
-      if (__DEV__) {
-        console.log("🧪 Development mode: Forcing unsubscribed status for paywall testing");
-        await Superwall.shared.setUserIsSubscribed(false);
-      }
-
       const { data: profileData, error } = await supabase
         .from("profiles")
         .select("successful_chat")
@@ -160,14 +154,9 @@ export default function MatchingScreen() {
         return;
       }
 
-      console.log("🔍 Profile data:", profileData);
-      console.log("📊 Successful chats count:", profileData?.successful_chat);
-
       if (profileData?.successful_chat === 1) {
-        console.log("💳 Showing subscription card for successful_chat = 1");
+        console.log("Showing subscription card for successful_chat = 1");
         setShowSubscriptionCard(true);
-      } else {
-        console.log("❌ Not showing subscription card - successful_chat count:", profileData?.successful_chat);
       }
     } catch (error) {
       console.error("Error checking successful_chat count:", error);
