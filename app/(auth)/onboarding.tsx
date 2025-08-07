@@ -225,7 +225,8 @@ export default function OnboardingScreen() {
               value={profileData.occupation}
               onChangeText={(text) => {
                 if (text.length <= 35) {
-                  setProfileData({ ...profileData, occupation: text });
+                  const capitalizedText = text.charAt(0).toUpperCase() + text.slice(1);
+                  setProfileData({ ...profileData, occupation: capitalizedText });
                 }
               }}
               maxLength={35}
