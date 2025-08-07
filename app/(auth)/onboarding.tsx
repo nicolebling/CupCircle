@@ -243,7 +243,7 @@ export default function OnboardingScreen() {
           </View>
         );
 
-        case 4:
+      case 4:
         return (
           <View style={styles.formSection}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>What best describes your current role or experience?</Text>
@@ -267,7 +267,10 @@ export default function OnboardingScreen() {
               numberOfLines={5}
               textAlignVertical="top"
               value={profileData.bio}
-              onChangeText={(text) => setProfileData({ ...profileData, bio: text })}
+              onChangeText={(text) => {
+                const capitalizedText = text.charAt(0).toUpperCase() + text.slice(1);
+                setProfileData({ ...profileData, bio: capitalizedText });
+              }}
             />
           </View>
         );
