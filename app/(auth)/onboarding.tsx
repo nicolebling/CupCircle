@@ -38,6 +38,14 @@ export default function OnboardingScreen() {
   });
 
   const handleNext = () => {
+    // Validate required fields for step 1 (names)
+    if (step === 1) {
+      if (!profileData.firstName.trim() || !profileData.lastName.trim()) {
+        Alert.alert('Required Fields', 'Please enter both your first and last name to continue.');
+        return;
+      }
+    }
+    
     if (step < 12) {
       setStep(step + 1);
     } else {
