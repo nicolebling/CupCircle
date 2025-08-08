@@ -167,7 +167,7 @@ export default function CircleChatsScreen() {
         // Get the chat details for notification
         const chat = chats.find((c) => c.match_id === chatId);
         const partnerProfile = getPartnerProfile(chat);
-        
+
         await supabase
           .from("matching")
           .update({ status: "confirmed" })
@@ -177,7 +177,7 @@ export default function CircleChatsScreen() {
         if (chat && partnerProfile) {
           // Get the correct recipient ID (the other user in the chat)
           const recipientUserId = chat.user1_id === user.id ? chat.user2_id : chat.user1_id;
-          
+
           try {
             await notificationService.sendCoffeeConfirmationNotification(
               recipientUserId,
@@ -195,7 +195,7 @@ export default function CircleChatsScreen() {
         // Get the chat details for notification before showing alert
         const chat = chats.find((c) => c.match_id === chatId);
         const partnerProfile = getPartnerProfile(chat);
-        
+
         // Immediately remove the chat from UI
         Alert.alert(
           "Cancel Chat",
@@ -290,7 +290,10 @@ export default function CircleChatsScreen() {
   };
 
   const renderChatCard = (chat) => {
-    const isExpired = new Date(chat.meeting_date) < new Date();
+    // Check if this is a past chat (expired)
+    const chatDate = parseISO(chat.meeting_date);
+    const isExpired = isPast(chatDate) && !isToday(chatDate);
+
 
     // When showing past chats, only show expired confirmed chats
     if (showPastChats) {
@@ -345,7 +348,9 @@ export default function CircleChatsScreen() {
               </Text>
             </View>
           </View>
-          <View
+          
+        </View>
+        <View
             style={[
               styles.statusBadge,
               { backgroundColor: getBadgeColor(chat.status, colors) },
@@ -353,7 +358,6 @@ export default function CircleChatsScreen() {
           >
             <Text style={styles.statusText}>{getStatusText(chat.status)}</Text>
           </View>
-        </View>
 
         <View style={styles.meetingDetails}>
           <View style={styles.detailRow}>
@@ -880,6 +884,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 12,
+    marginTop: 8, // Added margin to position it below header
+    alignSelf: 'flex-start', // Align badge to the start of the card
   },
   statusText: { fontFamily: "K2D-Medium", fontSize: 12, color: "#000000" },
   meetingDetails: { marginBottom: 12 },
