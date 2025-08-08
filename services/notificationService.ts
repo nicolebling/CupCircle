@@ -126,7 +126,7 @@ export const notificationService = {
       await this.createNotification(
         recipientUserId,
         "☕ New Coffee Chat Request!",
-        `${senderName} wants to meet you at ${cafeName}`,
+        `${senderName} wants to meet you at ${cafeName.split("|||")[0]}`,
         { type: "coffee_request" },
       );
     } catch (error) {
@@ -135,7 +135,7 @@ export const notificationService = {
       await this.createNotification(
         recipientUserId,
         "☕ New Coffee Chat Request!",
-        `Someone wants to meet you at ${cafeName}`,
+        `Someone wants to meet you at ${cafeName.split("|||")[0]}`,
         { type: "coffee_request" },
       );
     }
