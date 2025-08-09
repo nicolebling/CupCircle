@@ -1320,10 +1320,11 @@ export default function MatchingScreen() {
                             global.circleChatsScreen.refreshData();
                           }
 
-                          // Move to next profile
-                          if (currentIndex < profiles.length - 1) {
-                            setCurrentIndex(currentIndex + 1);
-                          }
+                          // Refresh the profiles to remove the user we just sent a request to
+                          await fetchProfiles();
+                          
+                          // Reset to first profile since we refreshed the list
+                          setCurrentIndex(0);
 
                         } catch (error) {
                           console.error("Error sending match request:", error);
