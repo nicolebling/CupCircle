@@ -38,7 +38,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="matching"
         options={{
-          title: 'Explore Your Circle',
+          title: 'Explore the Circle',
           headerRight: () => (
             <TouchableOpacity 
               onPress={() => {
