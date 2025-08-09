@@ -1255,8 +1255,9 @@ export default function MatchingScreen() {
                       onPress={async () => {
                         try {
                           if (!user?.id) {
-                            //console.error("No user ID found");
-                            return;                          }
+                            console.error("No user ID found");
+                            return;
+                          }
 
                           const currentProfile = profiles[currentIndex];
                           if (!selectedCafe && !selectedTimeSlot) {
@@ -1305,7 +1306,18 @@ export default function MatchingScreen() {
                             }
                           }
 
+                          // Send push notification
+                          if (currentProfile.id) {
+                            await notificationService.sendPushNotification(
+                              currentProfile.id,
+                              "Coffee Chat Request",
+                              `${user?.name} has sent you a coffee chat request!`,
+                            );
+                          }
+
+                          // Only show success alert if we reach this point without errors
                           alert("Match request sent successfully!");
+                          
                           // Clear selections after successful request
                           setSelectedCafe("");
                           setSelectedTimeSlot(null);
@@ -1324,20 +1336,11 @@ export default function MatchingScreen() {
                             setCurrentIndex(currentIndex + 1);
                           }
 
-                          // Send push notification
-                          if (currentProfile.id) {
-                            await notificationService.sendPushNotification(
-                              currentProfile.id,
-                              "Coffee Chat Request",
-                              `${user?.name} has sent you a coffee chat request!`,
-                            );
-                          }
                         } catch (error) {
-                          //console.error("Error sending match request:", error);
+                          console.error("Error sending match request:", error);
                           alert(
                             "Failed to send match request. Please try again.",
                           );
-                          return; // Exit early on error
                         }
                       }}
                       style={[
