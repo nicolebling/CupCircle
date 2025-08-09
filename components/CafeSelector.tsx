@@ -601,16 +601,54 @@ export default function CafeSelector({
                                   >
                                     🎁 Special Perks:
                                   </Text>
-                                  <Text
-                                    style={{
-                                      fontFamily: "K2D-Regular",
-                                      fontSize: 11,
-                                      color: '#333',
-                                      textAlign: "center",
-                                    }}
-                                  >
-                                    {cafe.perks}
-                                  </Text>
+                                  {(() => {
+                                    try {
+                                      const perksObj = typeof cafe.perks === 'string' ? JSON.parse(cafe.perks) : cafe.perks;
+                                      return Object.entries(perksObj).map(([key, value], index) => {
+                                        let displayText = '';
+                                        
+                                        if (typeof value === 'boolean' && value) {
+                                          // For boolean true values, display the key as a feature
+                                          displayText = key.replace(/_/g, ' ');
+                                        } else if (typeof value === 'string') {
+                                          // For string values, display the actual value
+                                          displayText = value;
+                                        } else if (typeof value === 'number') {
+                                          // For number values, display with the key
+                                          displayText = `${key.replace(/_/g, ' ')}: ${value}`;
+                                        }
+                                        
+                                        return displayText ? (
+                                          <Text
+                                            key={index}
+                                            style={{
+                                              fontFamily: "K2D-Regular",
+                                              fontSize: 11,
+                                              color: '#333',
+                                              textAlign: "center",
+                                              marginBottom: 2,
+                                            }}
+                                          >
+                                            ✓ {displayText}
+                                          </Text>
+                                        ) : null;
+                                      });
+                                    } catch (error) {
+                                      // Fallback for non-JSON perks
+                                      return (
+                                        <Text
+                                          style={{
+                                            fontFamily: "K2D-Regular",
+                                            fontSize: 11,
+                                            color: '#333',
+                                            textAlign: "center",
+                                          }}
+                                        >
+                                          ✓ {cafe.perks}
+                                        </Text>
+                                      );
+                                    }
+                                  })()}
                                 </View>
                               )}
                               <Text
