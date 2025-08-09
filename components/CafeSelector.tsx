@@ -594,12 +594,12 @@ export default function CafeSelector({
                                     style={{
                                       fontFamily: "K2D-SemiBold",
                                       fontSize: 12,
-                                      color: '#FFD700',
+                                      color: '#333',
                                       textAlign: "center",
                                       marginBottom: 3,
                                     }}
                                   >
-                                    🎁 Special Perks:
+                                    Special Perks:
                                   </Text>
                                   {(() => {
                                     try {
