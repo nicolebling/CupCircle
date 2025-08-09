@@ -16,6 +16,7 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import MapView, { Marker, Callout } from "react-native-maps";
 import * as Location from "expo-location";
 import LogoAnimation from "@/components/LogoAnimation";
+import { supabase } from "@/lib/supabase";
 
 interface CafeSelectorProps {
   selected: string[];
@@ -101,6 +102,7 @@ export default function CafeSelector({
     latitudeDelta: 0.05,
     longitudeDelta: 0.05,
   });
+  const [featuredCafes, setFeaturedCafes] = useState([]);
 
   useEffect(() => {
     let isMounted = true;
@@ -135,8 +137,9 @@ export default function CafeSelector({
           setInitialRegion(newRegion);
           setRegion(newRegion);
 
-          // Fetch cafes after setting region
+          // Fetch cafes and featured cafes after setting region
           fetchCafes(coords.latitude, coords.longitude);
+          fetchFeaturedCafes();
         } else if (isMounted) {
           setErrorMsg("Could not fetch location. Please try again.");
           setIsLoading(false);
@@ -156,8 +159,16 @@ export default function CafeSelector({
     };
   }, []); // Remove initialRegion dependency to prevent loops
 
-  const handleSelect = (place: any) => {
-    const cafeString = `${place.name}|||${place.vicinity}|||${place.geometry.location.lng}|||${place.geometry.location.lat}`;
+  const handleSelect = (place: any, isFeatured = false) => {
+    let cafeString;
+    
+    if (isFeatured) {
+      // Featured cafe from our database
+      cafeString = `${place.name}|||${place.address}|||${place.longitude}|||${place.latitude}`;
+    } else {
+      // Regular cafe from Google Places
+      cafeString = `${place.name}|||${place.vicinity}|||${place.geometry.location.lng}|||${place.geometry.location.lat}`;
+    }
     
     if (selected.includes(cafeString)) {
       Alert.alert(
@@ -177,6 +188,25 @@ export default function CafeSelector({
         "You've already added 3 cafes. Please remove one to add another.",
         [{ text: "OK" }],
       );
+    }
+  };
+
+  // Fetch featured cafes from Supabase
+  const fetchFeaturedCafes = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('cafes')
+        .select('*')
+        .eq('is_featured', true);
+
+      if (error) {
+        console.error('Error fetching featured cafes:', error);
+        return;
+      }
+
+      setFeaturedCafes(data || []);
+    } catch (error) {
+      console.error('Error fetching featured cafes:', error);
     }
   };
 
@@ -332,6 +362,10 @@ export default function CafeSelector({
         // Update visible markers based on current region
         const newVisible = filterVisibleMarkers(allCafes, region);
         setVisibleMarkers(newVisible);
+        
+        // Also refresh featured cafes
+        fetchFeaturedCafes();
+        
         setMarkersLoaded(true);
         setIsLoading(false);
       } catch (error) {
@@ -496,7 +530,94 @@ export default function CafeSelector({
                         />
                       )}
 
-                    {/* Cafe markers */}
+                    {/* Featured Cafe markers - always visible with special styling */}
+                    {featuredCafes.map((cafe) => (
+                      <Marker
+                        key={`featured-${cafe.id}`}
+                        coordinate={{
+                          latitude: cafe.latitude,
+                          longitude: cafe.longitude,
+                        }}
+                        title={cafe.name}
+                        description={cafe.address}
+                        pinColor="#FFD700" // Gold color for featured cafes
+                        tracksViewChanges={false}
+                      >
+                        <Callout onPress={() => handleSelect(cafe, true)}>
+                          <TouchableWithoutFeedback>
+                            <View
+                              style={{
+                                padding: 10,
+                                width: 220,
+                                alignItems: "center",
+                              }}
+                            >
+                              <View style={{
+                                backgroundColor: '#FFD700',
+                                paddingHorizontal: 8,
+                                paddingVertical: 2,
+                                borderRadius: 10,
+                                marginBottom: 5,
+                              }}>
+                                <Text
+                                  style={{
+                                    fontFamily: "K2D-Bold",
+                                    fontSize: 10,
+                                    color: 'white',
+                                    textAlign: "center",
+                                  }}
+                                >
+                                  ⭐ CAFE SPOTLIGHT
+                                </Text>
+                              </View>
+                              <Text
+                                style={{
+                                  fontFamily: "K2D-SemiBold",
+                                  marginBottom: 5,
+                                  textAlign: "center",
+                                }}
+                              >
+                                {cafe.name}
+                              </Text>
+                              <Text
+                                style={{
+                                  fontFamily: "K2D-Regular",
+                                  marginBottom: 5,
+                                  textAlign: "center",
+                                }}
+                              >
+                                {cafe.address}
+                              </Text>
+                              {cafe.perks && (
+                                <Text
+                                  style={{
+                                    fontFamily: "K2D-Regular",
+                                    fontSize: 12,
+                                    color: '#FFD700',
+                                    textAlign: "center",
+                                    marginBottom: 5,
+                                  }}
+                                >
+                                  🎁 Special perks available
+                                </Text>
+                              )}
+                              <Text
+                                style={{
+                                  fontFamily: "K2D-SemiBold",
+                                  color: colors.primary,
+                                  marginTop: 5,
+                                  textAlign: "center",
+                                }}
+                              >
+                                Select this café
+                              </Text>
+                            </View>
+                          </TouchableWithoutFeedback>
+                        </Callout>
+                      </Marker>
+                    ))}
+
+                    {/* Regular Cafe markers */}
                     {visibleMarkers.map((cafe) => (
                       <Marker
                         key={cafe.place_id}
@@ -508,7 +629,7 @@ export default function CafeSelector({
                         description={cafe.vicinity || "Unknown location"}
                         tracksViewChanges={false}
                       >
-                        <Callout onPress={() => handleSelect(cafe)}>
+                        <Callout onPress={() => handleSelect(cafe, false)}>
                           <TouchableWithoutFeedback>
                             <View
                               style={{
