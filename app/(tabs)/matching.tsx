@@ -185,9 +185,9 @@ export default function MatchingScreen() {
       // Store subscription status in state
       setIsPaidUser(isPaidUser);
 
-      // Logic: If user has 1 successful chat and is NOT subscribed, show subscription card
-      if (successfulChatCount === 1 && !isPaidUser) {
-        console.log("Showing subscription card for non-subscribed user with 1 successful chat");
+      // Logic: If user has 1+ successful chats and is NOT subscribed, show subscription card
+      if (successfulChatCount >= 1 && !isPaidUser) {
+        console.log(`Showing subscription card for non-subscribed user with ${successfulChatCount} successful chat(s)`);
         setShowSubscriptionCard(true);
       } else {
         setShowSubscriptionCard(false);
