@@ -8,10 +8,7 @@
     "icon": "./assets/images/cupcircle_logo.png",
     "scheme": "cupcircle",
     "userInterfaceStyle": "automatic",
-    "platforms": [
-      "ios",
-      "android"
-    ],
+    "platforms": ["ios", "android"],
     "newArchEnabled": true,
     "jsEngine": "jsc",
     "extra": {
@@ -35,7 +32,8 @@
       },
       "entitlements": {
         "aps-environment": "development"
-      }
+      },
+      "usesAppleSignIn": true
     },
     "android": {
       "package": "com.cupcircle.app",
@@ -84,6 +82,7 @@
           }
         }
       ],
+      ["expo-apple-authentication"],
       [
         "expo-notifications",
         {
