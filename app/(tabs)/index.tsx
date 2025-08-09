@@ -355,8 +355,8 @@ export default function CircleChatsScreen() {
               <Text
                 style={[styles.occupation, { color: colors.secondaryText }]}
               >
-                {(partnerProfile.occupation || " ").length > 30
-                  ? `${partnerProfile.occupation.substring(0, 30)}...`
+                {(partnerProfile.occupation || " ").length > 22
+                  ? `${partnerProfile.occupation.substring(0, 22)}...`
                   : partnerProfile.occupation || " "}
               </Text>
             </View>

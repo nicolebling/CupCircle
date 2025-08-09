@@ -274,7 +274,7 @@ export default function SettingsScreen() {
               }}
             >
               <View style={styles.settingContent}>
-                <Ionicons name="key-outline" size={22} color={colors.text} />
+                <Ionicons name="cube-outline" size={22} color={colors.text} />
                 <Text style={[styles.settingText, { color: colors.text }]}>
                   Manage Subscription
                 </Text>
