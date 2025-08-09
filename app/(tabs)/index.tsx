@@ -9,6 +9,8 @@ import {
   Image,
   Switch,
   Alert,
+  Linking,
+  Platform,
 } from "react-native";
 import Colors from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
@@ -269,6 +271,20 @@ export default function CircleChatsScreen() {
     return profiles[partnerId] || {};
   };
 
+  const openMaps = (cafeName, cafeAddress) => {
+    const query = encodeURIComponent(`${cafeName} ${cafeAddress}`);
+    
+    if (Platform.OS === 'ios') {
+      // Use Apple Maps on iOS
+      const url = `http://maps.apple.com/?q=${query}`;
+      Linking.openURL(url);
+    } else {
+      // Use Google Maps on Android
+      const url = `https://www.google.com/maps/search/?api=1&query=${query}`;
+      Linking.openURL(url);
+    }
+  };
+
   const checkFeedbackStatus = async (matchIds: string[]) => {
     try {
       const { data: existingFeedback, error } = await supabase
@@ -394,9 +410,19 @@ export default function CircleChatsScreen() {
               style={[styles.detailIcon, { marginTop: 2 }]} // tweak marginTop as needed
             />
             <View style={{ flex: 1 }}>
-              <Text style={[styles.detailTextBold, { color: colors.primary }]}>
-                {chat.meeting_location.split("|||")[0] || "Location not set"}
-              </Text>
+              <TouchableOpacity
+                onPress={() => {
+                  const cafeName = chat.meeting_location.split("|||")[0] || "Location not set";
+                  const cafeAddress = chat.meeting_location.split("|||")[1] || "Location not set";
+                  if (cafeName !== "Location not set" && cafeAddress !== "Location not set") {
+                    openMaps(cafeName, cafeAddress);
+                  }
+                }}
+              >
+                <Text style={[styles.detailTextBold, { color: colors.primary, textDecorationLine: 'underline' }]}>
+                  {chat.meeting_location.split("|||")[0] || "Location not set"}
+                </Text>
+              </TouchableOpacity>
               <Text
                 style={[styles.detailText, { color: colors.secondaryText }]}
               >
