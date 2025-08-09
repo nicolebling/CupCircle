@@ -1293,25 +1293,14 @@ export default function MatchingScreen() {
 
                           if (error) throw error;
 
+                          
+
                           // Send coffee request notification
                           if (currentProfile.id) {
-                            try {
-                              await notificationService.sendCoffeeRequestNotification(
-                                currentProfile.id,
-                                user?.id,
-                                selectedCafe || "a café"
-                              );
-                            } catch (notifError) {
-                              console.error('Error sending coffee request notification:', notifError);
-                            }
-                          }
-
-                          // Send push notification
-                          if (currentProfile.id) {
-                            await notificationService.sendPushNotification(
+                            await notificationService.sendCoffeeRequestNotification(
                               currentProfile.id,
-                              "Coffee Chat Request",
-                              `${user?.name} has sent you a coffee chat request!`,
+                              user?.id,
+                              selectedCafe || "a café"
                             );
                           }
 
