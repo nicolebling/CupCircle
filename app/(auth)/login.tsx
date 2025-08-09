@@ -19,6 +19,7 @@ import LogoAnimation from "@/components/LogoAnimation";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { useAuth } from "@/contexts/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
+import * as AppleAuthentication from 'expo-apple-authentication';
 import {
   DarkTheme,
   DefaultTheme,
@@ -138,6 +139,90 @@ export default function LoginScreen() {
     setLoading(false);
   }
 
+  async function signInWithApple() {
+    if (Platform.OS !== 'ios') return;
+    
+    setLoading(true);
+    setError("");
+    setToastMessage("");
+    setToastVisible(false);
+
+    try {
+      const credential = await AppleAuthentication.signInAsync({
+        requestedScopes: [
+          AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+          AppleAuthentication.AppleAuthenticationScope.EMAIL,
+        ],
+      });
+
+      if (credential.identityToken) {
+        const { error, data } = await supabase.auth.signInWithIdToken({
+          provider: 'apple',
+          token: credential.identityToken,
+        });
+
+        if (error) {
+          console.error("Apple Sign In error:", error.message);
+          setError("Apple Sign In failed. Please try again.");
+          setToastMessage("Apple Sign In failed. Please try again.");
+          setToastVisible(true);
+        } else {
+          console.log("Apple Sign In successful:", data);
+
+          try {
+            const { data: profileData, error: profileError } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', data.user.id)
+              .single();
+
+            if (profileError && profileError.code !== 'PGRST116') {
+              console.error("Error checking profile:", profileError);
+            }
+
+            if (!profileData) {
+              // Create profile for new Apple user
+              const { data: newProfile, error: createError } = await supabase
+                .from('profiles')
+                .insert([
+                  { 
+                    id: data.user.id,
+                    avatar_url: null,
+                  }
+                ])
+                .select();
+
+              if (createError) {
+                console.error("Profile creation error:", createError);
+              }
+
+              Alert.alert('Welcome!', 'Please complete your profile to continue.');
+              router.replace('/(auth)/onboarding');
+            } else {
+              router.replace('/(tabs)/matching');
+            }
+          } catch (checkError) {
+            console.error("Error in profile check:", checkError);
+            router.replace('/(auth)/onboarding');
+          }
+        }
+      } else {
+        throw new Error('No identityToken received from Apple.');
+      }
+    } catch (e) {
+      if (e.code === 'ERR_REQUEST_CANCELED') {
+        // User canceled the sign-in flow
+        console.log("Apple Sign In canceled by user");
+      } else {
+        console.error("Apple Sign In error:", e);
+        setError("Apple Sign In failed. Please try again.");
+        setToastMessage("Apple Sign In failed. Please try again.");
+        setToastVisible(true);
+      }
+    }
+    setLoading(false);
+  }
+
 
   // Hide splash screen when fonts are ready
   React.useEffect(() => {
@@ -234,6 +319,17 @@ export default function LoginScreen() {
                   {loading ? "Logging in..." : "Log In"}
                 </Text>
               </TouchableOpacity>
+
+              {/* Apple Sign In Button */}
+              {Platform.OS === 'ios' && (
+                <AppleAuthentication.AppleAuthenticationButton
+                  buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
+                  buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
+                  cornerRadius={10}
+                  style={styles.appleButton}
+                  onPress={signInWithApple}
+                />
+              )}
 
               {/* Error Message */}
               {error ? (
@@ -422,5 +518,10 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 14,
     fontFamily: "K2D-Regular",
+  },
+  appleButton: {
+    width: '100%',
+    height: 50,
+    marginTop: 15,
   },
 });

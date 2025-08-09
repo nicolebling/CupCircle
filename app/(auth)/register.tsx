@@ -17,6 +17,7 @@ import Colors from '@/constants/Colors';
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { useAuth } from "@/contexts/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
+import * as AppleAuthentication from 'expo-apple-authentication';
 import Toast from "@/components/ui/Toast";
 import {
   DarkTheme,
@@ -134,6 +135,90 @@ export default function SignUpScreen() {
       setToastVisible(true);
     }
     setLoading(false)
+  }
+
+  async function signUpWithApple() {
+    if (Platform.OS !== 'ios') return;
+    
+    setLoading(true);
+    setError("");
+    setToastMessage("");
+    setToastVisible(false);
+
+    try {
+      const credential = await AppleAuthentication.signInAsync({
+        requestedScopes: [
+          AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+          AppleAuthentication.AppleAuthenticationScope.EMAIL,
+        ],
+      });
+
+      if (credential.identityToken) {
+        const { error, data } = await supabase.auth.signInWithIdToken({
+          provider: 'apple',
+          token: credential.identityToken,
+        });
+
+        if (error) {
+          console.error("Apple Sign Up error:", error.message);
+          setError("Apple Sign Up failed. Please try again.");
+          setToastMessage("Apple Sign Up failed. Please try again.");
+          setToastVisible(true);
+        } else {
+          console.log("Apple Sign Up successful:", data);
+
+          // Create profile for the new user
+          if (data.user) {
+            try {
+              // Check if profile already exists
+              const { data: existingProfile, error: checkError } = await supabase
+                .from('profiles')
+                .select('id')
+                .eq('id', data.user.id)
+                .single();
+
+              if (checkError && checkError.code !== 'PGRST116') {
+                console.error("Error checking for existing profile:", checkError);
+              }
+
+              // Only create profile if it doesn't exist
+              if (!existingProfile) {
+                const { data: profileData, error: profileError } = await supabase
+                  .from('profiles')
+                  .insert([
+                    { 
+                      id: data.user.id,
+                      avatar_url: null,
+                    }
+                  ])
+                  .select();
+
+                if (profileError) {
+                  console.error("Profile creation error:", profileError);
+                }
+              }
+            } catch (profileCreationError) {
+              console.error("Exception during profile creation:", profileCreationError);
+            }
+          }
+
+          router.replace('/(auth)/onboarding');
+        }
+      } else {
+        throw new Error('No identityToken received from Apple.');
+      }
+    } catch (e) {
+      if (e.code === 'ERR_REQUEST_CANCELED') {
+        // User canceled the sign-in flow
+        console.log("Apple Sign Up canceled by user");
+      } else {
+        console.error("Apple Sign Up error:", e);
+        setError("Apple Sign Up failed. Please try again.");
+        setToastMessage("Apple Sign Up failed. Please try again.");
+        setToastVisible(true);
+      }
+    }
+    setLoading(false);
   }
 
   // Hide splash screen when fonts are ready
@@ -303,6 +388,17 @@ export default function SignUpScreen() {
                 </Text>
               </TouchableOpacity>
 
+              {/* Apple Sign Up Button */}
+              {Platform.OS === 'ios' && (
+                <AppleAuthentication.AppleAuthenticationButton
+                  buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_UP}
+                  buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
+                  cornerRadius={10}
+                  style={styles.appleButton}
+                  onPress={signUpWithApple}
+                />
+              )}
+
               {/* Error Message */}
               {error ? (
                 <Text style={styles.errorMessage}>{error}</Text>
@@ -459,5 +555,10 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 14,
     fontFamily: "K2D-Regular",
+  },
+  appleButton: {
+    width: '100%',
+    height: 50,
+    marginTop: 15,
   },
 });
