@@ -10,8 +10,6 @@ import {
   SafeAreaView,
   KeyboardAvoidingView,
   Platform,
-  Linking,
-  Alert,
 } from "react-native";
 import Colors from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
@@ -37,7 +35,6 @@ interface Conversation {
     isRead: boolean;
   };
   unreadCount: number;
-  meetingLocation?: string;
 }
 
 const MessageBadge = ({ count }: { count: number }) => {
@@ -96,44 +93,6 @@ export default function ChatsScreen() {
       setFilteredConversations(filtered);
     }
   }, [searchQuery, conversations]);
-
-  // Function to open cafe location in maps
-  const openInMaps = (cafeString: string) => {
-    try {
-      const parts = cafeString.split("|||");
-      if (parts.length >= 4) {
-        const cafeName = parts[0];
-        const cafeAddress = parts[1];
-        const longitude = parseFloat(parts[2]);
-        const latitude = parseFloat(parts[3]);
-
-        if (!isNaN(latitude) && !isNaN(longitude)) {
-          const mapsUrl = Platform.select({
-            ios: `maps://app?q=${encodeURIComponent(cafeName)}&ll=${latitude},${longitude}`,
-            android: `geo:${latitude},${longitude}?q=${encodeURIComponent(cafeName)}`,
-            default: `https://maps.google.com/maps?q=${latitude},${longitude}`,
-          });
-
-          Linking.canOpenURL(mapsUrl!).then((supported) => {
-            if (supported) {
-              Linking.openURL(mapsUrl!);
-            } else {
-              // Fallback to Google Maps web
-              const fallbackUrl = `https://maps.google.com/maps?q=${latitude},${longitude}`;
-              Linking.openURL(fallbackUrl);
-            }
-          });
-        } else {
-          Alert.alert("Error", "Invalid location coordinates");
-        }
-      } else {
-        Alert.alert("Error", "Location information not available");
-      }
-    } catch (error) {
-      console.error("Error opening maps:", error);
-      Alert.alert("Error", "Unable to open maps");
-    }
-  };
 
   const fetchConfirmedChats = async () => {
     if (!user?.id) return;
@@ -253,7 +212,6 @@ export default function ChatsScreen() {
               receiverId: lastMessage ? lastMessage.receiver_id : null,
             },
             unreadCount: unreadCount,
-            meetingLocation: match.meeting_location,
           };
         }),
       );
@@ -318,80 +276,52 @@ export default function ChatsScreen() {
     });
   };
 
-  const renderConversationItem = ({ item }: { item: Conversation }) => {
-    const getCafeName = () => {
-      if (item.meetingLocation) {
-        const parts = item.meetingLocation.split("|||");
-        return parts[0] || "Meeting location";
-      }
-      return null;
-    };
+  const renderConversationItem = ({ item }: { item: Conversation }) => (
+    <TouchableOpacity
+      style={[styles.conversationItem, { borderBottomColor: colors.border }]}
+      onPress={() => router.push(`/messages/${item.match_id}`)}
+    >
+      <View style={styles.avatarContainer}>
+        <Image source={{ uri: item.user.photo }} style={styles.avatar} />
+      </View>
 
-    const cafeName = getCafeName();
-
-    return (
-      <TouchableOpacity
-        style={[styles.conversationItem, { borderBottomColor: colors.border }]}
-        onPress={() => router.push(`/messages/${item.match_id}`)}
-      >
-        <View style={styles.avatarContainer}>
-          <Image source={{ uri: item.user.photo }} style={styles.avatar} />
+      <View style={styles.conversationContent}>
+        <View style={styles.conversationHeader}>
+          <Text style={[styles.userName, { color: colors.text }]}>
+            {item.user.name}
+          </Text>
+          <Text style={[styles.timestamp, { color: colors.secondaryText }]}>
+            {item.lastMessage.displayTimestamp}
+          </Text>
         </View>
 
-        <View style={styles.conversationContent}>
-          <View style={styles.conversationHeader}>
-            <Text style={[styles.userName, { color: colors.text }]}>
-              {item.user.name}
-            </Text>
-            <Text style={[styles.timestamp, { color: colors.secondaryText }]}>
-              {item.lastMessage.displayTimestamp}
-            </Text>
-          </View>
-
-          {cafeName && (
-            <TouchableOpacity
-              onPress={(e) => {
-                e.stopPropagation();
-                openInMaps(item.meetingLocation!);
-              }}
-              style={styles.cafeLocationContainer}
+        <View style={styles.messagePreviewContainer}>
+          <View style={styles.messageContainer}>
+            <Text
+              style={[
+                styles.messagePreview,
+                {
+                  color:
+                    item.unreadCount > 0 ? colors.text : colors.secondaryText,
+                  // Only use bold font when message is unread AND user is the receiver
+                  fontFamily: 
+                    !item.lastMessage.isRead && user?.id === item.lastMessage.receiverId
+                      ? "K2D-Bold"
+                      : "K2D-Regular",
+                },
+              ]}
+              numberOfLines={1}
             >
-              <Ionicons name="location" size={14} color={colors.primary} />
-              <Text style={[styles.cafeLocationText, { color: colors.primary }]}>
-                {cafeName}
-              </Text>
-              <Ionicons name="open-outline" size={12} color={colors.primary} />
-            </TouchableOpacity>
-          )}
-
-          <View style={styles.messagePreviewContainer}>
-            <View style={styles.messageContainer}>
-              <Text
-                style={[
-                  styles.messagePreview,
-                  {
-                    color:
-                      item.unreadCount > 0 ? colors.text : colors.secondaryText,
-                    // Only use bold font when message is unread AND user is the receiver
-                    fontFamily: 
-                      !item.lastMessage.isRead && user?.id === item.lastMessage.receiverId
-                        ? "K2D-Bold"
-                        : "K2D-Regular",
-                  },
-                ]}
-                numberOfLines={1}
-              >
-                {item.lastMessage.text}
-              </Text>
-              {item.unreadCount > 0 && (
-                <MessageBadge count={item.unreadCount} />
-              )}
-            </View>
+              {item.lastMessage.text}
+            </Text>
+            {item.unreadCount > 0 && (
+              <MessageBadge count={item.unreadCount} />
+            )}
           </View>
         </View>
-      </TouchableOpacity>
-    );
-  };
+      </View>
+    </TouchableOpacity>
+  );
 
   const SkeletonChatItem = () => (
     <View style={[styles.conversationItem, { borderBottomColor: colors.border }]} >
@@ -634,17 +564,5 @@ const styles = StyleSheet.create({
   messageContainer: {
     flexDirection: "row",
     alignItems: "center",
-  },
-  cafeLocationContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 4,
-    paddingHorizontal: 2,
-  },
-  cafeLocationText: {
-    fontFamily: "K2D-Medium",
-    fontSize: 12,
-    marginLeft: 4,
-    marginRight: 4,
   },
 });

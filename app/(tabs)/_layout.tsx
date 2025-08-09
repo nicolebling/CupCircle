@@ -1,3 +1,4 @@
+
 import { Tabs } from 'expo-router';
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
@@ -37,7 +38,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="matching"
         options={{
-          title: 'explore the circle',
+          title: 'Explore Your Circle',
           headerRight: () => (
             <TouchableOpacity 
               onPress={() => {
@@ -77,7 +78,7 @@ export default function TabLayout() {
         }}
       />
 
-
+    
       <Tabs.Screen
         name="chats"
         options={{
@@ -113,7 +114,7 @@ export default function TabLayout() {
         })}
       />
 
-
+      
     </Tabs>
   );
 }
