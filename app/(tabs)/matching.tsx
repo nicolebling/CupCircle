@@ -1323,8 +1323,8 @@ export default function MatchingScreen() {
                           // Refresh the profiles to remove the user we just sent a request to
                           await fetchProfiles();
                           
-                          // Move to next profile since we refreshed the list
-                          setCurrentIndex(currentIndex + 1);
+                          // Stay at the same index - the next person will now be at this position
+                          // No need to increment since the array has been filtered
 
                         } catch (error) {
                           console.error("Error sending match request:", error);
