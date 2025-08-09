@@ -589,17 +589,29 @@ export default function CafeSelector({
                                 {cafe.address}
                               </Text>
                               {cafe.perks && (
-                                <Text
-                                  style={{
-                                    fontFamily: "K2D-Regular",
-                                    fontSize: 12,
-                                    color: '#FFD700',
-                                    textAlign: "center",
-                                    marginBottom: 5,
-                                  }}
-                                >
-                                  🎁 Special perks available
-                                </Text>
+                                <View style={{ marginBottom: 5 }}>
+                                  <Text
+                                    style={{
+                                      fontFamily: "K2D-SemiBold",
+                                      fontSize: 12,
+                                      color: '#FFD700',
+                                      textAlign: "center",
+                                      marginBottom: 3,
+                                    }}
+                                  >
+                                    🎁 Special Perks:
+                                  </Text>
+                                  <Text
+                                    style={{
+                                      fontFamily: "K2D-Regular",
+                                      fontSize: 11,
+                                      color: '#333',
+                                      textAlign: "center",
+                                    }}
+                                  >
+                                    {cafe.perks}
+                                  </Text>
+                                </View>
                               )}
                               <Text
                                 style={{
