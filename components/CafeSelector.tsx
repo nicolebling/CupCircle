@@ -262,7 +262,7 @@ export default function CafeSelector({
   );
 
   // Helper function to check if a Google Maps cafe is too close to a featured cafe
-  const isNearFeaturedCafe = (googleCafe, featuredCafes, threshold = 100) => {
+  const isNearFeaturedCafe = (googleCafe, featuredCafes, threshold = 15) => {
     // threshold in meters - cafes within 100m are considered the same location
     for (const featuredCafe of featuredCafes) {
       const distance = calculateDistance(
