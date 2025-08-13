@@ -1415,7 +1415,7 @@ export default function MatchingScreen() {
           >
             <View style={styles.modalHeader}>
               <Text style={[styles.modalTitle, { color: colors.text }]}>
-                Filter Matches
+                Filter
               </Text>
               <TouchableOpacity onPress={() => setFilterModalVisible(false)}>
                 <Ionicons name="close" size={24} color={colors.text} />

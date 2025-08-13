@@ -36,7 +36,7 @@
       "usesAppleSignIn": true
     },
     "android": {
-      "package": "com.cupcircle.app",
+      "package": "com.cupcircle.connect",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"

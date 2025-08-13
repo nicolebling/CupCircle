@@ -33,6 +33,9 @@ const INTERESTS = [
   "Philosophy",
   "Education",
   "Mentoring",
+  "AI",
+  "Machine Learning",
+  "Coding",
   "Career Transitions",
   "Leadership",
   "Technology",
@@ -69,8 +72,7 @@ const INTERESTS = [
   "Meditation",
   "Podcasts",
   "Blogging",
-  "AI",
-  "Machine Learning",
+ 
 ];
 
 interface InterestSelectorProps {
