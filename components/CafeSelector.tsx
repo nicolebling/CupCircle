@@ -261,6 +261,24 @@ export default function CafeSelector({
     [calculateDistance],
   );
 
+  // Helper function to check if a Google Maps cafe is too close to a featured cafe
+  const isNearFeaturedCafe = (googleCafe, featuredCafes, threshold = 100) => {
+    // threshold in meters - cafes within 100m are considered the same location
+    for (const featuredCafe of featuredCafes) {
+      const distance = calculateDistance(
+        googleCafe.geometry.location.lat,
+        googleCafe.geometry.location.lng,
+        featuredCafe.latitude,
+        featuredCafe.longitude
+      ) * 1000; // Convert km to meters
+      
+      if (distance <= threshold) {
+        return true;
+      }
+    }
+    return false;
+  };
+
   const fetchCafes = async (lat, lng) => {
     try {
       setMarkersLoaded(false);
@@ -286,8 +304,14 @@ export default function CafeSelector({
         return;
       }
 
-      const allCafes = data.results || [];
-      setCafes(allCafes);
+      const allGoogleCafes = data.results || [];
+      
+      // Filter out Google Maps cafes that are too close to featured cafes
+      const filteredGoogleCafes = allGoogleCafes.filter(googleCafe => 
+        !isNearFeaturedCafe(googleCafe, featuredCafes)
+      );
+      
+      setCafes(filteredGoogleCafes);
 
       // Use the current region for filtering
       const currentRegion = {
@@ -297,7 +321,7 @@ export default function CafeSelector({
         longitudeDelta: 0.05,
       };
 
-      const initialVisible = filterVisibleMarkers(allCafes, currentRegion);
+      const initialVisible = filterVisibleMarkers(filteredGoogleCafes, currentRegion);
       setVisibleMarkers(initialVisible);
       setMarkersLoaded(true);
       setIsLoading(false);
@@ -356,15 +380,21 @@ export default function CafeSelector({
           return;
         }
 
-        const allCafes = data.results || [];
-        setCafes(allCafes);
+        // Also refresh featured cafes first to ensure we have the latest data
+        await fetchFeaturedCafes();
+
+        const allGoogleCafes = data.results || [];
+        
+        // Filter out Google Maps cafes that are too close to featured cafes
+        const filteredGoogleCafes = allGoogleCafes.filter(googleCafe => 
+          !isNearFeaturedCafe(googleCafe, featuredCafes)
+        );
+        
+        setCafes(filteredGoogleCafes);
 
         // Update visible markers based on current region
-        const newVisible = filterVisibleMarkers(allCafes, region);
+        const newVisible = filterVisibleMarkers(filteredGoogleCafes, region);
         setVisibleMarkers(newVisible);
-        
-        // Also refresh featured cafes
-        fetchFeaturedCafes();
         
         setMarkersLoaded(true);
         setIsLoading(false);
