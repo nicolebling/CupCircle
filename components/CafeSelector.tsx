@@ -395,6 +395,19 @@ export default function CafeSelector({
           return;
         }
 
+        // First, fetch fresh featured cafes data
+        const { data: freshFeaturedData, error: featuredError } = await supabase
+          .from('cafes')
+          .select('*')
+          .eq('is_featured', true);
+
+        let freshFeaturedCafes = [];
+        if (!featuredError && freshFeaturedData) {
+          freshFeaturedCafes = removeDuplicateFeaturedCafes(freshFeaturedData);
+          console.log('Fresh featured cafes loaded:', freshFeaturedCafes.length);
+        }
+
+        // Then fetch Google Maps cafes
         const response = await fetch(
           `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${region.latitude},${region.longitude}&radius=2000&type=cafe&keyword=coffee&key=${process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY}`,
         );
@@ -408,25 +421,22 @@ export default function CafeSelector({
           return;
         }
 
-        // Refresh featured cafes first and get the fresh data
-        const { data: freshFeaturedData, error: featuredError } = await supabase
-          .from('cafes')
-          .select('*')
-          .eq('is_featured', true);
-
-        let freshFeaturedCafes = [];
-        if (!featuredError && freshFeaturedData) {
-          freshFeaturedCafes = removeDuplicateFeaturedCafes(freshFeaturedData);
-          setFeaturedCafes(freshFeaturedCafes);
-        }
-
         const allGoogleCafes = data.results || [];
+        console.log('Google Maps cafes fetched:', allGoogleCafes.length);
 
         // Filter out Google Maps cafes using the fresh featured cafes data
-        const filteredGoogleCafes = allGoogleCafes.filter(googleCafe => 
-          !hasSameCoordinatesAsFeaturedCafe(googleCafe, freshFeaturedCafes)
-        );
+        const filteredGoogleCafes = allGoogleCafes.filter(googleCafe => {
+          const shouldFilter = hasSameCoordinatesAsFeaturedCafe(googleCafe, freshFeaturedCafes);
+          if (shouldFilter) {
+            console.log(`Filtering out Google cafe: ${googleCafe.name}`);
+          }
+          return !shouldFilter;
+        });
 
+        console.log('Filtered Google cafes:', filteredGoogleCafes.length);
+
+        // Update state with both fresh data
+        setFeaturedCafes(freshFeaturedCafes);
         setCafes(filteredGoogleCafes);
 
         // Update visible markers based on current region
