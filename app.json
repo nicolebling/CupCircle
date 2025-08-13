@@ -19,6 +19,7 @@
     },
     "ios": {
       "supportsTablet": true,
+      "usesAppleSignIn": true,
       "bundleIdentifier": "com.cupcircle.connect",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "This app requires location access to function properly.",

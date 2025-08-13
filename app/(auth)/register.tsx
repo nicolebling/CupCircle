@@ -26,7 +26,8 @@ import {
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import { supabase } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase';
+import * as AppleAuthentication from 'expo-apple-authentication';
 
 
 // Prevent splash screen from hiding until assets are loaded
@@ -187,6 +188,86 @@ export default function SignUpScreen() {
     }
   };
 
+  async function signUpWithApple() {
+    setLoading(true);
+    setError("");
+    setToastMessage("");
+    setToastVisible(false);
+
+    try {
+      const credential = await AppleAuthentication.signInAsync({
+        requestedScopes: [
+          AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+          AppleAuthentication.AppleAuthenticationScope.EMAIL,
+        ],
+      });
+
+      if (credential.identityToken) {
+        const { data, error } = await supabase.auth.signInWithIdToken({
+          provider: 'apple',
+          token: credential.identityToken,
+        });
+
+        if (error) {
+          console.error("Apple Sign-Up error:", error.message);
+          setError("Unable to sign up with Apple. Please try again.");
+          setToastMessage("Unable to sign up with Apple. Please try again.");
+          setToastVisible(true);
+        } else {
+          console.log("Apple Sign-Up successful:", data);
+
+          // Create profile for the new Apple user
+          if (data.user) {
+            try {
+              const { data: existingProfile, error: checkError } = await supabase
+                .from('profiles')
+                .select('id')
+                .eq('id', data.user.id)
+                .single();
+
+              if (checkError && checkError.code !== 'PGRST116') {
+                console.error("Error checking for existing profile:", checkError);
+              }
+
+              if (!existingProfile) {
+                const { data: profileData, error: profileError } = await supabase
+                  .from('profiles')
+                  .insert([
+                    { 
+                      id: data.user.id,
+                      name: credential.fullName ? `${credential.fullName.givenName || ''} ${credential.fullName.familyName || ''}`.trim() : null,
+                      avatar_url: null,
+                    }
+                  ])
+                  .select();
+
+                if (profileError) {
+                  console.error("Profile creation error:", profileError);
+                }
+              }
+            } catch (profileCreationError) {
+              console.error("Exception during profile creation:", profileCreationError);
+            }
+          }
+
+          router.replace('/(auth)/onboarding');
+        }
+      }
+    } catch (e: any) {
+      if (e.code === 'ERR_REQUEST_CANCELED') {
+        // User canceled the sign-in flow
+        console.log("Apple Sign-Up canceled");
+      } else {
+        console.error("Apple Sign-Up error:", e);
+        setError("Unable to sign up with Apple. Please try again.");
+        setToastMessage("Unable to sign up with Apple. Please try again.");
+        setToastVisible(true);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <ThemeProvider value={theme}>
       <SafeAreaView
@@ -302,6 +383,24 @@ export default function SignUpScreen() {
                   {loading ? "Signing up..." : "Sign Up"}
                 </Text>
               </TouchableOpacity>
+
+              {/* Apple Sign-Up Button - only show on iOS */}
+              {Platform.OS === 'ios' && (
+                <AppleAuthentication.AppleAuthenticationButton
+                  buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_UP}
+                  buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
+                  cornerRadius={10}
+                  style={styles.appleButton}
+                  onPress={signUpWithApple}
+                />
+              )}
+
+              {/* Divider */}
+              <View style={styles.dividerContainer}>
+                <View style={[styles.divider, { backgroundColor: theme.colors.border }]} />
+                <Text style={[styles.dividerText, { color: theme.colors.text }]}>or</Text>
+                <View style={[styles.divider, { backgroundColor: theme.colors.border }]} />
+              </View>
 
               {/* Error Message */}
               {error ? (
@@ -457,6 +556,25 @@ const styles = StyleSheet.create({
     color: '#f44336',
     textAlign: 'center',
     marginTop: 10,
+    fontSize: 14,
+    fontFamily: "K2D-Regular",
+  },
+  appleButton: {
+    width: '100%',
+    height: 50,
+    marginTop: 15,
+  },
+  dividerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 20,
+  },
+  divider: {
+    flex: 1,
+    height: 1,
+  },
+  dividerText: {
+    marginHorizontal: 15,
     fontSize: 14,
     fontFamily: "K2D-Regular",
   },
