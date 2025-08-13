@@ -129,7 +129,14 @@ export default function LoginScreen() {
           Alert.alert('Welcome back!', 'Please complete your profile to continue.');
           router.replace('/(auth)/onboarding');
         } else {
-          router.replace('/(tabs)/matching');
+          // Check if profile is complete (has required fields)
+          if (!profileData.occupation || !profileData.bio || !profileData.photo_url || 
+              !profileData.industry_categories || !profileData.interests || !profileData.favorite_cafes) {
+            Alert.alert('Welcome back!', 'Please complete your profile to continue.');
+            router.replace('/(auth)/onboarding');
+          } else {
+            router.replace('/(tabs)/matching');
+          }
         }
       } catch (checkError) {
         console.error("Error in profile check:", checkError);
@@ -194,10 +201,18 @@ export default function LoginScreen() {
                 console.error("Profile creation error:", createError);
               }
 
+              // Always go to onboarding for new Apple users
               Alert.alert('Welcome!', 'Please complete your profile to continue.');
               router.replace('/(auth)/onboarding');
             } else {
-              router.replace('/(tabs)/matching');
+              // Check if profile is complete (has required fields)
+              if (!profileData.occupation || !profileData.bio || !profileData.photo_url || 
+                  !profileData.industry_categories || !profileData.interests || !profileData.favorite_cafes) {
+                Alert.alert('Welcome back!', 'Please complete your profile to continue.');
+                router.replace('/(auth)/onboarding');
+              } else {
+                router.replace('/(tabs)/matching');
+              }
             }
           } catch (checkError) {
             console.error("Error in profile check:", checkError);
