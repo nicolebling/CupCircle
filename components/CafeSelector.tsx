@@ -435,13 +435,13 @@ export default function CafeSelector({
 
         console.log('Filtered Google cafes:', filteredGoogleCafes.length);
 
-        // Update state with both fresh data
-        setFeaturedCafes(freshFeaturedCafes);
-        setCafes(filteredGoogleCafes);
-
         // Update visible markers based on current region
         const newVisible = filterVisibleMarkers(filteredGoogleCafes, region);
+        
+        // Update all states together to prevent race conditions
+        setCafes(filteredGoogleCafes);
         setVisibleMarkers(newVisible);
+        setFeaturedCafes(freshFeaturedCafes);
 
         setMarkersLoaded(true);
         setIsLoading(false);
