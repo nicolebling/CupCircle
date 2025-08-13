@@ -408,14 +408,23 @@ export default function CafeSelector({
           return;
         }
 
-        // Also refresh featured cafes first to ensure we have the latest data
-        await fetchFeaturedCafes();
+        // Refresh featured cafes first and get the fresh data
+        const { data: freshFeaturedData, error: featuredError } = await supabase
+          .from('cafes')
+          .select('*')
+          .eq('is_featured', true);
+
+        let freshFeaturedCafes = [];
+        if (!featuredError && freshFeaturedData) {
+          freshFeaturedCafes = removeDuplicateFeaturedCafes(freshFeaturedData);
+          setFeaturedCafes(freshFeaturedCafes);
+        }
 
         const allGoogleCafes = data.results || [];
 
-        // Filter out Google Maps cafes that have the same coordinates as featured cafes
+        // Filter out Google Maps cafes using the fresh featured cafes data
         const filteredGoogleCafes = allGoogleCafes.filter(googleCafe => 
-          !hasSameCoordinatesAsFeaturedCafe(googleCafe, featuredCafes)
+          !hasSameCoordinatesAsFeaturedCafe(googleCafe, freshFeaturedCafes)
         );
 
         setCafes(filteredGoogleCafes);
