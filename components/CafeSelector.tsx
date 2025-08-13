@@ -33,32 +33,32 @@ export default function CafeSelector({
   maxSelections = 3,
   isDark = false,
 }: CafeSelectorProps) {
-  
+
   // Calculate centroid from cafe coordinates
   const calculateCentroid = (cafes: string[]): { latitude: number; longitude: number } | null => {
     if (cafes.length === 0) return null;
-    
+
     const coordinates: Array<{ latitude: number; longitude: number }> = [];
-    
+
     for (const cafe of cafes) {
       const parts = cafe.split("|||");
       if (parts.length >= 4) {
         const lng = parseFloat(parts[2]);
         const lat = parseFloat(parts[3]);
-        
+
         if (!isNaN(lat) && !isNaN(lng)) {
           coordinates.push({ latitude: lat, longitude: lng });
         }
       }
     }
-    
+
     if (coordinates.length === 0) return null;
-    
+
     // For 1 cafe: use its coordinates
     if (coordinates.length === 1) {
       return coordinates[0];
     }
-    
+
     // For 2 cafes: calculate midpoint
     if (coordinates.length === 2) {
       return {
@@ -66,17 +66,17 @@ export default function CafeSelector({
         longitude: (coordinates[0].longitude + coordinates[1].longitude) / 2
       };
     }
-    
+
     // For 3 cafes: calculate centroid of triangle
     const totalLat = coordinates.reduce((sum, coord) => sum + coord.latitude, 0);
     const totalLng = coordinates.reduce((sum, coord) => sum + coord.longitude, 0);
-    
+
     return {
       latitude: totalLat / coordinates.length,
       longitude: totalLng / coordinates.length
     };
   };
-  
+
   // Update centroid whenever selected cafes change
   useEffect(() => {
     if (onCentroidChange) {
@@ -161,7 +161,7 @@ export default function CafeSelector({
 
   const handleSelect = (place: any, isFeatured = false) => {
     let cafeString;
-    
+
     if (isFeatured) {
       // Featured cafe from our database
       cafeString = `${place.name}|||${place.address}|||${place.longitude}|||${place.latitude}`;
@@ -169,7 +169,7 @@ export default function CafeSelector({
       // Regular cafe from Google Places
       cafeString = `${place.name}|||${place.vicinity}|||${place.geometry.location.lng}|||${place.geometry.location.lat}`;
     }
-    
+
     if (selected.includes(cafeString)) {
       Alert.alert(
         "Cafe already selected",
@@ -178,7 +178,7 @@ export default function CafeSelector({
       );
       return;
     }
-    
+
     if (selected.length < maxSelections) {
       const updatedSelection = [...selected, cafeString];
       onChange(updatedSelection);
@@ -203,8 +203,9 @@ export default function CafeSelector({
         console.error('Error fetching featured cafes:', error);
         return;
       }
-
-      setFeaturedCafes(data || []);
+      // Remove duplicates from featured cafes
+      const uniqueFeaturedCafes = removeDuplicateFeaturedCafes(data || []);
+      setFeaturedCafes(uniqueFeaturedCafes);
     } catch (error) {
       console.error('Error fetching featured cafes:', error);
     }
@@ -261,22 +262,49 @@ export default function CafeSelector({
     [calculateDistance],
   );
 
-  // Helper function to check if a Google Maps cafe is too close to a featured cafe
-  const isNearFeaturedCafe = (googleCafe, featuredCafes, threshold = 100) => {
-    // threshold in meters - cafes within 100m are considered the same location
+  // Helper function to check if a Google Maps cafe has the same coordinates as a featured cafe
+  // This only filters out Google Maps cafes - featured cafes always take priority
+  const hasSameCoordinatesAsFeaturedCafe = (googleCafe, featuredCafes) => {
     for (const featuredCafe of featuredCafes) {
-      const distance = calculateDistance(
-        googleCafe.geometry.location.lat,
-        googleCafe.geometry.location.lng,
-        featuredCafe.latitude,
-        featuredCafe.longitude
-      ) * 1000; // Convert km to meters
-      
-      if (distance <= threshold) {
+      // Round to 6 decimal places to handle floating point precision issues
+      const googleLat = Math.round(googleCafe.geometry.location.lat * 1000000) / 1000000;
+      const googleLng = Math.round(googleCafe.geometry.location.lng * 1000000) / 1000000;
+      const featuredLat = Math.round(featuredCafe.latitude * 1000000) / 1000000;
+      const featuredLng = Math.round(featuredCafe.longitude * 1000000) / 1000000;
+
+      if (googleLat === featuredLat && googleLng === featuredLng) {
+        console.log(`Filtering out Google Maps cafe "${googleCafe.name}" because featured cafe "${featuredCafe.name}" has the same coordinates`);
         return true;
       }
     }
     return false;
+  };
+
+  // Helper function to remove duplicate featured cafes (in case of database duplicates)
+  const removeDuplicateFeaturedCafes = (featuredCafes) => {
+    const uniqueCafes = [];
+
+    for (const cafe of featuredCafes) {
+      const isDuplicate = uniqueCafes.some(existingCafe => {
+        // Round to 6 decimal places to handle floating point precision issues
+        const cafeLat = Math.round(cafe.latitude * 1000000) / 1000000;
+        const cafeLng = Math.round(cafe.longitude * 1000000) / 1000000;
+        const existingLat = Math.round(existingCafe.latitude * 1000000) / 1000000;
+        const existingLng = Math.round(existingCafe.longitude * 1000000) / 1000000;
+
+        if (cafeLat === existingLat && cafeLng === existingLng) {
+          console.log(`Found duplicate featured cafe "${cafe.name}" with same coordinates as "${existingCafe.name}"`);
+          return true;
+        }
+        return false;
+      });
+
+      if (!isDuplicate) {
+        uniqueCafes.push(cafe);
+      }
+    }
+
+    return uniqueCafes;
   };
 
   const fetchCafes = async (lat, lng) => {
@@ -305,12 +333,12 @@ export default function CafeSelector({
       }
 
       const allGoogleCafes = data.results || [];
-      
-      // Filter out Google Maps cafes that are too close to featured cafes
+
+      // Filter out Google Maps cafes that have the same coordinates as featured cafes
       const filteredGoogleCafes = allGoogleCafes.filter(googleCafe => 
-        !isNearFeaturedCafe(googleCafe, featuredCafes)
+        !hasSameCoordinatesAsFeaturedCafe(googleCafe, featuredCafes)
       );
-      
+
       setCafes(filteredGoogleCafes);
 
       // Use the current region for filtering
@@ -384,18 +412,18 @@ export default function CafeSelector({
         await fetchFeaturedCafes();
 
         const allGoogleCafes = data.results || [];
-        
-        // Filter out Google Maps cafes that are too close to featured cafes
+
+        // Filter out Google Maps cafes that have the same coordinates as featured cafes
         const filteredGoogleCafes = allGoogleCafes.filter(googleCafe => 
-          !isNearFeaturedCafe(googleCafe, featuredCafes)
+          !hasSameCoordinatesAsFeaturedCafe(googleCafe, featuredCafes)
         );
-        
+
         setCafes(filteredGoogleCafes);
 
         // Update visible markers based on current region
         const newVisible = filterVisibleMarkers(filteredGoogleCafes, region);
         setVisibleMarkers(newVisible);
-        
+
         setMarkersLoaded(true);
         setIsLoading(false);
       } catch (error) {
@@ -636,7 +664,7 @@ export default function CafeSelector({
                                       const perksObj = typeof cafe.perks === 'string' ? JSON.parse(cafe.perks) : cafe.perks;
                                       return Object.entries(perksObj).map(([key, value], index) => {
                                         let displayText = '';
-                                        
+
                                         if (typeof value === 'boolean' && value) {
                                           // For boolean true values, display the key as a feature
                                           displayText = key.replace(/_/g, ' ');
@@ -647,7 +675,7 @@ export default function CafeSelector({
                                           // For number values, display with the key
                                           displayText = `${key.replace(/_/g, ' ')}: ${value}`;
                                         }
-                                        
+
                                         return displayText ? (
                                           <Text
                                             key={index}
