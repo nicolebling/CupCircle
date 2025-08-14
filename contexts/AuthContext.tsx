@@ -9,6 +9,7 @@ import Superwall, {
   LogScope,
 } from "expo-superwall/compat";
 import { notificationService } from "../services/notificationService";
+import logger from "../utils/logger";
 
 type User = {
   id: string;
@@ -62,15 +63,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       if (session?.user) {
         try {
           await Superwall.shared.identify({ userId: session.user.id });
-          console.log(
-            "Superwall user identified from existing session:",
-            session.user.id,
-          );
+          logger.info("Superwall user identified from existing session", { userId: session.user.id });
         } catch (error) {
-          console.error(
-            "Failed to identify user with Superwall from session:",
-            error,
-          );
+          logger.error("Failed to identify user with Superwall from session", error);
         }
       }
 
@@ -132,16 +127,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         // Identify user with Superwall
         try {
           await Superwall.shared.identify({ userId: data.user.id });
-          console.log("Superwall user identified:", data.user.id);
+          logger.info("Superwall user identified on sign in", { userId: data.user.id });
         } catch (error) {
           console.error("Failed to identify user with Superwall:", error);
         }
 
         // Register for push notifications
         try {
-          console.log('🔔 Starting push notification registration for user:', data.user.id);
+          logger.info('Starting push notification registration', { userId: data.user.id });
           const token = await notificationService.registerForPushNotificationsAsync();
-          console.log('🎯 Push token registration result:', { token, hasToken: !!token });
+          logger.info('Push token registration result', { hasToken: !!token });
 
           if (token) {
             console.log('💾 Attempting to save push token to database...');

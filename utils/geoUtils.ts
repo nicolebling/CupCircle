@@ -1,4 +1,6 @@
 
+import logger from './logger';
+
 export interface CafeCoordinates {
   name: string;
   address: string;
@@ -24,7 +26,7 @@ export const geoUtils = {
 
   // Calculate distance between two points using Haversine formula (in miles)
   calculateDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
-    console.log("HEREeeeeee", lat1, lng1, lat2, lng2);
+    logger.debug("Calculating distance between coordinates", { lat1, lng1, lat2, lng2 });
     const R = 3959; // Earth's radius in miles
     const dLat = this.toRadians(lat2 - lat1);
     const dLng = this.toRadians(lng2 - lng1);
@@ -86,11 +88,11 @@ export const geoUtils = {
     maxDistance: number
   ): Array<any> {
     if (maxDistance === null || maxDistance === undefined) {
-      console.log("No max distance filter applied");
+      logger.debug("No max distance filter applied");
       return profiles;
     }
     
-    console.log(`Filtering profiles by max distance: ${maxDistance} miles`);
+    logger.debug("Filtering profiles by max distance", { maxDistance });
     
     const filteredProfiles = profiles.filter(profile => {
       if (profile.distance === null || profile.distance === undefined) {

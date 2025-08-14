@@ -13,6 +13,8 @@
     "jsEngine": "jsc",
     "extra": {
       "API_URL": "https://cupcircle-api.yourusername.replit.app",
+      "isDev": true,
+      "logLevel": "DEBUG",
       "eas": {
         "projectId": "c6804025-69e9-411a-9b2a-9eaa2dfb565e"
       }

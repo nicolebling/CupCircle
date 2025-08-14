@@ -1,20 +1,21 @@
 import { supabase } from '../lib/supabase';
+import logger from '../utils/logger';
 
 export const initApiClient = async () => {
   try {
     const { error } = await supabase.auth.getSession();
     if (error) {
-      console.error('Failed to initialize Supabase client:', error);
+      logger.error('Failed to initialize Supabase client', error);
     } else {
-      console.log('Supabase client initialized successfully');
+      logger.info('Supabase client initialized successfully');
     }
   } catch (error) {
-    console.error('Failed to initialize Supabase client:', error);
+    logger.error('Failed to initialize Supabase client', error);
   }
 };
 
 initApiClient().catch(err => {
-  console.error('Failed to initialize Supabase client:', err);
+  logger.error('Failed to initialize Supabase client during initialization', err);
 });
 
 export default {
