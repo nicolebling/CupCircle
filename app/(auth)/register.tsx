@@ -59,7 +59,7 @@ export default function SignUpScreen() {
 
   // Configure Google Sign-In
   GoogleSignin.configure({
-    webClientId: '145530736366-2gulq7kehbifko3gcfarc04jve23j2qh.apps.googleusercontent.com', // Your web client ID from Supabase dashboard
+    iosClientId: '145530736366-8o8pc0ttauphf34mkbijf16g3gvtqpc0.apps.googleusercontent.com', // Your web client ID from Supabase dashboard
   });
 
   //supabase signupwithEmail

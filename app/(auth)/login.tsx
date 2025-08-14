@@ -81,8 +81,7 @@ export default function LoginScreen() {
   // Configure Google Sign In
   React.useEffect(() => {
     GoogleSignin.configure({
-      webClientId: '145530736366-2gulq7kehbifko3gcfarc04jve23j2qh.apps.googleusercontent.com',
-      iosClientId: '145530736366-2gulq7kehbifko3gcfarc04jve23j2qh.apps.googleusercontent.com', // Your iOS client ID
+      iosClientId: '145530736366-8o8pc0ttauphf34mkbijf16g3gvtqpc0.apps.googleusercontent.com', // Your iOS client ID
     });
   }, []);
 
