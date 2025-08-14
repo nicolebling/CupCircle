@@ -197,8 +197,7 @@ export default function CafeSelector({
       const { data, error } = await supabase
         .from('cafes')
         .select('*')
-        .eq('is_featured', true)
-        .eq('show_on_maps', true); // Only fetch cafes that should show on maps
+        .eq('is_featured', true);
 
       if (error) {
         console.error('Error fetching featured cafes:', error);
@@ -384,22 +383,11 @@ export default function CafeSelector({
         // Also refresh featured cafes first to ensure we have the latest data
         await fetchFeaturedCafes();
 
-        // Fetch all featured cafes (including those with show_on_maps = false) for filtering purposes
-        const { data: allFeaturedCafes, error: allFeaturedError } = await supabase
-          .from('cafes')
-          .select('*')
-          .eq('is_featured', true);
-
-        if (allFeaturedError) {
-          console.error('Error fetching all featured cafes for filtering:', allFeaturedError);
-        }
-
         const allGoogleCafes = data.results || [];
         
-        // Filter out Google Maps cafes that are too close to ANY featured cafes (regardless of show_on_maps)
-        // This ensures we don't show duplicate pins for the same location
+        // Filter out Google Maps cafes that are too close to featured cafes
         const filteredGoogleCafes = allGoogleCafes.filter(googleCafe => 
-          !isNearFeaturedCafe(googleCafe, allFeaturedCafes || [])
+          !isNearFeaturedCafe(googleCafe, featuredCafes)
         );
         
         setCafes(filteredGoogleCafes);
