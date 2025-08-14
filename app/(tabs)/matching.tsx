@@ -105,6 +105,7 @@ export default function MatchingScreen() {
   const [hasMoreProfiles, setHasMoreProfiles] = useState(false);
   const [showSubscriptionCard, setShowSubscriptionCard] = useState(false);
   const [isPaidUser, setIsPaidUser] = useState(false);
+  const [hasInitiallyLoaded, setHasInitiallyLoaded] = useState(false);
   const PROFILES_PER_PAGE = 10;
 
   // Refs for auto-scroll functionality
@@ -337,13 +338,21 @@ export default function MatchingScreen() {
     }
   }, [user?.id]);
 
+  // Track if this is the initial load
+  const [hasInitiallyLoaded, setHasInitiallyLoaded] = useState(false);
+
   // Use useFocusEffect to run check when screen comes into focus
   useFocusEffect(
     useCallback(() => {
-      checkUserAvailability();
+      // Only do full reload on initial load or if no profiles are loaded
+      if (!hasInitiallyLoaded || profiles.length === 0) {
+        checkUserAvailability();
+        setHasInitiallyLoaded(true);
+      }
+      // Always check subscription status and user centroid (lightweight operations)
       checkSubscriptionAndPaywall();
       fetchUserCentroid();
-    }, [checkUserAvailability, checkSubscriptionAndPaywall, fetchUserCentroid]),
+    }, [checkUserAvailability, checkSubscriptionAndPaywall, fetchUserCentroid, hasInitiallyLoaded, profiles.length]),
   );
 
   // Periodic background refresh for new profiles (every 5 minutes)
