@@ -346,6 +346,18 @@ export default function MatchingScreen() {
     }, [checkUserAvailability, checkSubscriptionAndPaywall, fetchUserCentroid]),
   );
 
+  // Periodic background refresh for new profiles (every 5 minutes)
+  useEffect(() => {
+    const backgroundRefresh = setInterval(() => {
+      if (!isLoading && profiles.length > 0) {
+        // Silently refresh available profiles in background
+        fetchProfiles().catch(console.error);
+      }
+    }, 5 * 60 * 1000); // 5 minutes
+
+    return () => clearInterval(backgroundRefresh);
+  }, [isLoading, profiles.length]);
+
   const fetchProfiles = async () => {
     setIsLoading(true);
     try {
@@ -749,7 +761,22 @@ export default function MatchingScreen() {
     setIsLoading(false);
   };
 
-  // Watch for currentIndex to auto-load more profiles
+  // Background preloading function
+  const preloadNextProfilesBatch = async () => {
+    if (hasMoreProfiles && allProfiles.length > 0) {
+      const nextPage = currentPage + 1;
+      const startIdx = nextPage * PROFILES_PER_PAGE;
+      const endIdx = startIdx + PROFILES_PER_PAGE;
+      
+      if (startIdx < allProfiles.length) {
+        const nextPageProfiles = allProfiles.slice(startIdx, endIdx);
+        // Preload these profiles silently without updating the UI
+        console.log(`Preloaded ${nextPageProfiles.length} profiles for next batch`);
+      }
+    }
+  };
+
+  // Watch for currentIndex to auto-load more profiles and preload next batch
   useEffect(() => {
     if (
       currentIndex > 0 &&
@@ -757,7 +784,16 @@ export default function MatchingScreen() {
     ) {
       loadNextProfilesPage();
     }
-  }, [currentIndex]);
+    
+    // Preload next batch when user is 2 profiles away from the end of current batch
+    if (
+      currentIndex > 0 &&
+      currentIndex % PROFILES_PER_PAGE === PROFILES_PER_PAGE - 3 &&
+      hasMoreProfiles
+    ) {
+      preloadNextProfilesBatch();
+    }
+  }, [currentIndex, hasMoreProfiles]);
 
   // Simplified function to check if there's a cafe match
   // In a real implementation, you would compare with the current user's favorite cafes
@@ -1304,8 +1340,11 @@ export default function MatchingScreen() {
                             );
                           }
 
-                          // Only show success alert if we reach this point without errors
-                          alert("Match request sent successfully!");
+                          // Show a brief success message instead of blocking alert
+                          console.log("Match request sent successfully!");
+                          
+                          // You could add a toast notification here instead of alert
+                          // This keeps the UI flowing smoothly
                           
                           // Clear selections after successful request
                           setSelectedCafe("");
@@ -1320,11 +1359,20 @@ export default function MatchingScreen() {
                             global.circleChatsScreen.refreshData();
                           }
 
-                          // Refresh the profiles to remove the user we just sent a request to
-                          await fetchProfiles();
+                          // Optimistically remove the current user from the profiles array
+                          const updatedProfiles = profiles.filter(profile => profile.id !== currentProfile.id);
+                          const updatedAllProfiles = allProfiles.filter(profile => profile.id !== currentProfile.id);
                           
-                          // Stay at the same index - the next person will now be at this position
-                          // No need to increment since the array has been filtered
+                          setProfiles(updatedProfiles);
+                          setAllProfiles(updatedAllProfiles);
+                          
+                          // Adjust current index if we're at the end
+                          if (currentIndex >= updatedProfiles.length && updatedProfiles.length > 0) {
+                            setCurrentIndex(updatedProfiles.length - 1);
+                          } else if (updatedProfiles.length === 0) {
+                            setCurrentIndex(0);
+                          }
+                          // If currentIndex < updatedProfiles.length, keep the same index to show next profile
 
                         } catch (error) {
                           console.error("Error sending match request:", error);
