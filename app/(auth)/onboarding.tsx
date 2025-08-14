@@ -329,7 +329,10 @@ export default function OnboardingScreen() {
               placeholder="Enter your school or university"
               placeholderTextColor={colors.secondaryText}
               value={profileData.education}
-              onChangeText={(text) => setProfileData({ ...profileData, education: text })}
+              onChangeText={(text) => {
+                const capitalizedText = text.charAt(0).toUpperCase() + text.slice(1);
+                setProfileData({ ...profileData, education: capitalizedText });
+              }}
             />
           </View>
         );
