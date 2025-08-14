@@ -275,19 +275,8 @@ export default function LoginScreen() {
               Alert.alert('Welcome!', 'Please complete your profile to continue.');
               router.replace('/(auth)/onboarding');
             } else {
-              // Check if existing user has completed their profile
-              const isProfileComplete = profileData.age && 
-                                      profileData.occupation && 
-                                      profileData.bio && 
-                                      profileData.experience_level && 
-                                      profileData.education;
-
-              if (isProfileComplete) {
-                router.replace('/(tabs)/matching');
-              } else {
-                Alert.alert('Welcome back!', 'Please complete your profile to continue.');
-                router.replace('/(auth)/onboarding');
-              }
+              // Existing Google users always go to matching, regardless of profile completeness
+              router.replace('/(tabs)/matching');
             }
           } catch (checkError) {
             console.error("Error in profile check:", checkError);
