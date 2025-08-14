@@ -1340,11 +1340,11 @@ export default function MatchingScreen() {
                             );
                           }
 
-                          // Show a brief success message instead of blocking alert
-                          console.log("Match request sent successfully!");
+                          // Show success alert to user
+                          alert("Match request sent successfully!");
                           
-                          // You could add a toast notification here instead of alert
-                          // This keeps the UI flowing smoothly
+                          // Brief delay to allow user to see the success message
+                          await new Promise(resolve => setTimeout(resolve, 100));
                           
                           // Clear selections after successful request
                           setSelectedCafe("");
