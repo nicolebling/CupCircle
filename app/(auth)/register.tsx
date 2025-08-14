@@ -28,6 +28,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { supabase } from '@/lib/supabase';
 import * as AppleAuthentication from 'expo-apple-authentication';
+import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 
 
 // Prevent splash screen from hiding until assets are loaded
@@ -54,6 +55,11 @@ export default function SignUpScreen() {
   // Load custom fonts
   const [fontsLoaded] = useFonts({
     SpaceMono: require("@/assets/fonts/SpaceMono-Regular.ttf"),
+  });
+
+  // Configure Google Sign-In
+  GoogleSignin.configure({
+    webClientId: 'com.cupcircle.connect', // Your web client ID from Supabase dashboard
   });
 
   //supabase signupwithEmail
@@ -268,6 +274,91 @@ export default function SignUpScreen() {
     }
   }
 
+  async function signUpWithGoogle() {
+    setLoading(true);
+    setError("");
+    setToastMessage("");
+    setToastVisible(false);
+
+    try {
+      await GoogleSignin.hasPlayServices();
+      const userInfo = await GoogleSignin.signIn();
+
+      if (userInfo.data.idToken) {
+        const { data, error } = await supabase.auth.signInWithIdToken({
+          provider: 'google',
+          token: userInfo.data.idToken,
+        });
+
+        if (error) {
+          console.error("Google Sign-Up error:", error.message);
+          setError("Unable to sign up with Google. Please try again.");
+          setToastMessage("Unable to sign up with Google. Please try again.");
+          setToastVisible(true);
+        } else {
+          console.log("Google Sign-Up successful:", data);
+
+          // Create profile for the new Google user
+          if (data.user) {
+            try {
+              const { data: existingProfile, error: checkError } = await supabase
+                .from('profiles')
+                .select('id')
+                .eq('id', data.user.id)
+                .single();
+
+              if (checkError && checkError.code !== 'PGRST116') {
+                console.error("Error checking for existing profile:", checkError);
+              }
+
+              if (!existingProfile) {
+                const { data: profileData, error: profileError } = await supabase
+                  .from('profiles')
+                  .insert([
+                    { 
+                      id: data.user.id,
+                      name: userInfo.data.user?.name || null,
+                      avatar_url: userInfo.data.user?.photo || null,
+                    }
+                  ])
+                  .select();
+
+                if (profileError) {
+                  console.error("Profile creation error:", profileError);
+                }
+              }
+            } catch (profileCreationError) {
+              console.error("Exception during profile creation:", profileCreationError);
+            }
+          }
+
+          router.replace('/(auth)/onboarding');
+        }
+      } else {
+        throw new Error('No ID token present!');
+      }
+    } catch (error: any) {
+      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+        console.log("Google Sign-Up canceled");
+      } else if (error.code === statusCodes.IN_PROGRESS) {
+        setError("Google Sign-Up already in progress");
+        setToastMessage("Google Sign-Up already in progress");
+        setToastVisible(true);
+      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+        setError("Google Play Services not available");
+        setToastMessage("Google Play Services not available");
+        setToastVisible(true);
+      } else {
+        console.error("Google Sign-Up error:", error);
+        setError("Unable to sign up with Google. Please try again.");
+        setToastMessage("Unable to sign up with Google. Please try again.");
+        setToastVisible(true);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <ThemeProvider value={theme}>
       <SafeAreaView
@@ -279,7 +370,7 @@ export default function SignUpScreen() {
           style={styles.keyboardAvoidingView}
         >
           <View style={styles.content}>
-            
+
             {/* Logo & Branding */}
             <View style={styles.header}>
               <LogoAnimation showText={true} showSubtitle={true} />
@@ -368,7 +459,7 @@ export default function SignUpScreen() {
                 </TouchableOpacity>
               </View>
 
-              
+
 
               {/* Sign Up Button */}
               <TouchableOpacity
@@ -395,6 +486,22 @@ export default function SignUpScreen() {
                 />
               )}
 
+              {/* Google Sign-Up Button */}
+              <TouchableOpacity
+                style={[
+                  styles.button,
+                  { backgroundColor: Colors[colorScheme].google },
+                  styles.googleButton,
+                ]}
+                onPress={signUpWithGoogle}
+                disabled={loading}
+              >
+                <Ionicons name="logo-google" size={24} color="white" style={styles.googleIcon} />
+                <Text style={styles.buttonText}>
+                  {loading ? "Signing up with Google..." : "Sign up with Google"}
+                </Text>
+              </TouchableOpacity>
+
               {/* Divider */}
               <View style={styles.dividerContainer}>
                 <View style={[styles.divider, { backgroundColor: theme.colors.border }]} />
@@ -406,10 +513,10 @@ export default function SignUpScreen() {
               {error ? (
                 <Text style={styles.errorMessage}>{error}</Text>
               ) : null}
-              
+
             </View>
 
-           
+
 
             {/* Already Have an Account? */}
             <View style={styles.footer}>
@@ -447,7 +554,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     justifyContent: "space-between",
-    
+
   },
   header: {
     alignItems: "center",
@@ -488,9 +595,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderLeftWidth: 4,
     borderLeftColor: '#c62828',
-  },
-  errorIcon: {
-    marginRight: 10,
   },
   errorText: {
     color: '#c62828',
@@ -563,6 +667,16 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 50,
     marginTop: 15,
+  },
+  googleButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#4285F4', // Google Blue
+    marginTop: 15,
+  },
+  googleIcon: {
+    marginRight: 10,
   },
   dividerContainer: {
     flexDirection: 'row',

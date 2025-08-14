@@ -30,6 +30,11 @@ import { StatusBar } from "expo-status-bar";
 import { supabase } from '@/lib/supabase';
 import Colors from '@/constants/Colors';
 import * as AppleAuthentication from 'expo-apple-authentication';
+import {
+  GoogleSignin,
+  GoogleSigninButton,
+  statusCodes,
+} from '@react-native-google-signin/google-signin';
 
 
 
@@ -72,6 +77,14 @@ export default function LoginScreen() {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const theme = colorScheme === "dark" ? DarkTheme : DefaultTheme;
+
+  // Configure Google Sign In
+  React.useEffect(() => {
+    GoogleSignin.configure({
+      webClientId: '145530736366-2gulq7kehbifko3gcfarc04jve23j2qh.apps.googleusercontent.com',
+      iosClientId: 'com.cupcircle.connect', // Your iOS client ID
+    });
+  }, []);
 
   // Load custom fonts
   const [fontsLoaded] = useFonts({
@@ -223,6 +236,94 @@ export default function LoginScreen() {
     }
   }
 
+  async function signInWithGoogle() {
+    setLoading(true);
+    setError("");
+    setToastMessage("");
+    setToastVisible(false);
+
+    try {
+      await GoogleSignin.hasPlayServices();
+      const userInfo = await GoogleSignin.signIn();
+      
+      if (userInfo.data.idToken) {
+        const { data, error } = await supabase.auth.signInWithIdToken({
+          provider: 'google',
+          token: userInfo.data.idToken,
+        });
+
+        if (error) {
+          console.error("Google Sign-In error:", error.message);
+          setError("Unable to sign in with Google. Please try again.");
+          setToastMessage("Unable to sign in with Google. Please try again.");
+          setToastVisible(true);
+        } else {
+          console.log("Google Sign-In successful:", data);
+
+          try {
+            const { data: profileData, error: profileError } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', data.user.id)
+              .single();
+
+            if (profileError && profileError.code !== 'PGRST116') {
+              console.error("Error checking profile:", profileError);
+            }
+
+            if (!profileData) {
+              // Create a basic profile for Google users
+              const { error: createError } = await supabase
+                .from('profiles')
+                .insert([
+                  { 
+                    id: data.user.id,
+                    name: userInfo.data.user?.name || null,
+                    avatar_url: userInfo.data.user?.photo || null,
+                  }
+                ]);
+
+              if (createError) {
+                console.error("Profile creation error:", createError);
+              }
+
+              // Always go to onboarding for new Google users
+              Alert.alert('Welcome!', 'Please complete your profile to continue.');
+              router.replace('/(auth)/onboarding');
+            } else {
+              // Existing Google users always go to matching, regardless of profile completeness
+              router.replace('/(tabs)/matching');
+            }
+          } catch (checkError) {
+            console.error("Error in profile check:", checkError);
+            router.replace('/(auth)/onboarding');
+          }
+        }
+      } else {
+        throw new Error('No ID token present!');
+      }
+    } catch (error: any) {
+      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+        console.log("Google Sign-In canceled");
+      } else if (error.code === statusCodes.IN_PROGRESS) {
+        setError("Google Sign-In already in progress");
+        setToastMessage("Google Sign-In already in progress");
+        setToastVisible(true);
+      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+        setError("Google Play Services not available");
+        setToastMessage("Google Play Services not available");
+        setToastVisible(true);
+      } else {
+        console.error("Google Sign-In error:", error);
+        setError("Unable to sign in with Google. Please try again.");
+        setToastMessage("Unable to sign in with Google. Please try again.");
+        setToastVisible(true);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
+
 
   // Hide splash screen when fonts are ready
   React.useEffect(() => {
@@ -330,6 +431,14 @@ export default function LoginScreen() {
                   onPress={signInWithApple}
                 />
               )}
+
+              {/* Google Sign-In Button */}
+              <GoogleSigninButton
+                size={GoogleSigninButton.Size.Wide}
+                color={GoogleSigninButton.Color.Dark}
+                onPress={signInWithGoogle}
+                style={styles.googleButton}
+              />
 
               {/* Divider */}
               <View style={styles.dividerContainer}>
@@ -527,6 +636,11 @@ const styles = StyleSheet.create({
     fontFamily: "K2D-Regular",
   },
   appleButton: {
+    width: '100%',
+    height: 50,
+    marginTop: 15,
+  },
+  googleButton: {
     width: '100%',
     height: 50,
     marginTop: 15,
