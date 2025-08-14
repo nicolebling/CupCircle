@@ -259,6 +259,9 @@ export default function LoginScreen() {
         } else {
           console.log("Google Sign-In successful:", data);
 
+          // Check if this is a new user by looking at the created_at timestamp
+          const isNewUser = data.user && new Date(data.user.created_at).getTime() > (Date.now() - 60000); // Created within last minute
+
           try {
             const { data: profileData, error: profileError } = await supabase
               .from('profiles')
@@ -270,8 +273,8 @@ export default function LoginScreen() {
               console.error("Error checking profile:", profileError);
             }
 
-            if (!profileData) {
-              // Always go to onboarding for new Google users
+            // Redirect new users or users without profiles to onboarding
+            if (isNewUser || !profileData) {
               Alert.alert('Welcome!', 'Please complete your profile to continue.');
               router.replace('/(auth)/onboarding');
             } else {
