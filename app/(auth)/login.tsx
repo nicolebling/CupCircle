@@ -81,7 +81,7 @@ export default function LoginScreen() {
   // Configure Google Sign In
   React.useEffect(() => {
     GoogleSignin.configure({
-      iosClientId: '145530736366-8o8pc0ttauphf34mkbijf16g3gvtqpc0.apps.googleusercontent.com', // Your iOS client ID
+      iosClientId: '145530736366-8o8pc0ttauphf34mkbijf16g3gvtqpc0.apps.googleusercontent.com',
     });
   }, []);
 
@@ -244,7 +244,7 @@ export default function LoginScreen() {
     try {
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
-      
+
       if (userInfo.data.idToken) {
         const { data, error } = await supabase.auth.signInWithIdToken({
           provider: 'google',

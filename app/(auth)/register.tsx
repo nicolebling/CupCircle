@@ -58,9 +58,11 @@ export default function SignUpScreen() {
   });
 
   // Configure Google Sign-In
-  GoogleSignin.configure({
-    iosClientId: '145530736366-8o8pc0ttauphf34mkbijf16g3gvtqpc0.apps.googleusercontent.com', // Your web client ID from Supabase dashboard
-  });
+  React.useEffect(() => {
+    GoogleSignin.configure({
+      iosClientId: '145530736366-8o8pc0ttauphf34mkbijf16g3gvtqpc0.apps.googleusercontent.com',
+    });
+  }, []);
 
   //supabase signupwithEmail
   async function signUpWithEmail() {
