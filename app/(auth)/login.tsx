@@ -420,24 +420,30 @@ export default function LoginScreen() {
                 </Text>
               </TouchableOpacity>
 
-              {/* Apple Sign-In Button - only show on iOS */}
-              {Platform.OS === 'ios' && (
-                <AppleAuthentication.AppleAuthenticationButton
-                  buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
-                  buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
-                  cornerRadius={10}
-                  style={styles.appleButton}
-                  onPress={signInWithApple}
-                />
-              )}
+              {/* Social Login Buttons Container */}
+              <View style={styles.socialButtonsContainer}>
+                {/* Apple Sign-In Button - only show on iOS */}
+                {Platform.OS === 'ios' && (
+                  <TouchableOpacity
+                    style={[styles.socialButton, styles.appleButton]}
+                    onPress={signInWithApple}
+                    disabled={loading}
+                  >
+                    <Ionicons name="logo-apple" size={24} color="white" />
+                    <Text style={styles.socialButtonText}>Apple</Text>
+                  </TouchableOpacity>
+                )}
 
-              {/* Google Sign-In Button */}
-              <GoogleSigninButton
-                size={GoogleSigninButton.Size.Wide}
-                color={GoogleSigninButton.Color.Dark}
-                onPress={signInWithGoogle}
-                style={styles.googleButton}
-              />
+                {/* Google Sign-In Button */}
+                <TouchableOpacity
+                  style={[styles.socialButton, styles.googleButton]}
+                  onPress={signInWithGoogle}
+                  disabled={loading}
+                >
+                  <Ionicons name="logo-google" size={24} color="white" />
+                  <Text style={styles.socialButtonText}>Google</Text>
+                </TouchableOpacity>
+              </View>
 
               {/* Divider */}
               <View style={styles.dividerContainer}>
@@ -634,15 +640,31 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: "K2D-Regular",
   },
-  appleButton: {
-    width: '100%',
-    height: 50,
+  socialButtonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     marginTop: 15,
+    gap: 10,
+  },
+  socialButton: {
+    flex: 1,
+    height: 50,
+    borderRadius: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  appleButton: {
+    backgroundColor: '#000000',
   },
   googleButton: {
-    width: '100%',
-    height: 50,
-    marginTop: 15,
+    backgroundColor: '#4285F4',
+  },
+  socialButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontFamily: "K2D-Medium",
   },
   dividerContainer: {
     flexDirection: 'row',

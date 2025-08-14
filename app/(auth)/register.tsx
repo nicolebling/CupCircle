@@ -477,32 +477,30 @@ export default function SignUpScreen() {
                 </Text>
               </TouchableOpacity>
 
-              {/* Apple Sign-Up Button - only show on iOS */}
-              {Platform.OS === 'ios' && (
-                <AppleAuthentication.AppleAuthenticationButton
-                  buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_UP}
-                  buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
-                  cornerRadius={10}
-                  style={styles.appleButton}
-                  onPress={signUpWithApple}
-                />
-              )}
+              {/* Social Login Buttons Container */}
+              <View style={styles.socialButtonsContainer}>
+                {/* Apple Sign-Up Button - only show on iOS */}
+                {Platform.OS === 'ios' && (
+                  <TouchableOpacity
+                    style={[styles.socialButton, styles.appleButton]}
+                    onPress={signUpWithApple}
+                    disabled={loading}
+                  >
+                    <Ionicons name="logo-apple" size={24} color="white" />
+                    <Text style={styles.socialButtonText}>Apple</Text>
+                  </TouchableOpacity>
+                )}
 
-              {/* Google Sign-Up Button */}
-              <TouchableOpacity
-                style={[
-                  styles.button,
-                  { backgroundColor: Colors[colorScheme].google },
-                  styles.googleButton,
-                ]}
-                onPress={signUpWithGoogle}
-                disabled={loading}
-              >
-                <Ionicons name="logo-google" size={24} color="white" style={styles.googleIcon} />
-                <Text style={styles.buttonText}>
-                  {loading ? "Signing up with Google..." : "Sign up with Google"}
-                </Text>
-              </TouchableOpacity>
+                {/* Google Sign-Up Button */}
+                <TouchableOpacity
+                  style={[styles.socialButton, styles.googleButton]}
+                  onPress={signUpWithGoogle}
+                  disabled={loading}
+                >
+                  <Ionicons name="logo-google" size={24} color="white" />
+                  <Text style={styles.socialButtonText}>Google</Text>
+                </TouchableOpacity>
+              </View>
 
               {/* Divider */}
               <View style={styles.dividerContainer}>
@@ -665,20 +663,31 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: "K2D-Regular",
   },
-  appleButton: {
-    width: '100%',
-    height: 50,
+  socialButtonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     marginTop: 15,
+    gap: 10,
   },
-  googleButton: {
+  socialButton: {
+    flex: 1,
+    height: 50,
+    borderRadius: 10,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#4285F4', // Google Blue
-    marginTop: 15,
+    gap: 8,
   },
-  googleIcon: {
-    marginRight: 10,
+  appleButton: {
+    backgroundColor: '#000000',
+  },
+  googleButton: {
+    backgroundColor: '#4285F4',
+  },
+  socialButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontFamily: "K2D-Medium",
   },
   dividerContainer: {
     flexDirection: 'row',
