@@ -59,7 +59,7 @@ export default function SignUpScreen() {
 
   // Configure Google Sign-In
   GoogleSignin.configure({
-    webClientId: 'com.cupcircle.connect', // Your web client ID from Supabase dashboard
+    webClientId: '145530736366-2gulq7kehbifko3gcfarc04jve23j2qh.apps.googleusercontent.com', // Your web client ID from Supabase dashboard
   });
 
   //supabase signupwithEmail

@@ -21,6 +21,7 @@
       "supportsTablet": true,
       "usesAppleSignIn": true,
       "bundleIdentifier": "com.cupcircle.connect",
+      "googleServicesFile": "./GoogleService-Info.plist",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "This app requires location access to function properly.",
         "NSLocationAlwaysUsageDescription": "This app needs location access even in the background.",
@@ -92,7 +93,13 @@
           "defaultChannel": "default"
         }
       ],
-      "expo-web-browser"
+      "expo-web-browser",
+      [
+        "@react-native-google-signin/google-signin",
+        {
+          "iosUrlScheme": "com.googleusercontent.apps.145530736366-2gulq7kehbifko3gcfarc04jve23j2qh"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
