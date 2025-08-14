@@ -59,6 +59,10 @@ export default function AvailabilityScreen() {
   const [showAddSlot, setShowAddSlot] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Recurring availability state
+  const [isRecurring, setIsRecurring] = useState(false);
+  const [selectedDays, setSelectedDays] = useState<number[]>([]); // 0 for Sunday, 1 for Monday, etc.
+
   // Animation values
   const opacity = useSharedValue(0);
   const translateY = useSharedValue(30);
@@ -132,14 +136,14 @@ export default function AvailabilityScreen() {
     // Use format function for consistent date key generation
     const currentDateKey = format(selectedDate, 'yyyy-MM-dd');
     let allSelections = { ...multiDateSelections };
-    
+
     if (selectedTimes.length > 0) {
       allSelections[currentDateKey] = selectedTimes;
     }
 
     // Check if there are any selections at all
     const totalSelections = Object.values(allSelections).reduce((total, times) => total + times.length, 0);
-    
+
     if (totalSelections === 0) {
       Alert.alert("No Time Selected", "Please select at least one time slot.");
       return;
@@ -202,7 +206,7 @@ export default function AvailabilityScreen() {
     try {
       setIsLoading(true);
       let totalCreated = 0;
-      
+
       for (const [dateKey, times] of Object.entries(allSelections)) {
         // Parse the date key directly to avoid timezone issues
         const [year, month, day] = dateKey.split('-');
@@ -213,11 +217,11 @@ export default function AvailabilityScreen() {
           totalCreated++;
         }
       }
-      
+
       await getUserAvailability();
       setSelectedTimes([]);
       setMultiDateSelections({});
-      
+
       Alert.alert(
         "Success", 
         `Successfully created ${totalCreated} time slot${totalCreated > 1 ? 's' : ''} across ${Object.keys(allSelections).length} date${Object.keys(allSelections).length > 1 ? 's' : ''}.`
@@ -430,9 +434,9 @@ export default function AvailabilityScreen() {
         [dateKey]: selectedTimes
       }));
     }
-    
+
     setSelectedDate(date);
-    
+
     // Load selections for the new date using format function
     const newDateKey = format(date, 'yyyy-MM-dd');
     setSelectedTimes(multiDateSelections[newDateKey] || []);
@@ -493,12 +497,16 @@ export default function AvailabilityScreen() {
           setShowAddSlot(false);
           setSelectedTimes([]);
           setMultiDateSelections({});
+          setIsRecurring(false);
+          setSelectedDays([]);
         }}
       >
         <TouchableWithoutFeedback onPress={() => {
           setShowAddSlot(false);
           setSelectedTimes([]);
           setMultiDateSelections({});
+          setIsRecurring(false);
+          setSelectedDays([]);
         }}>
           <View style={styles.modalOverlay}>
             <TouchableWithoutFeedback onPress={() => {}}>
@@ -516,10 +524,68 @@ export default function AvailabilityScreen() {
                     setShowAddSlot(false);
                     setSelectedTimes([]);
                     setMultiDateSelections({});
+                    setIsRecurring(false);
+                    setSelectedDays([]);
                   }}>
                     <Ionicons name="close" size={24} color={colors.text} />
                   </TouchableOpacity>
                 </View>
+
+                {/* Recurring Toggle */}
+                <View style={styles.recurringToggleContainer}>
+                  <Text style={[styles.recurringToggleText, { color: colors.text }]}>
+                    Set as Recurring
+                  </Text>
+                  <TouchableOpacity
+                    style={[
+                      styles.toggleSwitch,
+                      isRecurring ? { backgroundColor: colors.primary } : { backgroundColor: colors.border }
+                    ]}
+                    onPress={() => setIsRecurring(!isRecurring)}
+                    activeOpacity={0.7}
+                  >
+                    <Animated.View
+                      style={[
+                        styles.toggleThumb,
+                        isRecurring ? { transform: [{ translateX: 25 }] } : {},
+                      ]}
+                    />
+                  </TouchableOpacity>
+                </View>
+
+                {isRecurring && (
+                  <>
+                    <Text style={[styles.recurringDaysLabel, { color: colors.text }]}>
+                      Repeat on these days:
+                    </Text>
+                    <View style={styles.daysContainer}>
+                      {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day, index) => {
+                        const isSelected = selectedDays.includes(index);
+                        return (
+                          <TouchableOpacity
+                            key={index}
+                            style={[
+                              styles.dayChip,
+                              isSelected && { backgroundColor: colors.primary },
+                            ]}
+                            onPress={() => {
+                              setSelectedDays(prev =>
+                                isSelected ? prev.filter(d => d !== index) : [...prev, index]
+                              );
+                            }}
+                          >
+                            <Text style={[
+                              styles.dayChipText,
+                              isSelected ? { color: "white" } : { color: colors.text }
+                            ]}>
+                              {day}
+                            </Text>
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </View>
+                  </>
+                )}
 
                 {/* Calendar Section */}
                 <View style={styles.calendarContainer}>
@@ -669,10 +735,10 @@ export default function AvailabilityScreen() {
 
                         const handleTimeSelection = () => {
                           if (isTimeTaken || isPastTime || isAlreadyAdded) return;
-                          
+
                           // Use format function for consistent date key
                           const currentDateKey = format(selectedDate, 'yyyy-MM-dd');
-                          
+
                           let updatedTimes;
                           if (isSelectedTime) {
                             // Remove from selection
@@ -683,7 +749,7 @@ export default function AvailabilityScreen() {
                             updatedTimes = [...selectedTimes, item];
                             setSelectedTimes(updatedTimes);
                           }
-                          
+
                           // Update multi-date selections immediately with format function
                           setMultiDateSelections(prev => ({
                             ...prev,
@@ -766,7 +832,7 @@ export default function AvailabilityScreen() {
                           </View>
                         ))}
                       </View>
-                      
+
                       {Object.keys(multiDateSelections).length > 0 && (
                         <View style={styles.otherDatesContainer}>
                           <Text style={[styles.otherDatesLabel, { color: colors.secondaryText }]}>
@@ -1166,5 +1232,54 @@ const styles = StyleSheet.create({
   },
   skeletonCardContent: {
     flex: 1,
+  },
+  recurringToggleContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 16,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    backgroundColor: "#f0f0f0", // Example background color
+  },
+  recurringToggleText: {
+    fontFamily: "K2D-Medium",
+    fontSize: 16,
+  },
+  toggleSwitch: {
+    width: 50,
+    height: 28,
+    borderRadius: 14,
+    justifyContent: "center",
+    paddingHorizontal: 2,
+  },
+  toggleThumb: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: "white",
+    position: "absolute",
+  },
+  recurringDaysLabel: {
+    fontFamily: "K2D-Medium",
+    fontSize: 14,
+    marginBottom: 8,
+  },
+  daysContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    marginBottom: 24,
+  },
+  dayChip: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    borderWidth: 1,
+  },
+  dayChipText: {
+    fontFamily: "K2D-Regular",
+    fontSize: 12,
   },
 });
