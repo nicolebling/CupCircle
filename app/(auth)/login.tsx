@@ -271,27 +271,23 @@ export default function LoginScreen() {
             }
 
             if (!profileData) {
-              // Create a basic profile for Google users
-              const { error: createError } = await supabase
-                .from('profiles')
-                .insert([
-                  { 
-                    id: data.user.id,
-                    name: userInfo.data.user?.name || null,
-                    avatar_url: userInfo.data.user?.photo || null,
-                  }
-                ]);
-
-              if (createError) {
-                console.error("Profile creation error:", createError);
-              }
-
               // Always go to onboarding for new Google users
               Alert.alert('Welcome!', 'Please complete your profile to continue.');
               router.replace('/(auth)/onboarding');
             } else {
-              // Existing Google users always go to matching, regardless of profile completeness
-              router.replace('/(tabs)/matching');
+              // Check if existing user has completed their profile
+              const isProfileComplete = profileData.age && 
+                                      profileData.occupation && 
+                                      profileData.bio && 
+                                      profileData.experience_level && 
+                                      profileData.education;
+
+              if (isProfileComplete) {
+                router.replace('/(tabs)/matching');
+              } else {
+                Alert.alert('Welcome back!', 'Please complete your profile to continue.');
+                router.replace('/(auth)/onboarding');
+              }
             }
           } catch (checkError) {
             console.error("Error in profile check:", checkError);
