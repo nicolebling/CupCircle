@@ -338,9 +338,6 @@ export default function MatchingScreen() {
     }
   }, [user?.id]);
 
-  // Track if this is the initial load
-  const [hasInitiallyLoaded, setHasInitiallyLoaded] = useState(false);
-
   // Use useFocusEffect to run check when screen comes into focus
   useFocusEffect(
     useCallback(() => {
