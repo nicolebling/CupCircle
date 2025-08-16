@@ -57,11 +57,16 @@ export default function ForgotPasswordScreen() {
       });
 
       if (error) {
-        console.error("Password reset error:", error.message);
+        console.error("Password reset error:", error.message, error);
         if (error.message.includes("Email not confirmed")) {
           Alert.alert("Error", "Please verify your email address first before resetting your password.");
+        } else if (error.message.includes("Invalid redirect URL")) {
+          Alert.alert("Error", "App configuration error. Please contact support.");
+          console.error("Redirect URL not configured in Supabase dashboard");
+        } else if (error.message.includes("Unable to validate email address")) {
+          Alert.alert("Error", "Please enter a valid email address.");
         } else {
-          Alert.alert("Error", "Unable to send reset email. Please try again.");
+          Alert.alert("Error", `Unable to send reset email: ${error.message}`);
         }
       } else {
         console.log("Password reset email sent successfully");
