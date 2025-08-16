@@ -12,7 +12,7 @@ import {
   Alert,
 } from "react-native";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { router, useLocalSearchParams } from "expo-router";
+import { router } from "expo-router";
 import LogoAnimation from "@/components/LogoAnimation";
 import Colors from '@/constants/Colors';
 import { useColorScheme } from "@/hooks/useColorScheme";
@@ -24,6 +24,7 @@ import {
 } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { supabase } from '@/lib/supabase';
+import { usePasswordRecovery } from '@/hooks/usePasswordRecovery';
 
 export default function ResetPasswordScreen() {
   const [password, setPassword] = useState("");
@@ -32,34 +33,28 @@ export default function ResetPasswordScreen() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const insets = useSafeAreaInsets();
-  const params = useLocalSearchParams();
+
+  const { readyForNewPassword, loading: recoveryLoading } = usePasswordRecovery();
 
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const theme = colorScheme === "dark" ? DarkTheme : DefaultTheme;
 
-  useEffect(() => {
-    // Check if user accessed this screen with a valid session from email link
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        Alert.alert(
-          "Invalid Reset Link",
-          "This password reset link is invalid or has expired. Please request a new one.",
-          [
-            {
-              text: "OK",
-              onPress: () => router.replace("/(auth)/forgot-password")
-            }
-          ]
-        );
-      }
-    };
-
-    checkSession();
-  }, []);
-
   async function updatePassword() {
+    if (!readyForNewPassword) {
+      Alert.alert(
+        "Invalid Reset Link",
+        "This password reset link is invalid or has expired. Please request a new one.",
+        [
+          {
+            text: "OK",
+            onPress: () => router.replace("/(auth)/forgot-password")
+          }
+        ]
+      );
+      return;
+    }
+
     setLoading(true);
 
     if (!password || !confirmPassword) {
@@ -107,6 +102,57 @@ export default function ResetPasswordScreen() {
     } finally {
       setLoading(false);
     }
+  }
+
+  // Show loading state while processing recovery link
+  if (recoveryLoading) {
+    return (
+      <ThemeProvider value={theme}>
+        <SafeAreaView
+          style={[styles.container, { backgroundColor: theme.colors.background }]}
+        >
+          <View style={styles.loadingContainer}>
+            <LogoAnimation showText={true} showSubtitle={false} />
+            <Text style={[styles.loadingText, { color: theme.colors.text }]}>
+              Processing recovery link...
+            </Text>
+          </View>
+        </SafeAreaView>
+      </ThemeProvider>
+    );
+  }
+
+  // Show error state if recovery link is invalid
+  if (!readyForNewPassword) {
+    return (
+      <ThemeProvider value={theme}>
+        <SafeAreaView
+          style={[styles.container, { backgroundColor: theme.colors.background }]}
+        >
+          <View style={styles.errorContainer}>
+            <LogoAnimation showText={true} showSubtitle={false} />
+            <Ionicons
+              name="alert-circle"
+              size={80}
+              color="#FF6B6B"
+              style={styles.errorIcon}
+            />
+            <Text style={[styles.errorTitle, { color: theme.colors.text }]}>
+              Invalid Reset Link
+            </Text>
+            <Text style={[styles.errorMessage, { color: theme.colors.text }]}>
+              This password reset link is invalid or has expired. Please request a new one.
+            </Text>
+            <TouchableOpacity
+              style={[styles.button, { backgroundColor: colors.primary }]}
+              onPress={() => router.replace("/(auth)/forgot-password")}
+            >
+              <Text style={styles.buttonText}>Request New Link</Text>
+            </TouchableOpacity>
+          </View>
+        </SafeAreaView>
+      </ThemeProvider>
+    );
   }
 
   return (
@@ -241,6 +287,40 @@ const styles = StyleSheet.create({
   header: {
     alignItems: "center",
     marginTop: 40,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  loadingText: {
+    marginTop: 20,
+    fontSize: 16,
+    fontFamily: "K2D-Regular",
+    textAlign: "center",
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  errorIcon: {
+    marginVertical: 20,
+  },
+  errorTitle: {
+    fontSize: 24,
+    fontFamily: "K2D-SemiBold",
+    marginBottom: 10,
+    textAlign: "center",
+  },
+  errorMessage: {
+    fontSize: 16,
+    fontFamily: "K2D-Regular",
+    textAlign: "center",
+    lineHeight: 22,
+    marginBottom: 30,
   },
   formContainer: {
     width: "100%",

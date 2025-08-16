@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import {
   View,
@@ -27,20 +26,15 @@ import { supabase } from '@/lib/supabase';
 
 export default function ForgotPasswordScreen() {
   const [email, setEmail] = useState("");
-  const [otp, setOtp] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [step, setStep] = useState(1); // 1: Enter email, 2: Enter OTP and new password
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
   const insets = useSafeAreaInsets();
 
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const theme = colorScheme === "dark" ? DarkTheme : DefaultTheme;
 
-  async function sendOTP() {
+  async function sendResetEmail() {
     setLoading(true);
 
     if (!email) {
@@ -58,257 +52,89 @@ export default function ForgotPasswordScreen() {
     }
 
     try {
-      const { error } = await supabase.auth.signInWithOtp({
-        email: email,
-        options: {
-          shouldCreateUser: false, // Don't create new user if email doesn't exist
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: 'cupcircle://reset'
+      });
+
+      if (error) {
+        console.error("Password reset error:", error.message);
+        if (error.message.includes("Email not confirmed")) {
+          Alert.alert("Error", "Please verify your email address first before resetting your password.");
+        } else {
+          Alert.alert("Error", "Unable to send reset email. Please try again.");
         }
-      });
-
-      if (error) {
-        console.error("OTP send error:", error.message);
-        Alert.alert("Error", "Unable to send verification code. Please try again.");
       } else {
-        console.log("OTP sent successfully");
-        setStep(2);
-        Alert.alert(
-          "Code Sent", 
-          "A verification code has been sent to your email. Please check your inbox and spam folder."
-        );
-      }
-    } catch (error) {
-      console.error("OTP send error:", error);
-      Alert.alert("Error", "Unable to send verification code. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function resetPassword() {
-    setLoading(true);
-
-    if (!otp) {
-      Alert.alert("Error", "Please enter the verification code");
-      setLoading(false);
-      return;
-    }
-
-    if (!newPassword || !confirmPassword) {
-      Alert.alert("Error", "Please fill in both password fields");
-      setLoading(false);
-      return;
-    }
-
-    if (newPassword !== confirmPassword) {
-      Alert.alert("Error", "Passwords do not match");
-      setLoading(false);
-      return;
-    }
-
-    if (newPassword.length < 6) {
-      Alert.alert("Error", "Password must be at least 6 characters long");
-      setLoading(false);
-      return;
-    }
-
-    try {
-      // Verify OTP and update password
-      const { error } = await supabase.auth.verifyOtp({
-        email: email,
-        token: otp,
-        type: 'email'
-      });
-
-      if (error) {
-        console.error("OTP verification error:", error.message);
-        Alert.alert("Error", "Invalid verification code. Please try again.");
-        setLoading(false);
-        return;
-      }
-
-      // Update password after successful OTP verification
-      const { error: passwordError } = await supabase.auth.updateUser({
-        password: newPassword
-      });
-
-      if (passwordError) {
-        console.error("Password update error:", passwordError.message);
-        Alert.alert("Error", "Unable to update password. Please try again.");
-      } else {
-        console.log("Password reset successful");
-        Alert.alert(
-          "Success",
-          "Your password has been reset successfully. You can now log in with your new password.",
-          [
-            {
-              text: "OK",
-              onPress: () => router.replace("/(auth)/login")
-            }
-          ]
-        );
+        console.log("Password reset email sent successfully");
+        setEmailSent(true);
       }
     } catch (error) {
       console.error("Password reset error:", error);
-      Alert.alert("Error", "Unable to reset password. Please try again.");
+      Alert.alert("Error", "Unable to send reset email. Please try again.");
     } finally {
       setLoading(false);
     }
   }
 
-  const renderStep1 = () => (
-    <View style={styles.formContainer}>
-      <Text style={[styles.formTitle, { color: theme.colors.text }]}>
-        Reset Password
-      </Text>
-      <Text style={[styles.formSubtitle, { color: theme.colors.text }]}>
-        Enter your email address and we'll send you a verification code to reset your password.
-      </Text>
-
-      {/* Email Input */}
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={[
-            styles.input,
-            {
-              color: theme.colors.text,
-              borderColor: theme.colors.border,
-            },
-          ]}
-          placeholder="Email"
-          placeholderTextColor={theme.colors.text}
-          value={email}
-          onChangeText={setEmail}
-          autoCapitalize="none"
-          keyboardType="email-address"
-        />
-      </View>
-
-      {/* Send Code Button */}
-      <TouchableOpacity
-        style={[
-          styles.button,
-          { backgroundColor: colors.primary },
-        ]}
-        onPress={sendOTP}
-        disabled={loading}
-      >
-        <Text style={styles.buttonText}>
-          {loading ? "Sending..." : "Send Verification Code"}
-        </Text>
-      </TouchableOpacity>
-    </View>
-  );
-
-  const renderStep2 = () => (
-    <View style={styles.formContainer}>
-      <Text style={[styles.formTitle, { color: theme.colors.text }]}>
-        Enter Verification Code
-      </Text>
-      <Text style={[styles.formSubtitle, { color: theme.colors.text }]}>
-        Enter the verification code sent to {email} and your new password.
-      </Text>
-
-      {/* OTP Input */}
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={[
-            styles.input,
-            {
-              color: theme.colors.text,
-              borderColor: theme.colors.border,
-            },
-          ]}
-          placeholder="Verification Code"
-          placeholderTextColor={theme.colors.text}
-          value={otp}
-          onChangeText={setOtp}
-          keyboardType="number-pad"
-          maxLength={6}
-        />
-      </View>
-
-      {/* New Password Input */}
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={[
-            styles.input,
-            {
-              color: theme.colors.text,
-              borderColor: theme.colors.border,
-            },
-          ]}
-          placeholder="New Password"
-          placeholderTextColor={theme.colors.text}
-          value={newPassword}
-          onChangeText={setNewPassword}
-          secureTextEntry={!showPassword}
-        />
-        <TouchableOpacity
-          style={styles.passwordVisibilityButton}
-          onPress={() => setShowPassword(!showPassword)}
+  if (emailSent) {
+    return (
+      <ThemeProvider value={theme}>
+        <SafeAreaView
+          style={[styles.container, { backgroundColor: theme.colors.background }]}
         >
-          <Ionicons
-            name={showPassword ? "eye-off" : "eye"}
-            size={24}
-            color={theme.colors.text}
-          />
-        </TouchableOpacity>
-      </View>
+          <View style={styles.content}>
+            <View style={styles.header}>
+              <LogoAnimation showText={true} showSubtitle={false} />
+            </View>
 
-      {/* Confirm Password Input */}
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={[
-            styles.input,
-            {
-              color: theme.colors.text,
-              borderColor: theme.colors.border,
-            },
-          ]}
-          placeholder="Confirm New Password"
-          placeholderTextColor={theme.colors.text}
-          value={confirmPassword}
-          onChangeText={setConfirmPassword}
-          secureTextEntry={!showConfirmPassword}
-        />
-        <TouchableOpacity
-          style={styles.passwordVisibilityButton}
-          onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-        >
-          <Ionicons
-            name={showConfirmPassword ? "eye-off" : "eye"}
-            size={24}
-            color={theme.colors.text}
-          />
-        </TouchableOpacity>
-      </View>
+            <View style={styles.formContainer}>
+              <View style={styles.successContainer}>
+                <Ionicons
+                  name="checkmark-circle"
+                  size={80}
+                  color={colors.primary}
+                  style={styles.successIcon}
+                />
+                <Text style={[styles.successTitle, { color: theme.colors.text }]}>
+                  Check Your Email
+                </Text>
+                <Text style={[styles.successMessage, { color: theme.colors.text }]}>
+                  We've sent a password reset link to{"\n"}
+                  <Text style={{ fontFamily: "K2D-SemiBold" }}>{email}</Text>
+                </Text>
+                <Text style={[styles.instructionText, { color: theme.colors.text }]}>
+                  Tap the link in the email to reset your password. The link will open the CupCircle app directly.
+                </Text>
+              </View>
 
-      {/* Reset Password Button */}
-      <TouchableOpacity
-        style={[
-          styles.button,
-          { backgroundColor: colors.primary },
-        ]}
-        onPress={resetPassword}
-        disabled={loading}
-      >
-        <Text style={styles.buttonText}>
-          {loading ? "Resetting..." : "Reset Password"}
-        </Text>
-      </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.button, { backgroundColor: colors.primary }]}
+                onPress={() => {
+                  setEmailSent(false);
+                  setEmail("");
+                }}
+              >
+                <Text style={styles.buttonText}>Send Another Email</Text>
+              </TouchableOpacity>
+            </View>
 
-      {/* Resend Code Button */}
-      <TouchableOpacity
-        style={[styles.resendButton]}
-        onPress={() => setStep(1)}
-        disabled={loading}
-      >
-        <Text style={[styles.resendText, { color: colors.primary }]}>
-          Didn't receive code? Send again
-        </Text>
-      </TouchableOpacity>
-    </View>
-  );
+            <View style={styles.footer}>
+              <Text style={[styles.footerText, { color: theme.colors.text }]}>
+                Remember your password?
+              </Text>
+              <Link href="/(auth)/login" asChild>
+                <TouchableOpacity>
+                  <Text style={[styles.loginLink, { color: colors.primary }]}>
+                    Back to Login
+                  </Text>
+                </TouchableOpacity>
+              </Link>
+            </View>
+          </View>
+          <StatusBar style="auto" />
+        </SafeAreaView>
+      </ThemeProvider>
+    );
+  }
 
   return (
     <ThemeProvider value={theme}>
@@ -325,13 +151,7 @@ export default function ForgotPasswordScreen() {
             <View style={styles.header}>
               <TouchableOpacity
                 style={styles.backButton}
-                onPress={() => {
-                  if (step === 2) {
-                    setStep(1);
-                  } else {
-                    router.back();
-                  }
-                }}
+                onPress={() => router.back()}
               >
                 <Ionicons
                   name="arrow-back"
@@ -343,7 +163,47 @@ export default function ForgotPasswordScreen() {
             </View>
 
             {/* Form Container */}
-            {step === 1 ? renderStep1() : renderStep2()}
+            <View style={styles.formContainer}>
+              <Text style={[styles.formTitle, { color: theme.colors.text }]}>
+                Reset Password
+              </Text>
+              <Text style={[styles.formSubtitle, { color: theme.colors.text }]}>
+                Enter your email address and we'll send you a link to reset your password.
+              </Text>
+
+              {/* Email Input */}
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={[
+                    styles.input,
+                    {
+                      color: theme.colors.text,
+                      borderColor: theme.colors.border,
+                    },
+                  ]}
+                  placeholder="Email"
+                  placeholderTextColor={theme.colors.text}
+                  value={email}
+                  onChangeText={setEmail}
+                  autoCapitalize="none"
+                  keyboardType="email-address"
+                />
+              </View>
+
+              {/* Send Reset Email Button */}
+              <TouchableOpacity
+                style={[
+                  styles.button,
+                  { backgroundColor: colors.primary },
+                ]}
+                onPress={sendResetEmail}
+                disabled={loading}
+              >
+                <Text style={styles.buttonText}>
+                  {loading ? "Sending..." : "Send Reset Link"}
+                </Text>
+              </TouchableOpacity>
+            </View>
 
             {/* Footer */}
             <View style={styles.footer}>
@@ -416,7 +276,6 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     marginBottom: 20,
-    position: "relative",
   },
   input: {
     height: 50,
@@ -425,11 +284,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     fontSize: 16,
     fontFamily: "K2D-Regular",
-  },
-  passwordVisibilityButton: {
-    position: "absolute",
-    right: 15,
-    top: 13,
   },
   button: {
     height: 50,
@@ -443,13 +297,32 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: "K2D-Medium",
   },
-  resendButton: {
-    marginTop: 15,
+  successContainer: {
     alignItems: "center",
+    marginBottom: 40,
   },
-  resendText: {
+  successIcon: {
+    marginBottom: 20,
+  },
+  successTitle: {
+    fontSize: 24,
+    fontFamily: "K2D-SemiBold",
+    marginBottom: 15,
+    textAlign: "center",
+  },
+  successMessage: {
+    fontSize: 16,
+    fontFamily: "K2D-Regular",
+    textAlign: "center",
+    marginBottom: 20,
+    lineHeight: 22,
+  },
+  instructionText: {
     fontSize: 14,
-    fontFamily: "K2D-Medium",
+    fontFamily: "K2D-Regular",
+    textAlign: "center",
+    lineHeight: 20,
+    opacity: 0.8,
   },
   footer: {
     flexDirection: "row",
