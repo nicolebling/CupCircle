@@ -8,12 +8,17 @@ import { parseRecoveryTokens } from '@/utils/recoveryUtils';
 export function usePasswordRecovery() {
   const [readyForNewPassword, setReadyForNewPassword] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [sessionProcessed, setSessionProcessed] = useState(false);
 
   async function handleUrl(url: string | null) {
     console.log('Processing recovery URL:', url);
     const tokens = parseRecoveryTokens(url);
     if (!tokens) {
       console.log('No valid recovery tokens found in URL');
+      // Only set loading to false if we haven't successfully processed a session yet
+      if (!sessionProcessed) {
+        setLoading(false);
+      }
       return;
     }
 
@@ -29,17 +34,21 @@ export function usePasswordRecovery() {
       if (!error) {
         console.log('Recovery session set successfully');
         setReadyForNewPassword(true);
+        setSessionProcessed(true);
         // Navigate to reset password screen with a small delay to ensure auth state is updated
         setTimeout(() => {
           router.replace('/(auth)/reset-password');
         }, 100);
       } else {
         console.error('Failed to set recovery session:', error);
+        setLoading(false);
       }
     } catch (error) {
       console.error('Error setting recovery session:', error);
-    } finally {
       setLoading(false);
+    } finally {
+      // Only set loading to false if there was an error
+      // Success case is handled above
     }
   }
 
@@ -47,10 +56,6 @@ export function usePasswordRecovery() {
     // When app is cold-started from the link
     Linking.getInitialURL().then((url) => {
       handleUrl(url);
-      // If no URL or no recovery tokens, stop loading after processing
-      if (!url || !parseRecoveryTokens(url)) {
-        setLoading(false);
-      }
     });
 
     // When app is already open and receives the link
@@ -59,5 +64,5 @@ export function usePasswordRecovery() {
     return () => subscription?.remove();
   }, []);
 
-  return { readyForNewPassword, loading };
+  return { readyForNewPassword, loading: loading && !sessionProcessed };
 }
