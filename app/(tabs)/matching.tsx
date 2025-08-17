@@ -106,6 +106,7 @@ export default function MatchingScreen() {
   const [showSubscriptionCard, setShowSubscriptionCard] = useState(false);
   const [isPaidUser, setIsPaidUser] = useState(false);
   const [hasInitiallyLoaded, setHasInitiallyLoaded] = useState(false);
+  const [featuredCafes, setFeaturedCafes] = useState<any[]>([]);
   const PROFILES_PER_PAGE = 10;
 
   // Refs for auto-scroll functionality
@@ -264,6 +265,43 @@ export default function MatchingScreen() {
     }
   }, [user, fetchProfiles]);
 
+  // Fetch featured cafes from database
+  const fetchFeaturedCafes = useCallback(async () => {
+    try {
+      const { data, error } = await supabase
+        .from("cafes")
+        .select("*");
+
+      if (error) {
+        console.error("Error fetching featured cafes:", error);
+        return;
+      }
+
+      setFeaturedCafes(data || []);
+    } catch (error) {
+      console.error("Error fetching featured cafes:", error);
+    }
+  }, []);
+
+  // Check if a cafe is featured in spotlight
+  const isCafeFeatured = useCallback((cafeString: string) => {
+    if (!cafeString || !featuredCafes.length) return false;
+    
+    const [cafeName, cafeAddress] = cafeString.split("|||");
+    
+    return featuredCafes.some(featuredCafe => {
+      // Check if name matches (case insensitive)
+      const nameMatch = featuredCafe.name?.toLowerCase().includes(cafeName?.toLowerCase()) ||
+                       cafeName?.toLowerCase().includes(featuredCafe.name?.toLowerCase());
+      
+      // Check if address matches (case insensitive)
+      const addressMatch = featuredCafe.address?.toLowerCase().includes(cafeAddress?.toLowerCase()) ||
+                          cafeAddress?.toLowerCase().includes(featuredCafe.address?.toLowerCase());
+      
+      return nameMatch && addressMatch;
+    });
+  }, [featuredCafes]);
+
   // Fetch user's centroid for distance calculations
   const fetchUserCentroid = useCallback(async () => {
     if (!user?.id) return;
@@ -349,6 +387,7 @@ export default function MatchingScreen() {
       // Always check subscription status and user centroid (lightweight operations)
       checkSubscriptionAndPaywall();
       fetchUserCentroid();
+      fetchFeaturedCafes();
     }, [checkUserAvailability, checkSubscriptionAndPaywall, fetchUserCentroid, hasInitiallyLoaded, profiles.length]),
   );
 
@@ -1079,6 +1118,7 @@ export default function MatchingScreen() {
                                 const [cafeName, cafeAddress] = cafe
                                   ? cafe.split("|||")
                                   : ["", ""];
+                                const isSpotlightCafe = isCafeFeatured(cafe);
                                 return (
                                   <TouchableOpacity
                                     key={index}
@@ -1089,6 +1129,8 @@ export default function MatchingScreen() {
                                           selectedCafe === cafe
                                             ? colors.primary
                                             : colors.card,
+                                        borderWidth: isSpotlightCafe ? 2 : 0,
+                                        borderColor: isSpotlightCafe ? "#FFD700" : "transparent",
                                       },
                                     ]}
                                     onPress={() =>
@@ -1098,29 +1140,27 @@ export default function MatchingScreen() {
                                     }
                                   >
                                     <View style={styles.cafeDetails}>
-                                      <Text
-                                        style={[
-                                          styles.cafeName,
-                                          {
-                                            color:
-                                              selectedCafe === cafe
-                                                ? "white"
-                                                : colors.text,
-                                          },
-                                        ]}
-                                      >
-                                        {/* <Ionicons
-                                          name="cafe"
-                                          size={16}
-                                          color={
-                                            selectedCafe === cafe
-                                              ? "white"
-                                              : colors.primary
-                                          }
-                                          style={{ marginRight: 5 }}
-                                        /> */}
-                                        {cafeName}
-                                      </Text>
+                                      <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 2 }}>
+                                        {isSpotlightCafe && (
+                                          <View style={[styles.spotlightBadge, { marginRight: 6 }]}>
+                                            <Text style={styles.spotlightText}>✨</Text>
+                                          </View>
+                                        )}
+                                        <Text
+                                          style={[
+                                            styles.cafeName,
+                                            {
+                                              color:
+                                                selectedCafe === cafe
+                                                  ? "white"
+                                                  : colors.text,
+                                              flex: 1,
+                                            },
+                                          ]}
+                                        >
+                                          {cafeName}
+                                        </Text>
+                                      </View>
                                       <Text
                                         style={[
                                           styles.cafeAddress,
@@ -1134,6 +1174,21 @@ export default function MatchingScreen() {
                                       >
                                         {cafeAddress}
                                       </Text>
+                                      {isSpotlightCafe && (
+                                        <Text
+                                          style={[
+                                            styles.spotlightLabel,
+                                            {
+                                              color:
+                                                selectedCafe === cafe
+                                                  ? "rgba(255,255,255,0.9)"
+                                                  : "#FFD700",
+                                            },
+                                          ]}
+                                        >
+                                          Café Spotlight
+                                        </Text>
+                                      )}
                                     </View>
                                   </TouchableOpacity>
                                 );
@@ -2129,5 +2184,22 @@ const styles = StyleSheet.create({
   distanceEndLabel: {
     fontFamily: "K2D-Regular",
     fontSize: 12,
+  },
+  spotlightBadge: {
+    backgroundColor: "#FFD700",
+    borderRadius: 8,
+    paddingHorizontal: 4,
+    paddingVertical: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  spotlightText: {
+    fontSize: 10,
+    fontFamily: "K2D-Bold",
+  },
+  spotlightLabel: {
+    fontFamily: "K2D-Medium",
+    fontSize: 10,
+    marginTop: 2,
   },
 });
