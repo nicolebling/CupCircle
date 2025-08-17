@@ -86,10 +86,8 @@ export default function ForgotPasswordScreen() {
         <SafeAreaView
           style={[styles.container, { backgroundColor: theme.colors.background }]}
         >
-          <View style={styles.content}>
-           
-
-            <View style={styles.formContainer}>
+          <View style={styles.successPageContent}>
+            <View style={styles.centeredSuccessContainer}>
               <View style={styles.successContainer}>
                 <Ionicons
                   name="checkmark-circle"
@@ -298,6 +296,19 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 16,
     fontFamily: "K2D-Medium",
+  },
+  successPageContent: {
+    flex: 1,
+    padding: 20,
+    justifyContent: "space-between",
+  },
+  centeredSuccessContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
+    maxWidth: 400,
+    alignSelf: "center",
   },
   successContainer: {
     alignItems: "center",
