@@ -1,7 +1,6 @@
 
 import { useEffect, useState } from 'react';
 import * as Linking from 'expo-linking';
-import { router } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 import { parseRecoveryTokens } from '@/utils/recoveryUtils';
 
@@ -14,9 +13,17 @@ export function usePasswordRecovery() {
     
     const tokens = parseRecoveryTokens(url);
     if (!tokens) {
-      console.log('No recovery tokens found in URL, user came directly to reset page');
-      // If no tokens, assume user is already authenticated and ready
-      setReadyForNewPassword(true);
+      console.log('No recovery tokens found in URL, checking current session...');
+      
+      // Check if user already has a valid session
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        console.log('User already has valid session');
+        setReadyForNewPassword(true);
+      } else {
+        console.log('No valid session found');
+        setReadyForNewPassword(false);
+      }
       setLoading(false);
       return;
     }
@@ -34,13 +41,11 @@ export function usePasswordRecovery() {
         setReadyForNewPassword(true);
       } else {
         console.error('Failed to set recovery session:', error);
-        // Even if session setting fails, if we have valid tokens, let user try
-        setReadyForNewPassword(true);
+        setReadyForNewPassword(false);
       }
     } catch (error) {
       console.error('Error setting recovery session:', error);
-      // Even if session setting fails, if we have valid tokens, let user try
-      setReadyForNewPassword(true);
+      setReadyForNewPassword(false);
     } finally {
       setLoading(false);
     }

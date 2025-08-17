@@ -51,15 +51,20 @@ function RootLayoutNav() {
 
     const timeoutId = setTimeout(() => {
       const currentSegment = segments[0];
+      const authSegment = segments[1];
+      
       if (!user && currentSegment !== "(auth)") {
         router.replace("/(auth)/login");
       } else if (
         user &&
         currentSegment === "(auth)" &&
-        segments[1] !== "onboarding" &&
-        !readyForNewPassword // Don't redirect if in password recovery flow
+        authSegment !== "onboarding" &&
+        authSegment !== "reset-password" // Allow access to reset-password for authenticated users
       ) {
         router.replace("/(tabs)/matching");
+      } else if (readyForNewPassword && currentSegment === "(auth)" && authSegment !== "reset-password") {
+        // If ready for password reset and not already on reset-password page, navigate there
+        router.replace("/(auth)/reset-password");
       }
     }, 100);
 
