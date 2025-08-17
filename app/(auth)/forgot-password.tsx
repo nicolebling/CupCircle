@@ -61,7 +61,7 @@ export default function ForgotPasswordScreen() {
         if (error.message.includes("Email not confirmed")) {
           Alert.alert("Error", "Please verify your email address first before resetting your password.");
         } else if (error.message.includes("Invalid redirect URL")) {
-          Alert.alert("Error", "App configuration error. Please contact support.");
+          Alert.alert("Error", "App configuration error. Please contact support@cupcircle.co.");
           console.error("Redirect URL not configured in Supabase dashboard");
         } else if (error.message.includes("Unable to validate email address")) {
           Alert.alert("Error", "Please enter a valid email address.");
