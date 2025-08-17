@@ -169,7 +169,7 @@ export default function CircleChatsScreen() {
         // Get the chat details for notification
         const chat = chats.find((c) => c.match_id === chatId);
         const partnerProfile = getPartnerProfile(chat);
-        
+
         await supabase
           .from("matching")
           .update({ status: "confirmed" })
@@ -179,7 +179,7 @@ export default function CircleChatsScreen() {
         if (chat && partnerProfile) {
           // Get the correct recipient ID (the other user in the chat)
           const recipientUserId = chat.user1_id === user.id ? chat.user2_id : chat.user1_id;
-          
+
           try {
             await notificationService.sendCoffeeConfirmationNotification(
               recipientUserId,
@@ -197,7 +197,7 @@ export default function CircleChatsScreen() {
         // Get the chat details for notification before showing alert
         const chat = chats.find((c) => c.match_id === chatId);
         const partnerProfile = getPartnerProfile(chat);
-        
+
         // Immediately remove the chat from UI
         Alert.alert(
           "Cancel Chat",
@@ -273,7 +273,7 @@ export default function CircleChatsScreen() {
 
   const openMaps = (cafeName, cafeAddress) => {
     const query = encodeURIComponent(`${cafeName} ${cafeAddress}`);
-    
+
     if (Platform.OS === 'ios') {
       // Use Apple Maps on iOS
       const url = `http://maps.apple.com/?q=${query}`;
@@ -306,7 +306,14 @@ export default function CircleChatsScreen() {
   };
 
   const renderChatCard = (chat) => {
-    const isExpired = new Date(chat.meeting_date) < new Date();
+    // Create full datetime for the chat
+    const [hours, minutes] = chat.start_time.split(':').map(Number);
+    const chatDateTime = new Date(chat.meeting_date);
+    chatDateTime.setHours(hours, minutes, 0, 0);
+
+    const now = new Date();
+    const isExpired = chatDateTime < now;
+
 
     // When showing past chats, only show expired confirmed chats
     if (showPastChats) {
