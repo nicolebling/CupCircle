@@ -62,6 +62,13 @@ function RootLayoutNav() {
         }
       }
       
+      // Prevent redirect loops - if user is on login but recovery state is true, clear it
+      if (readyForNewPassword && currentSegment === "(auth)" && authSegment === "login") {
+        console.log('Detected redirect loop, clearing recovery state');
+        resetRecoveryState();
+        return;
+      }
+      
       // Priority 2: Handle unauthenticated users
       if (!user && currentSegment !== "(auth)") {
         router.replace("/(auth)/login");

@@ -101,10 +101,10 @@ export default function ResetPasswordScreen() {
           [
             {
               text: "OK",
-              onPress: () => {
-                setTimeout(() => {
-                  router.replace("/(auth)/login");
-                }, 100);
+              onPress: async () => {
+                // Wait a bit longer to ensure all state is cleared
+                await new Promise(resolve => setTimeout(resolve, 300));
+                router.replace("/(auth)/login");
               }
             }
           ]
@@ -236,9 +236,9 @@ export default function ResetPasswordScreen() {
             <View style={styles.footer}>
               <TouchableOpacity onPress={async () => {
                 await resetRecoveryState();
-                setTimeout(() => {
-                  router.replace("/(auth)/login");
-                }, 100);
+                // Wait longer to ensure state is fully processed
+                await new Promise(resolve => setTimeout(resolve, 300));
+                router.replace("/(auth)/login");
               }}>
                 <Text
                   style={[
