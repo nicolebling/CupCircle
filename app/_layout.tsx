@@ -44,7 +44,7 @@ function RootLayoutNav() {
   const colors = Colors[colorScheme];
   
   // Handle password recovery deep links globally
-  const { readyForNewPassword } = usePasswordRecovery();
+  const { readyForNewPassword, resetRecoveryState } = usePasswordRecovery();
 
   useEffect(() => {
     if (loading) return;
@@ -74,6 +74,11 @@ function RootLayoutNav() {
         authSegment !== "reset-password" &&
         !readyForNewPassword // Don't redirect if in password recovery flow
       ) {
+        // If user is authenticated and trying to access auth screens (except allowed ones), 
+        // reset recovery state and redirect to main app
+        if (readyForNewPassword) {
+          resetRecoveryState();
+        }
         router.replace("/(tabs)/matching");
       }
     }, 100);

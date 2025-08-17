@@ -33,7 +33,7 @@ export default function ResetPasswordScreen() {
   const [loading, setLoading] = useState(false);
   const insets = useSafeAreaInsets();
 
-  const { readyForNewPassword, loading: recoveryLoading } = usePasswordRecovery();
+  const { readyForNewPassword, loading: recoveryLoading, resetRecoveryState } = usePasswordRecovery();
   const [initialLoad, setInitialLoad] = useState(true);
 
   const colorScheme = useColorScheme();
@@ -93,6 +93,8 @@ export default function ResetPasswordScreen() {
         }
       } else {
         console.log("Password updated successfully:", data);
+        // Reset the recovery state since password update was successful
+        resetRecoveryState();
         Alert.alert(
           "Success",
           "Your password has been updated successfully. You can now log in with your new password.",
@@ -228,7 +230,10 @@ export default function ResetPasswordScreen() {
 
             {/* Footer */}
             <View style={styles.footer}>
-              <TouchableOpacity onPress={() => router.replace("/(auth)/login")}>
+              <TouchableOpacity onPress={() => {
+                resetRecoveryState();
+                router.replace("/(auth)/login");
+              }}>
                 <Text
                   style={[
                     styles.backToLoginLink,

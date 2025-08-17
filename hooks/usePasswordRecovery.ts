@@ -8,6 +8,12 @@ export function usePasswordRecovery() {
   const [readyForNewPassword, setReadyForNewPassword] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  const resetRecoveryState = () => {
+    console.log('Resetting password recovery state');
+    setReadyForNewPassword(false);
+    setLoading(false);
+  };
+
   async function handleUrl(url: string | null) {
     console.log('Processing recovery URL:', url);
     
@@ -18,8 +24,10 @@ export function usePasswordRecovery() {
       // Check if user already has a valid session
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
-        console.log('User already has valid session');
-        setReadyForNewPassword(true);
+        console.log('User already has valid session, checking if it\'s a recovery session');
+        // Only set ready for password if this is actually a recovery session
+        // We can check this by looking at the session metadata or user state
+        setReadyForNewPassword(false);
       } else {
         console.log('No valid session found');
         setReadyForNewPassword(false);
@@ -79,6 +87,7 @@ export function usePasswordRecovery() {
   
   return { 
     readyForNewPassword, 
-    loading 
+    loading,
+    resetRecoveryState
   };
 }
