@@ -600,20 +600,46 @@ export default function CircleChatsScreen() {
 
   // Pre-filtered chat groups
   const confirmedChats = filterChatsByStatus("confirmed");
-  const pastConfirmed = confirmedChats.filter(
-    (chat) => new Date(chat.meeting_date) < new Date(),
-  );
-  const upcomingConfirmed = confirmedChats.filter(
-    (chat) => new Date(chat.meeting_date) >= new Date(),
-  );
+  const pastConfirmed = confirmedChats.filter((chat) => {
+    // Properly combine date and time for accurate comparison
+    const nyTimeZone = 'America/New_York';
+    const meetingDateTimeStr = `${chat.meeting_date}T${chat.start_time}`;
+    const meetingDateTime = new Date(meetingDateTimeStr);
+    const now = new Date();
+    const nowInNY = new Date(now.toLocaleString("en-US", {timeZone: nyTimeZone}));
+    const meetingInNY = new Date(meetingDateTime.toLocaleString("en-US", {timeZone: nyTimeZone}));
+    return meetingInNY < nowInNY;
+  });
+  const upcomingConfirmed = confirmedChats.filter((chat) => {
+    // Properly combine date and time for accurate comparison
+    const nyTimeZone = 'America/New_York';
+    const meetingDateTimeStr = `${chat.meeting_date}T${chat.start_time}`;
+    const meetingDateTime = new Date(meetingDateTimeStr);
+    const now = new Date();
+    const nowInNY = new Date(now.toLocaleString("en-US", {timeZone: nyTimeZone}));
+    const meetingInNY = new Date(meetingDateTime.toLocaleString("en-US", {timeZone: nyTimeZone}));
+    return meetingInNY >= nowInNY;
+  });
 
-  const pendingAcceptance = filterChatsByStatus("pending_acceptance").filter(
-    (chat) => new Date(chat.meeting_date) >= new Date(),
-  );
+  const pendingAcceptance = filterChatsByStatus("pending_acceptance").filter((chat) => {
+    const nyTimeZone = 'America/New_York';
+    const meetingDateTimeStr = `${chat.meeting_date}T${chat.start_time}`;
+    const meetingDateTime = new Date(meetingDateTimeStr);
+    const now = new Date();
+    const nowInNY = new Date(now.toLocaleString("en-US", {timeZone: nyTimeZone}));
+    const meetingInNY = new Date(meetingDateTime.toLocaleString("en-US", {timeZone: nyTimeZone}));
+    return meetingInNY >= nowInNY;
+  });
 
-  const pending = filterChatsByStatus("pending").filter(
-    (chat) => new Date(chat.meeting_date) >= new Date(),
-  );
+  const pending = filterChatsByStatus("pending").filter((chat) => {
+    const nyTimeZone = 'America/New_York';
+    const meetingDateTimeStr = `${chat.meeting_date}T${chat.start_time}`;
+    const meetingDateTime = new Date(meetingDateTimeStr);
+    const now = new Date();
+    const nowInNY = new Date(now.toLocaleString("en-US", {timeZone: nyTimeZone}));
+    const meetingInNY = new Date(meetingDateTime.toLocaleString("en-US", {timeZone: nyTimeZone}));
+    return meetingInNY >= nowInNY;
+  });
 
   const showEmptyState =
     (!showPastChats &&
