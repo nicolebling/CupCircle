@@ -306,13 +306,7 @@ export default function CircleChatsScreen() {
   };
 
   const renderChatCard = (chat) => {
-    // Create full datetime for the chat in user's local timezone
-    const [hours, minutes] = chat.start_time.split(':').map(Number);
-    const chatDateTime = new Date(chat.meeting_date + 'T00:00:00');
-    chatDateTime.setHours(hours, minutes, 0, 0);
-
-    const now = new Date();
-    const isExpired = chatDateTime < now;
+    const isExpired = new Date(chat.meeting_date) < new Date();
 
     // When showing past chats, only show expired confirmed chats
     if (showPastChats) {
