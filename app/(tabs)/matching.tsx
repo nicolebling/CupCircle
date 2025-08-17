@@ -1142,8 +1142,7 @@ export default function MatchingScreen() {
                                     <View style={styles.cafeDetails}>
                                       <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 2 }}>
                                         {isSpotlightCafe && (
-                                          <View style={[styles.spotlightBadge, { marginRight: 6 }]}>
-                                            <Text style={styles.spotlightText}>✨</Text>
+                                          <View style={[styles.spotlightCircle, { marginRight: 6 }]}>
                                           </View>
                                         )}
                                         <Text
@@ -2185,17 +2184,11 @@ const styles = StyleSheet.create({
     fontFamily: "K2D-Regular",
     fontSize: 12,
   },
-  spotlightBadge: {
+  spotlightCircle: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
     backgroundColor: "#FFD700",
-    borderRadius: 8,
-    paddingHorizontal: 4,
-    paddingVertical: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  spotlightText: {
-    fontSize: 10,
-    fontFamily: "K2D-Bold",
   },
   spotlightLabel: {
     fontFamily: "K2D-Medium",
