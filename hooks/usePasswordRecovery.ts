@@ -1,6 +1,7 @@
 
 import { useEffect, useState } from 'react';
 import * as Linking from 'expo-linking';
+import { router } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 import { parseRecoveryTokens } from '@/utils/recoveryUtils';
 
@@ -28,6 +29,8 @@ export function usePasswordRecovery() {
       if (!error) {
         console.log('Recovery session set successfully');
         setReadyForNewPassword(true);
+        // Navigate to reset password screen
+        router.replace('/(auth)/reset-password');
       } else {
         console.error('Failed to set recovery session:', error);
       }

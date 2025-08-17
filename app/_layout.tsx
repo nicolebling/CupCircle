@@ -14,6 +14,7 @@ import "react-native-reanimated";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { NetworkProvider } from "@/contexts/NetworkContext";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { usePasswordRecovery } from "@/hooks/usePasswordRecovery";
 import { Text, TextInput } from "react-native";
 import Colors from "@/constants/Colors";
 import CustomSplashScreen from "@/components/CustomSplashScreen";
@@ -41,6 +42,9 @@ function RootLayoutNav() {
   const router = useRouter();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
+  
+  // Handle password recovery deep links globally
+  usePasswordRecovery();
 
   useEffect(() => {
     if (loading) return;
