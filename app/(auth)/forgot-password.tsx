@@ -160,7 +160,7 @@ export default function ForgotPasswordScreen() {
                   color={theme.colors.text}
                 />
               </TouchableOpacity>
-              <LogoAnimation showText={true} showSubtitle={false} />
+              {/* <LogoAnimation showText={true} showSubtitle={false} /> */}
             </View>
 
             {/* Form Container */}
