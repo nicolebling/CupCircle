@@ -38,6 +38,7 @@ export function usePasswordRecovery() {
 
       if (!error) {
         console.log('Recovery session set successfully');
+        console.log('Setting readyForNewPassword to true');
         setReadyForNewPassword(true);
       } else {
         console.error('Failed to set recovery session:', error);
@@ -74,6 +75,8 @@ export function usePasswordRecovery() {
     };
   }, []);
 
+  console.log('usePasswordRecovery state:', { readyForNewPassword, loading });
+  
   return { 
     readyForNewPassword, 
     loading 

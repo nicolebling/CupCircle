@@ -53,18 +53,28 @@ function RootLayoutNav() {
       const currentSegment = segments[0];
       const authSegment = segments[1];
       
+      // Priority 1: Handle password recovery flow
+      if (readyForNewPassword) {
+        if (currentSegment !== "(auth)" || authSegment !== "reset-password") {
+          console.log('Navigating to reset-password for recovery flow');
+          router.replace("/(auth)/reset-password");
+          return;
+        }
+      }
+      
+      // Priority 2: Handle unauthenticated users
       if (!user && currentSegment !== "(auth)") {
         router.replace("/(auth)/login");
-      } else if (
+      } 
+      // Priority 3: Handle authenticated users (but not in recovery flow)
+      else if (
         user &&
         currentSegment === "(auth)" &&
         authSegment !== "onboarding" &&
-        authSegment !== "reset-password" // Allow access to reset-password for authenticated users
+        authSegment !== "reset-password" &&
+        !readyForNewPassword // Don't redirect if in password recovery flow
       ) {
         router.replace("/(tabs)/matching");
-      } else if (readyForNewPassword && currentSegment === "(auth)" && authSegment !== "reset-password") {
-        // If ready for password reset and not already on reset-password page, navigate there
-        router.replace("/(auth)/reset-password");
       }
     }, 100);
 
