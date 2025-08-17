@@ -45,6 +45,7 @@ function RootLayoutNav() {
   
   // Handle password recovery deep links globally
   const { readyForNewPassword, resetRecoveryState } = usePasswordRecovery();
+  const [lastRecoveryState, setLastRecoveryState] = useState<boolean | null>(null);
 
   useEffect(() => {
     if (loading) return;
@@ -57,15 +58,23 @@ function RootLayoutNav() {
       if (readyForNewPassword) {
         console.log('Recovery state detected:', { currentSegment, authSegment, hasUser: !!user });
         
-        // If we're not on the reset-password screen, navigate there
-        if (currentSegment !== "(auth)" || authSegment !== "reset-password") {
-          console.log('Navigating to reset-password for recovery flow');
-          router.replace("/(auth)/reset-password");
-          return;
+        // Only navigate if we haven't already handled this recovery state
+        if (lastRecoveryState !== readyForNewPassword) {
+          setLastRecoveryState(readyForNewPassword);
+          
+          // If we're not on the reset-password screen, navigate there
+          if (currentSegment !== "(auth)" || authSegment !== "reset-password") {
+            console.log('Navigating to reset-password for recovery flow');
+            router.replace("/(auth)/reset-password");
+            return;
+          }
         }
         
         // If we're already on the reset-password screen, stay there
         return;
+      } else if (lastRecoveryState !== readyForNewPassword) {
+        // Recovery state changed to false, update tracking
+        setLastRecoveryState(readyForNewPassword);
       }
       
       // Priority 2: Handle unauthenticated users
