@@ -306,21 +306,7 @@ export default function CircleChatsScreen() {
   };
 
   const renderChatCard = (chat) => {
-    // Properly combine date and time for accurate expiration check in NY timezone
-    const nyTimeZone = 'America/New_York';
-    
-    // Create meeting datetime in NY timezone
-    const meetingDateTimeStr = `${chat.meeting_date}T${chat.start_time}`;
-    const meetingDateTime = new Date(meetingDateTimeStr);
-    
-    // Get current time in NY timezone
-    const now = new Date();
-    const nowInNY = new Date(now.toLocaleString("en-US", {timeZone: nyTimeZone}));
-    
-    // Convert meeting time to NY timezone for comparison
-    const meetingInNY = new Date(meetingDateTime.toLocaleString("en-US", {timeZone: nyTimeZone}));
-    
-    const isExpired = meetingInNY < nowInNY;
+    const isExpired = new Date(chat.meeting_date) < new Date();
 
     // When showing past chats, only show expired confirmed chats
     if (showPastChats) {
