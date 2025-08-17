@@ -34,10 +34,20 @@ export default function ResetPasswordScreen() {
   const insets = useSafeAreaInsets();
 
   const { readyForNewPassword, loading: recoveryLoading } = usePasswordRecovery();
+  const [initialLoad, setInitialLoad] = useState(true);
 
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const theme = colorScheme === "dark" ? DarkTheme : DefaultTheme;
+
+  useEffect(() => {
+    // Give the recovery hook time to process the URL
+    const timer = setTimeout(() => {
+      setInitialLoad(false);
+    }, 1000);
+    
+    return () => clearTimeout(timer);
+  }, []);
 
   async function updatePassword() {
     if (!readyForNewPassword) {
@@ -103,8 +113,8 @@ export default function ResetPasswordScreen() {
     }
   }
 
-  // Show loading state while processing recovery link
-  if (recoveryLoading) {
+  // Show loading state while processing recovery link or during initial load
+  if (recoveryLoading || initialLoad) {
     return (
       <ThemeProvider value={theme}>
         <SafeAreaView

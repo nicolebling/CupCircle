@@ -7,7 +7,7 @@ import { parseRecoveryTokens } from '@/utils/recoveryUtils';
 
 export function usePasswordRecovery() {
   const [readyForNewPassword, setReadyForNewPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   async function handleUrl(url: string | null) {
     console.log('Processing recovery URL:', url);
@@ -45,7 +45,13 @@ export function usePasswordRecovery() {
 
   useEffect(() => {
     // When app is cold-started from the link
-    Linking.getInitialURL().then(handleUrl);
+    Linking.getInitialURL().then((url) => {
+      handleUrl(url);
+      // If no URL or no recovery tokens, stop loading after processing
+      if (!url || !parseRecoveryTokens(url)) {
+        setLoading(false);
+      }
+    });
 
     // When app is already open and receives the link
     const subscription = Linking.addEventListener('url', ({ url }) => handleUrl(url));
