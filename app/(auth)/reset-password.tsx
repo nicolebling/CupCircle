@@ -240,22 +240,31 @@ export default function ResetPasswordScreen() {
               <TouchableOpacity onPress={async () => {
                 console.log('Back to Login clicked - performing complete reset');
                 
-                // Clear recovery state
-                await resetRecoveryState();
-                
-                // Sign out user to clear all session tokens and authentication
                 try {
+                  // First, clear recovery state and clean up URL
+                  await resetRecoveryState();
+                  
+                  // Wait a moment for state to clear
+                  await new Promise(resolve => setTimeout(resolve, 100));
+                  
+                  // Sign out user to clear all session tokens and authentication
                   const { error } = await supabase.auth.signOut();
                   if (error) {
                     console.error('Error signing out:', error);
                   }
+                  
+                  // Wait another moment for signout to complete
+                  await new Promise(resolve => setTimeout(resolve, 100));
+                  
+                  // Navigate to login page
+                  router.replace("/(auth)/login");
+                  
+                  console.log('Complete reset finished');
                 } catch (error) {
-                  console.error('Failed to sign out:', error);
+                  console.error('Failed to perform complete reset:', error);
+                  // Force navigation even if there's an error
+                  router.replace("/(auth)/login");
                 }
-                
-                // Navigate to login page - this will be handled by the auth context
-                // which will detect the user is no longer authenticated and redirect
-                router.replace("/(auth)/login");
               }}>
                 <Text
                   style={[

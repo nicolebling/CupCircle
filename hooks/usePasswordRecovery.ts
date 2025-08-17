@@ -11,9 +11,27 @@ export function usePasswordRecovery() {
   const resetRecoveryState = async () => {
     console.log('Resetting password recovery state');
     
-    // Clear state immediately - don't sign out here as it interferes with natural auth flow
+    // Clear state immediately
     setReadyForNewPassword(false);
     setLoading(false);
+    
+    // Clear any lingering URL parameters by replacing the current URL
+    try {
+      if (typeof window !== 'undefined') {
+        const url = new URL(window.location.href);
+        // Remove recovery-related parameters
+        url.searchParams.delete('access_token');
+        url.searchParams.delete('refresh_token');
+        url.searchParams.delete('type');
+        url.hash = ''; // Clear any hash fragments
+        
+        // Replace the current URL without triggering navigation
+        window.history.replaceState({}, '', url.toString());
+        console.log('Cleaned up recovery URL parameters');
+      }
+    } catch (error) {
+      console.error('Failed to clean up URL:', error);
+    }
   };
 
   async function handleUrl(url: string | null) {

@@ -53,14 +53,17 @@ function RootLayoutNav() {
       const currentSegment = segments[0];
       const authSegment = segments[1];
       
-      // Priority 1: Handle password recovery flow (for both authenticated and unauthenticated users)
-      // Don't clear recovery state just because user is authenticated - they need to reset password first
+      // Priority 1: Handle password recovery flow
       if (readyForNewPassword) {
+        console.log('Recovery state detected:', { currentSegment, authSegment, hasUser: !!user });
+        
+        // If we're not on the reset-password screen, navigate there
         if (currentSegment !== "(auth)" || authSegment !== "reset-password") {
           console.log('Navigating to reset-password for recovery flow');
           router.replace("/(auth)/reset-password");
           return;
         }
+        
         // If we're already on the reset-password screen, stay there
         return;
       }
