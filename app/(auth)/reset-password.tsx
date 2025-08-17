@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -129,26 +128,27 @@ export default function ResetPasswordScreen() {
         <SafeAreaView
           style={[styles.container, { backgroundColor: theme.colors.background }]}
         >
-          <View style={styles.errorContainer}>
-            <LogoAnimation showText={true} showSubtitle={false} />
-            <Ionicons
-              name="alert-circle"
-              size={80}
-              color="#FF6B6B"
-              style={styles.errorIcon}
-            />
-            <Text style={[styles.errorTitle, { color: theme.colors.text }]}>
-              Invalid Reset Link
-            </Text>
-            <Text style={[styles.errorMessage, { color: theme.colors.text }]}>
-              This password reset link is invalid or has expired. Please request a new one.
-            </Text>
-            <TouchableOpacity
-              style={[styles.button, { backgroundColor: colors.primary }]}
-              onPress={() => router.replace("/(auth)/forgot-password")}
-            >
-              <Text style={styles.buttonText}>Request New Link</Text>
-            </TouchableOpacity>
+          <View style={styles.errorPageContent}>
+            <View style={styles.centeredErrorContainer}>
+              <Ionicons
+                name="alert-circle"
+                size={80}
+                color="#FF6B6B"
+                style={styles.errorIcon}
+              />
+              <Text style={[styles.errorTitle, { color: theme.colors.text }]}>
+                Invalid Reset Link
+              </Text>
+              <Text style={[styles.errorMessage, { color: theme.colors.text }]}>
+                This password reset link is invalid or has expired. Please request a new one.
+              </Text>
+              <TouchableOpacity
+                style={[styles.requestNewButton, { backgroundColor: colors.primary }]}
+                onPress={() => router.replace("/(auth)/forgot-password")}
+              >
+                <Text style={styles.buttonText}>Request New Link</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </SafeAreaView>
       </ThemeProvider>
@@ -292,19 +292,28 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: 20,
   },
   loadingText: {
-    marginTop: 20,
     fontSize: 16,
     fontFamily: "K2D-Regular",
-    textAlign: "center",
+    marginTop: 20,
   },
-  errorContainer: {
+  errorPageContent: {
+    flex: 1,
+    padding: 20,
+    justifyContent: "center",
+  },
+  centeredErrorContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: 20,
+    width: "100%",
+    maxWidth: 400,
+    alignSelf: "center",
+  },
+  errorContainer: {
+    alignItems: "center",
+    marginBottom: 40,
   },
   errorIcon: {
     marginVertical: 20,
@@ -369,6 +378,15 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 16,
     fontFamily: "K2D-Medium",
+  },
+  requestNewButton: {
+    height: 50,
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 40,
+    minWidth: 200,
+    alignSelf: "center",
   },
   footer: {
     alignItems: "center",
