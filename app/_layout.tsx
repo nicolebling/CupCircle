@@ -74,12 +74,13 @@ function RootLayoutNav() {
         authSegment !== "reset-password" &&
         !readyForNewPassword // Don't redirect if in password recovery flow
       ) {
-        // If user is authenticated and trying to access auth screens (except allowed ones), 
-        // reset recovery state and redirect to main app
-        if (readyForNewPassword) {
-          resetRecoveryState();
-        }
         router.replace("/(tabs)/matching");
+      }
+      
+      // Handle case where user is logged in but recovery state is still active
+      else if (user && readyForNewPassword && authSegment === "login") {
+        console.log('User is logged in but recovery state is active, clearing state');
+        resetRecoveryState();
       }
     }, 100);
 

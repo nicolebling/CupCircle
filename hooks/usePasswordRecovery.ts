@@ -8,10 +8,18 @@ export function usePasswordRecovery() {
   const [readyForNewPassword, setReadyForNewPassword] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const resetRecoveryState = () => {
+  const resetRecoveryState = async () => {
     console.log('Resetting password recovery state');
     setReadyForNewPassword(false);
     setLoading(false);
+    
+    // Also clear the current session to ensure we're fully logged out
+    try {
+      await supabase.auth.signOut();
+      console.log('Session cleared during recovery state reset');
+    } catch (error) {
+      console.log('Error clearing session:', error);
+    }
   };
 
   async function handleUrl(url: string | null) {

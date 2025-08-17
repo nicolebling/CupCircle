@@ -94,14 +94,18 @@ export default function ResetPasswordScreen() {
       } else {
         console.log("Password updated successfully:", data);
         // Reset the recovery state since password update was successful
-        resetRecoveryState();
+        await resetRecoveryState();
         Alert.alert(
           "Success",
           "Your password has been updated successfully. You can now log in with your new password.",
           [
             {
               text: "OK",
-              onPress: () => router.replace("/(auth)/login")
+              onPress: () => {
+                setTimeout(() => {
+                  router.replace("/(auth)/login");
+                }, 100);
+              }
             }
           ]
         );
@@ -230,9 +234,11 @@ export default function ResetPasswordScreen() {
 
             {/* Footer */}
             <View style={styles.footer}>
-              <TouchableOpacity onPress={() => {
-                resetRecoveryState();
-                router.replace("/(auth)/login");
+              <TouchableOpacity onPress={async () => {
+                await resetRecoveryState();
+                setTimeout(() => {
+                  router.replace("/(auth)/login");
+                }, 100);
               }}>
                 <Text
                   style={[
