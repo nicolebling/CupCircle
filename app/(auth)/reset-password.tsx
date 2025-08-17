@@ -238,10 +238,8 @@ export default function ResetPasswordScreen() {
             {/* Footer */}
             <View style={styles.footer}>
               <TouchableOpacity onPress={async () => {
-                console.log('Back to Login clicked - clearing recovery state');
                 await resetRecoveryState();
-                // Use push instead of replace to ensure proper navigation
-                router.push("/(auth)/login");
+                router.replace("/(auth)/login");
               }}>
                 <Text
                   style={[
