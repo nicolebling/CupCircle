@@ -306,11 +306,9 @@ export default function CircleChatsScreen() {
   };
 
   const renderChatCard = (chat) => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // Set to start of today
-    const meetingDate = new Date(chat.meeting_date);
-    meetingDate.setHours(0, 0, 0, 0); // Set to start of meeting date
-    const isExpired = meetingDate < today;
+    const todayStr = new Date().toISOString().split('T')[0]; // Get today as YYYY-MM-DD string
+    const meetingDateStr = chat.meeting_date; // Should already be in YYYY-MM-DD format
+    const isExpired = meetingDateStr < todayStr;
 
     // When showing past chats, only show expired confirmed chats
     if (showPastChats) {
