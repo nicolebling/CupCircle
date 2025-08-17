@@ -108,7 +108,7 @@ export default function ForgotPasswordScreen() {
               </View>
 
               <TouchableOpacity
-                style={[styles.button, { backgroundColor: colors.primary }]}
+                style={[styles.sendAnotherButton, { backgroundColor: colors.primary }]}
                 onPress={() => {
                   setEmailSent(false);
                   setEmail("");
@@ -291,6 +291,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginTop: 10,
+  },
+  sendAnotherButton: {
+    height: 50,
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 40,
+    minWidth: 200,
+    alignSelf: "center",
   },
   buttonText: {
     color: "white",
