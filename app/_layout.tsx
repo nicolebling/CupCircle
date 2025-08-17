@@ -53,8 +53,8 @@ function RootLayoutNav() {
       const currentSegment = segments[0];
       const authSegment = segments[1];
       
-      // Priority 1: Handle password recovery flow
-      if (readyForNewPassword) {
+      // Priority 1: Handle password recovery flow (only for unauthenticated users)
+      if (readyForNewPassword && !user) {
         if (currentSegment !== "(auth)" || authSegment !== "reset-password") {
           console.log('Navigating to reset-password for recovery flow');
           router.replace("/(auth)/reset-password");
@@ -62,32 +62,30 @@ function RootLayoutNav() {
         }
       }
       
-      // Prevent redirect loops - if user is on login but recovery state is true, clear it
-      if (readyForNewPassword && currentSegment === "(auth)" && authSegment === "login") {
-        console.log('Detected redirect loop, clearing recovery state');
+      // Clear recovery state if user becomes authenticated (password was updated successfully)
+      if (readyForNewPassword && user) {
+        console.log('User authenticated while in recovery flow - clearing recovery state');
         resetRecoveryState();
         return;
       }
       
       // Priority 2: Handle unauthenticated users
       if (!user && currentSegment !== "(auth)") {
+        // Clear any lingering recovery state when redirecting to login
+        if (readyForNewPassword) {
+          console.log('Clearing recovery state before login redirect');
+          resetRecoveryState();
+        }
         router.replace("/(auth)/login");
       } 
-      // Priority 3: Handle authenticated users (but not in recovery flow)
+      // Priority 3: Handle authenticated users
       else if (
         user &&
         currentSegment === "(auth)" &&
         authSegment !== "onboarding" &&
-        authSegment !== "reset-password" &&
-        !readyForNewPassword // Don't redirect if in password recovery flow
+        authSegment !== "reset-password"
       ) {
         router.replace("/(tabs)/matching");
-      }
-      
-      // Handle case where user is logged in but recovery state is still active
-      else if (user && readyForNewPassword && authSegment === "login") {
-        console.log('User is logged in but recovery state is active, clearing state');
-        resetRecoveryState();
       }
     }, 100);
 

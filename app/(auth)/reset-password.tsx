@@ -93,18 +93,21 @@ export default function ResetPasswordScreen() {
         }
       } else {
         console.log("Password updated successfully:", data);
-        // Reset the recovery state since password update was successful
+        
+        // Clear recovery state immediately
         await resetRecoveryState();
+        
+        // Supabase automatically invalidates the session after password update
+        // The auth context will detect this and redirect to login automatically
         Alert.alert(
           "Success",
-          "Your password has been updated successfully. You can now log in with your new password.",
+          "Your password has been updated successfully. You will be logged out and can then log in with your new password.",
           [
             {
               text: "OK",
-              onPress: async () => {
-                // Wait a bit longer to ensure all state is cleared
-                await new Promise(resolve => setTimeout(resolve, 300));
-                router.replace("/(auth)/login");
+              onPress: () => {
+                // Don't manually navigate - let the auth context handle the redirect
+                // The user will be automatically logged out and redirected to login
               }
             }
           ]
@@ -236,8 +239,6 @@ export default function ResetPasswordScreen() {
             <View style={styles.footer}>
               <TouchableOpacity onPress={async () => {
                 await resetRecoveryState();
-                // Wait longer to ensure state is fully processed
-                await new Promise(resolve => setTimeout(resolve, 300));
                 router.replace("/(auth)/login");
               }}>
                 <Text

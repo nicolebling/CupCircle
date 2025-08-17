@@ -11,20 +11,9 @@ export function usePasswordRecovery() {
   const resetRecoveryState = async () => {
     console.log('Resetting password recovery state');
     
-    // Clear state immediately
+    // Clear state immediately - don't sign out here as it interferes with natural auth flow
     setReadyForNewPassword(false);
     setLoading(false);
-    
-    // Clear the current session to ensure we're fully logged out
-    try {
-      await supabase.auth.signOut();
-      console.log('Session cleared during recovery state reset');
-      
-      // Additional delay to ensure state is processed
-      await new Promise(resolve => setTimeout(resolve, 200));
-    } catch (error) {
-      console.log('Error clearing session:', error);
-    }
   };
 
   async function handleUrl(url: string | null) {
