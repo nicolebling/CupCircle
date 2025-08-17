@@ -87,9 +87,7 @@ export default function ForgotPasswordScreen() {
           style={[styles.container, { backgroundColor: theme.colors.background }]}
         >
           <View style={styles.content}>
-            <View style={styles.header}>
-              <LogoAnimation showText={true} showSubtitle={false} />
-            </View>
+           
 
             <View style={styles.formContainer}>
               <View style={styles.successContainer}>
@@ -264,7 +262,6 @@ const styles = StyleSheet.create({
     width: "100%",
     maxWidth: 400,
     alignSelf: "center",
-    marginVertical: 30,
   },
   formTitle: {
     fontSize: 24,
