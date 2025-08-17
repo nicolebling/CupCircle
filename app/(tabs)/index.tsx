@@ -306,7 +306,10 @@ export default function CircleChatsScreen() {
   };
 
   const renderChatCard = (chat) => {
-    const isExpired = new Date(chat.meeting_date) < new Date();
+    // Properly combine date and time for accurate expiration check
+    const meetingDateTime = new Date(`${chat.meeting_date}T${chat.start_time}`);
+    const now = new Date();
+    const isExpired = meetingDateTime < now;
 
     // When showing past chats, only show expired confirmed chats
     if (showPastChats) {
