@@ -103,7 +103,7 @@ export default function ForgotPasswordScreen() {
                   <Text style={{ fontFamily: "K2D-SemiBold" }}>{email}</Text>
                 </Text>
                 <Text style={[styles.instructionText, { color: theme.colors.text }]}>
-                  Tap the link in the email to reset your password. The link will open the CupCircle app directly.
+                  Tap the link in the email to reset your password. Please also check your spam folder if you don't see it in your inbox.
                 </Text>
               </View>
 
