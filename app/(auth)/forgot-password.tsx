@@ -144,7 +144,7 @@ export default function ForgotPasswordScreen() {
       >
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
-          keyboardVerticalOffset={Platform.OS === "ios" ? insets.top + 200 : 20}
+          keyboardVerticalOffset={Platform.OS === "ios" ? 20 : 20}
           style={styles.keyboardAvoidingView}
         >
           <View style={styles.content}>
