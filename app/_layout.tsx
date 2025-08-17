@@ -44,7 +44,7 @@ function RootLayoutNav() {
   const colors = Colors[colorScheme];
   
   // Handle password recovery deep links globally
-  usePasswordRecovery();
+  const { readyForNewPassword } = usePasswordRecovery();
 
   useEffect(() => {
     if (loading) return;
@@ -56,14 +56,15 @@ function RootLayoutNav() {
       } else if (
         user &&
         currentSegment === "(auth)" &&
-        segments[1] !== "onboarding"
+        segments[1] !== "onboarding" &&
+        !readyForNewPassword // Don't redirect if in password recovery flow
       ) {
         router.replace("/(tabs)/matching");
       }
     }, 100);
 
     return () => clearTimeout(timeoutId);
-  }, [user, loading, segments]);
+  }, [user, loading, segments, readyForNewPassword]);
 
   if (loading) {
     return (

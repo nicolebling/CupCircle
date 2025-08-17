@@ -29,8 +29,10 @@ export function usePasswordRecovery() {
       if (!error) {
         console.log('Recovery session set successfully');
         setReadyForNewPassword(true);
-        // Navigate to reset password screen
-        router.replace('/(auth)/reset-password');
+        // Navigate to reset password screen with a small delay to ensure auth state is updated
+        setTimeout(() => {
+          router.replace('/(auth)/reset-password');
+        }, 100);
       } else {
         console.error('Failed to set recovery session:', error);
       }
