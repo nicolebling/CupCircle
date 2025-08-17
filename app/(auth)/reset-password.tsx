@@ -50,20 +50,6 @@ export default function ResetPasswordScreen() {
   }, []);
 
   async function updatePassword() {
-    if (!readyForNewPassword) {
-      Alert.alert(
-        "Invalid Reset Link",
-        "This password reset link is invalid or has expired. Please request a new one.",
-        [
-          {
-            text: "OK",
-            onPress: () => router.replace("/(auth)/forgot-password")
-          }
-        ]
-      );
-      return;
-    }
-
     setLoading(true);
 
     if (!password || !confirmPassword) {
@@ -91,7 +77,20 @@ export default function ResetPasswordScreen() {
 
       if (error) {
         console.error("Password update error:", error.message);
-        Alert.alert("Error", "Unable to update password. Please try again.");
+        if (error.message.includes("session_not_found") || error.message.includes("invalid")) {
+          Alert.alert(
+            "Session Expired", 
+            "Your reset session has expired. Please request a new password reset link.",
+            [
+              {
+                text: "OK",
+                onPress: () => router.replace("/(auth)/forgot-password")
+              }
+            ]
+          );
+        } else {
+          Alert.alert("Error", "Unable to update password. Please try again.");
+        }
       } else {
         console.log("Password updated successfully:", data);
         Alert.alert(
@@ -123,42 +122,8 @@ export default function ResetPasswordScreen() {
           <View style={styles.loadingContainer}>
             <LogoAnimation showText={true} showSubtitle={false} />
             <Text style={[styles.loadingText, { color: theme.colors.text }]}>
-              Processing recovery link...
+              Setting up password reset...
             </Text>
-          </View>
-        </SafeAreaView>
-      </ThemeProvider>
-    );
-  }
-
-  // Show error state if recovery link is invalid
-  if (!readyForNewPassword) {
-    return (
-      <ThemeProvider value={theme}>
-        <SafeAreaView
-          style={[styles.container, { backgroundColor: theme.colors.background }]}
-        >
-          <View style={styles.errorPageContent}>
-            <View style={styles.centeredErrorContainer}>
-              <Ionicons
-                name="alert-circle"
-                size={80}
-                color="#FF6B6B"
-                style={styles.errorIcon}
-              />
-              <Text style={[styles.errorTitle, { color: theme.colors.text }]}>
-                Invalid Reset Link
-              </Text>
-              <Text style={[styles.errorMessage, { color: theme.colors.text }]}>
-                This password reset link is invalid or has expired. Please request a new one.
-              </Text>
-              <TouchableOpacity
-                style={[styles.requestNewButton, { backgroundColor: colors.primary }]}
-                onPress={() => router.replace("/(auth)/forgot-password")}
-              >
-                <Text style={styles.buttonText}>Request New Link</Text>
-              </TouchableOpacity>
-            </View>
           </View>
         </SafeAreaView>
       </ThemeProvider>
