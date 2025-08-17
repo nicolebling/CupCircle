@@ -54,8 +54,7 @@ function RootLayoutNav() {
       const authSegment = segments[1];
       
       // Priority 1: Handle password recovery flow
-      // Only redirect if we're not already on reset-password AND user is not authenticated
-      if (readyForNewPassword && !user) {
+      if (readyForNewPassword) {
         if (currentSegment !== "(auth)" || authSegment !== "reset-password") {
           console.log('Navigating to reset-password for recovery flow');
           router.replace("/(auth)/reset-password");
@@ -63,9 +62,9 @@ function RootLayoutNav() {
         }
       }
       
-      // Clear recovery state if user is authenticated or trying to navigate away from reset-password
-      if (readyForNewPassword && (user || (currentSegment === "(auth)" && authSegment === "login"))) {
-        console.log('Clearing recovery state - user authenticated or navigating to login');
+      // Prevent redirect loops - if user is on login but recovery state is true, clear it
+      if (readyForNewPassword && currentSegment === "(auth)" && authSegment === "login") {
+        console.log('Detected redirect loop, clearing recovery state');
         resetRecoveryState();
         return;
       }
