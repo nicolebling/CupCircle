@@ -21,6 +21,7 @@ import CustomSplashScreen from "@/components/CustomSplashScreen";
 import Superwall from "expo-superwall/compat";
 import * as Notifications from 'expo-notifications';
 import { router } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Suppress animation warnings in development
 if (__DEV__) {
@@ -42,7 +43,7 @@ function RootLayoutNav() {
   const router = useRouter();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
-  
+
   // Handle password recovery deep links globally
   const { readyForNewPassword, resetRecoveryState } = usePasswordRecovery();
   const [lastRecoveryState, setLastRecoveryState] = useState<boolean | null>(null);
@@ -50,50 +51,43 @@ function RootLayoutNav() {
   useEffect(() => {
     if (loading) return;
 
-    const timeoutId = setTimeout(() => {
+    const timeoutId = setTimeout(async () => {
       const currentSegment = segments[0];
       const authSegment = segments[1];
-      
-      // Priority 1: Handle password recovery flow
-      if (readyForNewPassword) {
-        console.log('Recovery state detected:', { currentSegment, authSegment, hasUser: !!user });
-        
-        // Only navigate if we haven't already handled this recovery state
-        if (lastRecoveryState !== readyForNewPassword) {
-          setLastRecoveryState(readyForNewPassword);
-          
-          // If we're not on the reset-password screen, navigate there
-          if (currentSegment !== "(auth)" || authSegment !== "reset-password") {
-            console.log('Navigating to reset-password for recovery flow');
-            router.replace("/(auth)/reset-password");
-            return;
-          }
+
+      try {
+        const hasSeenOnboarding = await AsyncStorage.getItem('hasSeenOnboarding');
+
+        // Priority 0: First-time users should see onboarding
+        if (!hasSeenOnboarding && !user && currentSegment !== "(auth)") {
+          router.replace('/(auth)/welcome');
+          return;
         }
-        
-        // If we're already on the reset-password screen, stay there
-        return;
-      } else if (lastRecoveryState !== readyForNewPassword) {
-        // Recovery state changed to false, update tracking
-        setLastRecoveryState(readyForNewPassword);
-      }
-      
-      // Priority 2: Handle unauthenticated users
-      if (!user && currentSegment !== "(auth)") {
-        // Clear any lingering recovery state when redirecting to login
-        if (readyForNewPassword) {
-          console.log('Clearing recovery state before login redirect');
-          resetRecoveryState();
+
+        // Priority 1: Handle password recovery flows
+        if (readyForNewPassword && currentSegment !== "(auth)") {
+          router.replace("/(auth)/reset-password");
         }
-        router.replace("/(auth)/login");
-      } 
-      // Priority 3: Handle authenticated users
-      else if (
-        user &&
-        currentSegment === "(auth)" &&
-        authSegment !== "onboarding" &&
-        authSegment !== "reset-password"
-      ) {
-        router.replace("/(tabs)/matching");
+        // Priority 2: Handle unauthenticated users 
+        else if (
+          !user &&
+          currentSegment !== "(auth)" &&
+          authSegment !== "reset-password" &&
+          authSegment !== "welcome"
+        ) {
+          router.replace("/(auth)/auth");
+        }
+        // Priority 3: Handle authenticated users
+        else if (
+          user &&
+          currentSegment === "(auth)" &&
+          authSegment !== "onboarding" &&
+          authSegment !== "reset-password"
+        ) {
+          router.replace("/(tabs)/matching");
+        }
+      } catch (error) {
+        console.error('Error in navigation logic:', error);
       }
     }, 100);
 
