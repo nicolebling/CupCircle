@@ -1,0 +1,304 @@
+import React, { useEffect, useRef } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Animated,
+  Dimensions,
+  Easing,
+} from 'react-native';
+
+const { width, height } = Dimensions.get('window');
+
+const CupCircleAnimation = () => {
+  // Animation values
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const dot1Scale = useRef(new Animated.Value(1)).current;
+  const dot2Scale = useRef(new Animated.Value(1)).current;
+  const dot1Transform = useRef(new Animated.ValueXY({x: 0, y: 0})).current;
+  const dot2Transform = useRef(new Animated.ValueXY({x: 0, y: 0})).current;
+  const mugOpacity = useRef(new Animated.Value(0)).current;
+  const cheersRotation = useRef(new Animated.Value(0)).current;
+  const textOpacity = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    const startAnimation = () => {
+      // Initial fade in of logo (0-0.5s)
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 500,
+        useNativeDriver: true,
+      }).start();
+
+      // Text fade in
+      Animated.timing(textOpacity, {
+        toValue: 1,
+        duration: 500,
+        delay: 300,
+        useNativeDriver: true,
+      }).start();
+
+      // Transform dots to mugs (0.8-1.3s)
+      setTimeout(() => {
+        Animated.parallel([
+          // Hide dots
+          Animated.timing(dot1Scale, {
+            toValue: 0,
+            duration: 300,
+            useNativeDriver: true,
+          }),
+          Animated.timing(dot2Scale, {
+            toValue: 0,
+            duration: 300,
+            useNativeDriver: true,
+          }),
+          // Show mugs
+          Animated.timing(mugOpacity, {
+            toValue: 1,
+            duration: 300,
+            delay: 150,
+            useNativeDriver: true,
+          }),
+          // Move mugs to cheers position
+          Animated.timing(dot1Transform, {
+            toValue: {x: 20, y: -10},
+            duration: 400,
+            delay: 200,
+            easing: Easing.bezier(0.68, -0.55, 0.265, 1.55),
+            useNativeDriver: true,
+          }),
+          Animated.timing(dot2Transform, {
+            toValue: {x: -20, y: -10},
+            duration: 400,
+            delay: 200,
+            easing: Easing.bezier(0.68, -0.55, 0.265, 1.55),
+            useNativeDriver: true,
+          }),
+        ]).start();
+
+        // Cheers animation (1.5-1.8s)
+        setTimeout(() => {
+          Animated.sequence([
+            Animated.timing(cheersRotation, {
+              toValue: 1,
+              duration: 150,
+              easing: Easing.out(Easing.quad),
+              useNativeDriver: true,
+            }),
+            Animated.timing(cheersRotation, {
+              toValue: 0,
+              duration: 150,
+              easing: Easing.in(Easing.quad),
+              useNativeDriver: true,
+            }),
+          ]).start();
+        }, 700);
+
+        // Return to original position (2.2-2.8s)
+        setTimeout(() => {
+          Animated.parallel([
+            // Hide mugs
+            Animated.timing(mugOpacity, {
+              toValue: 0,
+              duration: 300,
+              useNativeDriver: true,
+            }),
+            // Return positions
+            Animated.timing(dot1Transform, {
+              toValue: {x: 0, y: 0},
+              duration: 400,
+              easing: Easing.bezier(0.68, -0.55, 0.265, 1.55),
+              useNativeDriver: true,
+            }),
+            Animated.timing(dot2Transform, {
+              toValue: {x: 0, y: 0},
+              duration: 400,
+              easing: Easing.bezier(0.68, -0.55, 0.265, 1.55),
+              useNativeDriver: true,
+            }),
+            // Show dots again
+            Animated.timing(dot1Scale, {
+              toValue: 1,
+              duration: 300,
+              delay: 200,
+              useNativeDriver: true,
+            }),
+            Animated.timing(dot2Scale, {
+              toValue: 1,
+              duration: 300,
+              delay: 200,
+              useNativeDriver: true,
+            }),
+          ]).start();
+        }, 1400);
+      }, 800);
+    };
+
+    startAnimation();
+
+    // Loop the animation every 4 seconds
+    const interval = setInterval(startAnimation, 4000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const cheersRotationInterpolate = cheersRotation.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '15deg'],
+  });
+
+  return (
+    <View style={styles.container}>
+      <Animated.View 
+        style={[
+          styles.logoContainer,
+          { opacity: fadeAnim }
+        ]}
+      >
+        {/* Circle border */}
+        <View style={styles.circle} />
+        
+        {/* Dot 1 */}
+        <Animated.View
+          style={[
+            styles.dot,
+            styles.dot1,
+            {
+              transform: [
+                { translateX: dot1Transform.x },
+                { translateY: dot1Transform.y },
+                { scale: dot1Scale },
+              ],
+            },
+          ]}
+        />
+        
+        {/* Dot 2 */}
+        <Animated.View
+          style={[
+            styles.dot,
+            styles.dot2,
+            {
+              transform: [
+                { translateX: dot2Transform.x },
+                { translateY: dot2Transform.y },
+                { scale: dot2Scale },
+              ],
+            },
+          ]}
+        />
+        
+        {/* Coffee Mug 1 */}
+        <Animated.View
+          style={[
+            styles.mug,
+            styles.mug1,
+            {
+              opacity: mugOpacity,
+              transform: [
+                { translateX: dot1Transform.x },
+                { translateY: dot1Transform.y },
+                { rotate: cheersRotationInterpolate },
+              ],
+            },
+          ]}
+        >
+          <Text style={styles.mugEmoji}>☕</Text>
+        </Animated.View>
+        
+        {/* Coffee Mug 2 */}
+        <Animated.View
+          style={[
+            styles.mug,
+            styles.mug2,
+            {
+              opacity: mugOpacity,
+              transform: [
+                { translateX: dot2Transform.x },
+                { translateY: dot2Transform.y },
+                { rotate: cheersRotationInterpolate },
+                { scaleX: -1 }, // Flip horizontally for cheers effect
+              ],
+            },
+          ]}
+        >
+          <Text style={styles.mugEmoji}>☕</Text>
+        </Animated.View>
+      </Animated.View>
+
+      {/* Brand Text */}
+      <Animated.View style={{ opacity: textOpacity }}>
+        <Text style={styles.brandName}>CupCircle</Text>
+        <Text style={styles.brandTagline}>Where every cup connects</Text>
+      </Animated.View>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f5f7fa',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  logoContainer: {
+    width: 120,
+    height: 120,
+    marginBottom: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  circle: {
+    width: 120,
+    height: 120,
+    borderWidth: 4,
+    borderColor: '#ff6b35',
+    borderRadius: 60,
+    position: 'absolute',
+  },
+  dot: {
+    width: 16,
+    height: 16,
+    backgroundColor: '#ff6b35',
+    borderRadius: 8,
+    position: 'absolute',
+  },
+  dot1: {
+    top: 25,
+    left: 35,
+  },
+  dot2: {
+    top: 45,
+    right: 35,
+  },
+  mug: {
+    position: 'absolute',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  mug1: {
+    top: 15,
+    left: 25,
+  },
+  mug2: {
+    top: 35,
+    right: 25,
+  },
+  mugEmoji: {
+    fontSize: 32,
+  },
+  brandName: {
+    fontSize: 36,
+    fontWeight: 'bold',
+    color: '#ff6b35',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  brandTagline: {
+    fontSize: 18,
+    color: '#666',
+    textAlign: 'center',
+  },
+});
+
+export default CupCircleAnimation;

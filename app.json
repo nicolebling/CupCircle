@@ -3,7 +3,7 @@
     "sdkVersion": "53.0.0",
     "name": "CupCircle",
     "slug": "cup-circle",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/cupcircle_logo.png",
     "scheme": "cupcircle",
