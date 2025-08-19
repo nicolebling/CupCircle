@@ -24,6 +24,7 @@ import * as ImagePicker from "expo-image-picker";
 import { decode } from "base64-arraybuffer";
 import NeighborhoodSelector from "./NeighborhoodSelector";
 import CafeSelector from "./CafeSelector";
+import ExperienceLevel from "./ExperienceLevel";
 import EmploymentHistoryEntry from "./EmploymentHistoryEntry";
 import CareerTransitionEntry from "./CareerTransitionEntry";
 import SkeletonLoader from "./SkeletonLoader";
@@ -91,8 +92,10 @@ const getCoffeeColor = (level: string): string => {
 
 export type UserProfileData = {
   id?: string;
-  name: string;
-  photo: string;
+  first_name?: string;
+  last_name?: string;
+  name?: string; // Keep for backward compatibility or if not using first/last name
+  photo_url?: string;
   birthday?: string;
   age?: number;
   occupation: string;
@@ -114,6 +117,10 @@ export type UserProfileData = {
     fromDate: string;
     toDate: string;
   }>;
+  career_transitions?: Array<{
+    position1: string;
+    position2: string;
+  }>;
 };
 
 type ProfileCardProps = {
@@ -133,12 +140,14 @@ type ProfileCardProps = {
 };
 
 const EMPTY_PROFILE: UserProfileData = {
+  first_name: "",
+  last_name: "",
   name: "",
-  photo: "https://via.placeholder.com/150",
+  photo_url: "https://via.placeholder.com/150",
   birthday: "",
   occupation: "",
-  experienceLevel: "",
-  industries: [],
+  experience_level: "",
+  industry_categories: [],
   skills: [],
   experience: "",
   education: "",
@@ -164,10 +173,10 @@ export default function ProfileCard({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
-  const [profileData, setProfileData] = useState(null);
+  const [profileData, setProfileData] = useState<UserProfileData | null>(null);
 
   useEffect(() => {
-    if (!isNewUser) {
+    if (!isNewUser && userId) {
       fetchProfile();
     }
   }, [userId, isNewUser]);
@@ -177,13 +186,12 @@ export default function ProfileCard({
       setLoading(true);
 
       const { data: session } = await supabase.auth.getSession();
-      //const userId = session?.user?.id;
       if (!session?.user) return;
 
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
-        .eq("id", user.id)
+        .eq("id", session.user.id) // Use session.user.id to fetch the current user's profile
         .single();
 
       if (error) {
@@ -191,28 +199,52 @@ export default function ProfileCard({
       }
 
       if (data) {
-
-
+        // Ensure employment and career_transitions are parsed correctly if they are strings
+        let parsedEmployment = [];
         if (data.employment) {
           try {
-            let employmentData = [];
-            // Parse the employment data array
             if (Array.isArray(data.employment)) {
-              employmentData = data.employment.map((entry) => {
-                return typeof entry === "string" ? JSON.parse(entry) : entry;
-              });
+              parsedEmployment = data.employment.map((entry) =>
+                typeof entry === "string" ? JSON.parse(entry) : entry
+              );
+            } else if (typeof data.employment === "string") {
+              parsedEmployment = [JSON.parse(data.employment)];
             } else {
-              employmentData = [JSON.parse(data.employment)];
+              parsedEmployment = data.employment; // Already an object or array of objects
             }
-
           } catch (e) {
             console.error("Error parsing employment data:", e);
-
+            parsedEmployment = []; // Default to empty array on error
           }
-        } 
+        }
+
+        let parsedCareerTransitions = [];
+        if (data.career_transitions) {
+          try {
+            if (Array.isArray(data.career_transitions)) {
+              parsedCareerTransitions = data.career_transitions.map((entry) =>
+                typeof entry === "string" ? JSON.parse(entry) : entry
+              );
+            } else if (typeof data.career_transitions === "string") {
+              parsedCareerTransitions = [JSON.parse(data.career_transitions)];
+            } else {
+              parsedCareerTransitions = data.career_transitions; // Already an object or array of objects
+            }
+          } catch (e) {
+            console.error("Error parsing career transition data:", e);
+            parsedCareerTransitions = []; // Default to empty array on error
+          }
+        }
+
+        // Update profileData with parsed and potentially corrected data
+        setProfileData({
+          ...data,
+          employment: parsedEmployment,
+          career_transitions: parsedCareerTransitions,
+        });
       }
-      setProfileData(data);
     } catch (error) {
+      console.error("Error fetching profile:", error);
       Alert.alert("Error", "Failed to load profile information");
     } finally {
       setLoading(false);
@@ -221,16 +253,24 @@ export default function ProfileCard({
 
   const { user } = useAuth();
 
+  const handlePrevious = () => {
+    // Implement logic for going to the previous profile if needed
+    if (currentIndex > 0) {
+      setCurrentIndex(currentIndex - 1);
+    }
+  };
+
   if (loading && !isNewUser) {
     return (
       <View style={styles.loadingContainer}>
-        {/* <ActivityIndicator size="large" color={colors.primary} />
-        <Text style={styles.loadingText}>Loading your profile...</Text> */}
+        <ActivityIndicator size="large" color={colors.primary} />
+        <Text style={styles.loadingText}>Loading your profile...</Text>
       </View>
     );
   }
 
-  const handleCafeSelect = async (selectedCafes) => {
+  const handleCafeSelect = async (selectedCafes: string[]) => {
+    if (!user) return;
     try {
       const { data, error } = await supabase
         .from("profiles")
@@ -243,12 +283,14 @@ export default function ProfileCard({
         .single();
 
       if (error) throw error;
+      // Optionally update local state if needed
     } catch (error) {
       Alert.alert("Error", "Failed to save cafe selections");
     }
   };
 
-  const handleProfileSave = async (updatedData) => {
+  const handleProfileSave = async (updatedData: UserProfileData) => {
+    if (!user) return;
     try {
       const { data, error } = await supabase
         .from("profiles")
@@ -265,7 +307,7 @@ export default function ProfileCard({
       setProfileData(data);
       setIsEditMode(false);
     } catch (error) {
-
+      console.error("Error saving profile:", error);
       Alert.alert("Error", "Failed to save profile changes");
     }
   };
@@ -273,6 +315,9 @@ export default function ProfileCard({
   if (!user) {
     return null;
   }
+
+  const displayProfile = profileData || profile; // Use profileData if available, otherwise use prop
+
   // For matching view
   if (!isUserProfile && !isEditMode && !isOnboarding) {
     return (
@@ -284,9 +329,8 @@ export default function ProfileCard({
       >
         {/* Profile Photo */}
         <View style={styles.imageContainer}>
-          {/* Added container */}
-          {profile.photo ? (
-            <Image source={{ uri: profile.photo }} style={styles.image} />
+          {displayProfile.photo_url ? (
+            <Image source={{ uri: displayProfile.photo_url }} style={styles.image} />
           ) : (
             <View
               style={[
@@ -302,18 +346,18 @@ export default function ProfileCard({
               <Ionicons name="person" size={60} color="#fff" />
             </View>
           )}
-          {profile.experience_level && (
+          {displayProfile.experience_level && (
             <View
               style={[
                 styles.decorativeCircle,
-                { borderColor: getCoffeeColor(profile.experience_level) },
+                { borderColor: getCoffeeColor(displayProfile.experience_level) },
               ]}
             />
           )}
         </View>
 
         {/* Match badge - Edit for later */}
-        {/* {profile.matchedCafe && (
+        {/* {displayProfile.matchedCafe && (
           <View
             style={[styles.matchBadge, { backgroundColor: colors.primary }]}
           >
@@ -327,35 +371,36 @@ export default function ProfileCard({
             <View style={styles.headerInfo}>
               {/* Name */}
               <Text style={[styles.name, { color: colors.text }]}>
-                {profile.name}
-                {/* {profile.age && <Text>({profile.age})</Text>} */}
+                {displayProfile.first_name && displayProfile.last_name
+                  ? `${displayProfile.first_name} ${displayProfile.last_name}`
+                  : displayProfile.first_name || displayProfile.last_name || "Name not set"}
               </Text>
 
               {/* Occupation / Headline */}
               <View style={styles.positionContainer}>
                 <Text style={[styles.position, { color: colors.primary }]}>
-                  {profile.occupation}
+                  {displayProfile.occupation}
                 </Text>
               </View>
 
               {/* Experience level */}
               <View style={styles.locationContainer}>
-                {profile.experience_level &&
-                  (profile.employment?.length > 0 ||
-                    profile.career_transitions?.length > 0) && (
+                {displayProfile.experience_level &&
+                  (displayProfile.employment?.length > 0 ||
+                    displayProfile.career_transitions?.length > 0) && (
                     <Text
                       style={[
                         styles.experience,
                         { color: colors.secondaryText },
                       ]}
                     >
-                      {profile.experience_level}
+                      {displayProfile.experience_level}
                     </Text>
                   )}
               </View>
 
               {/* Location */}
-              {profile.city && (
+              {displayProfile.city && (
                 <View style={styles.locationContainer}>
                   {/* <Ionicons
                     name="location-outline"
@@ -365,7 +410,7 @@ export default function ProfileCard({
                   <Text
                     style={[styles.location, { color: colors.secondaryText }]}
                   >
-                    {profile.city}
+                    {displayProfile.city}
                   </Text>
                 </View>
               )}
@@ -375,77 +420,71 @@ export default function ProfileCard({
           {/* Bio */}
           <View style={styles.bioContainer}>
             <Text style={[styles.bioText, { color: colors.text }]}>
-              {profile.bio}
+              {displayProfile.bio}
             </Text>
           </View>
 
           {/* Only show divider and Experience section if there's employment or career transition data */}
-          {((profile.employment && profile.employment.length > 0) || 
-            (profile.career_transitions && profile.career_transitions.length > 0)) && (
+          {((displayProfile.employment && displayProfile.employment.length > 0) ||
+            (displayProfile.career_transitions && displayProfile.career_transitions.length > 0)) && (
             <View style={styles.divider} />
           )}
 
           {/* Employment */}
-          {profile.employment && profile.employment.length > 0 && (
+          {displayProfile.employment && displayProfile.employment.length > 0 && (
             <>
               <Text style={[styles.label, { color: colors.secondaryText }]}>
                 Experience
               </Text>
-              {profile.employment.map((jobString, index) => {
-                const job =
-                  typeof jobString === "string"
-                    ? JSON.parse(jobString)
-                    : jobString;
-                return (
-                  <View key={index} style={styles.employmentContainer}>
-                    <View style={styles.timelineDot} />
-                    <View style={styles.employmentCard}>
-                      <Text
-                        style={[
-                          styles.position,
-                          { color: colors.text, fontSize: 16, marginBottom: 4 },
-                        ]}
-                      >
-                        {job.position}
-                      </Text>
-                      <Text
-                        style={[
-                          styles.companyName,
-                          { color: colors.text, fontSize: 14 },
-                        ]}
-                      >
-                        {job.company}
-                      </Text>
-                      <Text
-                        style={[
-                          styles.dateRange,
-                          {
-                            color: colors.secondaryText,
-                            fontSize: 14,
-                            marginTop: 4,
-                          },
-                        ]}
-                      >
-                        {job.fromDate} - {job.toDate}
-                      </Text>
-                    </View>
-                    {index < profile.employment.length - 1 && (
-                      <View
-                        style={[
-                          styles.timelineLine,
-                          { backgroundColor: colors.border },
-                        ]}
-                      />
-                    )}
+              {displayProfile.employment.map((job, index) => (
+                <View key={index} style={styles.employmentContainer}>
+                  <View style={styles.timelineDot} />
+                  <View style={styles.employmentCard}>
+                    <Text
+                      style={[
+                        styles.position,
+                        { color: colors.text, fontSize: 16, marginBottom: 4 },
+                      ]}
+                    >
+                      {job.position}
+                    </Text>
+                    <Text
+                      style={[
+                        styles.companyName,
+                        { color: colors.text, fontSize: 14 },
+                      ]}
+                    >
+                      {job.company}
+                    </Text>
+                    <Text
+                      style={[
+                        styles.dateRange,
+                        {
+                          color: colors.secondaryText,
+                          fontSize: 14,
+                          marginTop: 4,
+                        },
+                      ]}
+                    >
+                      {job.fromDate} - {job.toDate}
+                    </Text>
                   </View>
-                );
-              })}
+                  {index < displayProfile.employment.length - 1 && (
+                    <View
+                      style={[
+                        styles.timelineLine,
+                        { backgroundColor: colors.border },
+                      ]}
+                    />
+                  )}
+                </View>
+              ))}
             </>
           )}
 
           {/* Career Transitions */}
-          {profile.career_transitions &&
-            profile.career_transitions.length > 0 && (
+          {displayProfile.career_transitions &&
+            displayProfile.career_transitions.length > 0 && (
               <>
                 <Text
                   style={[
@@ -460,69 +499,66 @@ export default function ProfileCard({
                   Career Transitions
                 </Text>
                 <View>
-                  {profile.career_transitions.map(
-                    (transitionString, index) => {
-                      const transition = JSON.parse(transitionString);
-                      return (
-                        <View
-                          key={index}
-                          style={styles.transitionContainer}
-                        >
-                          <View style={styles.transitionCard}>
-                            <View style={styles.transitionText}>
-                              <Text
-                                style={[
-                                  styles.position,
-                                  { color: colors.text },
-                                ]}
-                              >
-                                {transition.position1}
-                              </Text>
-                              <Ionicons
-                                name="arrow-forward"
-                                size={20}
-                                color={colors.primary}
-                                style={styles.transitionArrow}
-                              />
-                              <Text
-                                style={[
-                                  styles.position,
-                                  { color: colors.text },
-                                ]}
-                              >
-                                {transition.position2}
-                              </Text>
-                            </View>
+                  {displayProfile.career_transitions.map(
+                    (transition, index) => (
+                      <View
+                        key={index}
+                        style={styles.transitionContainer}
+                      >
+                        <View style={styles.transitionCard}>
+                          <View style={styles.transitionText}>
+                            <Text
+                              style={[
+                                styles.position,
+                                { color: colors.text },
+                              ]}
+                            >
+                              {transition.position1}
+                            </Text>
+                            <Ionicons
+                              name="arrow-forward"
+                              size={20}
+                              color={colors.primary}
+                              style={styles.transitionArrow}
+                            />
+                            <Text
+                              style={[
+                                styles.position,
+                                { color: colors.text },
+                              ]}
+                            >
+                              {transition.position2}
+                            </Text>
                           </View>
                         </View>
-                      );
-                    },
+                      </View>
+                    ),
                   )}
                 </View>
               </>
             )}
 
           {/* Education */}
-          {profile.education && (
+          {displayProfile.education && (
             <>
               <Text style={[styles.label, { color: colors.secondaryText }]}>
                 Education
               </Text>
               <Text style={[styles.value, { color: colors.text }]}>
-                {profile.education}
+                {displayProfile.education}
               </Text>
             </>
           )}
 
           {/* Industries */}
-          {profile.industry_categories &&
-            profile.industry_categories.length > 0 && (
+          {displayProfile.industry_categories &&
+            displayProfile.industry_categories.length > 0 && (
               <>
                 <Text style={[styles.label, { color: colors.secondaryText }]}>
                   Industries
                 </Text>
                 <View style={styles.interestsContainer}>
-                  {profile.industry_categories.map((industry, index) => (
+                  {displayProfile.industry_categories.map((industry, index) => (
                     <View
                       key={index}
                       style={[
@@ -550,8 +586,8 @@ export default function ProfileCard({
             Interests
           </Text>
           <View style={styles.interestsContainer}>
-            {profile.interests &&
-              profile.interests.slice(0, 5).map((interest, index) => (
+            {displayProfile.interests &&
+              displayProfile.interests.slice(0, 5).map((interest, index) => (
                 <View
                   key={index}
                   style={[
@@ -622,9 +658,9 @@ export default function ProfileCard({
           {/* Profile Photo */}
           <View style={[styles.imageContainer, { marginTop: 32 }]}>
             {/* Added container */}
-            {profile.photo_url ? (
+            {displayProfile.photo_url ? (
               <Image
-                source={{ uri: profile.photo_url }}
+                source={{ uri: displayProfile.photo_url }}
                 style={[styles.image, { marginTop: 0 }]}
                 resizeMode="cover"
               />
@@ -643,11 +679,11 @@ export default function ProfileCard({
                 <Ionicons name="person" size={60} color="#fff" />
               </View>
             )}
-            {profile.experience_level && (
+            {displayProfile.experience_level && (
               <View
                 style={[
                   styles.decorativeCircle,
-                  { borderColor: getCoffeeColor(profile.experience_level) },
+                  { borderColor: getCoffeeColor(displayProfile.experience_level) },
                 ]}
               />
             )}
@@ -662,7 +698,9 @@ export default function ProfileCard({
                     { color: colors.text, textAlign: "center" },
                   ]}
                 >
-                  {profile.name}
+                  {displayProfile.first_name && displayProfile.last_name
+                    ? `${displayProfile.first_name} ${displayProfile.last_name}`
+                    : displayProfile.first_name || displayProfile.last_name || "Name not set"}
                 </Text>
 
                 <View
@@ -672,27 +710,27 @@ export default function ProfileCard({
                   ]}
                 >
                   <Text style={[styles.position, { color: colors.primary,  }]}>
-                    {profile.occupation}
+                    {displayProfile.occupation}
                   </Text>
                 </View>
 
                 {/* Experience Level */}
                 <View style={styles.locationContainer}>
-                  {profile.experience_level &&
-                    (profile.employment?.length > 0 ||
-                      profile.career_transitions?.length > 0) && (
+                  {displayProfile.experience_level &&
+                    (displayProfile.employment?.length > 0 ||
+                      displayProfile.career_transitions?.length > 0) && (
                       <Text
                         style={[
                           styles.experience,
                           { color: colors.secondaryText },
                         ]}
                       >
-                        {profile.experience_level}
+                        {displayProfile.experience_level}
                       </Text>
                     )}
                 </View>
 
-                {profile.city && (
+                {displayProfile.city && (
                   <View
                     style={[
                       styles.locationContainer,
@@ -707,7 +745,7 @@ export default function ProfileCard({
                     <Text
                       style={[styles.location, { color: colors.secondaryText }]}
                     >
-                      {profile.city}
+                      {displayProfile.city}
                     </Text>
                   </View>
                 )}
@@ -716,22 +754,22 @@ export default function ProfileCard({
 
             <View style={styles.bioContainer}>
               <Text style={[styles.bioText, { color: colors.text }]}>
-                {profile.bio}
+                {displayProfile.bio}
               </Text>
             </View>
 
             {/* Only show divider and Professional Details section if there's employment, career transitions, education, or industry data */}
-            {((profile.employment && profile.employment.length > 0) || 
-              (profile.career_transitions && profile.career_transitions.length > 0) ||
-              profile.education ||
-              (profile.industry_categories && profile.industry_categories.length > 0)) && (
+            {((displayProfile.employment && displayProfile.employment.length > 0) ||
+              (displayProfile.career_transitions && displayProfile.career_transitions.length > 0) ||
+              displayProfile.education ||
+              (displayProfile.industry_categories && displayProfile.industry_categories.length > 0)) && (
               <View style={styles.divider} />
             )}
 
             {/* Professional Details */}
             <View style={styles.section}>
               {/* Employment Section */}
-              {profile.employment && profile.employment.length > 0 && (
+              {displayProfile.employment && displayProfile.employment.length > 0 && (
                 <>
                   <Text
                     style={[
@@ -743,65 +781,55 @@ export default function ProfileCard({
                   </Text>
                   <View>
                     {/* Added View to wrap timeline */}
-                    {Array.isArray(profile.employment) ? (
-                      profile.employment.map((jobString, index) => {
-                        // Parse each job entry from string to object
-                        const job = JSON.parse(jobString);
-                        return (
-                          <View key={index} style={styles.employmentContainer}>
-                            <View style={styles.timelineDot} />
-                            <View style={styles.employmentCard}>
-                              <Text
-                                style={[
-                                  styles.position,
-                                  {
-                                    color: colors.text,
-                                    fontSize: 16,
-                                    marginBottom: 4,
-                                  },
-                                ]}
-                              >
-                                {job.position}
-                              </Text>
-                              <Text
-                                style={[
-                                  styles.companyName,
-                                  { color: colors.text, fontSize: 14 },
-                                ]}
-                              >
-                                {job.company}
-                              </Text>
-                              <Text
-                                style={[
-                                  styles.dateRange,
-                                  {
-                                    color: colors.secondaryText,
-                                    fontSize: 14,
-                                    marginTop: 4,
-                                  },
-                                ]}
-                              >
-                                {job.fromDate} - {job.toDate}
-                              </Text>
-                            </View>
-                            {index < profile.employment.length - 1 && (
-                              <View style={styles.timelineLine} />
-                            )}
-                          </View>
-                        );
-                      })
-                    ) : (
-                      <Text style={{ color: "red" }}>
-                        Employment data is not an array!
-                      </Text>
-                    )}
+                    {displayProfile.employment.map((job, index) => (
+                      <View key={index} style={styles.employmentContainer}>
+                        <View style={styles.timelineDot} />
+                        <View style={styles.employmentCard}>
+                          <Text
+                            style={[
+                              styles.position,
+                              {
+                                color: colors.text,
+                                fontSize: 16,
+                                marginBottom: 4,
+                              },
+                            ]}
+                          >
+                            {job.position}
+                          </Text>
+                          <Text
+                            style={[
+                              styles.companyName,
+                              { color: colors.text, fontSize: 14 },
+                            ]}
+                          >
+                            {job.company}
+                          </Text>
+                          <Text
+                            style={[
+                              styles.dateRange,
+                              {
+                                color: colors.secondaryText,
+                                fontSize: 14,
+                                marginTop: 4,
+                              },
+                            ]}
+                          >
+                            {job.fromDate} - {job.toDate}
+                          </Text>
+                        </View>
+                        {index < displayProfile.employment.length - 1 && (
+                          <View style={styles.timelineLine} />
+                        )}
+                      </View>
+                    ))}
                   </View>
                 </>
               )}
 
               {/* Career Transitions Section */}
-              {profile.career_transitions &&
-                profile.career_transitions.length > 0 && (
+              {displayProfile.career_transitions &&
+                displayProfile.career_transitions.length > 0 && (
                   <>
                     <Text
                       style={[
@@ -816,63 +844,60 @@ export default function ProfileCard({
                       Career Transitions
                     </Text>
                     <View>
-                      {profile.career_transitions.map(
-                        (transitionString, index) => {
-                          const transition = JSON.parse(transitionString);
-                          return (
-                            <View
-                              key={index}
-                              style={styles.transitionContainer}
-                            >
-                              <View style={styles.transitionCard}>
-                                <View style={styles.transitionText}>
-                                  <Text
-                                    style={[
-                                      styles.position,
-                                      { color: colors.text },
-                                    ]}
-                                  >
-                                    {transition.position1}
-                                  </Text>
-                                  <Ionicons
-                                    name="arrow-forward"
-                                    size={20}
-                                    color={colors.primary}
-                                    style={styles.transitionArrow}
-                                  />
-                                  <Text
-                                    style={[
-                                      styles.position,
-                                      { color: colors.text },
-                                    ]}
-                                  >
-                                    {transition.position2}
-                                  </Text>
-                                </View>
+                      {displayProfile.career_transitions.map(
+                        (transition, index) => (
+                          <View
+                            key={index}
+                            style={styles.transitionContainer}
+                          >
+                            <View style={styles.transitionCard}>
+                              <View style={styles.transitionText}>
+                                <Text
+                                  style={[
+                                    styles.position,
+                                    { color: colors.text },
+                                  ]}
+                                >
+                                  {transition.position1}
+                                </Text>
+                                <Ionicons
+                                  name="arrow-forward"
+                                  size={20}
+                                  color={colors.primary}
+                                  style={styles.transitionArrow}
+                                />
+                                <Text
+                                  style={[
+                                    styles.position,
+                                    { color: colors.text },
+                                  ]}
+                                >
+                                  {transition.position2}
+                                </Text>
                               </View>
                             </View>
-                          );
-                        },
+                          </View>
+                        ),
                       )}
                     </View>
                   </>
                 )}
 
               {/* Education */}
-              {profile.education && (
+              {displayProfile.education && (
                 <>
                   <Text style={[styles.label, { color: colors.secondaryText }]}>
                     Education
                   </Text>
                   <Text style={[styles.value, { color: colors.text }]}>
-                    {profile.education}
+                    {displayProfile.education}
                   </Text>
                 </>
               )}
 
               {/* Industry Categories */}
-              {profile.industry_categories &&
-                profile.industry_categories.length > 0 && (
+              {displayProfile.industry_categories &&
+                displayProfile.industry_categories.length > 0 && (
                   <>
                     <Text
                       style={[styles.label, { color: colors.secondaryText }]}
@@ -880,7 +905,7 @@ export default function ProfileCard({
                       Industries
                     </Text>
                     <View style={styles.tagsContainer}>
-                      {profile.industry_categories.map((industry, index) => (
+                      {displayProfile.industry_categories.map((industry, index) => (
                         <View
                           key={index}
                           style={[
@@ -904,13 +929,13 @@ export default function ProfileCard({
                 )}
 
               {/* Interests */}
-              {profile.interests && profile.interests.length > 0 && (
+              {displayProfile.interests && displayProfile.interests.length > 0 && (
                 <View style={styles.section}>
                   <Text style={[styles.label, { color: colors.secondaryText }]}>
                     Interests
                   </Text>
                   <View style={styles.tagsContainer}>
-                    {profile.interests.map((interest, index) => (
+                    {displayProfile.interests.map((interest, index) => (
                       <View
                         key={index}
                         style={[
@@ -942,13 +967,13 @@ export default function ProfileCard({
                 Location Preferences
               </Text>
 
-              {profile.neighborhoods && profile.neighborhoods.length > 0 && (
+              {displayProfile.neighborhoods && displayProfile.neighborhoods.length > 0 && (
                 <>
                   <Text style={[styles.label, { color: colors.secondaryText }]}>
                     Neighborhoods
                   </Text>
                   <View style={styles.tagsContainer}>
-                    {profile.neighborhoods.map((neighborhood, index) => (
+                    {displayProfile.neighborhoods.map((neighborhood, index) => (
                       <View
                         key={index}
                         style={[
@@ -971,13 +996,13 @@ export default function ProfileCard({
                 </>
               )} */}
 
-              {profile.favorite_cafes && profile.favorite_cafes.length > 0 && (
+              {displayProfile.favoriteCafes && displayProfile.favoriteCafes.length > 0 && (
                 <>
                   <Text style={[styles.label, { color: colors.secondaryText }]}>
                     Cafe Preferences
                   </Text>
                   <View style={styles.tagsContainer}>
-                    {profile.favorite_cafes.map((cafe, index) => {
+                    {displayProfile.favoriteCafes.map((cafe, index) => {
                       const [cafeName, cafeAddress] = cafe
                         ? cafe.split("|||")
                         : ["", ""];
@@ -1056,7 +1081,7 @@ export default function ProfileCard({
           <ProfileForm
             userId={user.id}
             isNewUser={false}
-            initialData={profileData}
+            initialData={profileData || EMPTY_PROFILE} // Ensure initialData is always provided
             onSave={(updatedData) => {
               handleProfileSave(updatedData);
               setIsEditMode(false);
@@ -1066,6 +1091,8 @@ export default function ProfileCard({
           />
         </ScrollView>
       ) : null}
+      {/* If not in edit mode, and not isUserProfile=false, and not isOnboarding, then it should render nothing or a default state.
+          The existing logic handles these cases. */}
     </SafeAreaView>
   );
 }
@@ -1457,9 +1484,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
     color: "#0097FB",
     fontSize: 16,
-  },
-  textDark: {
-    color: "#fff",
   },
   loadingContainer: {
     flex: 1,
