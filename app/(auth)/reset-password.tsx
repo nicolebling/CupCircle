@@ -101,7 +101,7 @@ export default function ResetPasswordScreen() {
         // The auth context will detect this and redirect to login automatically
         Alert.alert(
           "Success",
-          "Your password has been updated successfully. Please log in with your new password.",
+          "Your password has been updated successfully. You will be logged out and can then log in with your new password.",
           [
             {
               text: "OK",

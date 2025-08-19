@@ -114,11 +114,6 @@ export type UserProfileData = {
     fromDate: string;
     toDate: string;
   }>;
-  notification_preferences?: {
-    coffee_reminders: boolean;
-    new_messages: boolean;
-    coffee_requests: boolean;
-  };
 };
 
 type ProfileCardProps = {

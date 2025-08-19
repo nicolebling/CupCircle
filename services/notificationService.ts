@@ -242,18 +242,4 @@ export const notificationService = {
       );
     }
   },
-
-  async sendCoffeeReminderNotification(
-    recipientUserId: string,
-    partnerName: string,
-    cafeName: string,
-    startTime: string,
-  ) {
-    await this.createNotification(
-      recipientUserId,
-      "☕ Coffee Chat Reminder",
-      `Your coffee chat with ${partnerName} at ${cafeName} starts in 3 hours (${startTime})`,
-      { type: "coffee_reminder" },
-    );
-  },
 };
