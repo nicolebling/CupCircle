@@ -52,8 +52,25 @@ export default function ForgotPasswordScreen() {
     }
 
     try {
-      // Proceed directly with password reset
-      // Supabase handles non-existent emails securely by not revealing whether they exist
+      // Check if email exists using Edge Function
+      const { data: checkResponse, error: checkError } = await supabase.functions.invoke('check-email-exists', {
+        body: { email: email.toLowerCase() }
+      });
+
+      if (checkError) {
+        console.error("Error checking email existence:", checkError);
+        Alert.alert("Error", "Unable to verify email. Please try again.");
+        setLoading(false);
+        return;
+      }
+
+      if (!checkResponse.exists) {
+        Alert.alert("Error", "This email is not registered. Please try again.");
+        setLoading(false);
+        return;
+      }
+
+      // Email exists, proceed with password reset
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: 'cupcircle://reset'
       });
