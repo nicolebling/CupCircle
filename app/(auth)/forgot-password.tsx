@@ -52,27 +52,8 @@ export default function ForgotPasswordScreen() {
     }
 
     try {
-      // First, check if the email exists in the auth.users table
-      const { data: users, error: userError } = await supabase.auth.admin.listUsers();
-      
-      if (userError) {
-        console.error("Error checking user existence:", userError);
-        // Fall back to attempting reset if we can't check users
-        Alert.alert("Error", "Unable to verify email. Please try again.");
-        setLoading(false);
-        return;
-      }
-
-      // Check if email exists in the users list
-      const userExists = users.users.some(user => user.email === email.toLowerCase());
-      
-      if (!userExists) {
-        Alert.alert("Error", "This email is not registered. Please try again.");
-        setLoading(false);
-        return;
-      }
-
-      // Email exists, proceed with password reset
+      // Proceed directly with password reset
+      // Supabase handles non-existent emails securely by not revealing whether they exist
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: 'cupcircle://reset'
       });
