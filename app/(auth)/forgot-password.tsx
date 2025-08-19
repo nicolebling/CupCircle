@@ -125,16 +125,6 @@ export default function ForgotPasswordScreen() {
                   Tap the link in the email to reset your password. Please also check your spam folder if you don't see it in your inbox.
                 </Text>
               </View>
-
-              <TouchableOpacity
-                style={[styles.sendAnotherButton, { backgroundColor: colors.primary }]}
-                onPress={() => {
-                  setEmailSent(false);
-                  setEmail("");
-                }}
-              >
-                <Text style={styles.buttonText}>Send Another Email</Text>
-              </TouchableOpacity>
             </View>
 
             <View style={styles.footer}>
