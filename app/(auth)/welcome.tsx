@@ -11,7 +11,7 @@ import {
   StatusBar,
 } from 'react-native';
 import { router } from 'expo-router';
-import PagerView from 'react-native-pager-view';
+import { PagerView } from 'react-native-pager-view';
 import Colors from '@/constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
