@@ -62,42 +62,55 @@ export default function OnboardingScreens({ onComplete }: OnboardingScreensProps
   const slideAnim = useRef(new Animated.Value(50)).current;
 
   const colors = Colors.light;
-  
 
   useEffect(() => {
-    // Add 1s delay to allow PNG load time, then animate in content
-    const timer = setTimeout(() => {
-      Animated.parallel([
-        Animated.timing(fadeAnim, {
-          toValue: 1,
-          duration: 400,
-          useNativeDriver: true,
-        }),
-        Animated.timing(scaleAnim, {
-          toValue: 1,
-          duration: 400,
-          useNativeDriver: true,
-        }),
-        Animated.timing(slideAnim, {
-          toValue: 0,
-          duration: 400,
-          useNativeDriver: true,
-        }),
-      ]).start();
-    }, 500);
-
-    return () => clearTimeout(timer);
+    // Animate in content when screen changes
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 250,
+        useNativeDriver: true,
+      }),
+      Animated.timing(scaleAnim, {
+        toValue: 1,
+        duration: 250,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 250,
+        useNativeDriver: true,
+      }),
+    ]).start();
   }, [currentIndex]);
 
   const handleNext = () => {
     if (currentIndex < onboardingData.length - 1) {
-      // Reset animation values for new content
-      fadeAnim.setValue(0);
-      scaleAnim.setValue(0.8);
-      slideAnim.setValue(50);
-      
-      // Change screen immediately
-      setCurrentIndex(currentIndex + 1);
+      // First, fade out current content
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 0,
+          duration: 150,
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleAnim, {
+          toValue: 0.8,
+          duration: 150,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: 50,
+          duration: 150,
+          useNativeDriver: true,
+        }),
+      ]).start(() => {
+        // Change the screen content after fade out completes
+        setCurrentIndex(currentIndex + 1);
+        // Reset values immediately for the new screen (invisible)
+        fadeAnim.setValue(0);
+        scaleAnim.setValue(0.8);
+        slideAnim.setValue(50);
+      });
     } else {
       onComplete();
     }
@@ -109,13 +122,31 @@ export default function OnboardingScreens({ onComplete }: OnboardingScreensProps
 
   const handlePrevious = () => {
     if (currentIndex > 0) {
-      // Reset animation values for new content
-      fadeAnim.setValue(0);
-      scaleAnim.setValue(0.8);
-      slideAnim.setValue(50);
-      
-      // Change screen immediately
-      setCurrentIndex(currentIndex - 1);
+      // First, fade out current content
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 0,
+          duration: 150,
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleAnim, {
+          toValue: 0.8,
+          duration: 150,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: 50,
+          duration: 150,
+          useNativeDriver: true,
+        }),
+      ]).start(() => {
+        // Change the screen content after fade out completes
+        setCurrentIndex(currentIndex - 1);
+        // Reset values immediately for the new screen (invisible)
+        fadeAnim.setValue(0);
+        scaleAnim.setValue(0.8);
+        slideAnim.setValue(50);
+      });
     }
   };
 
