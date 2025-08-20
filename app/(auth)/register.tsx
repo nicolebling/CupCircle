@@ -319,8 +319,7 @@ export default function SignUpScreen() {
                   .insert([
                     { 
                       id: data.user.id,
-                      first_name: userInfo.data.user?.givenName || '',
-                      last_name: userInfo.data.user?.familyName || '',
+                      name: userInfo.data.user?.name || null,
                       avatar_url: userInfo.data.user?.photo || null,
                     }
                   ])

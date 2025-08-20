@@ -689,7 +689,7 @@ export default function MatchingScreen() {
           // console.log("Processing profile:", profile.id, profile.name);
           const formattedProfile = {
             id: profile.id,
-            name: `${profile.first_name || ''} ${profile.last_name || ''}`.trim(),
+            name: profile.name,
             photo:
               profile.photo_url ||
               "https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg",
