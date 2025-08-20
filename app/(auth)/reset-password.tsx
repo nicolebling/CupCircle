@@ -120,25 +120,20 @@ export default function ResetPasswordScreen() {
         // Clear recovery state
         await resetRecoveryState();
         
-        // Show success message and redirect automatically
+        // Show success message and redirect when user presses OK
         Alert.alert(
           "Success",
-          "Your password has been updated successfully. You will now be redirected to the login page.",
+          "Your password has been updated successfully.",
           [
             {
               text: "OK",
               onPress: () => {
-                // Redirect to login immediately
+                // Redirect to login only when user presses OK
                 router.replace("/(auth)/login");
               }
             }
           ]
         );
-        
-        // Also redirect automatically after a short delay in case user doesn't press OK
-        setTimeout(() => {
-          router.replace("/(auth)/login");
-        }, 3000);
       }
     } catch (error) {
       console.error("Password update error:", error);
