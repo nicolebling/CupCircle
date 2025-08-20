@@ -117,21 +117,25 @@ export default function ResetPasswordScreen() {
         // Clear recovery state immediately
         await resetRecoveryState();
         
-        // Supabase automatically invalidates the session after password update
-        // The auth context will detect this and redirect to login automatically
+        // Show success message and redirect automatically
         Alert.alert(
           "Success",
-          "Your password has been updated successfully. You will be logged out and can then log in with your new password.",
+          "Your password has been updated successfully. You will now be redirected to the login page.",
           [
             {
               text: "OK",
               onPress: () => {
-                // Don't manually navigate - let the auth context handle the redirect
-                // The user will be automatically logged out and redirected to login
+                // Redirect to login immediately
+                router.replace("/(auth)/login");
               }
             }
           ]
         );
+        
+        // Also redirect automatically after a short delay in case user doesn't press OK
+        setTimeout(() => {
+          router.replace("/(auth)/login");
+        }, 3000);
       }
     } catch (error) {
       console.error("Password update error:", error);
