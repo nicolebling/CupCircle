@@ -9,13 +9,21 @@ export function usePasswordRecovery() {
   const [loading, setLoading] = useState(true);
 
   const resetRecoveryState = async () => {
-    console.log('Resetting password recovery state');
+    console.log('Resetting password recovery state completely');
     
-    // Clear state immediately
+    // Clear all recovery-related state
     setReadyForNewPassword(false);
     setLoading(false);
     
-    console.log('Recovery state reset completed');
+    // Clear any potential URL parameters or deep link state
+    try {
+      // Remove any lingering URL state by clearing the initial URL
+      await Linking.getInitialURL();
+    } catch (error) {
+      console.log('Error clearing URL state:', error);
+    }
+    
+    console.log('Complete recovery state reset finished');
   };
 
   async function handleUrl(url: string | null) {

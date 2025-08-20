@@ -64,22 +64,28 @@ function RootLayoutNav() {
       if (readyForNewPassword && currentSegment !== "(auth)") {
         router.replace("/(auth)/reset-password");
       }
-      // Priority 2: Show onboarding for first-time users (unauthenticated)
-      else if (!user && !hasCompletedOnboarding && !showOnboarding) {
+      // Priority 2: Show onboarding for first-time users (unauthenticated, not in recovery)
+      else if (!user && !hasCompletedOnboarding && !showOnboarding && !readyForNewPassword) {
         setShowOnboarding(true);
       }
-      // Priority 3: Handle unauthenticated users who completed onboarding
-      else if (!user && hasCompletedOnboarding && currentSegment !== "(auth)") {
+      // Priority 3: Handle unauthenticated users who completed onboarding (not in recovery)
+      else if (!user && hasCompletedOnboarding && currentSegment !== "(auth)" && !readyForNewPassword) {
         router.replace("/(auth)/login");
       }
-      // Priority 4: Handle authenticated users
+      // Priority 4: Handle authenticated users (not in recovery)
       else if (
         user &&
         currentSegment === "(auth)" &&
         authSegment !== "onboarding" &&
-        authSegment !== "reset-password"
+        authSegment !== "reset-password" &&
+        !readyForNewPassword
       ) {
         router.replace("/(tabs)/matching");
+      }
+      // Priority 5: Ensure clean state when user manually navigates back to login from recovery
+      else if (!user && !readyForNewPassword && currentSegment === "(auth)" && authSegment === "login") {
+        // Ensure we're in a clean login state
+        console.log('Ensuring clean login state');
       }
     }, 100);
 

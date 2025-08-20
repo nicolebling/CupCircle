@@ -258,31 +258,33 @@ export default function ResetPasswordScreen() {
             {/* Footer */}
             <View style={styles.footer}>
               <TouchableOpacity onPress={async () => {
-                console.log('Back to Login clicked - performing complete reset');
+                console.log('Back to Login clicked - performing complete app refresh');
                 
                 try {
-                  // First, clear recovery state and clean up URL
+                  // First, clear recovery state completely
                   await resetRecoveryState();
                   
-                  // Wait a moment for state to clear
-                  await new Promise(resolve => setTimeout(resolve, 100));
-                  
-                  // Sign out user to clear all session tokens and authentication
+                  // Sign out user to clear all session tokens and authentication state
                   const { error } = await supabase.auth.signOut();
                   if (error) {
                     console.error('Error signing out:', error);
                   }
                   
-                  // Wait another moment for signout to complete
-                  await new Promise(resolve => setTimeout(resolve, 100));
-                  
-                  // Navigate to login page
+                  // Clear any potential URL state by replacing with a clean login route
+                  router.dismissAll();
                   router.replace("/(auth)/login");
                   
-                  console.log('Complete reset finished');
+                  // Force a complete app refresh by triggering a navigation reset
+                  setTimeout(() => {
+                    // This ensures the app state is completely reset
+                    router.replace("/(auth)/login");
+                  }, 50);
+                  
+                  console.log('Complete app refresh finished');
                 } catch (error) {
-                  console.error('Failed to perform complete reset:', error);
+                  console.error('Failed to perform complete app refresh:', error);
                   // Force navigation even if there's an error
+                  router.dismissAll();
                   router.replace("/(auth)/login");
                 }
               }}>
