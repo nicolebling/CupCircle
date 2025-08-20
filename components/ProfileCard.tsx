@@ -24,7 +24,7 @@ import * as ImagePicker from "expo-image-picker";
 import { decode } from "base64-arraybuffer";
 import NeighborhoodSelector from "./NeighborhoodSelector";
 import CafeSelector from "./CafeSelector";
-import EmploymentHistoryEntry from "./EmploymentHistoryEntry";
+import ExperienceHistoryEntry from "./ExperienceHistoryEntry";
 import CareerTransitionEntry from "./CareerTransitionEntry";
 import SkeletonLoader from "./SkeletonLoader";
 import {
@@ -326,10 +326,11 @@ export default function ProfileCard({
           <View style={styles.headerContainer}>
             <View style={styles.headerInfo}>
               {/* Name */}
-              <Text style={[styles.name, { color: colors.text }]}>
-                {profile.name}
-                {/* {profile.age && <Text>({profile.age})</Text>} */}
-              </Text>
+              <View style={styles.nameContainer}>
+                <Text style={[styles.name, { color: colors.text }]}>
+                  {profile.name}{profile.last_name ? ` ${profile.last_name.charAt(0)}.` : ''}
+                </Text>
+              </View>
 
               {/* Occupation / Headline */}
               <View style={styles.positionContainer}>
@@ -662,7 +663,7 @@ export default function ProfileCard({
                     { color: colors.text, textAlign: "center" },
                   ]}
                 >
-                  {profile.name}
+                  {profile.name}{profile.last_name ? ` ${profile.last_name.charAt(0)}.` : ''}
                 </Text>
 
                 <View

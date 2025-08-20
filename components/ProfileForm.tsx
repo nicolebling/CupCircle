@@ -266,7 +266,12 @@ export default function ProfileForm({
 
   const validateForm = () => {
     if (!name.trim()) {
-      setError("Name is required");
+      setError("First name is required");
+      return false;
+    }
+
+    if (!lastName.trim()) {
+      setError("Last name is required");
       return false;
     }
 

@@ -1,4 +1,3 @@
-
 import { query } from '../services/database';
 
 export interface Employment {
@@ -60,7 +59,7 @@ export class ProfileModel {
   static async update(id: string, profileData: Partial<Profile>): Promise<Profile> {
     const keys = Object.keys(profileData);
     const setClause = keys.map((key, i) => `${key} = $${i + 2}`).join(', ');
-    
+
     const values = keys.map(key => {
       if (key === 'location' && profileData.location) {
         return JSON.stringify(profileData.location);
