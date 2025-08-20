@@ -242,13 +242,14 @@ app.post('/api/profile', async (req, res) => {
       // Create new profile
       const result = await pool.query(
         `INSERT INTO profiles(
-          user_id, name, age, occupation, photo, bio,
+          user_id, first_name, last_name, age, occupation, photo, bio,
           industry_categories, skills, neighborhoods, favorite_cafes, interests
-        ) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) 
+        ) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) 
         RETURNING *`,
         [
           user_id,
-          profileData.name || '',
+          profileData.first_name || '',
+          profileData.last_name || '',
           profileData.age || null,
           profileData.occupation || '',
           profileData.photo || '',

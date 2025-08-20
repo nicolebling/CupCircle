@@ -87,14 +87,10 @@ export const profileService = {
           : null,
       };
 
-      // Remove firstName and lastName since backend only has 'name' column
-      const { firstName, lastName, ...dataForBackend } = formattedData as any;
-
       const { data, error } = await supabase
         .from("profiles")
         .upsert({
-          
-          ...dataForBackend,
+          ...formattedData,
           updated_at: new Date().toISOString(),
         })
         .select()

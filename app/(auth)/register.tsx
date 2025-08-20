@@ -114,6 +114,8 @@ export default function SignUpScreen() {
                 .insert([
                   { 
                     id: data.user.id,
+                    first_name: '',
+                    last_name: '',
                     avatar_url: null,
                   }
                 ])
@@ -314,12 +316,14 @@ export default function SignUpScreen() {
               }
 
               if (!existingProfile) {
+                const nameParts = userInfo.data.user?.name?.split(' ') || ['', ''];
                 const { data: profileData, error: profileError } = await supabase
                   .from('profiles')
                   .insert([
                     { 
                       id: data.user.id,
-                      name: userInfo.data.user?.name || null,
+                      first_name: nameParts[0] || '',
+                      last_name: nameParts.slice(1).join(' ') || '',
                       avatar_url: userInfo.data.user?.photo || null,
                     }
                   ])
