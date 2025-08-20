@@ -13,7 +13,6 @@ import { View, ActivityIndicator, Platform } from "react-native";
 import "react-native-reanimated";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { NetworkProvider } from "@/contexts/NetworkContext";
-import { useColorScheme } from "@/hooks/useColorScheme";
 import { usePasswordRecovery } from "@/hooks/usePasswordRecovery";
 import { Text, TextInput } from "react-native";
 import Colors from "@/constants/Colors";
@@ -21,6 +20,8 @@ import CustomSplashScreen from "@/components/CustomSplashScreen";
 import Superwall from "expo-superwall/compat";
 import * as Notifications from 'expo-notifications';
 import { router } from 'expo-router';
+import { useOnboarding } from "@/hooks/useOnboarding";
+import OnboardingScreens from "@/components/OnboardingScreens";
 
 // Suppress animation warnings in development
 if (__DEV__) {
@@ -42,51 +43,35 @@ function RootLayoutNav() {
   const router = useRouter();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
-  
+
   // Handle password recovery deep links globally
   const { readyForNewPassword, resetRecoveryState } = usePasswordRecovery();
   const [lastRecoveryState, setLastRecoveryState] = useState<boolean | null>(null);
 
+  // Onboarding state
+  const { hasCompletedOnboarding, loading: onboardingLoading, completeOnboarding } = useOnboarding();
+  const [showOnboarding, setShowOnboarding] = useState(false);
+
   useEffect(() => {
-    if (loading) return;
+    if (loading || onboardingLoading) return;
 
     const timeoutId = setTimeout(() => {
       const currentSegment = segments[0];
       const authSegment = segments[1];
-      
-      // Priority 1: Handle password recovery flow
-      if (readyForNewPassword) {
-        console.log('Recovery state detected:', { currentSegment, authSegment, hasUser: !!user });
-        
-        // Only navigate if we haven't already handled this recovery state
-        if (lastRecoveryState !== readyForNewPassword) {
-          setLastRecoveryState(readyForNewPassword);
-          
-          // If we're not on the reset-password screen, navigate there
-          if (currentSegment !== "(auth)" || authSegment !== "reset-password") {
-            console.log('Navigating to reset-password for recovery flow');
-            router.replace("/(auth)/reset-password");
-            return;
-          }
-        }
-        
-        // If we're already on the reset-password screen, stay there
-        return;
-      } else if (lastRecoveryState !== readyForNewPassword) {
-        // Recovery state changed to false, update tracking
-        setLastRecoveryState(readyForNewPassword);
+
+      // Priority 1: Handle password recovery
+      if (readyForNewPassword && currentSegment !== "(auth)") {
+        router.replace("/(auth)/reset-password");
       }
-      
-      // Priority 2: Handle unauthenticated users
-      if (!user && currentSegment !== "(auth)") {
-        // Clear any lingering recovery state when redirecting to login
-        if (readyForNewPassword) {
-          console.log('Clearing recovery state before login redirect');
-          resetRecoveryState();
-        }
+      // Priority 2: Show onboarding for first-time users (unauthenticated)
+      else if (!user && !hasCompletedOnboarding && !showOnboarding) {
+        setShowOnboarding(true);
+      }
+      // Priority 3: Handle unauthenticated users who completed onboarding
+      else if (!user && hasCompletedOnboarding && currentSegment !== "(auth)") {
         router.replace("/(auth)/login");
-      } 
-      // Priority 3: Handle authenticated users
+      }
+      // Priority 4: Handle authenticated users
       else if (
         user &&
         currentSegment === "(auth)" &&
@@ -98,9 +83,9 @@ function RootLayoutNav() {
     }, 100);
 
     return () => clearTimeout(timeoutId);
-  }, [user, loading, segments, readyForNewPassword]);
+  }, [user, loading, segments, readyForNewPassword, hasCompletedOnboarding, onboardingLoading, showOnboarding]);
 
-  if (loading) {
+  if (loading || onboardingLoading) {
     return (
       <View
         style={{
@@ -113,6 +98,13 @@ function RootLayoutNav() {
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
+  }
+
+  if (showOnboarding) {
+    return <OnboardingScreens onComplete={() => {
+      completeOnboarding();
+      setShowOnboarding(false);
+    }} />;
   }
 
   return (
