@@ -63,7 +63,7 @@ export default function OnboardingScreens({ onComplete }: OnboardingScreensProps
   const colors = Colors.light;
 
   useEffect(() => {
-    // Add 1.2s delay to ensure WebP images fully load, then animate in content
+    // Add 350ms delay to ensure WebP images fully load, then animate in content
     const timer = setTimeout(() => {
       Animated.parallel([
         Animated.timing(fadeAnim, {
@@ -82,7 +82,7 @@ export default function OnboardingScreens({ onComplete }: OnboardingScreensProps
           useNativeDriver: true,
         }),
       ]).start();
-    },350);
+    }, 350);
 
     return () => clearTimeout(timer);
   }, [currentIndex]);
@@ -107,12 +107,12 @@ export default function OnboardingScreens({ onComplete }: OnboardingScreensProps
           useNativeDriver: true,
         }),
       ]).start(() => {
-        // Change the screen content after fade out completes
-        setCurrentIndex(currentIndex + 1);
         // Reset values immediately for the new screen (invisible)
         fadeAnim.setValue(0);
         scaleAnim.setValue(0.8);
         slideAnim.setValue(50);
+        // Change the screen content after fade out completes - this triggers useEffect timer
+        setCurrentIndex(currentIndex + 1);
       });
     } else {
       onComplete();
@@ -143,12 +143,12 @@ export default function OnboardingScreens({ onComplete }: OnboardingScreensProps
           useNativeDriver: true,
         }),
       ]).start(() => {
-        // Change the screen content after fade out completes
-        setCurrentIndex(currentIndex - 1);
         // Reset values immediately for the new screen (invisible)
         fadeAnim.setValue(0);
         scaleAnim.setValue(0.8);
         slideAnim.setValue(50);
+        // Change the screen content after fade out completes - this triggers useEffect timer
+        setCurrentIndex(currentIndex - 1);
       });
     }
   };
