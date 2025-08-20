@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
@@ -64,24 +63,28 @@ export default function OnboardingScreens({ onComplete }: OnboardingScreensProps
   const colors = Colors.light;
 
   useEffect(() => {
-    // Animate in content when screen changes
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 250,
-        useNativeDriver: true,
-      }),
-      Animated.timing(scaleAnim, {
-        toValue: 1,
-        duration: 250,
-        useNativeDriver: true,
-      }),
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 250,
-        useNativeDriver: true,
-      }),
-    ]).start();
+    // Add 1.2s delay to ensure WebP images fully load, then animate in content
+    const timer = setTimeout(() => {
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleAnim, {
+          toValue: 1,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }, 1200);
+
+    return () => clearTimeout(timer);
   }, [currentIndex]);
 
   const handleNext = () => {
@@ -235,7 +238,7 @@ export default function OnboardingScreens({ onComplete }: OnboardingScreensProps
               </Text>
             </TouchableOpacity>
           )}
-          
+
           <TouchableOpacity 
             style={[
               styles.nextButton, 
