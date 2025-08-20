@@ -69,18 +69,22 @@ function RootLayoutNav() {
         // Stay on reset-password page, don't redirect
         return;
       }
-      // Priority 3: Show onboarding for first-time users (unauthenticated, not in recovery)
-      else if (!user && !hasCompletedOnboarding && !showOnboarding && !readyForNewPassword) {
+      // Priority 3: If in recovery mode, prevent any other redirects
+      else if (readyForNewPassword) {
+        // Don't redirect anywhere if recovery is active, let the recovery flow handle navigation
+        return;
+      }
+      // Priority 4: Show onboarding for first-time users (unauthenticated, not in recovery)
+      else if (!user && !hasCompletedOnboarding && !showOnboarding) {
         setShowOnboarding(true);
       }
-      // Priority 4: Handle unauthenticated users who completed onboarding (not in recovery)
-      else if (!user && hasCompletedOnboarding && currentSegment !== "(auth)" && !readyForNewPassword) {
+      // Priority 5: Handle unauthenticated users who completed onboarding (not in recovery)
+      else if (!user && hasCompletedOnboarding && currentSegment !== "(auth)") {
         router.replace("/(auth)/login");
       }
-      // Priority 5: Handle authenticated users who are NOT in recovery mode
+      // Priority 6: Handle authenticated users who are NOT in recovery mode
       else if (
         user &&
-        !readyForNewPassword &&
         currentSegment === "(auth)" &&
         authSegment !== "onboarding"
       ) {
