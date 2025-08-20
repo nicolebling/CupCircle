@@ -62,29 +62,31 @@ export default function OnboardingScreens({ onComplete }: OnboardingScreensProps
 
   const colors = Colors.light;
 
-  useEffect(() => {
-    // Add 350ms delay to ensure WebP images fully load, then animate in content
-    const timer = setTimeout(() => {
-      Animated.parallel([
-        Animated.timing(fadeAnim, {
-          toValue: 1,
-          duration: 600,
-          useNativeDriver: true,
-        }),
-        Animated.timing(scaleAnim, {
-          toValue: 1,
-          duration: 600,
-          useNativeDriver: true,
-        }),
-        Animated.timing(slideAnim, {
-          toValue: 0,
-          duration: 600,
-          useNativeDriver: true,
-        }),
-      ]).start();
-    }, 350);
+  const startAnimation = () => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 600,
+        useNativeDriver: true,
+      }),
+      Animated.timing(scaleAnim, {
+        toValue: 1,
+        duration: 600,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 600,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
 
-    return () => clearTimeout(timer);
+  useEffect(() => {
+    // Reset to initial state when screen changes
+    fadeAnim.setValue(0);
+    scaleAnim.setValue(0.8);
+    slideAnim.setValue(50);
   }, [currentIndex]);
 
   const handleNext = () => {
@@ -182,6 +184,7 @@ export default function OnboardingScreens({ onComplete }: OnboardingScreensProps
             source={currentScreen.image} 
             style={styles.image}
             resizeMode="contain"
+            onLoad={startAnimation}
           />
         </Animated.View>
 
