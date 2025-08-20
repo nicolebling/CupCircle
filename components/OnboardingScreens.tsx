@@ -65,39 +65,47 @@ export default function OnboardingScreens({ onComplete }: OnboardingScreensProps
 
   useEffect(() => {
     // Animate in content when screen changes
-    Animated.sequence([
+    Animated.parallel([
       Animated.timing(fadeAnim, {
-        toValue: 0,
-        duration: 150,
+        toValue: 1,
+        duration: 400,
         useNativeDriver: true,
       }),
-      Animated.parallel([
-        Animated.timing(fadeAnim, {
-          toValue: 1,
-          duration: 600,
-          useNativeDriver: true,
-        }),
-        Animated.timing(scaleAnim, {
-          toValue: 1,
-          duration: 600,
-          useNativeDriver: true,
-        }),
-        Animated.timing(slideAnim, {
-          toValue: 0,
-          duration: 600,
-          useNativeDriver: true,
-        }),
-      ]),
+      Animated.timing(scaleAnim, {
+        toValue: 1,
+        duration: 400,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 400,
+        useNativeDriver: true,
+      }),
     ]).start();
   }, [currentIndex]);
 
   const handleNext = () => {
     if (currentIndex < onboardingData.length - 1) {
-      setCurrentIndex(currentIndex + 1);
-      // Reset animations for next screen
-      fadeAnim.setValue(0);
-      scaleAnim.setValue(0.8);
-      slideAnim.setValue(50);
+      // Smoothly animate out first, then change screen
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleAnim, {
+          toValue: 0.8,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: 50,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+      ]).start(() => {
+        setCurrentIndex(currentIndex + 1);
+      });
     } else {
       onComplete();
     }
@@ -109,11 +117,26 @@ export default function OnboardingScreens({ onComplete }: OnboardingScreensProps
 
   const handlePrevious = () => {
     if (currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1);
-      // Reset animations for previous screen
-      fadeAnim.setValue(0);
-      scaleAnim.setValue(0.8);
-      slideAnim.setValue(50);
+      // Smoothly animate out first, then change screen
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleAnim, {
+          toValue: 0.8,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: 50,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+      ]).start(() => {
+        setCurrentIndex(currentIndex - 1);
+      });
     }
   };
 
@@ -258,10 +281,10 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   image: {
-    width: width * 0.7,
-    height: width * 0.5,
-    maxWidth: 300,
-    maxHeight: 220,
+    width: width * 1.05, // Increased by 50% (0.7 * 1.5)
+    height: width * 0.75, // Increased by 50% (0.5 * 1.5)
+    maxWidth: 450, // Increased by 50% (300 * 1.5)
+    maxHeight: 330, // Increased by 50% (220 * 1.5)
   },
   textContainer: {
     flex: 0.4,
