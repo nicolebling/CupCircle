@@ -98,7 +98,8 @@
         {
           "iosUrlScheme": "com.googleusercontent.apps.145530736366-8o8pc0ttauphf34mkbijf16g3gvtqpc0"
         }
-      ]
+      ],
+      "./plugins/withAndroidExported.js"
     ],
     "experiments": {
       "typedRoutes": true
