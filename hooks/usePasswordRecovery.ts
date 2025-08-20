@@ -7,34 +7,28 @@ import { parseRecoveryTokens } from '@/utils/recoveryUtils';
 export function usePasswordRecovery() {
   const [readyForNewPassword, setReadyForNewPassword] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [hasProcessedUrl, setHasProcessedUrl] = useState(false);
 
   const resetRecoveryState = async () => {
     console.log('Resetting password recovery state');
     
-    // Clear state immediately
     setReadyForNewPassword(false);
     setLoading(false);
-    setHasProcessedUrl(true);
     
     // Clear any recovery tokens from the URL
     if (typeof window !== 'undefined') {
       const url = new URL(window.location.href);
-      if (url.searchParams.has('access_token') || url.searchParams.has('refresh_token')) {
+      const hasTokens = url.searchParams.has('access_token') || 
+                       url.searchParams.has('refresh_token') || 
+                       url.hash.includes('access_token') || 
+                       url.hash.includes('refresh_token');
+      
+      if (hasTokens) {
         url.searchParams.delete('access_token');
         url.searchParams.delete('refresh_token');
         url.searchParams.delete('type');
+        url.hash = '';
         window.history.replaceState({}, '', url.toString());
       }
-    }
-    
-    // Also clear from AsyncStorage to prevent future issues
-    try {
-      await import('@react-native-async-storage/async-storage').then(({ default: AsyncStorage }) => {
-        AsyncStorage.removeItem('password_recovery_processed');
-      });
-    } catch (error) {
-      console.log('Could not clear AsyncStorage:', error);
     }
     
     console.log('Recovery state reset completed');
@@ -43,9 +37,9 @@ export function usePasswordRecovery() {
   async function handleUrl(url: string | null) {
     console.log('Processing recovery URL:', url);
     
-    // Check if we've already processed a recovery URL in this session
-    if (hasProcessedUrl) {
-      console.log('Already processed recovery URL in this session, skipping');
+    if (!url) {
+      console.log('No URL provided');
+      setReadyForNewPassword(false);
       setLoading(false);
       return;
     }
@@ -55,12 +49,10 @@ export function usePasswordRecovery() {
       console.log('No recovery tokens found in URL');
       setReadyForNewPassword(false);
       setLoading(false);
-      setHasProcessedUrl(true);
       return;
     }
 
     console.log('Valid recovery tokens found, setting session...');
-    setHasProcessedUrl(true);
     
     try {
       const { error } = await supabase.auth.setSession({
@@ -70,7 +62,6 @@ export function usePasswordRecovery() {
 
       if (!error) {
         console.log('Recovery session set successfully');
-        console.log('Setting readyForNewPassword to true');
         setReadyForNewPassword(true);
       } else {
         console.error('Failed to set recovery session:', error);
@@ -88,33 +79,34 @@ export function usePasswordRecovery() {
     let mounted = true;
 
     const initializeRecovery = async () => {
-      // Check if we've already processed a recovery in this session
-      try {
-        const AsyncStorage = await import('@react-native-async-storage/async-storage').then(m => m.default);
-        const processed = await AsyncStorage.getItem('password_recovery_processed');
-        if (processed) {
-          console.log('Recovery already processed in this session');
-          setLoading(false);
-          setHasProcessedUrl(true);
-          return;
+      console.log('Initializing password recovery...');
+      
+      // First check the current URL when the hook mounts
+      if (typeof window !== 'undefined') {
+        const currentUrl = window.location.href;
+        console.log('Current URL on mount:', currentUrl);
+        if (mounted) {
+          await handleUrl(currentUrl);
+          return; // Don't continue if we found tokens in current URL
         }
-      } catch (error) {
-        console.log('Could not check AsyncStorage:', error);
       }
 
-      // When app is cold-started from the link
-      Linking.getInitialURL().then((url) => {
-        if (mounted && !hasProcessedUrl) {
-          handleUrl(url);
-        }
-      });
+      // Fallback: check initial URL from Linking
+      const initialUrl = await Linking.getInitialURL();
+      console.log('Initial URL from Linking:', initialUrl);
+      if (mounted && initialUrl) {
+        await handleUrl(initialUrl);
+      } else if (mounted) {
+        setLoading(false);
+      }
     };
 
     initializeRecovery();
 
-    // When app is already open and receives the link
+    // Listen for URL changes while app is running
     const subscription = Linking.addEventListener('url', ({ url }) => {
-      if (mounted && !hasProcessedUrl) {
+      console.log('URL changed:', url);
+      if (mounted) {
         handleUrl(url);
       }
     });
@@ -123,7 +115,7 @@ export function usePasswordRecovery() {
       mounted = false;
       subscription?.remove();
     };
-  }, [hasProcessedUrl]);
+  }, []);
 
   console.log('usePasswordRecovery state:', { readyForNewPassword, loading });
   
