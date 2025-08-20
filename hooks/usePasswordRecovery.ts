@@ -11,9 +11,18 @@ export function usePasswordRecovery() {
   const resetRecoveryState = async () => {
     console.log('Resetting password recovery state');
     
-    // Clear state immediately
+    // Clear state immediately and synchronously
     setReadyForNewPassword(false);
     setLoading(false);
+    
+    // Also clear any URL parameters that might trigger recovery again
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      if (url.searchParams.has('access_token') || url.searchParams.has('refresh_token')) {
+        url.search = '';
+        window.history.replaceState({}, '', url.toString());
+      }
+    }
     
     console.log('Recovery state reset completed');
   };
