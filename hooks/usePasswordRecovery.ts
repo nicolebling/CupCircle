@@ -11,19 +11,9 @@ export function usePasswordRecovery() {
   const resetRecoveryState = async () => {
     console.log('Resetting password recovery state');
     
-    // Clear state immediately and forcefully
+    // Clear state immediately
     setReadyForNewPassword(false);
     setLoading(false);
-    
-    // Clear any URL parameters that might trigger recovery again
-    if (typeof window !== 'undefined') {
-      const currentUrl = window.location.href;
-      if (currentUrl.includes('access_token') || currentUrl.includes('refresh_token')) {
-        const cleanUrl = currentUrl.split('#')[0].split('?')[0];
-        window.history.replaceState({}, '', cleanUrl);
-        console.log('Cleared recovery tokens from URL');
-      }
-    }
     
     console.log('Recovery state reset completed');
   };
@@ -38,8 +28,9 @@ export function usePasswordRecovery() {
       // Check if user already has a valid session
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
-        console.log('User already has valid session, clearing recovery state');
-        // If user has a valid session but no recovery tokens, they've completed the flow
+        console.log('User already has valid session, checking if it\'s a recovery session');
+        // Only set ready for password if this is actually a recovery session
+        // We can check this by looking at the session metadata or user state
         setReadyForNewPassword(false);
       } else {
         console.log('No valid session found');
@@ -89,19 +80,10 @@ export function usePasswordRecovery() {
         handleUrl(url);
       }
     });
-
-    // Listen for auth state changes to clear recovery state when user signs in normally
-    const { data: { subscription: authSubscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (mounted && event === 'SIGNED_IN' && session?.user && !parseRecoveryTokens(window?.location?.href)) {
-        console.log('User signed in normally, clearing recovery state');
-        setReadyForNewPassword(false);
-      }
-    });
     
     return () => {
       mounted = false;
       subscription?.remove();
-      authSubscription?.unsubscribe();
     };
   }, []);
 

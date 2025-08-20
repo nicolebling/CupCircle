@@ -60,22 +60,26 @@ function RootLayoutNav() {
       const currentSegment = segments[0];
       const authSegment = segments[1];
 
-      // Priority 1: Handle authenticated users first to prevent recovery redirect loops
-      if (user && currentSegment === "(auth)" && authSegment !== "onboarding") {
-        console.log('Authenticated user detected, redirecting to matching tab');
-        router.replace("/(tabs)/matching");
-      }
-      // Priority 2: Handle password recovery only for unauthenticated users
-      else if (readyForNewPassword && !user && currentSegment !== "(auth)") {
+      // Priority 1: Handle password recovery
+      if (readyForNewPassword && currentSegment !== "(auth)") {
         router.replace("/(auth)/reset-password");
       }
-      // Priority 3: Show onboarding for first-time users (unauthenticated)
+      // Priority 2: Show onboarding for first-time users (unauthenticated)
       else if (!user && !hasCompletedOnboarding && !showOnboarding) {
         setShowOnboarding(true);
       }
-      // Priority 4: Handle unauthenticated users who completed onboarding
+      // Priority 3: Handle unauthenticated users who completed onboarding
       else if (!user && hasCompletedOnboarding && currentSegment !== "(auth)") {
         router.replace("/(auth)/login");
+      }
+      // Priority 4: Handle authenticated users
+      else if (
+        user &&
+        currentSegment === "(auth)" &&
+        authSegment !== "onboarding" &&
+        authSegment !== "reset-password"
+      ) {
+        router.replace("/(tabs)/matching");
       }
     }, 100);
 
