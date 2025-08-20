@@ -114,20 +114,21 @@ export default function ResetPasswordScreen() {
       } else {
         console.log("Password updated successfully:", data);
         
-        // Clear recovery state immediately
-        await resetRecoveryState();
-        
-        // Supabase automatically invalidates the session after password update
-        // The auth context will detect this and redirect to login automatically
         Alert.alert(
           "Success",
-          "Your password has been updated successfully. You will be logged out and can then log in with your new password.",
+          "Your password has been updated successfully. Please log in with your new password.",
           [
             {
               text: "OK",
-              onPress: () => {
-                // Don't manually navigate - let the auth context handle the redirect
-                // The user will be automatically logged out and redirected to login
+              onPress: async () => {
+                // Clear recovery state and sign out completely
+                await resetRecoveryState();
+                
+                // Small delay to ensure cleanup completes
+                setTimeout(() => {
+                  // Force redirect to login
+                  router.replace("/(auth)/login");
+                }, 100);
               }
             }
           ]
@@ -258,33 +259,9 @@ export default function ResetPasswordScreen() {
             {/* Footer */}
             <View style={styles.footer}>
               <TouchableOpacity onPress={async () => {
-                console.log('Back to Login clicked - performing complete reset');
-                
-                try {
-                  // First, clear recovery state and clean up URL
-                  await resetRecoveryState();
-                  
-                  // Wait a moment for state to clear
-                  await new Promise(resolve => setTimeout(resolve, 100));
-                  
-                  // Sign out user to clear all session tokens and authentication
-                  const { error } = await supabase.auth.signOut();
-                  if (error) {
-                    console.error('Error signing out:', error);
-                  }
-                  
-                  // Wait another moment for signout to complete
-                  await new Promise(resolve => setTimeout(resolve, 100));
-                  
-                  // Navigate to login page
-                  router.replace("/(auth)/login");
-                  
-                  console.log('Complete reset finished');
-                } catch (error) {
-                  console.error('Failed to perform complete reset:', error);
-                  // Force navigation even if there's an error
-                  router.replace("/(auth)/login");
-                }
+                console.log('Back to Login clicked');
+                await resetRecoveryState();
+                router.replace("/(auth)/login");
               }}>
                 <Text
                   style={[

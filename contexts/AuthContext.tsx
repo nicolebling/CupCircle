@@ -53,66 +53,39 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const [initializing, setInitializing] = useState(true); // Added for clarity on initial load
+
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session)
+      setUser(session?.user ?? null)
+      setInitializing(false)
+    })
 
-      // Identify user with Superwall if session exists
-      if (session?.user) {
-        try {
-          await Superwall.shared.identify({ userId: session.user.id });
-          console.log(
-            "Superwall user identified from existing session:",
-            session.user.id,
-          );
-        } catch (error) {
-          console.error(
-            "Failed to identify user with Superwall from session:",
-            error,
-          );
-        }
-      }
-
-      setLoading(false);
-    });
-
+    // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth state change:', event, session?.user?.email);
 
-      // Handle Superwall user identification based on auth state
-      if (session?.user) {
-        try {
-          await Superwall.shared.identify({ userId: session.user.id });
-          console.log(
-            "Superwall user identified on auth state change:",
-            session.user.id,
-          );
-        } catch (error) {
-          console.error(
-            "Failed to identify user with Superwall on auth state change:",
-            error,
-          );
-        }
-      } else {
-        try {
-          await Superwall.shared.reset();
-          console.log("Superwall user reset on auth state change");
-        } catch (error) {
-          console.error(
-            "Failed to reset Superwall user on auth state change:",
-            error,
-          );
-        }
+      // Handle password recovery completion
+      if (event === 'PASSWORD_RECOVERY') {
+        console.log('Password recovery detected - user should set new password');
       }
 
-      setLoading(false);
-    });
+      // Handle sign out or token refresh
+      if (event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
+        console.log('Auth event:', event);
+      }
 
-    return () => subscription.unsubscribe();
+      setSession(session)
+      setUser(session?.user ?? null)
+      setInitializing(false)
+    })
+
+    return () => subscription.unsubscribe()
   }, []);
 
   const signIn = async (email: string, password: string) => {
