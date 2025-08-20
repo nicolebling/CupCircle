@@ -271,7 +271,8 @@ export default function MatchingScreen() {
     try {
       const { data, error } = await supabase
         .from("cafes")
-        .select("*");
+        .select("*")
+        .eq("is_featured", true);
 
       if (error) {
         console.error("Error fetching featured cafes:", error);
@@ -291,6 +292,9 @@ export default function MatchingScreen() {
     const [cafeName, cafeAddress] = cafeString.split("|||");
     
     return featuredCafes.some(featuredCafe => {
+      // Only consider cafes that are actually featured
+      if (!featuredCafe.is_featured) return false;
+      
       // Check if name matches (case insensitive)
       const nameMatch = featuredCafe.name?.toLowerCase().includes(cafeName?.toLowerCase()) ||
                        cafeName?.toLowerCase().includes(featuredCafe.name?.toLowerCase());
