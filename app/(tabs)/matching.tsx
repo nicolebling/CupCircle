@@ -43,6 +43,7 @@ import { geoUtils } from "@/utils/geoUtils";
 interface Profile {
   id: string;
   name: string;
+  last_name?: string;
   photo_url?: string;
   photo?: string;
   birthday?: string;
