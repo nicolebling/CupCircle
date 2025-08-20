@@ -22,6 +22,7 @@ import * as Notifications from 'expo-notifications';
 import { router } from 'expo-router';
 import { useOnboarding } from "@/hooks/useOnboarding";
 import OnboardingScreens from "@/components/OnboardingScreens";
+import { useColorScheme } from "@/hooks/useColorScheme";
 
 // Suppress animation warnings in development
 if (__DEV__) {
