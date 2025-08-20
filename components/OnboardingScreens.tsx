@@ -86,7 +86,7 @@ export default function OnboardingScreens({ onComplete }: OnboardingScreensProps
 
   const handleNext = () => {
     if (currentIndex < onboardingData.length - 1) {
-      // Smoothly animate out first, then change screen
+      // First, fade out current content
       Animated.parallel([
         Animated.timing(fadeAnim, {
           toValue: 0,
@@ -104,7 +104,12 @@ export default function OnboardingScreens({ onComplete }: OnboardingScreensProps
           useNativeDriver: true,
         }),
       ]).start(() => {
+        // Change the screen content after fade out completes
         setCurrentIndex(currentIndex + 1);
+        // Reset values immediately for the new screen (invisible)
+        fadeAnim.setValue(0);
+        scaleAnim.setValue(0.8);
+        slideAnim.setValue(50);
       });
     } else {
       onComplete();
@@ -117,7 +122,7 @@ export default function OnboardingScreens({ onComplete }: OnboardingScreensProps
 
   const handlePrevious = () => {
     if (currentIndex > 0) {
-      // Smoothly animate out first, then change screen
+      // First, fade out current content
       Animated.parallel([
         Animated.timing(fadeAnim, {
           toValue: 0,
@@ -135,7 +140,12 @@ export default function OnboardingScreens({ onComplete }: OnboardingScreensProps
           useNativeDriver: true,
         }),
       ]).start(() => {
+        // Change the screen content after fade out completes
         setCurrentIndex(currentIndex - 1);
+        // Reset values immediately for the new screen (invisible)
+        fadeAnim.setValue(0);
+        scaleAnim.setValue(0.8);
+        slideAnim.setValue(50);
       });
     }
   };
