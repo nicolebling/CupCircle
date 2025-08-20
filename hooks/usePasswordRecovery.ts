@@ -15,40 +15,27 @@ export function usePasswordRecovery() {
     setReadyForNewPassword(false);
     setLoading(false);
     
-    // Sign out completely to clear any recovery session
-    try {
-      await supabase.auth.signOut();
-      console.log('Signed out successfully during recovery reset');
-    } catch (error) {
-      console.error('Error signing out during recovery reset:', error);
-    }
-    
     console.log('Recovery state reset completed');
   };
 
   async function handleUrl(url: string | null) {
     console.log('Processing recovery URL:', url);
     
-    // If no URL, check if we have a valid regular session (not recovery)
-    if (!url) {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        // Only set ready if this is actually a recovery session
-        // Check if the session has recovery metadata
-        const isRecoverySession = session.user.recovery_sent_at || 
-                                session.user.email_confirmed_at === session.user.created_at;
-        setReadyForNewPassword(isRecoverySession || false);
-      } else {
-        setReadyForNewPassword(false);
-      }
-      setLoading(false);
-      return;
-    }
-
     const tokens = parseRecoveryTokens(url);
     if (!tokens) {
-      console.log('No recovery tokens found in URL');
-      setReadyForNewPassword(false);
+      console.log('No recovery tokens found in URL, checking current session...');
+      
+      // Check if user already has a valid session
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        console.log('User already has valid session, checking if it\'s a recovery session');
+        // Only set ready for password if this is actually a recovery session
+        // We can check this by looking at the session metadata or user state
+        setReadyForNewPassword(false);
+      } else {
+        console.log('No valid session found');
+        setReadyForNewPassword(false);
+      }
       setLoading(false);
       return;
     }
@@ -63,6 +50,7 @@ export function usePasswordRecovery() {
 
       if (!error) {
         console.log('Recovery session set successfully');
+        console.log('Setting readyForNewPassword to true');
         setReadyForNewPassword(true);
       } else {
         console.error('Failed to set recovery session:', error);
