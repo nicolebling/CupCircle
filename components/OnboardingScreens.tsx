@@ -32,21 +32,21 @@ const onboardingData: OnboardingData[] = [
     headline: "What is CupCircle?",
     subheadline: "Your local coffee club",
     description: "Connect with local professionals for real, in person conversations, right in your neighborhood.",
-    image: require('@/assets/images/onboarding-1.png'),
+    image: require('@/assets/images/onboarding-1.webp'),
   },
   {
     id: 2,
     headline: "How does it work?",
     subheadline: "3 easy brews",
     description: "Build your profile, pick your favorite cafes, share when you're available, and we'll do the rest.",
-    image: require('@/assets/images/onboarding-2.png'),
+    image: require('@/assets/images/onboarding-2.webp'),
   },
   {
     id: 3,
     headline: "The Circle awaits.",
     subheadline: "Grow. Learn. Latte.",
     description: "Swap stories, learn something new, explore your neighborhood, one cup at a time.",
-    image: require('@/assets/images/onboarding-3.png'),
+    image: require('@/assets/images/onboarding-3.webp'),
   },
 ];
 

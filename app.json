@@ -39,8 +39,8 @@
     "android": {
       "package": "com.cupcircle.connect",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/images/cupcircle_logo.png",
+        "backgroundColor": "#F97415"
       },
       "permissions": [
         "ACCESS_FINE_LOCATION",
