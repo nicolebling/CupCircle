@@ -244,8 +244,10 @@ export default function ResetPasswordScreen() {
                   // First, clear recovery state and clean up URL
                   await resetRecoveryState();
                   
-                  // Wait a moment for state to clear
-                  await new Promise(resolve => setTimeout(resolve, 100));
+                  // Clear the current URL by replacing the current history entry
+                  if (typeof window !== 'undefined' && window.history) {
+                    window.history.replaceState({}, '', window.location.pathname);
+                  }
                   
                   // Sign out user to clear all session tokens and authentication
                   const { error } = await supabase.auth.signOut();
@@ -253,10 +255,29 @@ export default function ResetPasswordScreen() {
                     console.error('Error signing out:', error);
                   }
                   
-                  // Wait another moment for signout to complete
-                  await new Promise(resolve => setTimeout(resolve, 100));
+                  // Clear any cached session data
+                  await supabase.auth.getSession();
                   
-                  // Navigate to login page
+                  // Additional cleanup - remove any stored tokens from local storage
+                  try {
+                    if (typeof localStorage !== 'undefined') {
+                      const keysToRemove = [];
+                      for (let i = 0; i < localStorage.length; i++) {
+                        const key = localStorage.key(i);
+                        if (key && (key.includes('supabase') || key.includes('auth'))) {
+                          keysToRemove.push(key);
+                        }
+                      }
+                      keysToRemove.forEach(key => localStorage.removeItem(key));
+                    }
+                  } catch (storageError) {
+                    console.log('Local storage cleanup not available in this environment');
+                  }
+                  
+                  // Wait for all cleanup to complete
+                  await new Promise(resolve => setTimeout(resolve, 200));
+                  
+                  // Navigate to login page with replace to ensure clean navigation
                   router.replace("/(auth)/login");
                   
                   console.log('Complete reset finished');
