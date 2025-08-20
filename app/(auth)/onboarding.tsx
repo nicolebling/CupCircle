@@ -19,9 +19,8 @@ export default function OnboardingScreen() {
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(1);
   const [profileData, setProfileData] = useState({
-    name: user?.name || '',
-    firstName: '',
-    lastName: '',
+    name: '',
+    last_name: '',
     occupation: '',
     city: 'New York City',
     bio: '',
@@ -40,7 +39,7 @@ export default function OnboardingScreen() {
   const handleNext = () => {
     // Validate required fields for step 1 (names)
     if (step === 1) {
-      if (!profileData.firstName.trim() || !profileData.lastName.trim()) {
+      if (!profileData.name.trim() || !profileData.last_name.trim()) {
         Alert.alert('Required Fields', 'Please enter both your first and last name to continue.');
         return;
       }
@@ -140,7 +139,7 @@ export default function OnboardingScreen() {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      if (!profileData.firstName || !profileData.lastName || !profileData.occupation || !profileData.city || 
+      if (!profileData.name || !profileData.last_name || !profileData.occupation || !profileData.city || 
           !profileData.bio || !profileData.education || !profileData.experience_level || 
           !profileData.industry_categories.length || !profileData.interests.length || 
           !profileData.favorite_cafes.length || !profileData.photo_url) {
@@ -148,10 +147,8 @@ export default function OnboardingScreen() {
         setLoading(false);
         return;
       }
-      const { firstName, lastName, ...profileDataWithoutNames } = profileData;
       const profileDataWithId = {
-        ...profileDataWithoutNames,
-        name: `${firstName} ${lastName}`,
+        ...profileData,
         id: user?.id
       };
       await updateUser(profileDataWithId);
@@ -194,20 +191,20 @@ export default function OnboardingScreen() {
               style={[styles.input, { backgroundColor: colors.card, color: colors.text, borderColor: colors.border }]}
               placeholder="First name"
               placeholderTextColor={colors.secondaryText}
-              value={profileData.firstName}
+              value={profileData.name}
               onChangeText={(text) => {
                 const capitalizedText = text.charAt(0).toUpperCase() + text.slice(1);
-                setProfileData({ ...profileData, firstName: capitalizedText });
+                setProfileData({ ...profileData, name: capitalizedText });
               }}
             />
             <TextInput
               style={[styles.input, { backgroundColor: colors.card, color: colors.text, borderColor: colors.border, marginTop: 12 }]}
               placeholder="Last name"
               placeholderTextColor={colors.secondaryText}
-              value={profileData.lastName}
+              value={profileData.last_name}
               onChangeText={(text) => {
                 const capitalizedText = text.charAt(0).toUpperCase() + text.slice(1);
-                setProfileData({ ...profileData, lastName: capitalizedText });
+                setProfileData({ ...profileData, last_name: capitalizedText });
               }}
             />
           </View>

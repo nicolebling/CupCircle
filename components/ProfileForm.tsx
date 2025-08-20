@@ -54,6 +54,7 @@ export default function ProfileForm({
 
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [avatar, setAvatar] = useState("");
   const [occupation, setOccupation] = useState("");
   const [bio, setBio] = useState("");
@@ -129,6 +130,7 @@ export default function ProfileForm({
 
       if (data) {
         setName(data.name || "");
+        setLastName(data.last_name || "");
         setOccupation(data.occupation || "");
         setBio(data.bio || "");
         setAge(data.age);
@@ -288,6 +290,7 @@ export default function ProfileForm({
       const profileData = {
         id: userId,
         name,
+        last_name: lastName,
         occupation,
         photo_url: avatar,
         bio,
@@ -326,6 +329,7 @@ export default function ProfileForm({
         onSave({
           id: userId,
           name,
+          last_name: lastName,
           occupation,
           photo_url: avatar,
           bio,
@@ -484,13 +488,26 @@ export default function ProfileForm({
           <View style={[styles.section, { marginTop: 24 }]}>
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isDark && styles.textDark]}>
-                Name
+                First Name
               </Text>
               <TextInput
                 style={[styles.input, isDark && styles.inputDark]}
                 value={name}
                 onChangeText={setName}
-                placeholder="Your name"
+                placeholder="Your first name"
+                placeholderTextColor={colors.secondaryText}
+              />
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={[styles.label, isDark && styles.textDark]}>
+                Last Name
+              </Text>
+              <TextInput
+                style={[styles.input, isDark && styles.inputDark]}
+                value={lastName}
+                onChangeText={setLastName}
+                placeholder="Your last name"
                 placeholderTextColor={colors.secondaryText}
               />
             </View>
