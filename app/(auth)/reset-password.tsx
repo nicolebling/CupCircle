@@ -105,11 +105,9 @@ export default function ResetPasswordScreen() {
           [
             {
               text: "OK",
-              onPress: async () => {
-                // Clear recovery state and sign out user
-                await resetRecoveryState();
-                await supabase.auth.signOut();
-                router.replace("/(auth)/login");
+              onPress: () => {
+                // Don't manually navigate - let the auth context handle the redirect
+                // The user will be automatically logged out and redirected to login
               }
             }
           ]
@@ -139,13 +137,6 @@ export default function ResetPasswordScreen() {
         </SafeAreaView>
       </ThemeProvider>
     );
-  }
-
-  // If not ready for new password and not loading, redirect to login
-  if (!readyForNewPassword && !recoveryLoading && !initialLoad) {
-    console.log('Not ready for new password, redirecting to login');
-    router.replace("/(auth)/login");
-    return null;
   }
 
   return (

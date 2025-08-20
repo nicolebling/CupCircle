@@ -11,25 +11,9 @@ export function usePasswordRecovery() {
   const resetRecoveryState = async () => {
     console.log('Resetting password recovery state');
     
+    // Clear state immediately
     setReadyForNewPassword(false);
     setLoading(false);
-    
-    // Clear any recovery tokens from the URL
-    if (typeof window !== 'undefined') {
-      const url = new URL(window.location.href);
-      const hasTokens = url.searchParams.has('access_token') || 
-                       url.searchParams.has('refresh_token') || 
-                       url.hash.includes('access_token') || 
-                       url.hash.includes('refresh_token');
-      
-      if (hasTokens) {
-        url.searchParams.delete('access_token');
-        url.searchParams.delete('refresh_token');
-        url.searchParams.delete('type');
-        url.hash = '';
-        window.history.replaceState({}, '', url.toString());
-      }
-    }
     
     console.log('Recovery state reset completed');
   };
@@ -37,17 +21,21 @@ export function usePasswordRecovery() {
   async function handleUrl(url: string | null) {
     console.log('Processing recovery URL:', url);
     
-    if (!url) {
-      console.log('No URL provided');
-      setReadyForNewPassword(false);
-      setLoading(false);
-      return;
-    }
-    
     const tokens = parseRecoveryTokens(url);
     if (!tokens) {
-      console.log('No recovery tokens found in URL');
-      setReadyForNewPassword(false);
+      console.log('No recovery tokens found in URL, checking current session...');
+      
+      // Check if user already has a valid session
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        console.log('User already has valid session, checking if it\'s a recovery session');
+        // Only set ready for password if this is actually a recovery session
+        // We can check this by looking at the session metadata or user state
+        setReadyForNewPassword(false);
+      } else {
+        console.log('No valid session found');
+        setReadyForNewPassword(false);
+      }
       setLoading(false);
       return;
     }
@@ -62,6 +50,7 @@ export function usePasswordRecovery() {
 
       if (!error) {
         console.log('Recovery session set successfully');
+        console.log('Setting readyForNewPassword to true');
         setReadyForNewPassword(true);
       } else {
         console.error('Failed to set recovery session:', error);
@@ -78,34 +67,15 @@ export function usePasswordRecovery() {
   useEffect(() => {
     let mounted = true;
 
-    const initializeRecovery = async () => {
-      console.log('Initializing password recovery...');
-      
-      // First check the current URL when the hook mounts
-      if (typeof window !== 'undefined') {
-        const currentUrl = window.location.href;
-        console.log('Current URL on mount:', currentUrl);
-        if (mounted) {
-          await handleUrl(currentUrl);
-          return; // Don't continue if we found tokens in current URL
-        }
+    // When app is cold-started from the link
+    Linking.getInitialURL().then((url) => {
+      if (mounted) {
+        handleUrl(url);
       }
+    });
 
-      // Fallback: check initial URL from Linking
-      const initialUrl = await Linking.getInitialURL();
-      console.log('Initial URL from Linking:', initialUrl);
-      if (mounted && initialUrl) {
-        await handleUrl(initialUrl);
-      } else if (mounted) {
-        setLoading(false);
-      }
-    };
-
-    initializeRecovery();
-
-    // Listen for URL changes while app is running
+    // When app is already open and receives the link
     const subscription = Linking.addEventListener('url', ({ url }) => {
-      console.log('URL changed:', url);
       if (mounted) {
         handleUrl(url);
       }
