@@ -60,19 +60,19 @@ function RootLayoutNav() {
       const currentSegment = segments[0];
       const authSegment = segments[1];
 
-      // Priority 1: Handle password recovery
-      if (readyForNewPassword && currentSegment !== "(auth)") {
+      // Priority 1: Handle password recovery (only if user is not authenticated)
+      if (readyForNewPassword && !user && currentSegment !== "(auth)") {
         router.replace("/(auth)/reset-password");
       }
       // Priority 2: Show onboarding for first-time users (unauthenticated)
-      else if (!user && !hasCompletedOnboarding && !showOnboarding) {
+      else if (!user && !hasCompletedOnboarding && !showOnboarding && !readyForNewPassword) {
         setShowOnboarding(true);
       }
       // Priority 3: Handle unauthenticated users who completed onboarding
-      else if (!user && hasCompletedOnboarding && currentSegment !== "(auth)") {
+      else if (!user && hasCompletedOnboarding && currentSegment !== "(auth)" && !readyForNewPassword) {
         router.replace("/(auth)/login");
       }
-      // Priority 4: Handle authenticated users
+      // Priority 4: Handle authenticated users (ensure they don't get stuck in recovery)
       else if (
         user &&
         currentSegment === "(auth)" &&
@@ -80,6 +80,11 @@ function RootLayoutNav() {
         authSegment !== "reset-password"
       ) {
         router.replace("/(tabs)/matching");
+      }
+      // Priority 5: If user is authenticated but somehow still in recovery state, clear it
+      else if (user && readyForNewPassword) {
+        console.log('User is authenticated but recovery state is active - clearing recovery state');
+        resetRecoveryState();
       }
     }, 100);
 
