@@ -33,13 +33,21 @@ export function usePasswordRecovery() {
     if (!tokens) {
       console.log('No recovery tokens found in URL, checking current session...');
       
-      // Check if user already has a valid session
+      // Check if user already has a valid session and if it's a recovery session
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
-        console.log('User already has valid session, checking if it\'s a recovery session');
-        // Only set ready for password if this is actually a recovery session
-        // We can check this by looking at the session metadata or user state
-        setReadyForNewPassword(false);
+        console.log('User has valid session:', session.user.id);
+        // Check if this is a recovery session by looking for recovery metadata
+        const isRecoverySession = session.access_token && 
+          (url?.includes('type=recovery') || session.user.user_metadata?.is_recovery);
+        
+        if (isRecoverySession) {
+          console.log('Detected recovery session, setting readyForNewPassword to true');
+          setReadyForNewPassword(true);
+        } else {
+          console.log('Regular session, not recovery');
+          setReadyForNewPassword(false);
+        }
       } else {
         console.log('No valid session found');
         setReadyForNewPassword(false);
@@ -51,13 +59,13 @@ export function usePasswordRecovery() {
     console.log('Valid recovery tokens found, setting session...');
     
     try {
-      const { error } = await supabase.auth.setSession({
+      const { data, error } = await supabase.auth.setSession({
         access_token: tokens.access_token!,
         refresh_token: tokens.refresh_token!,
       });
 
-      if (!error) {
-        console.log('Recovery session set successfully');
+      if (!error && data.session) {
+        console.log('Recovery session set successfully for user:', data.session.user.id);
         console.log('Setting readyForNewPassword to true');
         setReadyForNewPassword(true);
       } else {

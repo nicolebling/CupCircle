@@ -60,34 +60,44 @@ function RootLayoutNav() {
       const currentSegment = segments[0];
       const authSegment = segments[1];
 
-      // Priority 1: Handle password recovery
-      if (readyForNewPassword && currentSegment !== "(auth)") {
-        router.replace("/(auth)/reset-password");
+      console.log('Navigation check:', { 
+        currentSegment, 
+        authSegment, 
+        readyForNewPassword, 
+        user: !!user, 
+        hasCompletedOnboarding 
+      });
+
+      // Priority 1: Handle password recovery - redirect to reset-password if recovery is ready
+      if (readyForNewPassword) {
+        if (currentSegment !== "(auth)" || authSegment !== "reset-password") {
+          console.log('Redirecting to reset-password due to recovery state');
+          router.replace("/(auth)/reset-password");
+        }
+        return; // Don't process other conditions when in recovery mode
       }
-      // Priority 2: Show onboarding for first-time users (unauthenticated, not in recovery)
-      else if (!user && !hasCompletedOnboarding && !showOnboarding && !readyForNewPassword) {
+      
+      // Priority 2: Show onboarding for first-time users (only when not in recovery)
+      if (!user && !hasCompletedOnboarding && !showOnboarding) {
+        console.log('Showing onboarding for new user');
         setShowOnboarding(true);
+        return;
       }
-      // Priority 3: Handle unauthenticated users who completed onboarding (not in recovery)
-      else if (!user && hasCompletedOnboarding && currentSegment !== "(auth)" && !readyForNewPassword) {
+      
+      // Priority 3: Handle unauthenticated users who completed onboarding
+      if (!user && hasCompletedOnboarding && currentSegment !== "(auth)") {
+        console.log('Redirecting unauthenticated user to login');
         router.replace("/(auth)/login");
+        return;
       }
-      // Priority 4: Handle authenticated users (not in recovery)
-      else if (
-        user &&
-        currentSegment === "(auth)" &&
-        authSegment !== "onboarding" &&
-        authSegment !== "reset-password" &&
-        !readyForNewPassword
-      ) {
+      
+      // Priority 4: Handle authenticated users (redirect away from auth pages)
+      if (user && currentSegment === "(auth)" && authSegment !== "onboarding") {
+        console.log('Redirecting authenticated user to main app');
         router.replace("/(tabs)/matching");
+        return;
       }
-      // Priority 5: Ensure clean state when user manually navigates back to login from recovery
-      else if (!user && !readyForNewPassword && currentSegment === "(auth)" && authSegment === "login") {
-        // Ensure we're in a clean login state
-        console.log('Ensuring clean login state');
-      }
-    }, 100);
+    }, 50); // Reduced timeout for faster response
 
     return () => clearTimeout(timeoutId);
   }, [user, loading, segments, readyForNewPassword, hasCompletedOnboarding, onboardingLoading, showOnboarding]);
