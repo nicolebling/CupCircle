@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import * as Linking from 'expo-linking';
 import { supabase } from '@/lib/supabase';
@@ -10,11 +9,11 @@ export function usePasswordRecovery() {
 
   const resetRecoveryState = async () => {
     console.log('Resetting password recovery state completely');
-    
+
     // Clear all recovery-related state immediately
     setReadyForNewPassword(false);
     setLoading(false);
-    
+
     // Force sign out to clear any recovery session
     try {
       const { error } = await supabase.auth.signOut();
@@ -26,24 +25,24 @@ export function usePasswordRecovery() {
     } catch (error) {
       console.error('Error during signout:', error);
     }
-    
+
     // Clear any potential URL parameters or deep link state
     try {
       await Linking.getInitialURL();
     } catch (error) {
       console.log('Error clearing URL state:', error);
     }
-    
+
     console.log('Complete recovery state reset finished');
   };
 
   async function handleUrl(url: string | null) {
     console.log('Processing recovery URL:', url);
-    
+
     const tokens = parseRecoveryTokens(url);
     if (!tokens) {
       console.log('No recovery tokens found in URL, checking current session...');
-      
+
       // Check if user already has a valid session and if it's a recovery session
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
@@ -51,7 +50,7 @@ export function usePasswordRecovery() {
         // Only treat as recovery session if URL explicitly contains recovery type
         // This prevents false positives from regular authenticated sessions
         const isRecoverySession = url?.includes('type=recovery');
-        
+
         if (isRecoverySession) {
           console.log('Detected recovery session from URL, setting readyForNewPassword to true');
           setReadyForNewPassword(true);
@@ -68,7 +67,7 @@ export function usePasswordRecovery() {
     }
 
     console.log('Valid recovery tokens found, setting session...');
-    
+
     try {
       const { data, error } = await supabase.auth.setSession({
         access_token: tokens.access_token!,
@@ -107,15 +106,33 @@ export function usePasswordRecovery() {
         handleUrl(url);
       }
     });
-    
+
     return () => {
       mounted = false;
       subscription?.remove();
     };
   }, []);
 
+  useEffect(() => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth state change event:', event, 'Session:', !!session);
+
+      // If user session becomes invalid/null after password update, clear recovery state
+      if (event === 'SIGNED_OUT' || !session) {
+        console.log('User signed out or session invalid, clearing recovery state');
+        setReadyForNewPassword(false);
+        setLoading(false);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+
   console.log('usePasswordRecovery state:', { readyForNewPassword, loading });
-  
+
   return { 
     readyForNewPassword, 
     loading,

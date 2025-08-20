@@ -114,7 +114,10 @@ export default function ResetPasswordScreen() {
       } else {
         console.log("Password updated successfully:", data);
         
-        // Clear recovery state immediately
+        // Force sign out to clear recovery session and trigger auth state change
+        await supabase.auth.signOut();
+        
+        // Clear recovery state
         await resetRecoveryState();
         
         // Show success message and redirect automatically
