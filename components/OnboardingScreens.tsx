@@ -56,36 +56,48 @@ interface OnboardingScreensProps {
 
 export default function OnboardingScreens({ onComplete }: OnboardingScreensProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [displayIndex, setDisplayIndex] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const scrollX = useRef(new Animated.Value(0)).current;
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const scaleAnim = useRef(new Animated.Value(0.8)).current;
-  const slideAnim = useRef(new Animated.Value(50)).current;
+  const fadeAnim = useRef(new Animated.Value(1)).current;
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+  const slideAnim = useRef(new Animated.Value(0)).current;
 
   const colors = Colors.light;
 
   useEffect(() => {
-    // Animate in content when screen changes
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 400,
-        useNativeDriver: true,
-      }),
-      Animated.timing(scaleAnim, {
-        toValue: 1,
-        duration: 400,
-        useNativeDriver: true,
-      }),
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 400,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, [currentIndex]);
+    if (currentIndex !== displayIndex && !isTransitioning) {
+      setIsTransitioning(true);
+      
+      // Only animate in if we're not transitioning
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleAnim, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+      ]).start(() => {
+        setIsTransitioning(false);
+      });
+    }
+  }, [displayIndex, currentIndex, isTransitioning]);
 
   const handleNext = () => {
     if (currentIndex < onboardingData.length - 1) {
+      if (isTransitioning) return; // Prevent multiple rapid taps
+      
+      setIsTransitioning(true);
+      
       // First, fade out current content
       Animated.parallel([
         Animated.timing(fadeAnim, {
@@ -104,9 +116,12 @@ export default function OnboardingScreens({ onComplete }: OnboardingScreensProps
           useNativeDriver: true,
         }),
       ]).start(() => {
-        // Change the screen content after fade out completes
-        setCurrentIndex(currentIndex + 1);
-        // Reset values immediately for the new screen (invisible)
+        // Change the display content after fade out completes
+        const nextIndex = currentIndex + 1;
+        setDisplayIndex(nextIndex);
+        setCurrentIndex(nextIndex);
+        
+        // Reset animation values to starting position for fade in
         fadeAnim.setValue(0);
         scaleAnim.setValue(0.8);
         slideAnim.setValue(50);
@@ -122,6 +137,10 @@ export default function OnboardingScreens({ onComplete }: OnboardingScreensProps
 
   const handlePrevious = () => {
     if (currentIndex > 0) {
+      if (isTransitioning) return; // Prevent multiple rapid taps
+      
+      setIsTransitioning(true);
+      
       // First, fade out current content
       Animated.parallel([
         Animated.timing(fadeAnim, {
@@ -140,9 +159,12 @@ export default function OnboardingScreens({ onComplete }: OnboardingScreensProps
           useNativeDriver: true,
         }),
       ]).start(() => {
-        // Change the screen content after fade out completes
-        setCurrentIndex(currentIndex - 1);
-        // Reset values immediately for the new screen (invisible)
+        // Change the display content after fade out completes
+        const prevIndex = currentIndex - 1;
+        setDisplayIndex(prevIndex);
+        setCurrentIndex(prevIndex);
+        
+        // Reset animation values to starting position for fade in
         fadeAnim.setValue(0);
         scaleAnim.setValue(0.8);
         slideAnim.setValue(50);
@@ -150,7 +172,7 @@ export default function OnboardingScreens({ onComplete }: OnboardingScreensProps
     }
   };
 
-  const currentScreen = onboardingData[currentIndex];
+  const currentScreen = onboardingData[displayIndex];
 
   return (
     <SafeAreaView style={styles.container}>
