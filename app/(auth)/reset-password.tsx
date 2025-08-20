@@ -70,6 +70,26 @@ export default function ResetPasswordScreen() {
       return;
     }
 
+    // Check if the new password is the same as the current password
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user?.email) {
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email: user.email,
+          password: password,
+        });
+
+        if (!signInError) {
+          Alert.alert("Error", "New password cannot be the same as your current password");
+          setLoading(false);
+          return;
+        }
+      }
+    } catch (error) {
+      // Continue with password update if we can't verify the current password
+      console.log("Could not verify current password:", error);
+    }
+
     try {
       const { data, error } = await supabase.auth.updateUser({
         password: password
