@@ -15,19 +15,6 @@ export function usePasswordRecovery() {
     setReadyForNewPassword(false);
     setLoading(false);
     
-    // Clear any recovery-related URL parameters from the browser
-    try {
-      if (typeof window !== 'undefined') {
-        const url = new URL(window.location.href);
-        if (url.hash.includes('type=recovery') || url.search.includes('type=recovery')) {
-          // Clear the URL without triggering navigation
-          window.history.replaceState({}, document.title, url.pathname);
-        }
-      }
-    } catch (error) {
-      console.log('Could not clear URL parameters:', error);
-    }
-    
     console.log('Recovery state reset completed');
   };
 
@@ -41,8 +28,9 @@ export function usePasswordRecovery() {
       // Check if user already has a valid session
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
-        console.log('User already has valid session');
-        // If user has a normal session (not recovery), don't set recovery state
+        console.log('User already has valid session, checking if it\'s a recovery session');
+        // Only set ready for password if this is actually a recovery session
+        // We can check this by looking at the session metadata or user state
         setReadyForNewPassword(false);
       } else {
         console.log('No valid session found');

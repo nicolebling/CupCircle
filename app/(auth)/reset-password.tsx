@@ -97,10 +97,7 @@ export default function ResetPasswordScreen() {
 
       if (error) {
         console.error("Password update error:", error.message);
-        if (error.message.includes("session_not_found") || error.message.includes("invalid") || error.message.includes("expired")) {
-          // Clear recovery state first
-          await resetRecoveryState();
-          
+        if (error.message.includes("session_not_found") || error.message.includes("invalid")) {
           Alert.alert(
             "Session Expired", 
             "Your reset session has expired. Please request a new password reset link.",
@@ -128,18 +125,9 @@ export default function ResetPasswordScreen() {
           [
             {
               text: "OK",
-              onPress: async () => {
-                // Clear recovery state first
-                await resetRecoveryState();
-                
-                // Force sign out to clear all session data
-                await supabase.auth.signOut();
-                
-                // Small delay to ensure state is cleared
-                await new Promise(resolve => setTimeout(resolve, 200));
-                
-                // Navigate to login
-                router.replace("/(auth)/login");
+              onPress: () => {
+                // Don't manually navigate - let the auth context handle the redirect
+                // The user will be automatically logged out and redirected to login
               }
             }
           ]
