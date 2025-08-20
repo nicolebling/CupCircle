@@ -79,7 +79,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth state changed:', event, session?.user?.id || 'no user');
+      
       setSession(session);
       setUser(session?.user ?? null);
 
@@ -106,6 +108,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
             "Failed to reset Superwall user on auth state change:",
             error,
           );
+        }
+      }
+
+      // If this is a password recovery event and session is null, 
+      // mark that recovery has been processed to prevent loops
+      if (event === 'SIGNED_OUT' && !session) {
+        try {
+          const AsyncStorage = await import('@react-native-async-storage/async-storage').then(m => m.default);
+          await AsyncStorage.setItem('password_recovery_processed', 'true');
+        } catch (error) {
+          console.log('Could not set AsyncStorage:', error);
         }
       }
 

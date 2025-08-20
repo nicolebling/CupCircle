@@ -141,6 +141,13 @@ export default function ResetPasswordScreen() {
     );
   }
 
+  // If not ready for new password and not loading, redirect to login
+  if (!readyForNewPassword && !recoveryLoading && !initialLoad) {
+    console.log('Not ready for new password, redirecting to login');
+    router.replace("/(auth)/login");
+    return null;
+  }
+
   return (
     <ThemeProvider value={theme}>
       <SafeAreaView
