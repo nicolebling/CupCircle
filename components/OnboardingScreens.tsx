@@ -82,7 +82,7 @@ export default function OnboardingScreens({ onComplete }: OnboardingScreensProps
           useNativeDriver: true,
         }),
       ]).start();
-    }, 1200);
+    },350);
 
     return () => clearTimeout(timer);
   }, [currentIndex]);
