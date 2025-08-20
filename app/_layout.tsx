@@ -60,31 +60,31 @@ function RootLayoutNav() {
       const currentSegment = segments[0];
       const authSegment = segments[1];
 
-      // Priority 1: Handle password recovery (only if user is not authenticated)
-      if (readyForNewPassword && !user && currentSegment !== "(auth)") {
+      // Priority 1: Handle password recovery - redirect to reset-password if ready
+      if (readyForNewPassword && currentSegment !== "(auth)") {
         router.replace("/(auth)/reset-password");
       }
-      // Priority 2: Show onboarding for first-time users (unauthenticated)
+      // Priority 2: Handle password recovery - stay on reset-password if already there and ready
+      else if (readyForNewPassword && currentSegment === "(auth)" && authSegment === "reset-password") {
+        // Stay on reset-password page, don't redirect
+        return;
+      }
+      // Priority 3: Show onboarding for first-time users (unauthenticated, not in recovery)
       else if (!user && !hasCompletedOnboarding && !showOnboarding && !readyForNewPassword) {
         setShowOnboarding(true);
       }
-      // Priority 3: Handle unauthenticated users who completed onboarding
+      // Priority 4: Handle unauthenticated users who completed onboarding (not in recovery)
       else if (!user && hasCompletedOnboarding && currentSegment !== "(auth)" && !readyForNewPassword) {
         router.replace("/(auth)/login");
       }
-      // Priority 4: Handle authenticated users (ensure they don't get stuck in recovery)
+      // Priority 5: Handle authenticated users who are NOT in recovery mode
       else if (
         user &&
+        !readyForNewPassword &&
         currentSegment === "(auth)" &&
-        authSegment !== "onboarding" &&
-        authSegment !== "reset-password"
+        authSegment !== "onboarding"
       ) {
         router.replace("/(tabs)/matching");
-      }
-      // Priority 5: If user is authenticated but somehow still in recovery state, clear it
-      else if (user && readyForNewPassword) {
-        console.log('User is authenticated but recovery state is active - clearing recovery state');
-        resetRecoveryState();
       }
     }, 100);
 
