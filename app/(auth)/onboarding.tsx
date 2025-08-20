@@ -148,10 +148,8 @@ export default function OnboardingScreen() {
         setLoading(false);
         return;
       }
-      const { firstName, lastName, ...profileDataWithoutNames } = profileData;
       const profileDataWithId = {
-        ...profileDataWithoutNames,
-        name: `${firstName} ${lastName}`,
+        ...profileData,
         id: user?.id
       };
       await updateUser(profileDataWithId);
