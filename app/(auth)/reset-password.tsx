@@ -275,7 +275,7 @@ export default function ResetPasswordScreen() {
                   console.log('Reset and navigation completed');
                 } catch (error) {
                   console.error('Failed to reset and navigate:', error);
-                  // Force navigation even if there's an error
+                  // Force navigation even if there's an error !
                   router.replace("/(auth)/login");
                 }
               }}>
