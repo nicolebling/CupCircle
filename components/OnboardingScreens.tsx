@@ -37,7 +37,7 @@ const onboardingData: OnboardingData[] = [
   {
     id: 2,
     headline: "How does it work?",
-    subheadline: "Meet in 3 easy brews",
+    subheadline: "3 easy brews",
     description: "Build your profile, pick your favorite cafes, share when you're available, and we'll do the rest.",
     image: require('@/assets/images/onboarding-2.png'),
   },
