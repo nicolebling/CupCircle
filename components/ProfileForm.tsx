@@ -53,8 +53,7 @@ export default function ProfileForm({
   const isDark = colorScheme === "dark";
 
   const [loading, setLoading] = useState(false);
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
+  const [name, setName] = useState("");
   const [avatar, setAvatar] = useState("");
   const [occupation, setOccupation] = useState("");
   const [bio, setBio] = useState("");
@@ -129,8 +128,7 @@ export default function ProfileForm({
       }
 
       if (data) {
-        setFirstName(data.first_name || "");
-        setLastName(data.last_name || "");
+        setName(data.name || "");
         setOccupation(data.occupation || "");
         setBio(data.bio || "");
         setAge(data.age);
@@ -265,8 +263,8 @@ export default function ProfileForm({
   };
 
   const validateForm = () => {
-    if (!firstName.trim()) {
-      setError("First name is required");
+    if (!name.trim()) {
+      setError("Name is required");
       return false;
     }
 
@@ -289,8 +287,7 @@ export default function ProfileForm({
 
       const profileData = {
         id: userId,
-        first_name: firstName,
-        last_name: lastName,
+        name,
         occupation,
         photo_url: avatar,
         bio,
@@ -328,8 +325,7 @@ export default function ProfileForm({
       if (onSave) {
         onSave({
           id: userId,
-          first_name: firstName,
-          last_name: lastName,
+          name,
           occupation,
           photo_url: avatar,
           bio,
@@ -488,26 +484,13 @@ export default function ProfileForm({
           <View style={[styles.section, { marginTop: 24 }]}>
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isDark && styles.textDark]}>
-                First Name
+                Name
               </Text>
               <TextInput
                 style={[styles.input, isDark && styles.inputDark]}
-                value={firstName}
-                onChangeText={setFirstName}
-                placeholder="Your first name"
-                placeholderTextColor={colors.secondaryText}
-              />
-            </View>
-
-            <View style={styles.inputGroup}>
-              <Text style={[styles.label, isDark && styles.textDark]}>
-                Last Name
-              </Text>
-              <TextInput
-                style={[styles.input, isDark && styles.inputDark]}
-                value={lastName}
-                onChangeText={setLastName}
-                placeholder="Your last name"
+                value={name}
+                onChangeText={setName}
+                placeholder="Your name"
                 placeholderTextColor={colors.secondaryText}
               />
             </View>

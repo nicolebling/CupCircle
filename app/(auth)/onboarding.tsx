@@ -45,7 +45,7 @@ export default function OnboardingScreen() {
         return;
       }
     }
-
+    
     if (step < 12) {
       setStep(step + 1);
     } else {
@@ -149,13 +149,12 @@ export default function OnboardingScreen() {
         return;
       }
       const { firstName, lastName, ...profileDataWithoutNames } = profileData;
-      const finalData = {
-        id: user?.id,
-        first_name: firstName,
-        last_name: lastName,
+      const profileDataWithId = {
         ...profileDataWithoutNames,
+        name: `${firstName} ${lastName}`,
+        id: user?.id
       };
-      await updateUser(finalData);
+      await updateUser(profileDataWithId);
 
       // Register for push notifications now that profile is complete
       try {

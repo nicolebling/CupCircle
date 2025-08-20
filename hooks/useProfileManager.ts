@@ -4,8 +4,7 @@ import { profileService } from '../services/api';
 import { Profile } from '../models/Profile';
 
 export interface ProfileFormData {
-  first_name: string;
-  last_name: string;
+  name: string;
   age?: number;
   birthday: string;
   occupation?: string;

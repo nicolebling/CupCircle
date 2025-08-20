@@ -11,8 +11,7 @@ export interface Employment {
 export interface Profile {
   id: string;
   user_id: string;
-  first_name: string;
-  last_name: string;
+  name: string;
   age?: number;
   occupation?: string;
   photo?: string;
@@ -32,18 +31,18 @@ export class ProfileModel {
   // Create a new profile
   static async create(profile: Omit<Profile, 'id' | 'created_at' | 'updated_at'>): Promise<Profile> {
     const {
-      user_id, first_name, last_name, age, occupation, photo, bio,
+      user_id, name, age, occupation, photo, bio,
       industry_categories, skills, neighborhoods, favorite_cafes, interests, location
     } = profile;
 
     const result = await query(
       `INSERT INTO profiles(
-        user_id, first_name, last_name, age, occupation, photo, bio,
+        user_id, name, age, occupation, photo, bio,
         industry_categories, skills, neighborhoods, favorite_cafes, interests, location
-      ) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) 
+      ) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) 
       RETURNING *`,
       [
-        user_id, first_name, last_name, age, occupation, photo, bio,
+        user_id, name, age, occupation, photo, bio,
         industry_categories, skills, neighborhoods, favorite_cafes, interests, JSON.stringify(location)
       ]
     );

@@ -724,11 +724,10 @@ export default function MatchingScreen() {
 
         // Log profile centroids before sorting
         formattedProfiles.forEach(profile => {
-          const profileName = `${profile.first_name || ''} ${profile.last_name || ''}`.trim() || 'Unknown';
           if (profile.centroid_lat && profile.centroid_long) {
-            console.log(`Profile ${profileName}: ${profile.centroid_lat}, ${profile.centroid_long}`);
+            console.log(`Profile ${profile.name}: ${profile.centroid_lat}, ${profile.centroid_long}`);
           } else {
-            console.log(`Profile ${profileName}: No centroid data`);
+            console.log(`Profile ${profile.name}: No centroid data`);
           }
         });
 
@@ -736,8 +735,7 @@ export default function MatchingScreen() {
 
         // Log sorted profiles with distances
         formattedProfiles.forEach((profile, index) => {
-          const profileName = `${profile.first_name || ''} ${profile.last_name || ''}`.trim() || 'Unknown';
-          console.log(`${index + 1}. ${profileName}: ${profile.distance ? profile.distance.toFixed(2) + ' miles' : 'No distance'}`);
+          console.log(`${index + 1}. ${profile.name}: ${profile.distance ? profile.distance.toFixed(2) + ' miles' : 'No distance'}`);
         });
 
         // Apply distance filter if set
