@@ -105,9 +105,11 @@ export default function ResetPasswordScreen() {
           [
             {
               text: "OK",
-              onPress: () => {
-                // Don't manually navigate - let the auth context handle the redirect
-                // The user will be automatically logged out and redirected to login
+              onPress: async () => {
+                // Clear recovery state and sign out user
+                await resetRecoveryState();
+                await supabase.auth.signOut();
+                router.replace("/(auth)/login");
               }
             }
           ]
