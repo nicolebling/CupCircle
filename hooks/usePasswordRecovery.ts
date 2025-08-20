@@ -15,6 +15,20 @@ export function usePasswordRecovery() {
     setReadyForNewPassword(false);
     setLoading(false);
     
+    // Clear any URL parameters that might cause issues
+    try {
+      if (typeof window !== 'undefined' && window.history) {
+        // For web, clear any recovery tokens from URL
+        const url = new URL(window.location.href);
+        url.searchParams.delete('token');
+        url.searchParams.delete('type');
+        url.searchParams.delete('redirect_to');
+        window.history.replaceState({}, '', url.toString());
+      }
+    } catch (error) {
+      console.log('Could not clear URL parameters:', error);
+    }
+    
     console.log('Recovery state reset completed');
   };
 

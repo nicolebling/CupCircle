@@ -261,23 +261,28 @@ export default function ResetPasswordScreen() {
                 console.log('Back to Login clicked - performing complete reset');
                 
                 try {
-                  // First, clear recovery state and clean up URL
+                  // First, clear recovery state
                   await resetRecoveryState();
                   
-                  // Wait a moment for state to clear
-                  await new Promise(resolve => setTimeout(resolve, 100));
-                  
-                  // Sign out user to clear all session tokens and authentication
+                  // Sign out user to clear all session tokens
                   const { error } = await supabase.auth.signOut();
                   if (error) {
                     console.error('Error signing out:', error);
                   }
                   
-                  // Wait another moment for signout to complete
-                  await new Promise(resolve => setTimeout(resolve, 100));
-                  
-                  // Navigate to login page
-                  router.replace("/(auth)/login");
+                  // Force a complete app refresh by reloading
+                  if (Platform.OS === 'web') {
+                    window.location.href = '/';
+                  } else {
+                    // For mobile, we need to clear all navigation state
+                    router.dismissAll?.() || router.canDismiss?.() && router.dismiss();
+                    router.replace("/(auth)/login");
+                    
+                    // Force a brief delay and additional state clearing
+                    setTimeout(() => {
+                      router.replace("/(auth)/login");
+                    }, 500);
+                  }
                   
                   console.log('Complete reset finished');
                 } catch (error) {

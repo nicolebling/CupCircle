@@ -48,6 +48,7 @@ function RootLayoutNav() {
   // Handle password recovery deep links globally
   const { readyForNewPassword, resetRecoveryState } = usePasswordRecovery();
   const [lastRecoveryState, setLastRecoveryState] = useState<boolean | null>(null);
+  const [recoveryStateCleared, setRecoveryStateCleared] = useState(false);
 
   // Onboarding state
   const { hasCompletedOnboarding, loading: onboardingLoading, completeOnboarding } = useOnboarding();
@@ -60,24 +61,38 @@ function RootLayoutNav() {
       const currentSegment = segments[0];
       const authSegment = segments[1];
 
-      // Priority 1: Handle password recovery
-      if (readyForNewPassword && currentSegment !== "(auth)") {
+      // Track recovery state changes
+      if (lastRecoveryState === true && readyForNewPassword === false) {
+        // Recovery state was just cleared, mark it
+        setRecoveryStateCleared(true);
+        console.log('Recovery state was cleared - preventing redirects');
+      }
+      setLastRecoveryState(readyForNewPassword);
+
+      // Priority 1: Handle password recovery (but not if state was just cleared)
+      if (readyForNewPassword && !recoveryStateCleared && currentSegment !== "(auth)") {
         router.replace("/(auth)/reset-password");
       }
-      // Priority 2: Show onboarding for first-time users (unauthenticated)
-      else if (!user && !hasCompletedOnboarding && !showOnboarding) {
-        setShowOnboarding(true);
-      }
-      // Priority 3: Handle unauthenticated users who completed onboarding
-      else if (!user && hasCompletedOnboarding && currentSegment !== "(auth)") {
+      // Priority 2: Handle recovery state being cleared - go to login
+      else if (recoveryStateCleared && !readyForNewPassword && currentSegment !== "(auth)") {
+        console.log('Recovery state cleared - redirecting to login');
+        setRecoveryStateCleared(false);
         router.replace("/(auth)/login");
       }
-      // Priority 4: Handle authenticated users
+      // Priority 3: Show onboarding for first-time users (unauthenticated)
+      else if (!user && !hasCompletedOnboarding && !showOnboarding && !readyForNewPassword) {
+        setShowOnboarding(true);
+      }
+      // Priority 4: Handle unauthenticated users who completed onboarding
+      else if (!user && hasCompletedOnboarding && currentSegment !== "(auth)" && !readyForNewPassword) {
+        router.replace("/(auth)/login");
+      }
+      // Priority 5: Handle authenticated users (not in recovery)
       else if (
         user &&
+        !readyForNewPassword &&
         currentSegment === "(auth)" &&
-        authSegment !== "onboarding" &&
-        authSegment !== "reset-password"
+        authSegment !== "onboarding"
       ) {
         router.replace("/(tabs)/matching");
       }
