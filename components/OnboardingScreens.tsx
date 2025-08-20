@@ -86,31 +86,13 @@ export default function OnboardingScreens({ onComplete }: OnboardingScreensProps
 
   const handleNext = () => {
     if (currentIndex < onboardingData.length - 1) {
-      // First, fade out current content
-      Animated.parallel([
-        Animated.timing(fadeAnim, {
-          toValue: 0,
-          duration: 200,
-          useNativeDriver: true,
-        }),
-        Animated.timing(scaleAnim, {
-          toValue: 0.8,
-          duration: 200,
-          useNativeDriver: true,
-        }),
-        Animated.timing(slideAnim, {
-          toValue: 50,
-          duration: 200,
-          useNativeDriver: true,
-        }),
-      ]).start(() => {
-        // Change the screen content after fade out completes
-        setCurrentIndex(currentIndex + 1);
-        // Reset values immediately for the new screen (invisible)
-        fadeAnim.setValue(0);
-        scaleAnim.setValue(0.8);
-        slideAnim.setValue(50);
-      });
+      // Reset animation values for new content
+      fadeAnim.setValue(0);
+      scaleAnim.setValue(0.8);
+      slideAnim.setValue(50);
+      
+      // Change screen immediately
+      setCurrentIndex(currentIndex + 1);
     } else {
       onComplete();
     }
@@ -122,31 +104,13 @@ export default function OnboardingScreens({ onComplete }: OnboardingScreensProps
 
   const handlePrevious = () => {
     if (currentIndex > 0) {
-      // First, fade out current content
-      Animated.parallel([
-        Animated.timing(fadeAnim, {
-          toValue: 0,
-          duration: 200,
-          useNativeDriver: true,
-        }),
-        Animated.timing(scaleAnim, {
-          toValue: 0.8,
-          duration: 200,
-          useNativeDriver: true,
-        }),
-        Animated.timing(slideAnim, {
-          toValue: 50,
-          duration: 200,
-          useNativeDriver: true,
-        }),
-      ]).start(() => {
-        // Change the screen content after fade out completes
-        setCurrentIndex(currentIndex - 1);
-        // Reset values immediately for the new screen (invisible)
-        fadeAnim.setValue(0);
-        scaleAnim.setValue(0.8);
-        slideAnim.setValue(50);
-      });
+      // Reset animation values for new content
+      fadeAnim.setValue(0);
+      scaleAnim.setValue(0.8);
+      slideAnim.setValue(50);
+      
+      // Change screen immediately
+      setCurrentIndex(currentIndex - 1);
     }
   };
 
