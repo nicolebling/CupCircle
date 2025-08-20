@@ -68,17 +68,17 @@ export default function OnboardingScreens({ onComplete }: OnboardingScreensProps
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
-        duration: 250,
+        duration: 400,
         useNativeDriver: true,
       }),
       Animated.timing(scaleAnim, {
         toValue: 1,
-        duration: 250,
+        duration: 400,
         useNativeDriver: true,
       }),
       Animated.timing(slideAnim, {
         toValue: 0,
-        duration: 250,
+        duration: 400,
         useNativeDriver: true,
       }),
     ]).start();
@@ -90,17 +90,17 @@ export default function OnboardingScreens({ onComplete }: OnboardingScreensProps
       Animated.parallel([
         Animated.timing(fadeAnim, {
           toValue: 0,
-          duration: 150,
+          duration: 200,
           useNativeDriver: true,
         }),
         Animated.timing(scaleAnim, {
           toValue: 0.8,
-          duration: 150,
+          duration: 200,
           useNativeDriver: true,
         }),
         Animated.timing(slideAnim, {
           toValue: 50,
-          duration: 150,
+          duration: 200,
           useNativeDriver: true,
         }),
       ]).start(() => {
@@ -126,17 +126,17 @@ export default function OnboardingScreens({ onComplete }: OnboardingScreensProps
       Animated.parallel([
         Animated.timing(fadeAnim, {
           toValue: 0,
-          duration: 150,
+          duration: 200,
           useNativeDriver: true,
         }),
         Animated.timing(scaleAnim, {
           toValue: 0.8,
-          duration: 150,
+          duration: 200,
           useNativeDriver: true,
         }),
         Animated.timing(slideAnim, {
           toValue: 50,
-          duration: 150,
+          duration: 200,
           useNativeDriver: true,
         }),
       ]).start(() => {
