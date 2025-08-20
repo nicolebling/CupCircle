@@ -11,13 +11,24 @@ export function usePasswordRecovery() {
   const resetRecoveryState = async () => {
     console.log('Resetting password recovery state completely');
     
-    // Clear all recovery-related state
+    // Clear all recovery-related state immediately
     setReadyForNewPassword(false);
     setLoading(false);
     
+    // Force sign out to clear any recovery session
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('Error signing out during reset:', error);
+      } else {
+        console.log('Successfully signed out during reset');
+      }
+    } catch (error) {
+      console.error('Error during signout:', error);
+    }
+    
     // Clear any potential URL parameters or deep link state
     try {
-      // Remove any lingering URL state by clearing the initial URL
       await Linking.getInitialURL();
     } catch (error) {
       console.log('Error clearing URL state:', error);
@@ -37,15 +48,15 @@ export function usePasswordRecovery() {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
         console.log('User has valid session:', session.user.id);
-        // Check if this is a recovery session by looking for recovery metadata
-        const isRecoverySession = session.access_token && 
-          (url?.includes('type=recovery') || session.user.user_metadata?.is_recovery);
+        // Only treat as recovery session if URL explicitly contains recovery type
+        // This prevents false positives from regular authenticated sessions
+        const isRecoverySession = url?.includes('type=recovery');
         
         if (isRecoverySession) {
-          console.log('Detected recovery session, setting readyForNewPassword to true');
+          console.log('Detected recovery session from URL, setting readyForNewPassword to true');
           setReadyForNewPassword(true);
         } else {
-          console.log('Regular session, not recovery');
+          console.log('Regular session or no recovery URL, not recovery');
           setReadyForNewPassword(false);
         }
       } else {
