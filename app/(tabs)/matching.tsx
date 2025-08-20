@@ -504,7 +504,7 @@ export default function MatchingScreen() {
       // Fetch profiles for users with availability in next 7 days (including centroid data)
       const { data: profilesData, error: profilesError } = await supabase
         .from("profiles")
-        .select("*, centroid_lat, centroid_long")
+        .select("*, centroid_lat, centroid_long, last_name")
         .in("id", userIds);
 
       if (profilesError) {
