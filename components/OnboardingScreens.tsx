@@ -62,6 +62,7 @@ export default function OnboardingScreens({ onComplete }: OnboardingScreensProps
   const slideAnim = useRef(new Animated.Value(50)).current;
 
   const colors = Colors.light;
+  
 
   useEffect(() => {
     // Animate in content when screen changes
