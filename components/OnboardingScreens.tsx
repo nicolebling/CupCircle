@@ -36,7 +36,7 @@ const onboardingData: OnboardingData[] = [
   {
     id: 2,
     headline: "How does it work?",
-    subheadline: "3 easy brews",
+    subheadline: "3 simple steps",
     description: "Build your profile, pick your favorite cafes, share when you're available, and we'll do the rest.",
     image: require('@/assets/images/onboarding-2.webp'),
   },
