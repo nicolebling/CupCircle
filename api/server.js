@@ -210,24 +210,26 @@ app.post('/api/profile', async (req, res) => {
       // Update existing profile
       const result = await pool.query(
         `UPDATE profiles SET 
-         name = $2, 
-         age = $3, 
-         occupation = $4, 
-         photo = $5, 
-         bio = $6, 
-         industry_categories = $7, 
-         skills = $8, 
-         neighborhoods = $9, 
-         favorite_cafes = $10, 
-         interests = $11, 
+         first_name = $2, 
+         last_name = $3,
+         age = $4, 
+         occupation = $5, 
+         photo_url = $6, 
+         bio = $7, 
+         industry_categories = $8, 
+         skills = $9, 
+         neighborhoods = $10, 
+         favorite_cafes = $11, 
+         interests = $12, 
          updated_at = NOW() 
          WHERE user_id = $1 RETURNING *`,
         [
           user_id,
-          profileData.name || existingProfile.rows[0].name,
+          profileData.first_name || existingProfile.rows[0].first_name,
+          profileData.last_name || existingProfile.rows[0].last_name,
           profileData.age || existingProfile.rows[0].age,
           profileData.occupation || existingProfile.rows[0].occupation,
-          profileData.photo || existingProfile.rows[0].photo,
+          profileData.photo_url || existingProfile.rows[0].photo_url,
           profileData.bio || existingProfile.rows[0].bio,
           profileData.industry_categories || existingProfile.rows[0].industry_categories,
           profileData.skills || existingProfile.rows[0].skills,
@@ -242,7 +244,7 @@ app.post('/api/profile', async (req, res) => {
       // Create new profile
       const result = await pool.query(
         `INSERT INTO profiles(
-          user_id, first_name, last_name, age, occupation, photo, bio,
+          user_id, first_name, last_name, age, occupation, photo_url, bio,
           industry_categories, skills, neighborhoods, favorite_cafes, interests
         ) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) 
         RETURNING *`,
@@ -252,7 +254,7 @@ app.post('/api/profile', async (req, res) => {
           profileData.last_name || '',
           profileData.age || null,
           profileData.occupation || '',
-          profileData.photo || '',
+          profileData.photo_url || '',
           profileData.bio || '',
           profileData.industry_categories || [],
           profileData.skills || [],
