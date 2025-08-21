@@ -176,11 +176,11 @@ export default function CafeSelector({
       cafeString = `${place.name}|||${place.vicinity}|||${longitude}|||${latitude}`;
     }
 
-    // Check if the cafe is within New York State
-    if (!geoUtils.isWithinNewYorkState(latitude, longitude)) {
+    // Check if the cafe is within New York or New Jersey
+    if (!geoUtils.isWithinNewYorkOrNewJersey(latitude, longitude)) {
       Alert.alert(
         "Location Not Available",
-        "We're currently only available in New York State. Please select a cafe within NY to continue.",
+        "We're currently only available in New York and New Jersey. Please select a cafe within NY or NJ to continue.",
         [{ text: "OK" }]
       );
       return;

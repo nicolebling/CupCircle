@@ -108,27 +108,51 @@ export const geoUtils = {
     return filteredProfiles;
   },
 
-  // Check if coordinates are within New York State boundaries
-  isWithinNewYorkState(latitude: number, longitude: number): boolean {
-    // NY State approximate boundaries
-    // These are rough boundaries - for production you might want more precise polygon checking
-    const NY_BOUNDS = {
-      north: 45.015861,   // Northern border with Canada
-      south: 40.477399,   // Southern border (Staten Island)
-      east: -71.777491,   // Eastern border with Vermont/Massachusetts  
-      west: -79.762152    // Western border with Pennsylvania/Ontario
+  // Check if coordinates are within New York or New Jersey using polygon boundaries
+  isWithinNewYorkOrNewJersey(latitude: number, longitude: number): boolean {
+    const nyPolygon = [
+      [-79.762152, 45.015861], // NW corner
+      [-71.777491, 45.015861], // NE corner  
+      [-71.856214, 41.196191], // Eastern border with CT/MA
+      [-73.260498, 40.495865], // NYC area
+      [-74.259090, 40.477399], // Staten Island
+      [-75.420157, 39.840000], // Delaware border
+      [-79.487915, 42.000000], // Pennsylvania border
+      [-79.762152, 45.015861]  // Back to start
+    ];
+
+    const njPolygon = [
+      [-75.559614, 41.357423], // Northern border with NY
+      [-73.893979, 41.357423], // NE corner with NY
+      [-73.893979, 40.213542], // Atlantic coast north
+      [-74.236547, 39.142229], // Southern tip
+      [-75.414089, 39.677325], // Delaware border
+      [-75.559614, 41.357423]  // Back to start
+    ];
+
+    const isInPolygon = (point: [number, number], polygon: number[][]) => {
+      const [x, y] = point;
+      let inside = false;
+      
+      for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+        const [xi, yi] = polygon[i];
+        const [xj, yj] = polygon[j];
+        
+        if (((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi)) {
+          inside = !inside;
+        }
+      }
+      
+      return inside;
     };
 
-    // Check if the coordinates fall within NY state boundaries
-    const withinBounds = (
-      latitude >= NY_BOUNDS.south &&
-      latitude <= NY_BOUNDS.north &&
-      longitude >= NY_BOUNDS.west &&
-      longitude <= NY_BOUNDS.east
-    );
+    const point: [number, number] = [longitude, latitude];
+    const inNY = isInPolygon(point, nyPolygon);
+    const inNJ = isInPolygon(point, njPolygon);
+    const result = inNY || inNJ;
 
-    console.log(`Checking coordinates (${latitude}, ${longitude}) - Within NY: ${withinBounds}`);
-    return withinBounds;
+    console.log(`Checking coordinates (${latitude}, ${longitude}) - Within NY/NJ: ${result} (NY: ${inNY}, NJ: ${inNJ})`);
+    return result;
   },
 
   
