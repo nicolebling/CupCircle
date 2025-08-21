@@ -424,7 +424,11 @@ export default function LoginScreen() {
 
                 {/* Google Sign-In Button */}
                 <TouchableOpacity
-                  style={[styles.socialButton, styles.googleButton]}
+                  style={[
+                    styles.socialButton, 
+                    styles.googleButton,
+                    Platform.OS === 'android' && styles.fullWidthSocialButton
+                  ]}
                   onPress={signInWithGoogle}
                   disabled={loading}
                 >
@@ -642,6 +646,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
+  },
+  fullWidthSocialButton: {
+    flex: 1,
+    width: '100%',
   },
   appleButton: {
     backgroundColor: '#000000',
