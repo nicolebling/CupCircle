@@ -108,5 +108,28 @@ export const geoUtils = {
     return filteredProfiles;
   },
 
+  // Check if coordinates are within New York State boundaries
+  isWithinNewYorkState(latitude: number, longitude: number): boolean {
+    // NY State approximate boundaries
+    // These are rough boundaries - for production you might want more precise polygon checking
+    const NY_BOUNDS = {
+      north: 45.015861,   // Northern border with Canada
+      south: 40.477399,   // Southern border (Staten Island)
+      east: -71.777491,   // Eastern border with Vermont/Massachusetts  
+      west: -79.762152    // Western border with Pennsylvania/Ontario
+    };
+
+    // Check if the coordinates fall within NY state boundaries
+    const withinBounds = (
+      latitude >= NY_BOUNDS.south &&
+      latitude <= NY_BOUNDS.north &&
+      longitude >= NY_BOUNDS.west &&
+      longitude <= NY_BOUNDS.east
+    );
+
+    console.log(`Checking coordinates (${latitude}, ${longitude}) - Within NY: ${withinBounds}`);
+    return withinBounds;
+  },
+
   
 };

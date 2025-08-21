@@ -17,6 +17,7 @@ import MapView, { Marker, Callout } from "react-native-maps";
 import * as Location from "expo-location";
 import LogoAnimation from "@/components/LogoAnimation";
 import { supabase } from "@/lib/supabase";
+import { geoUtils } from "@/utils/geoUtils";
 
 interface CafeSelectorProps {
   selected: string[];
@@ -161,13 +162,28 @@ export default function CafeSelector({
 
   const handleSelect = (place: any, isFeatured = false) => {
     let cafeString;
+    let latitude, longitude;
     
     if (isFeatured) {
       // Featured cafe from our database
-      cafeString = `${place.name}|||${place.address}|||${place.longitude}|||${place.latitude}`;
+      latitude = place.latitude;
+      longitude = place.longitude;
+      cafeString = `${place.name}|||${place.address}|||${longitude}|||${latitude}`;
     } else {
       // Regular cafe from Google Places
-      cafeString = `${place.name}|||${place.vicinity}|||${place.geometry.location.lng}|||${place.geometry.location.lat}`;
+      latitude = place.geometry.location.lat;
+      longitude = place.geometry.location.lng;
+      cafeString = `${place.name}|||${place.vicinity}|||${longitude}|||${latitude}`;
+    }
+
+    // Check if the cafe is within New York State
+    if (!geoUtils.isWithinNewYorkState(latitude, longitude)) {
+      Alert.alert(
+        "Location Not Available",
+        "We're currently only available in New York State. Please select a cafe within NY to continue.",
+        [{ text: "OK" }]
+      );
+      return;
     }
     
     if (selected.includes(cafeString)) {
