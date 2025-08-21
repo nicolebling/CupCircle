@@ -62,7 +62,7 @@
         "expo-splash-screen",
         {
           "image": "./assets/images/cupcircle_logo.png",
-          "backgroundColor": "#ffffff",
+          "backgroundColor": "#F97415",
           "resizeMode": "contain"
         }
       ],
