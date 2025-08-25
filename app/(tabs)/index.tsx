@@ -105,6 +105,7 @@ export default function CircleChatsScreen() {
       setChats(matchesData);
 
       // Check feedback status for past confirmed chats
+      // Updated filter for current and past chats 08252025
       const pastConfirmedChats = matchesData.filter(
         (match) => {
           if (match.status !== "confirmed") return false;
