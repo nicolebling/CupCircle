@@ -106,9 +106,15 @@ export default function CircleChatsScreen() {
 
       // Check feedback status for past confirmed chats
       const pastConfirmedChats = matchesData.filter(
-        (match) =>
-          match.status === "confirmed" &&
-          new Date(match.meeting_date) < new Date(),
+        (match) => {
+          if (match.status !== "confirmed") return false;
+          
+          const [year, month, day] = match.meeting_date.split('-').map(Number);
+          const [hours, minutes] = match.start_time.split(':').map(Number);
+          const meetingDateTime = new Date(year, month - 1, day, hours, minutes);
+          
+          return meetingDateTime < new Date();
+        }
       );
       if (pastConfirmedChats.length > 0) {
         checkFeedbackStatus(pastConfirmedChats.map((chat) => chat.match_id));
@@ -306,7 +312,7 @@ export default function CircleChatsScreen() {
   };
 
   const renderChatCard = (chat) => {
-    const isExpired = new Date(chat.meeting_date) < new Date();
+    const isExpired = getMeetingDateTime(chat) < new Date();
 
     // When showing past chats, only show expired confirmed chats
     if (showPastChats) {
@@ -600,19 +606,32 @@ export default function CircleChatsScreen() {
 
   // Pre-filtered chat groups
   const confirmedChats = filterChatsByStatus("confirmed");
+  
+  // Helper function to create proper date from meeting date and time
+  const getMeetingDateTime = (chat) => {
+    // Combine meeting_date and start_time to get the actual meeting datetime
+    const [year, month, day] = chat.meeting_date.split('-').map(Number);
+    const [hours, minutes] = chat.start_time.split(':').map(Number);
+    
+    // Create date in local timezone
+    return new Date(year, month - 1, day, hours, minutes);
+  };
+  
+  const now = new Date();
+  
   const pastConfirmed = confirmedChats.filter(
-    (chat) => new Date(chat.meeting_date) < new Date(),
+    (chat) => getMeetingDateTime(chat) < now,
   );
   const upcomingConfirmed = confirmedChats.filter(
-    (chat) => new Date(chat.meeting_date) >= new Date(),
+    (chat) => getMeetingDateTime(chat) >= now,
   );
 
   const pendingAcceptance = filterChatsByStatus("pending_acceptance").filter(
-    (chat) => new Date(chat.meeting_date) >= new Date(),
+    (chat) => getMeetingDateTime(chat) >= now,
   );
 
   const pending = filterChatsByStatus("pending").filter(
-    (chat) => new Date(chat.meeting_date) >= new Date(),
+    (chat) => getMeetingDateTime(chat) >= now,
   );
 
   const showEmptyState =
