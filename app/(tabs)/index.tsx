@@ -600,38 +600,19 @@ export default function CircleChatsScreen() {
 
   // Pre-filtered chat groups
   const confirmedChats = filterChatsByStatus("confirmed");
-  const today = new Date();
-  today.setHours(0, 0, 0, 0); // Reset time to start of day
-  
   const pastConfirmed = confirmedChats.filter(
-    (chat) => {
-      const chatDate = new Date(chat.meeting_date);
-      chatDate.setHours(0, 0, 0, 0); // Reset time to start of day
-      return chatDate < today;
-    }
+    (chat) => new Date(chat.meeting_date) < new Date(),
   );
   const upcomingConfirmed = confirmedChats.filter(
-    (chat) => {
-      const chatDate = new Date(chat.meeting_date);
-      chatDate.setHours(0, 0, 0, 0); // Reset time to start of day
-      return chatDate >= today;
-    }
+    (chat) => new Date(chat.meeting_date) >= new Date(),
   );
 
   const pendingAcceptance = filterChatsByStatus("pending_acceptance").filter(
-    (chat) => {
-      const chatDate = new Date(chat.meeting_date);
-      chatDate.setHours(0, 0, 0, 0); // Reset time to start of day
-      return chatDate >= today;
-    }
+    (chat) => new Date(chat.meeting_date) >= new Date(),
   );
 
   const pending = filterChatsByStatus("pending").filter(
-    (chat) => {
-      const chatDate = new Date(chat.meeting_date);
-      chatDate.setHours(0, 0, 0, 0); // Reset time to start of day
-      return chatDate >= today;
-    }
+    (chat) => new Date(chat.meeting_date) >= new Date(),
   );
 
   const showEmptyState =
