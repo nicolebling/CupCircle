@@ -25,10 +25,17 @@ export default function AvailabilityCard({
   const colors = Colors[colorScheme];
 
   // Get timezone from props or fallback to system timezone
-  const timeZone = timeSlot.timezone || 
-    (typeof Intl !== 'undefined' && Intl.DateTimeFormat 
-      ? Intl.DateTimeFormat().resolvedOptions().timeZone 
-      : 'America/New_York');
+  let timeZone = timeSlot.timezone || 'America/New_York';
+  
+  if (!timeSlot.timezone) {
+    try {
+      if (typeof Intl !== 'undefined' && Intl.DateTimeFormat) {
+        timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      }
+    } catch (error) {
+      console.warn('Failed to get timezone from Intl, using fallback:', error);
+    }
+  }
   const timeZoneAbbr = timeZone.split("/")[1] || timeZone;
 
   const formattedStartTime = `${timeSlot.startTime.split(":")[0]}:${timeSlot.startTime.split(":")[1]}`;
