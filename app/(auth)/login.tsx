@@ -82,6 +82,7 @@ export default function LoginScreen() {
   React.useEffect(() => {
     GoogleSignin.configure({
       iosClientId: '145530736366-8o8pc0ttauphf34mkbijf16g3gvtqpc0.apps.googleusercontent.com',
+      androidClientId: '145530736366-24t38u2f489fn6tubeqnkebajuujjprf.apps.googleusercontent.com',
     });
   }, []);
 
