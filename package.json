@@ -59,7 +59,6 @@
     "expo-updates": "~0.28.16",
     "expo-web-browser": "~14.2.0",
     "express": "^4.21.2",
-    "intl": "^1.2.5",
     "pg": "^8.13.3",
     "react": "19.0.0",
     "react-dom": "19.0.0",
