@@ -5,8 +5,10 @@ import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { TimeSlot } from "@/models/Availability";
 
-// Import the polyfill
+// Import the polyfills
 import '@formatjs/intl-getcanonicallocales/polyfill';
+import '@formatjs/intl-locale/polyfill';
+import '@formatjs/intl-datetimeformat/polyfill';
 
 // Function to safely get timezone
 const getTimeZone = (): string => {

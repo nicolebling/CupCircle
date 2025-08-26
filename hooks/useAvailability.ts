@@ -6,8 +6,10 @@ import { cacheService } from "../services/cacheService";
 import NetInfo from "@react-native-community/netinfo";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-// Import the polyfill
+// Import the polyfills
 import '@formatjs/intl-getcanonicallocales/polyfill';
+import '@formatjs/intl-locale/polyfill';
+import '@formatjs/intl-datetimeformat/polyfill';
 
 // Function to safely get timezone
 const getTimeZone = (): string => {

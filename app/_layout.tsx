@@ -24,6 +24,8 @@ import { useOnboarding } from "@/hooks/useOnboarding";
 import OnboardingScreens from "@/components/OnboardingScreens";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import '@formatjs/intl-getcanonicallocales/polyfill';
+import '@formatjs/intl-locale/polyfill';
+import '@formatjs/intl-datetimeformat/polyfill';
 
 
 // Suppress animation warnings in development
