@@ -100,6 +100,7 @@ export default function AvailabilityScreen() {
           date,
           startTime: slot.start_time,
           endTime: slot.end_time,
+          timezone: slot.timezone || 'America/New_York',
         };
       });
 
@@ -132,14 +133,14 @@ export default function AvailabilityScreen() {
     // Use format function for consistent date key generation
     const currentDateKey = format(selectedDate, 'yyyy-MM-dd');
     let allSelections = { ...multiDateSelections };
-    
+
     if (selectedTimes.length > 0) {
       allSelections[currentDateKey] = selectedTimes;
     }
 
     // Check if there are any selections at all
     const totalSelections = Object.values(allSelections).reduce((total, times) => total + times.length, 0);
-    
+
     if (totalSelections === 0) {
       Alert.alert("No Time Selected", "Please select at least one time slot.");
       return;
@@ -202,7 +203,7 @@ export default function AvailabilityScreen() {
     try {
       setIsLoading(true);
       let totalCreated = 0;
-      
+
       for (const [dateKey, times] of Object.entries(allSelections)) {
         // Parse the date key directly to avoid timezone issues
         const [year, month, day] = dateKey.split('-');
@@ -213,11 +214,11 @@ export default function AvailabilityScreen() {
           totalCreated++;
         }
       }
-      
+
       await getUserAvailability();
       setSelectedTimes([]);
       setMultiDateSelections({});
-      
+
       Alert.alert(
         "Success", 
         `Successfully created ${totalCreated} time slot${totalCreated > 1 ? 's' : ''} across ${Object.keys(allSelections).length} date${Object.keys(allSelections).length > 1 ? 's' : ''}.`
@@ -430,9 +431,9 @@ export default function AvailabilityScreen() {
         [dateKey]: selectedTimes
       }));
     }
-    
+
     setSelectedDate(date);
-    
+
     // Load selections for the new date using format function
     const newDateKey = format(date, 'yyyy-MM-dd');
     setSelectedTimes(multiDateSelections[newDateKey] || []);
@@ -588,7 +589,7 @@ export default function AvailabilityScreen() {
                   ]}
                 >
                   <Text style={[styles.addSlotTitle, { color: colors.text }]}>
-                    Add Time Slot
+                    Add Availability
                   </Text>
                   <Text
                     style={[
@@ -669,10 +670,10 @@ export default function AvailabilityScreen() {
 
                         const handleTimeSelection = () => {
                           if (isTimeTaken || isPastTime || isAlreadyAdded) return;
-                          
+
                           // Use format function for consistent date key
                           const currentDateKey = format(selectedDate, 'yyyy-MM-dd');
-                          
+
                           let updatedTimes;
                           if (isSelectedTime) {
                             // Remove from selection
@@ -683,7 +684,7 @@ export default function AvailabilityScreen() {
                             updatedTimes = [...selectedTimes, item];
                             setSelectedTimes(updatedTimes);
                           }
-                          
+
                           // Update multi-date selections immediately with format function
                           setMultiDateSelections(prev => ({
                             ...prev,
@@ -766,7 +767,7 @@ export default function AvailabilityScreen() {
                           </View>
                         ))}
                       </View>
-                      
+
                       {Object.keys(multiDateSelections).length > 0 && (
                         <View style={styles.otherDatesContainer}>
                           <Text style={[styles.otherDatesLabel, { color: colors.secondaryText }]}>

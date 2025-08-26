@@ -6,16 +6,6 @@ import { cacheService } from "../services/cacheService";
 import NetInfo from "@react-native-community/netinfo";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-// Polyfill for Intl if not available
-if (typeof Intl === 'undefined' || !Intl.DateTimeFormat) {
-  try {
-    require('intl');
-    require('intl/locale-data/jsonp/en-US');
-  } catch (error) {
-    console.warn('Failed to load Intl polyfill:', error);
-  }
-}
-
 export function useAvailability() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -41,15 +31,9 @@ export function useAvailability() {
     setError(null);
 
     try {
-      let timeZone = 'America/New_York'; // Default fallback
-      
-      try {
-        if (typeof Intl !== 'undefined' && Intl.DateTimeFormat) {
-          timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        }
-      } catch (error) {
-        console.warn('Failed to get timezone from Intl, using fallback:', error);
-      }
+      // Use a simple timezone fallback without relying on Intl
+      const timeZone = 'America/New_York'; // Default timezone for consistency
+      console.log("Using timezone:", timeZone);
       console.log("Original selected date:", date);
       console.log("Original date ISO string:", date);
 
