@@ -122,7 +122,7 @@ export default function OnboardingScreens({ onComplete }: OnboardingScreensProps
   };
 
   const handleSkip = () => {
-    router.replace('/(auth)/login');
+    onComplete();
   };
 
   const handlePrevious = () => {

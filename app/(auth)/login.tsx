@@ -63,7 +63,7 @@ const Toast = ({ visible, message }) => {
   );
 };
 
-function LoginScreen() {
+export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -677,5 +677,3 @@ const styles = StyleSheet.create({
     fontFamily: "K2D-Regular",
   },
 });
-
-export default LoginScreen;

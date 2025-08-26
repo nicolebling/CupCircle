@@ -24,8 +24,9 @@ export default function AvailabilityCard({
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
 
-  // Get timezone from props or fallback to default timezone
-  const timeZone = timeSlot.timezone || 'America/New_York';
+  // Get timezone from props or fallback to system timezone
+  const timeZone =
+    timeSlot.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
   const timeZoneAbbr = timeZone.split("/")[1] || timeZone;
 
   const formattedStartTime = `${timeSlot.startTime.split(":")[0]}:${timeSlot.startTime.split(":")[1]}`;

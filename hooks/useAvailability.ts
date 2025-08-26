@@ -31,23 +31,14 @@ export function useAvailability() {
     setError(null);
 
     try {
-      // Use a simple timezone fallback without relying on Intl
-      const timeZone = 'America/New_York'; // Default timezone for consistency
-      console.log("Using timezone:", timeZone);
+      const timeZone = typeof Intl !== 'undefined' && Intl.DateTimeFormat 
+        ? Intl.DateTimeFormat().resolvedOptions().timeZone 
+        : 'America/New_York';
       console.log("Original selected date:", date);
       console.log("Original date ISO string:", date);
 
       // Format date as YYYY-MM-DD using local date
-      let formattedDate;
-      if (date instanceof Date) {
-        formattedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-      } else if (typeof date === 'string') {
-        // If date is already a string, parse it first
-        const parsedDate = new Date(date);
-        formattedDate = `${parsedDate.getFullYear()}-${String(parsedDate.getMonth() + 1).padStart(2, '0')}-${String(parsedDate.getDate()).padStart(2, '0')}`;
-      } else {
-        throw new Error('Invalid date format provided');
-      }
+      const formattedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
       console.log("Original date:", date);
       console.log("Formatted date:", formattedDate);
 
