@@ -1,20 +1,23 @@
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { format } from "date-fns";
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { TimeSlot } from "@/models/Availability";
 
-type TimeSlot = {
-  id: string;
-  date: Date;
-  startTime: string;
-  endTime: string;
-};
+// Import the polyfill
+import '@formatjs/intl-getcanonicallocales/polyfill';
 
-type AvailabilityCardProps = {
-  timeSlot: TimeSlot;
-  onDelete: () => void;
+// Function to safely get timezone
+const getTimeZone = (): string => {
+  try {
+    if (typeof Intl !== 'undefined' && Intl.DateTimeFormat) {
+      return Intl.DateTimeFormat().resolvedOptions().timeZone;
+    }
+  } catch (error) {
+    console.warn('Intl.DateTimeFormat not available, using fallback timezone:', error);
+  }
+  return 'America/New_York'; // Fallback timezone
 };
 
 export default function AvailabilityCard({
@@ -25,8 +28,7 @@ export default function AvailabilityCard({
   const colors = Colors[colorScheme];
 
   // Get timezone from props or fallback to system timezone
-  const timeZone =
-    timeSlot.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const timeZone = timeSlot.timezone || getTimeZone();
   const timeZoneAbbr = timeZone.split("/")[1] || timeZone;
 
   const formattedStartTime = `${timeSlot.startTime.split(":")[0]}:${timeSlot.startTime.split(":")[1]}`;

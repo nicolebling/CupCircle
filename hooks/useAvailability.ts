@@ -6,6 +6,21 @@ import { cacheService } from "../services/cacheService";
 import NetInfo from "@react-native-community/netinfo";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+// Import the polyfill
+import '@formatjs/intl-getcanonicallocales/polyfill';
+
+// Function to safely get timezone
+const getTimeZone = (): string => {
+  try {
+    if (typeof Intl !== 'undefined' && Intl.DateTimeFormat) {
+      return Intl.DateTimeFormat().resolvedOptions().timeZone;
+    }
+  } catch (error) {
+    console.warn('Intl.DateTimeFormat not available, using fallback timezone:', error);
+  }
+  return 'America/New_York'; // Fallback timezone
+};
+
 export function useAvailability() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -31,7 +46,7 @@ export function useAvailability() {
     setError(null);
 
     try {
-      const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const timeZone = getTimeZone();
       console.log("Original selected date:", date);
       console.log("Original date ISO string:", date);
 
