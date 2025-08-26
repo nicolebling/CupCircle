@@ -6,6 +6,12 @@ import { cacheService } from "../services/cacheService";
 import NetInfo from "@react-native-community/netinfo";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+// Polyfill for Intl if not available
+if (typeof Intl === 'undefined') {
+  require('intl');
+  require('intl/locale-data/jsonp/en');
+}
+
 export function useAvailability() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -38,7 +44,16 @@ export function useAvailability() {
       console.log("Original date ISO string:", date);
 
       // Format date as YYYY-MM-DD using local date
-      const formattedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+      let formattedDate;
+      if (date instanceof Date) {
+        formattedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+      } else if (typeof date === 'string') {
+        // If date is already a string, parse it first
+        const parsedDate = new Date(date);
+        formattedDate = `${parsedDate.getFullYear()}-${String(parsedDate.getMonth() + 1).padStart(2, '0')}-${String(parsedDate.getDate()).padStart(2, '0')}`;
+      } else {
+        throw new Error('Invalid date format provided');
+      }
       console.log("Original date:", date);
       console.log("Formatted date:", formattedDate);
 
