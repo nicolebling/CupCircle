@@ -30,11 +30,6 @@ import { StatusBar } from "expo-status-bar";
 import { supabase } from '@/lib/supabase';
 import Colors from '@/constants/Colors';
 import * as AppleAuthentication from 'expo-apple-authentication';
-import {
-  GoogleSignin,
-  GoogleSigninButton,
-  statusCodes,
-} from '@react-native-google-signin/google-signin';
 
 
 
