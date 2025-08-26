@@ -31,9 +31,7 @@ export function useAvailability() {
     setError(null);
 
     try {
-      const timeZone = typeof Intl !== 'undefined' && Intl.DateTimeFormat 
-        ? Intl.DateTimeFormat().resolvedOptions().timeZone 
-        : 'America/New_York';
+      const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       console.log("Original selected date:", date);
       console.log("Original date ISO string:", date);
 
