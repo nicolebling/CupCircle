@@ -29,19 +29,7 @@ import { StatusBar } from "expo-status-bar";
 import { supabase } from '@/lib/supabase';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
-
-// Email service function (assuming this is defined elsewhere or will be added)
-async function sendWelcomeEmail(email: string, name: string) {
-  // Placeholder for actual email sending logic
-  console.log(`Sending welcome email to ${name} at ${email}`);
-  // In a real application, you would use a service like Nodemailer, SendGrid, etc.
-  // Example:
-  // await fetch('YOUR_EMAIL_API_ENDPOINT', {
-  //   method: 'POST',
-  //   headers: { 'Content-Type': 'application/json' },
-  //   body: JSON.stringify({ to: email, name: name, template: 'welcome' }),
-  // });
-}
+import { sendWelcomeEmail } from '@/services/emailService';
 
 
 // Prevent splash screen from hiding until assets are loaded
