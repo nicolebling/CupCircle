@@ -29,7 +29,6 @@ import { StatusBar } from "expo-status-bar";
 import { supabase } from '@/lib/supabase';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
-import { sendWelcomeEmail } from '@/services/emailService';
 
 
 // Prevent splash screen from hiding until assets are loaded
@@ -114,7 +113,7 @@ export default function SignUpScreen() {
               const { data: profileData, error: profileError } = await supabase
                 .from('profiles')
                 .insert([
-                  {
+                  { 
                     id: data.user.id,
                     avatar_url: null,
                   }
@@ -126,16 +125,6 @@ export default function SignUpScreen() {
                 console.error("Profile error details:", JSON.stringify(profileError));
                 // Don't sign out - just continue to profile setup
                 console.log("Continuing to profile setup despite profile creation error");
-              } else {
-                // Send welcome email after successful email sign-up
-                try {
-                  console.log("🔔 Attempting to send welcome email to:", email);
-                  const emailResult = await sendWelcomeEmail(email, name || 'New User');
-                  console.log("✅ Welcome email sent successfully:", emailResult?.id || "Email queued");
-                } catch (emailError) {
-                  console.error("❌ Failed to send welcome email:", emailError);
-                  console.error("Email error details:", emailError.message);
-                }
               }
             } else {
               console.log("Profile already exists, continuing to profile setup");
@@ -253,7 +242,7 @@ export default function SignUpScreen() {
                 const { data: profileData, error: profileError } = await supabase
                   .from('profiles')
                   .insert([
-                    {
+                    { 
                       id: data.user.id,
                       name: credential.fullName ? `${credential.fullName.givenName || ''} ${credential.fullName.familyName || ''}`.trim() : null,
                       avatar_url: null,
@@ -263,17 +252,6 @@ export default function SignUpScreen() {
 
                 if (profileError) {
                   console.error("Profile creation error:", profileError);
-                } else {
-                  // Send welcome email after successful Apple sign-up
-                  try {
-                    const userName = credential.fullName ? `${credential.fullName.givenName || ''} ${credential.fullName.familyName || ''}`.trim() : 'New User';
-                    console.log("🔔 Attempting to send welcome email to:", data.user.email);
-                    const emailResult = await sendWelcomeEmail(data.user.email, userName || 'New User');
-                    console.log("✅ Welcome email sent successfully:", emailResult?.id || "Email queued");
-                  } catch (emailError) {
-                    console.error("❌ Failed to send welcome email:", emailError);
-                    console.error("Email error details:", emailError.message);
-                  }
                 }
               }
             } catch (profileCreationError) {
@@ -340,7 +318,7 @@ export default function SignUpScreen() {
                 const { data: profileData, error: profileError } = await supabase
                   .from('profiles')
                   .insert([
-                    {
+                    { 
                       id: data.user.id,
                       name: userInfo.data.user?.name || null,
                       avatar_url: userInfo.data.user?.photo || null,
@@ -350,17 +328,6 @@ export default function SignUpScreen() {
 
                 if (profileError) {
                   console.error("Profile creation error:", profileError);
-                } else {
-                  // Send welcome email after successful Google sign-up
-                  try {
-                    const userName = userInfo.data.user?.name || 'New User';
-                    console.log("🔔 Attempting to send welcome email to:", data.user.email);
-                    const emailResult = await sendWelcomeEmail(data.user.email, userName);
-                    console.log("✅ Welcome email sent successfully:", emailResult?.id || "Email queued");
-                  } catch (emailError) {
-                    console.error("❌ Failed to send welcome email:", emailError);
-                    console.error("Email error details:", emailError.message);
-                  }
                 }
               }
             } catch (profileCreationError) {
