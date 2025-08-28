@@ -423,18 +423,27 @@ export default function AvailabilityScreen() {
 
   const handleDateSelect = (date: Date) => {
     // Save current selections for the previous date using format function
-    if (selectedTimes.length > 0) {
-      const dateKey = format(selectedDate, 'yyyy-MM-dd');
-      setMultiDateSelections(prev => ({
-        ...prev,
-        [dateKey]: selectedTimes
-      }));
-    }
+    const previousDateKey = format(selectedDate, 'yyyy-MM-dd');
+    const newDateKey = format(date, 'yyyy-MM-dd');
+    
+    // Update multi-date selections with current selections
+    setMultiDateSelections(prev => {
+      const updated = { ...prev };
+      
+      // Save current selections for the previous date
+      if (selectedTimes.length > 0) {
+        updated[previousDateKey] = selectedTimes;
+      } else {
+        // Remove empty selections
+        delete updated[previousDateKey];
+      }
+      
+      return updated;
+    });
     
     setSelectedDate(date);
     
-    // Load selections for the new date using format function
-    const newDateKey = format(date, 'yyyy-MM-dd');
+    // Load selections for the new date
     setSelectedTimes(multiDateSelections[newDateKey] || []);
   };
 
@@ -670,25 +679,16 @@ export default function AvailabilityScreen() {
                         const handleTimeSelection = () => {
                           if (isTimeTaken || isPastTime || isAlreadyAdded) return;
                           
-                          // Use format function for consistent date key
-                          const currentDateKey = format(selectedDate, 'yyyy-MM-dd');
-                          
                           let updatedTimes;
                           if (isSelectedTime) {
                             // Remove from selection
                             updatedTimes = selectedTimes.filter(time => time !== item);
-                            setSelectedTimes(updatedTimes);
                           } else {
                             // Add to selection
                             updatedTimes = [...selectedTimes, item];
-                            setSelectedTimes(updatedTimes);
                           }
                           
-                          // Update multi-date selections immediately with format function
-                          setMultiDateSelections(prev => ({
-                            ...prev,
-                            [currentDateKey]: updatedTimes
-                          }));
+                          setSelectedTimes(updatedTimes);
                         };
 
                         return (
@@ -772,11 +772,17 @@ export default function AvailabilityScreen() {
                           <Text style={[styles.otherDatesLabel, { color: colors.secondaryText }]}>
                             Other Dates ({Object.values(multiDateSelections).reduce((total, times) => total + times.length, 0)} slots):
                           </Text>
-                          {Object.entries(multiDateSelections).map(([dateKey, times]) => (
-                            <Text key={dateKey} style={[styles.otherDateText, { color: colors.secondaryText }]}>
-                              {format(new Date(dateKey), 'MMM d')}: {times.length} slot{times.length > 1 ? 's' : ''}
-                            </Text>
-                          ))}
+                          {Object.entries(multiDateSelections).map(([dateKey, times]) => {
+                            const currentDateKey = format(selectedDate, 'yyyy-MM-dd');
+                            // Don't show current date in "other dates" section
+                            if (dateKey === currentDateKey) return null;
+                            
+                            return (
+                              <Text key={dateKey} style={[styles.otherDateText, { color: colors.secondaryText }]}>
+                                {format(new Date(dateKey), 'MMM d')}: {times.length} slot{times.length > 1 ? 's' : ''}
+                              </Text>
+                            );
+                          })}
                         </View>
                       )}
                     </View>
@@ -785,10 +791,18 @@ export default function AvailabilityScreen() {
                   <TouchableOpacity
                     style={[
                       styles.saveButton,
-                      { 
-                        backgroundColor: (selectedTimes.length > 0 || Object.keys(multiDateSelections).length > 0) ? colors.primary : colors.border,
-                        opacity: (selectedTimes.length > 0 || Object.keys(multiDateSelections).length > 0) ? 1 : 0.5 
-                      },
+                      (() => {
+                        const currentDateKey = format(selectedDate, 'yyyy-MM-dd');
+                        let allSelections = { ...multiDateSelections };
+                        if (selectedTimes.length > 0) {
+                          allSelections[currentDateKey] = selectedTimes;
+                        }
+                        const hasSelections = Object.values(allSelections).reduce((total, times) => total + times.length, 0) > 0;
+                        return {
+                          backgroundColor: hasSelections ? colors.primary : colors.border,
+                          opacity: hasSelections ? 1 : 0.5
+                        };
+                      })(),
                     ]}
                     onPress={() => {
                       const totalSelections = selectedTimes.length + Object.values(multiDateSelections).reduce((total, times) => total + times.length, 0);
@@ -798,15 +812,32 @@ export default function AvailabilityScreen() {
                         setShowAddSlot(false);
                       }
                     }}
-                    disabled={selectedTimes.length === 0 && Object.keys(multiDateSelections).length === 0}
+                    disabled={(() => {
+                      const currentDateKey = format(selectedDate, 'yyyy-MM-dd');
+                      let allSelections = { ...multiDateSelections };
+                      if (selectedTimes.length > 0) {
+                        allSelections[currentDateKey] = selectedTimes;
+                      }
+                      return Object.values(allSelections).reduce((total, times) => total + times.length, 0) === 0;
+                    })()}
                   >
                     <Text style={[
                       styles.saveButtonText,
                       { color: (selectedTimes.length > 0 || Object.keys(multiDateSelections).length > 0) ? "white" : colors.secondaryText }
                     ]}>
                       {(() => {
-                        const totalSelections = selectedTimes.length + Object.values(multiDateSelections).reduce((total, times) => total + times.length, 0);
-                        const totalDates = Object.keys(multiDateSelections).length + (selectedTimes.length > 0 ? 1 : 0);
+                        // Calculate total selections without double counting
+                        const currentDateKey = format(selectedDate, 'yyyy-MM-dd');
+                        let allSelections = { ...multiDateSelections };
+                        
+                        // Add current selections if any exist
+                        if (selectedTimes.length > 0) {
+                          allSelections[currentDateKey] = selectedTimes;
+                        }
+                        
+                        const totalSelections = Object.values(allSelections).reduce((total, times) => total + times.length, 0);
+                        const totalDates = Object.keys(allSelections).length;
+                        
                         if (totalSelections === 0) return 'Save Time Slots';
                         return `Save ${totalSelections} Slot${totalSelections > 1 ? 's' : ''} (${totalDates} Date${totalDates > 1 ? 's' : ''})`;
                       })()}
