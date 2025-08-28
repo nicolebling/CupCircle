@@ -86,7 +86,7 @@ export default function CareerTransitionEntry({ transition, onChange, onDelete, 
       </View>
 
       <View style={styles.inputContainer}>
-        <Text style={[styles.label, { color: colors.secondaryText }]}>Previous position</Text>
+        <Text style={[styles.label, { color: colors.secondaryText }]}>Previous</Text>
         <TextInput
           style={[styles.input, { backgroundColor: colors.input, color: colors.text }]}
           placeholder=""
@@ -97,7 +97,7 @@ export default function CareerTransitionEntry({ transition, onChange, onDelete, 
       </View>
 
       <View style={styles.inputContainer}>
-        <Text style={[styles.label, { color: colors.secondaryText }]}>New position</Text>
+        <Text style={[styles.label, { color: colors.secondaryText }]}>New</Text>
         <TextInput
           style={[styles.input, { backgroundColor: colors.input, color: colors.text }]}
           placeholder=""

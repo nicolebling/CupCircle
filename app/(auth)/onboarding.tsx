@@ -570,7 +570,6 @@ const styles = StyleSheet.create({
   hintText: {
     fontSize: 12,
     fontFamily: 'K2D-Regular',
-    marginTop: 4,
     marginBottom: 8,
   },
   photoContainer: {
