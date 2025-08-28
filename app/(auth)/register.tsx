@@ -141,9 +141,12 @@ export default function SignUpScreen() {
               } else {
                 // Send welcome email after successful email sign-up
                 try {
-                  await sendWelcomeEmail(email, name || 'New User');
+                  console.log("🔔 Attempting to send welcome email to:", email);
+                  const emailResult = await sendWelcomeEmail(email, name || 'New User');
+                  console.log("✅ Welcome email sent successfully:", emailResult?.id || "Email queued");
                 } catch (emailError) {
-                  console.error("Failed to send welcome email:", emailError);
+                  console.error("❌ Failed to send welcome email:", emailError);
+                  console.error("Email error details:", emailError.message);
                 }
               }
             } else {
@@ -276,9 +279,12 @@ export default function SignUpScreen() {
                   // Send welcome email after successful Apple sign-up
                   try {
                     const userName = credential.fullName ? `${credential.fullName.givenName || ''} ${credential.fullName.familyName || ''}`.trim() : 'New User';
-                    await sendWelcomeEmail(data.user.email, userName || 'New User');
+                    console.log("🔔 Attempting to send welcome email to:", data.user.email);
+                    const emailResult = await sendWelcomeEmail(data.user.email, userName || 'New User');
+                    console.log("✅ Welcome email sent successfully:", emailResult?.id || "Email queued");
                   } catch (emailError) {
-                    console.error("Failed to send welcome email:", emailError);
+                    console.error("❌ Failed to send welcome email:", emailError);
+                    console.error("Email error details:", emailError.message);
                   }
                 }
               }
@@ -360,9 +366,12 @@ export default function SignUpScreen() {
                   // Send welcome email after successful Google sign-up
                   try {
                     const userName = userInfo.data.user?.name || 'New User';
-                    await sendWelcomeEmail(data.user.email, userName);
+                    console.log("🔔 Attempting to send welcome email to:", data.user.email);
+                    const emailResult = await sendWelcomeEmail(data.user.email, userName);
+                    console.log("✅ Welcome email sent successfully:", emailResult?.id || "Email queued");
                   } catch (emailError) {
-                    console.error("Failed to send welcome email:", emailError);
+                    console.error("❌ Failed to send welcome email:", emailError);
+                    console.error("Email error details:", emailError.message);
                   }
                 }
               }
