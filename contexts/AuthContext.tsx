@@ -210,28 +210,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           );
         }
 
-        // Send welcome email
-        try {
-          const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
-          const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
-          
-          await fetch(`${supabaseUrl}/functions/v1/send-welcome-email`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${supabaseAnonKey}`,
-            },
-            body: JSON.stringify({ 
-              email: data.user.email, 
-              name: data.user.user_metadata?.name || name || data.user.email 
-            }),
-          });
-          console.log("Welcome email sent successfully from AuthContext");
-        } catch (emailError) {
-          console.error("Failed to send welcome email from AuthContext:", emailError);
-          // Don't block registration if email fails
-        }
-
         router.replace("/profile-setup");
       }
     } catch (error) {

@@ -129,28 +129,6 @@ export default function SignUpScreen() {
             } else {
               console.log("Profile already exists, continuing to profile setup");
             }
-
-            // Send welcome email
-            try {
-              const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
-              const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
-              
-              await fetch(`${supabaseUrl}/functions/v1/send-welcome-email`, {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${supabaseAnonKey}`,
-                },
-                body: JSON.stringify({ 
-                  email: data.user.email, 
-                  name: data.user.user_metadata?.name || data.user.email 
-                }),
-              });
-              console.log("Welcome email sent successfully");
-            } catch (emailError) {
-              console.error("Failed to send welcome email:", emailError);
-              // Don't block registration if email fails
-            }
           } catch (profileCreationError) {
             console.error("Exception during profile creation:", profileCreationError);
             // Don't sign out - just continue to profile setup
@@ -275,27 +253,6 @@ export default function SignUpScreen() {
                 if (profileError) {
                   console.error("Profile creation error:", profileError);
                 }
-
-                // Send welcome email for new Apple users
-                try {
-                  const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
-                  const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
-                  
-                  await fetch(`${supabaseUrl}/functions/v1/send-welcome-email`, {
-                    method: "POST",
-                    headers: {
-                      "Content-Type": "application/json",
-                      Authorization: `Bearer ${supabaseAnonKey}`,
-                    },
-                    body: JSON.stringify({ 
-                      email: data.user.email, 
-                      name: credential.fullName ? `${credential.fullName.givenName || ''} ${credential.fullName.familyName || ''}`.trim() : data.user.email 
-                    }),
-                  });
-                  console.log("Welcome email sent successfully for Apple user");
-                } catch (emailError) {
-                  console.error("Failed to send welcome email for Apple user:", emailError);
-                }
               }
             } catch (profileCreationError) {
               console.error("Exception during profile creation:", profileCreationError);
@@ -371,27 +328,6 @@ export default function SignUpScreen() {
 
                 if (profileError) {
                   console.error("Profile creation error:", profileError);
-                }
-
-                // Send welcome email for new Google users
-                try {
-                  const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
-                  const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
-                  
-                  await fetch(`${supabaseUrl}/functions/v1/send-welcome-email`, {
-                    method: "POST",
-                    headers: {
-                      "Content-Type": "application/json",
-                      Authorization: `Bearer ${supabaseAnonKey}`,
-                    },
-                    body: JSON.stringify({ 
-                      email: data.user.email, 
-                      name: userInfo.data.user?.name || data.user.email 
-                    }),
-                  });
-                  console.log("Welcome email sent successfully for Google user");
-                } catch (emailError) {
-                  console.error("Failed to send welcome email for Google user:", emailError);
                 }
               }
             } catch (profileCreationError) {
