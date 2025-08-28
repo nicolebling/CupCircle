@@ -207,6 +207,9 @@ export default function OnboardingScreen() {
                 setProfileData({ ...profileData, last_name: capitalizedText });
               }}
             />
+            <Text style={[styles.hintText, { color: colors.secondaryText }]}>
+              Your last name will appear as initials only.
+            </Text>
           </View>
         );
 
@@ -563,6 +566,12 @@ const styles = StyleSheet.create({
     fontFamily: 'K2D-Regular',
     marginTop: -8,
     marginBottom: 16,
+  },
+  hintText: {
+    fontSize: 12,
+    fontFamily: 'K2D-Regular',
+    marginTop: 4,
+    marginBottom: 8,
   },
   photoContainer: {
     alignItems: 'center',
