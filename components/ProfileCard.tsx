@@ -1177,10 +1177,10 @@ const styles = StyleSheet.create({
 
   // Matching card styles
   image: {
-    width: (width - 32) * 0.6, // 60% of original width
-    height: (width - 32) * 0.6, // Keep 1:1 ratio
+    width: Math.min((width - 32) * 0.45, 180), // Smaller and capped for tablets
+    height: Math.min((width - 32) * 0.45, 180), // Keep 1:1 ratio
     resizeMode: "cover",
-    borderRadius: ((width - 32) * 0.6) / 2, // Makes the image circular
+    borderRadius: Math.min((width - 32) * 0.45, 180) / 2, // Makes the image circular
     alignSelf: "center", // Center the image
     zIndex: 2,
   },
@@ -1191,6 +1191,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 16,
+    paddingHorizontal: Math.max(16, (width - 600) / 2 + 16), // Add more padding on wider screens
   },
   nameRow: {
     flexDirection: "row",
@@ -1309,9 +1310,9 @@ const styles = StyleSheet.create({
     position: "relative",
   },
   profilePhoto: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
     marginBottom: 16,
     justifyContent: "center",
     alignItems: "center",
@@ -1525,6 +1526,7 @@ const styles = StyleSheet.create({
   bioContainer: {
     marginBottom: 16,
     marginTop: 22,
+    paddingHorizontal: 4, // Add padding to prevent text clipping
   },
   bioText: {
     fontFamily: "K2D-Regular",
@@ -1536,12 +1538,12 @@ const styles = StyleSheet.create({
   },
   decorativeCircle: {
     position: "absolute",
-    width: (width - 32) * 0.6 + 20, // 8px larger on each side, was +16
-    height: (width - 32) * 0.6 + 20,
-    borderRadius: ((width - 32) * 0.6 + 16) / 2,
+    width: Math.min((width - 32) * 0.45, 180) + 20, // Match smaller image size
+    height: Math.min((width - 32) * 0.45, 180) + 20,
+    borderRadius: (Math.min((width - 32) * 0.45, 180) + 16) / 2,
     borderWidth: 6,
     backgroundColor: "transparent",
-    top: -10, //was -8
+    top: -10,
     zIndex: 1,
     shadowColor: "#FFF",
     shadowOffset: { width: 0, height: 0 },
