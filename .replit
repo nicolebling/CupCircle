@@ -107,3 +107,6 @@ args = "npx expo start --tunnel --port 8082"
 
 [deployment]
 run = ["sh", "-c", "npm run start"]
+
+[agent]
+expertMode = true
