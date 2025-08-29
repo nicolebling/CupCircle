@@ -13,10 +13,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   Alert,
-  Dimensions,
 } from "react-native";
-
-const { width } = Dimensions.get('window');
 import Slider from "@react-native-community/slider";
 import { useFocusEffect } from "@react-navigation/native";
 import { useAuth } from "@/contexts/AuthContext";
@@ -1017,7 +1014,6 @@ export default function MatchingScreen() {
             contentContainerStyle={{
               flexGrow: 1,
               paddingBottom: 120, // Extra padding for keyboard space
-              paddingHorizontal: Math.max(16, (width - 600) / 2), // Better padding for iPad
               justifyContent: "center",
               alignItems: "center",
             }}
