@@ -174,7 +174,9 @@ export default function OnboardingScreen() {
       // Trigger Superwall placement for first-time users after onboarding
       try {
         console.log('🎯 Triggering after_onboarding Superwall placement');
-        await Superwall.shared.register('after_onboarding');
+        await Superwall.shared.register({
+          event: 'after_onboarding',
+        });
         console.log('✅ Successfully triggered after_onboarding placement');
       } catch (error) {
         console.error('❌ Failed to trigger after_onboarding placement:', error);
