@@ -384,6 +384,37 @@ export default function MatchingScreen() {
   // Use useFocusEffect to run check when screen comes into focus
   useFocusEffect(
     useCallback(() => {
+      // Check if this is a first-time user and trigger paywall placement
+      const checkFirstTimeUser = async () => {
+        if (!user?.id) return;
+        
+        try {
+          const { data, error } = await supabase
+            .from("profiles")
+            .select("successful_chat")
+            .eq("id", user.id)
+            .single();
+
+          if (error) {
+            console.error("Error checking first-time user status:", error);
+            return;
+          }
+
+          const successfulChatCount = data?.successful_chat || 0;
+          
+          // For all new users (regardless of successful chat count), trigger the placement
+          console.log('🎯 Triggering after_onboarding Superwall placement for user with', successfulChatCount, 'successful chats');
+          await Superwall.shared.register({
+            placement: 'after_onboarding',
+          });
+          console.log('✅ Successfully triggered after_onboarding placement');
+          
+        } catch (error) {
+          console.error('❌ Failed to trigger after_onboarding placement:', error);
+          // Don't block the user flow if Superwall fails
+        }
+      };
+
       // Only do full reload on initial load or if no profiles are loaded
       if (!hasInitiallyLoaded || profiles.length === 0) {
         checkUserAvailability();
@@ -393,7 +424,10 @@ export default function MatchingScreen() {
       checkSubscriptionAndPaywall();
       fetchUserCentroid();
       fetchFeaturedCafes();
-    }, [checkUserAvailability, checkSubscriptionAndPaywall, fetchUserCentroid, hasInitiallyLoaded, profiles.length]),
+      
+      // Check for first-time user and trigger placement
+      checkFirstTimeUser();
+    }, [checkUserAvailability, checkSubscriptionAndPaywall, fetchUserCentroid, hasInitiallyLoaded, profiles.length, user?.id]),
   );
 
   // Periodic background refresh for new profiles (every 5 minutes)

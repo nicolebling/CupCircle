@@ -171,18 +171,6 @@ export default function OnboardingScreen() {
         // Don't block the user flow if push notifications fail
       }
 
-      // Trigger Superwall placement for first-time users after onboarding
-      try {
-        console.log('🎯 Triggering after_onboarding Superwall placement');
-        await Superwall.shared.register({
-          placement: 'after_onboarding',
-        });
-        console.log('✅ Successfully triggered after_onboarding placement');
-      } catch (error) {
-        console.error('❌ Failed to trigger after_onboarding placement:', error);
-        // Don't block the user flow if Superwall fails
-      }
-
       router.replace('/(tabs)/matching');
     } catch (error) {
       console.error('Failed to save profile', error);
