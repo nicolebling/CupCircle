@@ -63,6 +63,13 @@ export default function MessageScreen() {
   const [showProfileModal, setShowProfileModal] = useState(false);
   //const [activeTab, setActiveTab] = useState("messages"); // 'messages' or 'profile' - Removed
 
+  // Helper function to format name with last name initial
+  const formatNameWithInitial = (firstName: string | undefined, lastName: string | undefined): string => {
+    if (!firstName) return "";
+    if (!lastName) return firstName;
+    return `${firstName} ${lastName.charAt(0).toUpperCase()}.`;
+  };
+
   const flatListRef = useRef<FlatList>(null);
 
   // Fetch messages and partner info
@@ -195,7 +202,7 @@ export default function MessageScreen() {
       // Fetch basic partner profile info
       const { data: profileData, error: profileError } = await supabase
         .from("profiles")
-        .select("id, name, photo_url")
+        .select("id, name, photo_url, last_name")
         .eq("id", partnerId)
         .single();
 
@@ -622,7 +629,7 @@ export default function MessageScreen() {
               style={styles.profileImage}
             />
             <Text style={[styles.profileName, { color: colors.text }]}>
-              {partner.name || "Chat Partner"}
+              {formatNameWithInitial(partner.name, partner.last_name) || "Chat Partner"}
             </Text>
           </TouchableOpacity>
         ) : (
