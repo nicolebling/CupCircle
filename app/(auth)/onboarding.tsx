@@ -8,6 +8,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { decode } from 'base64-arraybuffer';
 import { supabase } from '@/lib/supabase';
 import InterestSelector from '@/components/InterestSelector';
+import Superwall from 'expo-superwall/compat';
 import IndustrySelector from '@/components/IndustrySelector';
 import ExperienceLevelSelector from '@/components/ExperienceLevelSelector';
 import CafeSelector from '@/components/CafeSelector';
@@ -172,7 +173,6 @@ export default function OnboardingScreen() {
 
       // Trigger Superwall placement for first-time users after onboarding
       try {
-        const Superwall = require('expo-superwall/compat').default;
         console.log('🎯 Triggering after_onboarding Superwall placement');
         await Superwall.shared.register('after_onboarding');
         console.log('✅ Successfully triggered after_onboarding placement');
