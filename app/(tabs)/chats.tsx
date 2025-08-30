@@ -61,6 +61,13 @@ export default function ChatsScreen() {
   const [loading, setLoading] = useState(true);
   const [showSkeleton, setShowSkeleton] = useState(false);
 
+  // Helper function to format name with last name initial
+  const formatNameWithInitial = (firstName: string | undefined, lastName: string | undefined): string => {
+    if (!firstName) return "";
+    if (!lastName) return firstName;
+    return `${firstName} ${lastName.charAt(0).toUpperCase()}.`;
+  };
+
   // Animation values
   const opacity = useSharedValue(0);
   const translateY = useSharedValue(30);
@@ -140,7 +147,7 @@ export default function ChatsScreen() {
       // Fetch profiles for these users
       const { data: profilesData, error: profilesError } = await supabase
         .from("profiles")
-        .select("*")
+        .select("*, last_name")
         .in("id", Array.from(userIds));
 
       if (profilesError) {
@@ -193,7 +200,7 @@ export default function ChatsScreen() {
             match_id: match.match_id || match.id,
             user: {
               id: partnerId,
-              name: partnerProfile.name || "User",
+              name: formatNameWithInitial(partnerProfile.name, partnerProfile.last_name) || "User",
               photo:
                 partnerProfile.photo_url ||
                 "https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg",
