@@ -51,6 +51,15 @@ export default function CircleChatsScreen() {
   );
   const [feedbackGiven, setFeedbackGiven] = useState<Set<string>>(new Set());
 
+  // Helper function to get initials from a name and last_name
+  const getInitials = (name: string | undefined, lastName: string | undefined): string => {
+    if (!name) return "";
+    const firstInitial = name.charAt(0).toUpperCase();
+    if (!lastName) return firstInitial;
+    const lastInitial = lastName.charAt(0).toUpperCase();
+    return `${firstInitial}${lastInitial}`;
+  };
+
   const fetchChats = async () => {
     if (!user) return;
     try {
@@ -109,11 +118,11 @@ export default function CircleChatsScreen() {
       const pastConfirmedChats = matchesData.filter(
         (match) => {
           if (match.status !== "confirmed") return false;
-          
+
           const [year, month, day] = match.meeting_date.split('-').map(Number);
           const [hours, minutes] = match.start_time.split(':').map(Number);
           const meetingDateTime = new Date(year, month - 1, day, hours, minutes);
-          
+
           return meetingDateTime < new Date();
         }
       );
@@ -176,7 +185,7 @@ export default function CircleChatsScreen() {
         // Get the chat details for notification
         const chat = chats.find((c) => c.match_id === chatId);
         const partnerProfile = getPartnerProfile(chat);
-        
+
         await supabase
           .from("matching")
           .update({ status: "confirmed" })
@@ -186,7 +195,7 @@ export default function CircleChatsScreen() {
         if (chat && partnerProfile) {
           // Get the correct recipient ID (the other user in the chat)
           const recipientUserId = chat.user1_id === user.id ? chat.user2_id : chat.user1_id;
-          
+
           try {
             await notificationService.sendCoffeeConfirmationNotification(
               recipientUserId,
@@ -204,7 +213,7 @@ export default function CircleChatsScreen() {
         // Get the chat details for notification before showing alert
         const chat = chats.find((c) => c.match_id === chatId);
         const partnerProfile = getPartnerProfile(chat);
-        
+
         // Immediately remove the chat from UI
         Alert.alert(
           "Cancel Chat",
@@ -280,7 +289,7 @@ export default function CircleChatsScreen() {
 
   const openMaps = (cafeName, cafeAddress) => {
     const query = encodeURIComponent(`${cafeName} ${cafeAddress}`);
-    
+
     if (Platform.OS === 'ios') {
       // Use Apple Maps on iOS
       const url = `http://maps.apple.com/?q=${query}`;
@@ -357,7 +366,7 @@ export default function CircleChatsScreen() {
             </TouchableOpacity>
             <View style={styles.profileInfo}>
               <Text style={[styles.partnerName, { color: colors.text }]}>
-                {partnerProfile.name || " "}
+                {partnerProfile.name} ({getInitials(partnerProfile.name, partnerProfile.last_name)})
               </Text>
               <Text
                 style={[styles.occupation, { color: colors.secondaryText }]}
@@ -607,19 +616,19 @@ export default function CircleChatsScreen() {
 
   // Pre-filtered chat groups
   const confirmedChats = filterChatsByStatus("confirmed");
-  
+
   // Helper function to create proper date from meeting date and time
   const getMeetingDateTime = (chat) => {
     // Combine meeting_date and start_time to get the actual meeting datetime
     const [year, month, day] = chat.meeting_date.split('-').map(Number);
     const [hours, minutes] = chat.start_time.split(':').map(Number);
-    
+
     // Create date in local timezone
     return new Date(year, month - 1, day, hours, minutes);
   };
-  
+
   const now = new Date();
-  
+
   const pastConfirmed = confirmedChats.filter(
     (chat) => getMeetingDateTime(chat) < now,
   );
