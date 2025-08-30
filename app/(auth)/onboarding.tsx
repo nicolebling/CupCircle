@@ -175,7 +175,7 @@ export default function OnboardingScreen() {
       try {
         console.log('🎯 Triggering after_onboarding Superwall placement');
         await Superwall.shared.register({
-          event: 'after_onboarding',
+          placement: 'after_onboarding',
         });
         console.log('✅ Successfully triggered after_onboarding placement');
       } catch (error) {
