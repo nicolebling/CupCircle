@@ -1373,13 +1373,13 @@ export default function MatchingScreen() {
                             return;
                           }
 
-                          // Trigger after_onboarding placement for all users when they try to send a request
+                          // Trigger send request placement for all users when they try to send a request
                           try {
-                            console.log('🎯 Triggering after_onboarding Superwall placement on send request button press');
+                            console.log('🎯 Triggering send request  Superwall placement on send request button press');
                             await Superwall.shared.register({
-                              placement: 'after_onboarding',
+                              placement: 'send request_onPress',
                             });
-                            console.log('✅ Successfully triggered after_onboarding placement');
+                            console.log('✅ Successfully triggered send request placement');
                             
                             // Check if user should be blocked by paywall
                             // Get subscription status
@@ -1410,7 +1410,7 @@ export default function MatchingScreen() {
                             }
                             
                           } catch (error) {
-                            console.error('❌ Failed to trigger after_onboarding placement:', error);
+                            console.error('❌ Failed to trigger send request placement:', error);
                             // Continue with request even if Superwall fails
                           }
 
