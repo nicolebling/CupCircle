@@ -51,6 +51,13 @@ export default function CircleChatsScreen() {
   );
   const [feedbackGiven, setFeedbackGiven] = useState<Set<string>>(new Set());
 
+  // Helper function to format name with last name initial
+  const formatNameWithInitial = (firstName: string | undefined, lastName: string | undefined): string => {
+    if (!firstName) return "";
+    if (!lastName) return firstName;
+    return `${firstName} ${lastName.charAt(0).toUpperCase()}.`;
+  };
+
   const fetchChats = async () => {
     if (!user) return;
     try {
@@ -357,7 +364,7 @@ export default function CircleChatsScreen() {
             </TouchableOpacity>
             <View style={styles.profileInfo}>
               <Text style={[styles.partnerName, { color: colors.text }]}>
-                {partnerProfile.name || " "}
+                {formatNameWithInitial(partnerProfile.name, partnerProfile.last_name)}
               </Text>
               <Text
                 style={[styles.occupation, { color: colors.secondaryText }]}
