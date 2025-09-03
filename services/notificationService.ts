@@ -317,42 +317,27 @@ export const notificationService = {
           
           // Only schedule if notification time is in the future
           if (notificationTime > new Date()) {
-            // First check if this notification already exists
-            const { data: existing, error: checkError } = await supabase
+            // Use upsert with onConflict to handle duplicates gracefully
+            const { error, data } = await supabase
               .from("scheduled_notifications")
-              .select("id")
-              .eq("meeting_id", matchingId)
-              .eq("user_id", user.id)
-              .eq("notification_type", reminder.type)
-              .single();
-
-            if (checkError && checkError.code !== 'PGRST116') {
-              console.error(`Error checking existing notification for ${reminder.type}:`, checkError);
-              continue;
-            }
-
-            // Skip if notification already exists
-            if (existing) {
-              console.log(`⏭️ ${reminder.type} notification already exists for user ${user.id}, skipping`);
-              continue;
-            }
-
-            // Create the notification
-            const { error } = await supabase.from("scheduled_notifications").insert({
-              meeting_id: matchingId,
-              user_id: user.id,
-              notification_type: reminder.type,
-              title: `☕ Coffee Chat in ${reminder.label}`,
-              body: `Your coffee chat with ${user.partnerName} at ${cafeName} is coming up in ${reminder.label}!`,
-              scheduled_time: notificationTime.toISOString(),
-              metadata: {
+              .upsert({
                 meeting_id: matchingId,
-                cafe_name: cafeName,
-                partner_name: user.partnerName,
-                meeting_time: meetingDateTime.toISOString()
-              },
-              sent: false
-            });
+                user_id: user.id,
+                notification_type: reminder.type,
+                title: `☕ Coffee Chat in ${reminder.label}`,
+                body: `Your coffee chat with ${user.partnerName} at ${cafeName} is coming up in ${reminder.label}!`,
+                scheduled_time: notificationTime.toISOString(),
+                metadata: {
+                  meeting_id: matchingId,
+                  cafe_name: cafeName,
+                  partner_name: user.partnerName,
+                  meeting_time: meetingDateTime.toISOString()
+                },
+                sent: false
+              }, {
+                onConflict: 'meeting_id,user_id,notification_type',
+                ignoreDuplicates: true
+              });
 
             if (error) {
               console.error(`Error scheduling ${reminder.type} for user ${user.id}:`, error);
