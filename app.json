@@ -23,8 +23,8 @@
       "bundleIdentifier": "com.cupcircle.connect",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "This app requires location access to function properly.",
-        "NSLocationAlwaysUsageDescription": "This app needs location access even in the background.",
-        "NSPhotoLibraryUsageDescription": "We need access to your photo library to upload images.",
+        "NSLocationAlwaysUsageDescription": "CupCircle uses your approximate location to suggest cafés in your neighborhood for coffee chats. Your exact location is never stored or shared.",
+        "NSPhotoLibraryUsageDescription": "CupCircle uses your photo library so you can upload a profile picture, helping others recognize you when connecting for coffee chats.",
         "ITSAppUsesNonExemptEncryption": false,
         "UIBackgroundModes": ["fetch", "remote-notification"]
       },
