@@ -317,6 +317,27 @@ export const notificationService = {
           
           // Only schedule if notification time is in the future
           if (notificationTime > new Date()) {
+            // First check if this notification already exists
+            const { data: existing, error: checkError } = await supabase
+              .from("scheduled_notifications")
+              .select("id")
+              .eq("meeting_id", matchingId)
+              .eq("user_id", user.id)
+              .eq("notification_type", reminder.type)
+              .single();
+
+            if (checkError && checkError.code !== 'PGRST116') {
+              console.error(`Error checking existing notification for ${reminder.type}:`, checkError);
+              continue;
+            }
+
+            // Skip if notification already exists
+            if (existing) {
+              console.log(`⏭️ ${reminder.type} notification already exists for user ${user.id}, skipping`);
+              continue;
+            }
+
+            // Create the notification
             const { error } = await supabase.from("scheduled_notifications").insert({
               meeting_id: matchingId,
               user_id: user.id,
