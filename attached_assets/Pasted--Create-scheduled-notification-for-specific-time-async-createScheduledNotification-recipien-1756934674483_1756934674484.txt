@@ -1,0 +1,181 @@
+// Create scheduled notification for specific time
+  async createScheduledNotification(
+    recipientUserId: string,
+    title: string,
+    body: string,
+    scheduledTime: Date,
+    notificationType: 'meeting_reminder' | 'pre_meeting' | 'post_meeting',
+    metadata?: Record<string, any>,
+  ) {
+    try {
+      const { error } = await supabase.from("scheduled_notifications").insert({
+        user_id: recipientUserId,
+        title,
+        body,
+        scheduled_time: scheduledTime.toISOString(),
+        notification_type: notificationType,
+        metadata: metadata || {},
+        sent: false
+      });
+
+      if (error) {
+        console.error("Error creating scheduled notification in DB:", error);
+        return;
+      }
+
+      console.log(
+        "✅ Scheduled notification created in DB for", scheduledTime.toISOString()
+      );
+    } catch (err) {
+      console.error("❌ Failed to create scheduled notification in DB:", err);
+    }
+  },
+
+  // Schedule meeting reminder notifications
+  async scheduleMeetingNotifications(
+    matchingId: string,
+    user1Id: string,
+    user2Id: string,
+    meetingDate: string, // Format: "2025-04-29"
+    startTime: string,   // Format: "10:00:00"
+    cafeName: string
+  ) {
+    try {
+      // Parse the meeting date and time properly
+      const meetingDateTime = new Date(`${meetingDate}T${startTime}`);
+      
+      if (isNaN(meetingDateTime.getTime())) {
+        console.error("Invalid date/time format:", meetingDate, startTime);
+        return;
+      }
+
+      // Get user names for personalized notifications
+      const [user1Profile, user2Profile] = await Promise.all([
+        supabase.from("profiles").select("name").eq("id", user1Id).single(),
+        supabase.from("profiles").select("name").eq("id", user2Id).single()
+      ]);
+
+      const user1Name = user1Profile.data?.name || "Your coffee chat partner";
+      const user2Name = user2Profile.data?.name || "Your coffee chat partner";
+      const cafeDisplayName = cafeName.split("|||")[0]; // Extract cafe name
+
+      // Calculate notification times
+      const oneDayBefore = new Date(meetingDateTime.getTime() - 24 * 60 * 60 * 1000);
+      const oneHourBefore = new Date(meetingDateTime.getTime() - 60 * 60 * 1000);
+      const fifteenMinsBefore = new Date(meetingDateTime.getTime() - 15 * 60 * 1000);
+
+      // Don't schedule notifications that are in the past
+      const now = new Date();
+      
+      // 24 hours before reminder
+      if (oneDayBefore > now) {
+        await this.createScheduledNotification(
+          user1Id,
+          "☕ Coffee Chat Tomorrow",
+          `Don't forget: You have a coffee chat with ${user2Name} at ${cafeDisplayName} tomorrow at ${startTime}`,
+          oneDayBefore,
+          'meeting_reminder',
+          { matching_id: matchingId, reminder_type: '24h' }
+        );
+
+        await this.createScheduledNotification(
+          user2Id,
+          "☕ Coffee Chat Tomorrow",
+          `Don't forget: You have a coffee chat with ${user1Name} at ${cafeDisplayName} tomorrow at ${startTime}`,
+          oneDayBefore,
+          'meeting_reminder',
+          { matching_id: matchingId, reminder_type: '24h' }
+        );
+      }
+
+      // 1 hour before reminder
+      if (oneHourBefore > now) {
+        await this.createScheduledNotification(
+          user1Id,
+          "⏰ Coffee Chat in 1 Hour",
+          `Your coffee chat with ${user2Name} at ${cafeDisplayName} starts in 1 hour`,
+          oneHourBefore,
+          'pre_meeting',
+          { matching_id: matchingId, reminder_type: '1h' }
+        );
+
+        await this.createScheduledNotification(
+          user2Id,
+          "⏰ Coffee Chat in 1 Hour",
+          `Your coffee chat with ${user1Name} at ${cafeDisplayName} starts in 1 hour`,
+          oneHourBefore,
+          'pre_meeting',
+          { matching_id: matchingId, reminder_type: '1h' }
+        );
+      }
+
+      // 15 minutes before reminder
+      if (fifteenMinsBefore > now) {
+        await this.createScheduledNotification(
+          user1Id,
+          "🏃‍♂️ Coffee Chat Starting Soon",
+          `Your coffee chat with ${user2Name} at ${cafeDisplayName} starts in 15 minutes. Time to head out!`,
+          fifteenMinsBefore,
+          'pre_meeting',
+          { matching_id: matchingId, reminder_type: '15m' }
+        );
+
+        await this.createScheduledNotification(
+          user2Id,
+          "🏃‍♀️ Coffee Chat Starting Soon",
+          `Your coffee chat with ${user1Name} at ${cafeDisplayName} starts in 15 minutes. Time to head out!`,
+          fifteenMinsBefore,
+          'pre_meeting',
+          { matching_id: matchingId, reminder_type: '15m' }
+        );
+      }
+
+      console.log("✅ Meeting reminder notifications scheduled successfully");
+    } catch (err) {
+      console.error("❌ Failed to schedule meeting notifications:", err);
+    }
+  },
+
+  // Wrapper methods for specific events
+  async sendCoffeeRequestNotification(
+    recipientUserId: string,
+    senderUserId: string,
+    cafeName: string,
+  ) {
+    try {
+      // Fetch sender name from profiles table
+      const { data: senderProfile, error } = await supabase
+        .from("profiles")
+        .select("name")
+        .eq("id", senderUserId)
+        .single();
+
+      const senderName = senderProfile?.name || "Someone";
+
+      await this.createNotification(
+        recipientUserId,
+        "☕ New Coffee Chat Request!",
+        `${senderName} wants to meet you at ${cafeName.split("|||")[0]}`,
+        { type: "coffee_request" },
+      );
+    } catch (error) {
+      console.error("Error fetching sender name for coffee request notification:", error);
+      // Fallback notification
+      await this.createNotification(
+        recipientUserId,
+        "☕ New Coffee Chat Request!",
+        `Someone wants to meet you at ${cafeName.split("|||")[0]}`,
+        { type: "coffee_request" },
+      );
+    }
+  },
+
+  async sendCoffeeConfirmationNotification(
+    recipientUserId: string,
+    senderUserId: string,
+    cafeName: string,
+    matchingId?: string,
+    meetingDate?: string,
+    startTime?: string,
+  ) {
+    try {

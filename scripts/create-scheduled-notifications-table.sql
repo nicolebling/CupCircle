@@ -1,8 +1,6 @@
-
--- Create scheduled_notifications table to track sent notifications
 CREATE TABLE IF NOT EXISTS scheduled_notifications (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  meeting_id UUID NOT NULL REFERENCES matching(id) ON DELETE CASCADE,
+  meeting_id INTEGER NOT NULL REFERENCES matching(match_id) ON DELETE CASCADE,
   user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   notification_type VARCHAR NOT NULL CHECK (notification_type IN ('reminder_24h', 'reminder_1h', 'reminder_15m')),
   title TEXT NOT NULL,
