@@ -348,35 +348,6 @@ export const notificationService = {
     }
   },
 
-  // Create a test notification that's due immediately
-  async createTestNotification(userId: string) {
-    try {
-      const now = new Date();
-      const testTime = new Date(now.getTime() - 1000); // 1 second ago to ensure it's due
-
-      const { error } = await supabase.from("scheduled_notifications").insert({
-        user_id: userId,
-        notification_type: 'meeting_reminder',
-        title: '🧪 Test Notification',
-        body: 'This is a test of the scheduled notification system!',
-        scheduled_time: testTime.toISOString(),
-        metadata: { test: true },
-        sent: false
-      });
-
-      if (error) {
-        console.error("Error creating test notification:", error);
-        return false;
-      }
-
-      console.log("✅ Test notification created for immediate processing");
-      return true;
-    } catch (error) {
-      console.error("❌ Failed to create test notification:", error);
-      return false;
-    }
-  },
-
   // Test scheduled notifications function manually
   async testScheduledNotifications() {
     try {

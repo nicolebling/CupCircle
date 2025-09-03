@@ -415,52 +415,6 @@ export default function SettingsScreen() {
                 ios_backgroundColor={colors.border}
               />
             </View>
-
-            <TouchableOpacity
-              style={[styles.settingItem, { borderColor: colors.border }]}
-              onPress={async () => {
-                if (!user?.id) {
-                  Alert.alert("Error", "User not found");
-                  return;
-                }
-                
-                Alert.alert("Testing", "Creating test notification...");
-                
-                // Create a test notification
-                const created = await notificationService.createTestNotification(user.id);
-                
-                if (!created) {
-                  Alert.alert("Error", "Failed to create test notification");
-                  return;
-                }
-                
-                // Wait a moment then trigger the processor
-                setTimeout(async () => {
-                  const result = await notificationService.testScheduledNotifications();
-                  Alert.alert(
-                    "Test Complete",
-                    result ? `Processed: ${result.processed || 0} notifications` : "Test failed",
-                    [{ text: "OK" }]
-                  );
-                }, 1000);
-              }}
-            >
-              <View style={styles.settingContent}>
-                <Ionicons
-                  name="flask-outline"
-                  size={22}
-                  color={colors.text}
-                />
-                <Text style={[styles.settingText, { color: colors.text }]}>
-                  Test Notifications
-                </Text>
-              </View>
-              <Ionicons
-                name="chevron-forward"
-                size={20}
-                color={colors.secondaryText}
-              />
-            </TouchableOpacity>
           </View>
 
           <View style={styles.section}>
