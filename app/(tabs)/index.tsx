@@ -116,11 +116,11 @@ export default function CircleChatsScreen() {
       const pastConfirmedChats = matchesData.filter(
         (match) => {
           if (match.status !== "confirmed") return false;
-          
+
           const [year, month, day] = match.meeting_date.split('-').map(Number);
           const [hours, minutes] = match.start_time.split(':').map(Number);
           const meetingDateTime = new Date(year, month - 1, day, hours, minutes);
-          
+
           return meetingDateTime < new Date();
         }
       );
@@ -183,26 +183,36 @@ export default function CircleChatsScreen() {
         // Get the chat details for notification
         const chat = chats.find((c) => c.match_id === chatId);
         const partnerProfile = getPartnerProfile(chat);
-        
+
         await supabase
           .from("matching")
           .update({ status: "confirmed" })
           .eq("match_id", chatId);
 
-        // Send confirmation notification to the other user
-        if (chat && partnerProfile) {
-          // Get the correct recipient ID (the other user in the chat)
-          const recipientUserId = chat.user1_id === user.id ? chat.user2_id : chat.user1_id;
-          
-          try {
-            await notificationService.sendCoffeeConfirmationNotification(
-              recipientUserId,
-              user.id,
-              chat.meeting_location.split("|||")[0] || "the café"
-            );
-          } catch (notifError) {
-            console.error('Error sending coffee confirmation notification:', notifError);
-          }
+        // Send coffee confirmation notification
+        const otherUserId = chat.user1_id === user.id ? chat.user2_id : chat.user1_id;
+        if (otherUserId) {
+          await notificationService.sendCoffeeConfirmationNotification(
+            otherUserId,
+            user?.id,
+            chat.meeting_location.split("|||")[0] || "a café"
+          );
+        }
+
+        // Schedule meeting reminder notifications
+        try {
+          await notificationService.scheduleMeetingNotifications(
+            chat.match_id.toString(),
+            chat.user1_id,
+            chat.user2_id,
+            chat.meeting_date,
+            chat.start_time,
+            chat.meeting_location.split("|||")[0] || "a café"
+          );
+          console.log(`✅ Scheduled meeting notifications for match ${chat.match_id}`);
+        } catch (error) {
+          console.error("❌ Error scheduling meeting notifications:", error);
+          // Don't block the confirmation flow if scheduling fails
         }
 
         // Refresh chats after update
@@ -211,7 +221,7 @@ export default function CircleChatsScreen() {
         // Get the chat details for notification before showing alert
         const chat = chats.find((c) => c.match_id === chatId);
         const partnerProfile = getPartnerProfile(chat);
-        
+
         // Immediately remove the chat from UI
         Alert.alert(
           "Cancel Chat",
@@ -287,7 +297,7 @@ export default function CircleChatsScreen() {
 
   const openMaps = (cafeName, cafeAddress) => {
     const query = encodeURIComponent(`${cafeName} ${cafeAddress}`);
-    
+
     if (Platform.OS === 'ios') {
       // Use Apple Maps on iOS
       const url = `http://maps.apple.com/?q=${query}`;
@@ -614,19 +624,19 @@ export default function CircleChatsScreen() {
 
   // Pre-filtered chat groups
   const confirmedChats = filterChatsByStatus("confirmed");
-  
+
   // Helper function to create proper date from meeting date and time
   const getMeetingDateTime = (chat) => {
     // Combine meeting_date and start_time to get the actual meeting datetime
     const [year, month, day] = chat.meeting_date.split('-').map(Number);
     const [hours, minutes] = chat.start_time.split(':').map(Number);
-    
+
     // Create date in local timezone
     return new Date(year, month - 1, day, hours, minutes);
   };
-  
+
   const now = new Date();
-  
+
   const pastConfirmed = confirmedChats.filter(
     (chat) => getMeetingDateTime(chat) < now,
   );
