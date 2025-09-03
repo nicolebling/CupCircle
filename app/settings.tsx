@@ -38,6 +38,8 @@ export default function SettingsScreen() {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   const handleNotificationsToggle = async () => {
     const newNotificationState = !notifications;
@@ -175,6 +177,83 @@ export default function SettingsScreen() {
     setShowCurrentPassword(false);
     setShowNewPassword(false);
     setShowConfirmPassword(false);
+  };
+
+  const deleteAccount = async () => {
+    setDeleteLoading(true);
+    
+    try {
+      if (!user?.id) {
+        Alert.alert("Error", "User not found. Please try again.");
+        setDeleteLoading(false);
+        return;
+      }
+
+      // Delete user profile data
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .delete()
+        .eq("id", user.id);
+
+      if (profileError) {
+        console.error("Error deleting profile:", profileError);
+        throw new Error("Failed to delete profile data");
+      }
+
+      // Delete user availability data
+      const { error: availabilityError } = await supabase
+        .from("availability")
+        .delete()
+        .eq("id", user.id);
+
+      // Note: availability deletion errors are not critical since the table might not exist for all users
+      if (availabilityError) {
+        console.log("Note: Could not delete availability data:", availabilityError);
+      }
+
+      // Delete the user account from Supabase Auth
+      const { error: authError } = await supabase.auth.admin.deleteUser(user.id);
+      
+      if (authError) {
+        console.error("Error deleting user auth:", authError);
+        // Fallback: try to sign out the user even if deletion fails
+        await signOut();
+        throw new Error("Account deletion failed. Please contact support.");
+      }
+
+      // Success - close modal and sign out
+      setShowDeleteModal(false);
+      setDeleteLoading(false);
+      
+      Alert.alert(
+        "Account Deleted",
+        "Your account has been successfully deleted.",
+        [
+          {
+            text: "OK",
+            onPress: async () => {
+              await signOut();
+            }
+          }
+        ]
+      );
+
+    } catch (error) {
+      setDeleteLoading(false);
+      console.error("Account deletion error:", error);
+      
+      Alert.alert(
+        "Deletion Failed",
+        error.message || "An error occurred while deleting your account. Please try again or contact support.",
+        [
+          { text: "Cancel", style: "cancel" },
+          {
+            text: "Retry",
+            onPress: () => deleteAccount()
+          }
+        ]
+      );
+    }
   };
 
   // Load user's notification preference
@@ -438,6 +517,14 @@ export default function SettingsScreen() {
           </View>
 
           <TouchableOpacity
+            style={[styles.deleteAccountButton, { borderColor: "#FF3B30" }]}
+            onPress={() => setShowDeleteModal(true)}
+          >
+            <Ionicons name="trash-outline" size={22} color="#FF3B30" />
+            <Text style={styles.deleteAccountText}>Delete Account</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
             style={[styles.logoutButton, { borderColor: colors.border }]}
             onPress={handleLogout}
           >
@@ -577,6 +664,74 @@ export default function SettingsScreen() {
             </View>
           </View>
         </Modal>
+
+        {/* Delete Account Confirmation Modal */}
+        <Modal
+          visible={showDeleteModal}
+          transparent={true}
+          animationType="fade"
+          onRequestClose={() => !deleteLoading && setShowDeleteModal(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={[styles.deleteModalContent, { backgroundColor: colors.background }]}>
+              <View style={styles.deleteModalHeader}>
+                <Ionicons name="warning" size={48} color="#FF3B30" />
+                <Text style={[styles.deleteModalTitle, { color: colors.text }]}>
+                  Delete Account
+                </Text>
+                <Text style={[styles.deleteModalSubtitle, { color: colors.secondaryText }]}>
+                  Are you sure you want to delete your account?
+                </Text>
+              </View>
+
+              <View style={styles.deleteModalBody}>
+                <Text style={[styles.deleteWarningText, { color: colors.text }]}>
+                  This action cannot be undone. All of your data including:
+                </Text>
+                <View style={styles.deleteWarningList}>
+                  <Text style={[styles.deleteWarningItem, { color: colors.secondaryText }]}>
+                    • Profile information
+                  </Text>
+                  <Text style={[styles.deleteWarningItem, { color: colors.secondaryText }]}>
+                    • Match history
+                  </Text>
+                  <Text style={[styles.deleteWarningItem, { color: colors.secondaryText }]}>
+                    • Availability settings
+                  </Text>
+                  <Text style={[styles.deleteWarningItem, { color: colors.secondaryText }]}>
+                    • All conversations
+                  </Text>
+                </View>
+                <Text style={[styles.deleteWarningText, { color: colors.text }]}>
+                  will be permanently deleted.
+                </Text>
+              </View>
+
+              <View style={styles.deleteModalButtons}>
+                <TouchableOpacity
+                  style={[styles.deleteCancelButton, { borderColor: colors.border }]}
+                  onPress={() => setShowDeleteModal(false)}
+                  disabled={deleteLoading}
+                >
+                  <Text style={[styles.deleteCancelButtonText, { color: colors.text }]}>
+                    Cancel
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.deleteConfirmButton, { backgroundColor: "#FF3B30" }]}
+                  onPress={deleteAccount}
+                  disabled={deleteLoading}
+                >
+                  {deleteLoading ? (
+                    <ActivityIndicator color="#FFFFFF" size="small" />
+                  ) : (
+                    <Text style={styles.deleteConfirmButtonText}>Delete Account</Text>
+                  )}
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
       </SafeAreaView>
    
   );
@@ -703,6 +858,89 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   updateButtonText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontFamily: "K2D-Medium",
+  },
+  deleteAccountButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 16,
+    marginVertical: 8,
+    marginBottom: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+  },
+  deleteAccountText: {
+    color: "#FF3B30",
+    fontSize: 16,
+    fontFamily: "K2D-SemiBold",
+    marginLeft: 8,
+  },
+  deleteModalContent: {
+    width: "90%",
+    borderRadius: 16,
+    padding: 24,
+    maxHeight: "80%",
+  },
+  deleteModalHeader: {
+    alignItems: "center",
+    marginBottom: 24,
+  },
+  deleteModalTitle: {
+    fontSize: 24,
+    fontFamily: "K2D-SemiBold",
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  deleteModalSubtitle: {
+    fontSize: 16,
+    fontFamily: "K2D-Regular",
+    textAlign: "center",
+  },
+  deleteModalBody: {
+    marginBottom: 24,
+  },
+  deleteWarningText: {
+    fontSize: 16,
+    fontFamily: "K2D-Regular",
+    lineHeight: 24,
+    marginBottom: 12,
+  },
+  deleteWarningList: {
+    marginVertical: 12,
+    paddingLeft: 8,
+  },
+  deleteWarningItem: {
+    fontSize: 14,
+    fontFamily: "K2D-Regular",
+    lineHeight: 20,
+    marginBottom: 4,
+  },
+  deleteModalButtons: {
+    flexDirection: "row",
+    gap: 12,
+  },
+  deleteCancelButton: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 8,
+    borderWidth: 1,
+    alignItems: "center",
+  },
+  deleteCancelButtonText: {
+    fontSize: 16,
+    fontFamily: "K2D-Medium",
+  },
+  deleteConfirmButton: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  deleteConfirmButtonText: {
     color: "#FFFFFF",
     fontSize: 16,
     fontFamily: "K2D-Medium",
