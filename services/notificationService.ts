@@ -243,6 +243,111 @@ export const notificationService = {
     }
   },
 
+  // Create scheduled notification for specific time
+  async createScheduledNotification(
+    recipientUserId: string,
+    title: string,
+    body: string,
+    scheduledTime: Date,
+    notificationType: 'meeting_reminder' | 'pre_meeting' | 'post_meeting',
+    metadata?: Record<string, any>,
+  ) {
+    try {
+      const { error } = await supabase.from("scheduled_notifications").insert({
+        user_id: recipientUserId,
+        title,
+        body,
+        scheduled_time: scheduledTime.toISOString(),
+        notification_type: notificationType,
+        metadata: metadata || {},
+        sent: false
+      });
+
+      if (error) {
+        console.error("Error creating scheduled notification in DB:", error);
+        return;
+      }
+
+      console.log(
+        "✅ Scheduled notification created in DB for", scheduledTime.toISOString()
+      );
+    } catch (err) {
+      console.error("❌ Failed to create scheduled notification in DB:", err);
+    }
+  },
+
+  // Schedule meeting reminder notifications
+  async scheduleMeetingNotifications(
+    matchingId: string,
+    user1Id: string,
+    user2Id: string,
+    meetingDate: string, // Format: "2025-04-29"
+    startTime: string,   // Format: "10:00:00"
+    cafeName: string
+  ) {
+    try {
+      // Parse the meeting date and time properly
+      const meetingDateTime = new Date(`${meetingDate}T${startTime}`);
+      
+      if (isNaN(meetingDateTime.getTime())) {
+        console.error("Invalid date/time format:", meetingDate, startTime);
+        return;
+      }
+
+      // Get user names for personalized notifications
+      const [user1Profile, user2Profile] = await Promise.all([
+        supabase.from("profiles").select("name").eq("id", user1Id).single(),
+        supabase.from("profiles").select("name").eq("id", user2Id).single(),
+      ]);
+
+      const user1Name = user1Profile.data?.name || "Your coffee partner";
+      const user2Name = user2Profile.data?.name || "Your coffee partner";
+
+      // Calculate notification times
+      const reminderTimes = [
+        { offset: 24 * 60, type: 'reminder_24h' as const, label: '24 hours' },
+        { offset: 60, type: 'reminder_1h' as const, label: '1 hour' },
+        { offset: 15, type: 'reminder_15m' as const, label: '15 minutes' }
+      ];
+
+      // Create notifications for both users
+      for (const user of [{ id: user1Id, partnerName: user2Name }, { id: user2Id, partnerName: user1Name }]) {
+        for (const reminder of reminderTimes) {
+          const notificationTime = new Date(meetingDateTime.getTime() - (reminder.offset * 60 * 1000));
+          
+          // Only schedule if notification time is in the future
+          if (notificationTime > new Date()) {
+            const { error } = await supabase.from("scheduled_notifications").insert({
+              meeting_id: parseInt(matchingId),
+              user_id: user.id,
+              notification_type: reminder.type,
+              title: `☕ Coffee Chat in ${reminder.label}`,
+              body: `Your coffee chat with ${user.partnerName} at ${cafeName} is coming up in ${reminder.label}!`,
+              scheduled_time: notificationTime.toISOString(),
+              metadata: {
+                meeting_id: matchingId,
+                cafe_name: cafeName,
+                partner_name: user.partnerName,
+                meeting_time: meetingDateTime.toISOString()
+              },
+              sent: false
+            });
+
+            if (error) {
+              console.error(`Error scheduling ${reminder.type} for user ${user.id}:`, error);
+            } else {
+              console.log(`✅ Scheduled ${reminder.type} notification for ${user.id} at ${notificationTime.toISOString()}`);
+            }
+          }
+        }
+      }
+
+      console.log(`✅ All meeting notifications scheduled for match ${matchingId}`);
+    } catch (error) {
+      console.error("❌ Error scheduling meeting notifications:", error);
+    }
+  },
+
   // Test scheduled notifications function manually
   async testScheduledNotifications() {
     try {
