@@ -242,4 +242,27 @@ export const notificationService = {
       );
     }
   },
+
+  // Test scheduled notifications function manually
+  async testScheduledNotifications() {
+    try {
+      const response = await fetch(
+        `${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1/scheduled-notifications`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY}`,
+          },
+        }
+      );
+
+      const result = await response.json();
+      console.log('Scheduled notifications test result:', result);
+      return result;
+    } catch (error) {
+      console.error('Error testing scheduled notifications:', error);
+      return null;
+    }
+  },
 };
