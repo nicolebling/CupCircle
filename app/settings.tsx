@@ -10,7 +10,8 @@ import {
   Modal,
   TextInput,
   Alert,
-  Switch
+  Switch,
+  ActivityIndicator
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -516,14 +517,7 @@ export default function SettingsScreen() {
             </TouchableOpacity>
           </View>
 
-          <TouchableOpacity
-            style={[styles.deleteAccountButton, { borderColor: "#FF3B30" }]}
-            onPress={() => setShowDeleteModal(true)}
-          >
-            <Ionicons name="trash-outline" size={22} color="#FF3B30" />
-            <Text style={styles.deleteAccountText}>Delete Account</Text>
-          </TouchableOpacity>
-
+  
           <TouchableOpacity
             style={[styles.logoutButton, { borderColor: colors.border }]}
             onPress={handleLogout}
@@ -531,6 +525,15 @@ export default function SettingsScreen() {
             <Ionicons name="log-out-outline" size={22} color="#FF3B30" />
             <Text style={styles.logoutText}>Log Out</Text>
           </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.deleteAccountButton, {  borderColor: colors.border }]}
+            onPress={() => setShowDeleteModal(true)}
+          >
+            <Ionicons name="trash-outline" size={22} color="#FF3B30" />
+            <Text style={styles.deleteAccountText}>Delete Account</Text>
+          </TouchableOpacity>
+          
         </ScrollView>
 
         {/* Password Change Modal */}
@@ -693,7 +696,7 @@ export default function SettingsScreen() {
                     • Profile information
                   </Text>
                   <Text style={[styles.deleteWarningItem, { color: colors.secondaryText }]}>
-                    • Match history
+                    • Coffee Chat history
                   </Text>
                   <Text style={[styles.deleteWarningItem, { color: colors.secondaryText }]}>
                     • Availability settings
