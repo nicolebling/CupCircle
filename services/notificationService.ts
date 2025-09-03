@@ -278,7 +278,7 @@ export const notificationService = {
 
   // Schedule meeting reminder notifications
   async scheduleMeetingNotifications(
-    matchingId: string,
+    matchingId: number,
     user1Id: string,
     user2Id: string,
     meetingDate: string, // Format: "2025-04-29"
@@ -318,7 +318,7 @@ export const notificationService = {
           // Only schedule if notification time is in the future
           if (notificationTime > new Date()) {
             const { error } = await supabase.from("scheduled_notifications").insert({
-              meeting_id: parseInt(matchingId),
+              meeting_id: matchingId,
               user_id: user.id,
               notification_type: reminder.type,
               title: `☕ Coffee Chat in ${reminder.label}`,

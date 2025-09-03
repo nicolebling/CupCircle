@@ -202,7 +202,7 @@ export default function CircleChatsScreen() {
         // Schedule meeting reminder notifications
         try {
           await notificationService.scheduleMeetingNotifications(
-            chat.match_id.toString(),
+            chat.match_id,
             chat.user1_id,
             chat.user2_id,
             chat.meeting_date,
