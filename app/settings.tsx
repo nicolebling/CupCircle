@@ -44,7 +44,7 @@ export default function SettingsScreen() {
 
   const handleNotificationsToggle = async () => {
     const newNotificationState = !notifications;
-    
+
     try {
       if (!user?.id) {
         Alert.alert("Error", "User not found. Please try again.");
@@ -67,10 +67,10 @@ export default function SettingsScreen() {
       }
 
       // Update the notification preference and push token in the database
-      const updateData: any = { 
-        notifications_enabled: newNotificationState 
+      const updateData: any = {
+        notifications_enabled: newNotificationState
       };
-      
+
       if (pushToken) {
         updateData.push_token = pushToken;
       } else if (!newNotificationState) {
@@ -91,7 +91,7 @@ export default function SettingsScreen() {
 
       // Update local state
       setNotifications(newNotificationState);
-      
+
       // Show success alert
       const statusMessage = newNotificationState ? "enabled" : "disabled";
       Alert.alert(
@@ -101,7 +101,7 @@ export default function SettingsScreen() {
       );
 
       console.log(`Notifications ${statusMessage} for user ${user.id}`);
-      
+
     } catch (error) {
       console.error("Error toggling notifications:", error);
       Alert.alert("Error", "An unexpected error occurred. Please try again.");
@@ -182,7 +182,7 @@ export default function SettingsScreen() {
 
   const deleteAccount = async () => {
     setDeleteLoading(true);
-    
+
     try {
       if (!user?.id) {
         Alert.alert("Error", "User not found. Please try again.");
@@ -190,42 +190,36 @@ export default function SettingsScreen() {
         return;
       }
 
-      // Delete user profile data
-      const { error: profileError } = await supabase
-        .from("profiles")
-        .delete()
-        .eq("id", user.id);
+      // Get the current session to get the access token
+      const { data: { session } } = await supabase.auth.getSession();
 
-      if (profileError) {
-        console.error("Error deleting profile:", profileError);
-        throw new Error("Failed to delete profile data");
+      if (!session?.access_token) {
+        Alert.alert("Error", "Authentication required. Please log in again.");
+        setDeleteLoading(false);
+        return;
       }
 
-      // Delete user availability data
-      const { error: availabilityError } = await supabase
-        .from("availability")
-        .delete()
-        .eq("id", user.id);
+      // Call the edge function to delete the account
+      const { data, error } = await supabase.functions.invoke('delete-account', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
 
-      // Note: availability deletion errors are not critical since the table might not exist for all users
-      if (availabilityError) {
-        console.log("Note: Could not delete availability data:", availabilityError);
+      if (error) {
+        console.error("Edge function error:", error);
+        throw new Error("Failed to delete account. Please try again.");
       }
 
-      // Delete the user account from Supabase Auth
-      const { error: authError } = await supabase.auth.admin.deleteUser(user.id);
-      
-      if (authError) {
-        console.error("Error deleting user auth:", authError);
-        // Fallback: try to sign out the user even if deletion fails
-        await signOut();
-        throw new Error("Account deletion failed. Please contact support.");
+      if (data?.error) {
+        console.error("Account deletion failed:", data.error);
+        throw new Error(data.error);
       }
 
       // Success - close modal and sign out
       setShowDeleteModal(false);
       setDeleteLoading(false);
-      
+
       Alert.alert(
         "Account Deleted",
         "Your account has been successfully deleted.",
@@ -242,7 +236,7 @@ export default function SettingsScreen() {
     } catch (error) {
       setDeleteLoading(false);
       console.error("Account deletion error:", error);
-      
+
       Alert.alert(
         "Deletion Failed",
         error.message || "An error occurred while deleting your account. Please try again or contact support.",
@@ -292,7 +286,7 @@ export default function SettingsScreen() {
         Superwall.configure({
           apiKey: apiKey,
         });
-        
+
         // Set debug level for more detailed logging
         await Superwall.shared.setLogLevel(LogLevel.Debug);
         console.log('Superwall configured with debug logging in settings');
@@ -300,7 +294,7 @@ export default function SettingsScreen() {
         console.error('Failed to configure Superwall in settings:', error);
       }
     };
-    
+
     initializeSuperwall();
   }, [])
 
@@ -315,7 +309,7 @@ export default function SettingsScreen() {
   }, [colors.text]);
 
   return (
-   
+
       <SafeAreaView
         style={[styles.container, { backgroundColor: colors.background }]}
       >
@@ -395,7 +389,7 @@ export default function SettingsScreen() {
               />
             </TouchableOpacity>
           </View>
-          
+
 
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>
@@ -517,7 +511,7 @@ export default function SettingsScreen() {
             </TouchableOpacity>
           </View>
 
-  
+
           <TouchableOpacity
             style={[styles.logoutButton, { borderColor: colors.border }]}
             onPress={handleLogout}
@@ -533,7 +527,7 @@ export default function SettingsScreen() {
             <Ionicons name="trash-outline" size={22} color="#FF3B30" />
             <Text style={styles.deleteAccountText}>Delete Account</Text>
           </TouchableOpacity>
-          
+
         </ScrollView>
 
         {/* Password Change Modal */}
@@ -736,7 +730,7 @@ export default function SettingsScreen() {
           </View>
         </Modal>
       </SafeAreaView>
-   
+
   );
 }
 
@@ -774,7 +768,7 @@ const styles = StyleSheet.create({
     marginLeft: 12,
     fontFamily: "K2D-Regular",
   },
-  
+
   logoutButton: {
     flexDirection: "row",
     alignItems: "center",
