@@ -61,19 +61,24 @@ Deno.serve(async (req) => {
     const now = new Date()
     console.log('Current time:', now.toISOString())
 
-    // First, get notifications that need processing
+    // Atomically get and mark notifications as sent in a single operation
+    // This prevents any race conditions between concurrent function executions
     const { data: dueNotifications, error: queryError } = await supabase
       .from('scheduled_notifications')
-      .select('*')
+      .update({ 
+        sent: true, 
+        sent_at: now.toISOString() 
+      })
       .eq('sent', false)
       .lte('scheduled_time', now.toISOString())
+      .select('*')
 
     if (queryError) {
       console.error('Error querying scheduled notifications:', queryError)
       throw queryError
     }
 
-    console.log(`Found ${dueNotifications?.length || 0} due notifications`)
+    console.log(`Found and claimed ${dueNotifications?.length || 0} due notifications`)
 
     if (!dueNotifications || dueNotifications.length === 0) {
       return new Response(
@@ -89,27 +94,9 @@ Deno.serve(async (req) => {
     let processedCount = 0
     let errorCount = 0
 
-    // Process each due notification with individual locking
+    // Process each notification (they're already marked as sent, so no duplicates possible)
     for (const notification of dueNotifications) {
       try {
-        // Try to atomically claim this notification for processing
-        const { data: claimedNotification, error: claimError } = await supabase
-          .from('scheduled_notifications')
-          .update({ 
-            sent: true, 
-            sent_at: now.toISOString() 
-          })
-          .eq('id', notification.id)
-          .eq('sent', false) // Only update if still not sent
-          .select('*')
-          .single()
-
-        // If claiming failed (notification was already processed), skip it
-        if (claimError || !claimedNotification) {
-          console.log(`Notification ${notification.id} already processed by another instance`)
-          continue
-        }
-
         // Get user's push token and notification preference
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
@@ -126,7 +113,6 @@ Deno.serve(async (req) => {
         // Check if user has notifications enabled
         if (!profile?.notifications_enabled) {
           console.log(`Notifications disabled for user ${notification.user_id}, skipping...`)
-          
           processedCount++
           continue
         }
@@ -168,6 +154,9 @@ Deno.serve(async (req) => {
       } catch (error) {
         console.error(`Error processing notification ${notification.id}:`, error)
         errorCount++
+        
+        // If processing failed, we could optionally revert the sent status
+        // but it's better to avoid duplicates and log the error instead
       }
     }
 
