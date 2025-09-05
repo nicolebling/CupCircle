@@ -1429,6 +1429,7 @@ export default function MatchingScreen() {
                                 start_time: selectedTimeSlot.start_time,
                                 end_time: selectedTimeSlot.end_time,
                                 initial_message: messageText,
+                                timezone: "America/New_York", // Default timezone, could be made dynamic
                                 created_at: new Date().toISOString(),
                               },
                             ])
