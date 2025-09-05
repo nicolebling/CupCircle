@@ -42,6 +42,16 @@ export default function SettingsScreen() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
+  const testScheduledNotifications = async () => {
+    try {
+      Alert.alert("Testing", "Processing scheduled notifications...");
+      const result = await notificationService.testScheduledNotifications();
+      Alert.alert("Test Complete", JSON.stringify(result, null, 2));
+    } catch (error) {
+      Alert.alert("Error", `Test failed: ${error.message}`);
+    }
+  };
+
   const handleNotificationsToggle = async () => {
     const newNotificationState = !notifications;
 
@@ -421,6 +431,27 @@ export default function SettingsScreen() {
             <Text style={[styles.sectionTitle, { color: colors.text }]}>
               Support
             </Text>
+
+            <TouchableOpacity
+              style={[styles.settingItem, { borderColor: colors.border }]}
+              onPress={testScheduledNotifications}
+            >
+              <View style={styles.settingContent}>
+                <Ionicons
+                  name="send-outline"
+                  size={22}
+                  color={colors.text}
+                />
+                <Text style={[styles.settingText, { color: colors.text }]}>
+                  Test Notifications
+                </Text>
+              </View>
+              <Ionicons
+                name="chevron-forward"
+                size={20}
+                color={colors.secondaryText}
+              />
+            </TouchableOpacity>
 
             <TouchableOpacity
               style={[styles.settingItem, { borderColor: colors.border }]}
