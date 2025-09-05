@@ -61,12 +61,16 @@ Deno.serve(async (req) => {
     const now = new Date()
     console.log('Current time:', now.toISOString())
 
-    // Query for notifications that are due to be sent
+    // Atomically get and mark notifications as processing to prevent duplicates
     const { data: dueNotifications, error: queryError } = await supabase
       .from('scheduled_notifications')
-      .select('*')
+      .update({ 
+        sent: true, 
+        sent_at: now.toISOString() 
+      })
       .eq('sent', false)
       .lte('scheduled_time', now.toISOString())
+      .select('*')
 
     if (queryError) {
       console.error('Error querying scheduled notifications:', queryError)
@@ -109,15 +113,6 @@ Deno.serve(async (req) => {
         if (!profile?.notifications_enabled) {
           console.log(`Notifications disabled for user ${notification.user_id}, skipping...`)
           
-          // Mark as sent even though we didn't send it
-          await supabase
-            .from('scheduled_notifications')
-            .update({ 
-              sent: true, 
-              sent_at: now.toISOString() 
-            })
-            .eq('id', notification.id)
-          
           processedCount++
           continue
         }
@@ -134,15 +129,6 @@ Deno.serve(async (req) => {
             metadata: notification.metadata || {}
           })
 
-          // Mark as sent
-          await supabase
-            .from('scheduled_notifications')
-            .update({ 
-              sent: true, 
-              sent_at: now.toISOString() 
-            })
-            .eq('id', notification.id)
-          
           processedCount++
           continue
         }
@@ -162,22 +148,8 @@ Deno.serve(async (req) => {
           metadata: notification.metadata || {}
         })
 
-        // Mark notification as sent
-        const { error: updateError } = await supabase
-          .from('scheduled_notifications')
-          .update({ 
-            sent: true, 
-            sent_at: now.toISOString() 
-          })
-          .eq('id', notification.id)
-
-        if (updateError) {
-          console.error(`Error marking notification ${notification.id} as sent:`, updateError)
-          errorCount++
-        } else {
-          console.log(`✅ Sent notification ${notification.id} to user ${notification.user_id}`)
-          processedCount++
-        }
+        console.log(`✅ Sent notification ${notification.id} to user ${notification.user_id}`)
+        processedCount++
 
       } catch (error) {
         console.error(`Error processing notification ${notification.id}:`, error)
