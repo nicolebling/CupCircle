@@ -276,7 +276,7 @@ export const notificationService = {
     }
   },
 
-  // Schedule meeting reminder notifications
+  // Schedule meeting reminder notifications via edge function
   async scheduleMeetingNotifications(
     matchingId: number,
     user1Id: string,
@@ -286,69 +286,42 @@ export const notificationService = {
     cafeName: string
   ) {
     try {
-      // Parse the meeting date and time properly
-      const meetingDateTime = new Date(`${meetingDate}T${startTime}`);
-      
-      if (isNaN(meetingDateTime.getTime())) {
-        console.error("Invalid date/time format:", meetingDate, startTime);
+      console.log(`📅 Scheduling notifications for meeting ${matchingId}...`);
+
+      // Get the current session for authentication
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (!session?.access_token) {
+        console.error("❌ No authentication session available");
         return;
       }
 
-      // Get user names for personalized notifications
-      const [user1Profile, user2Profile] = await Promise.all([
-        supabase.from("profiles").select("name").eq("id", user1Id).single(),
-        supabase.from("profiles").select("name").eq("id", user2Id).single(),
-      ]);
+      // Call the edge function to schedule notifications
+      const { data, error } = await supabase.functions.invoke('schedule-meeting-notifications', {
+        body: {
+          matchingId,
+          user1Id,
+          user2Id,
+          meetingDate,
+          startTime,
+          cafeName
+        },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
 
-      const user1Name = user1Profile.data?.name || "Your coffee partner";
-      const user2Name = user2Profile.data?.name || "Your coffee partner";
-
-      // Calculate notification times
-      const reminderTimes = [
-        { offset: 24 * 60, type: 'reminder_24h' as const, label: '24 hours' },
-        { offset: 60, type: 'reminder_1h' as const, label: '1 hour' },
-        { offset: 15, type: 'reminder_15m' as const, label: '15 minutes' }
-      ];
-
-      // Create notifications for both users
-      for (const user of [{ id: user1Id, partnerName: user2Name }, { id: user2Id, partnerName: user1Name }]) {
-        for (const reminder of reminderTimes) {
-          const notificationTime = new Date(meetingDateTime.getTime() - (reminder.offset * 60 * 1000));
-          
-          // Only schedule if notification time is in the future
-          if (notificationTime > new Date()) {
-            // Use upsert with onConflict to handle duplicates gracefully
-            const { error, data } = await supabase
-              .from("scheduled_notifications")
-              .upsert({
-                meeting_id: matchingId,
-                user_id: user.id,
-                notification_type: reminder.type,
-                title: `☕ Coffee Chat in ${reminder.label}`,
-                body: `Your coffee chat with ${user.partnerName} at ${cafeName} is coming up in ${reminder.label}!`,
-                scheduled_time: notificationTime.toISOString(),
-                metadata: {
-                  meeting_id: matchingId,
-                  cafe_name: cafeName,
-                  partner_name: user.partnerName,
-                  meeting_time: meetingDateTime.toISOString()
-                },
-                sent: false
-              }, {
-                onConflict: 'meeting_id,user_id,notification_type',
-                ignoreDuplicates: true
-              });
-
-            if (error) {
-              console.error(`Error scheduling ${reminder.type} for user ${user.id}:`, error);
-            } else {
-              console.log(`✅ Scheduled ${reminder.type} notification for ${user.id} at ${notificationTime.toISOString()}`);
-            }
-          }
-        }
+      if (error) {
+        console.error("❌ Edge function error:", error);
+        throw new Error("Failed to schedule meeting notifications");
       }
 
-      console.log(`✅ All meeting notifications scheduled for match ${matchingId}`);
+      if (data?.error) {
+        console.error("❌ Meeting notification scheduling failed:", data.error);
+        throw new Error(data.error);
+      }
+
+      console.log(`✅ Scheduled meeting notifications for match ${matchingId}:`, data);
     } catch (error) {
       console.error("❌ Error scheduling meeting notifications:", error);
     }
