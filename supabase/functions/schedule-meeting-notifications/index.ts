@@ -80,10 +80,25 @@ Deno.serve(async (req) => {
         // Only schedule if notification time is in the future
         if (notificationTime > new Date()) {
           try {
-            // Use upsert with onConflict to handle duplicates gracefully
+            // First check if notification already exists to avoid duplicates
+            const { data: existingNotification } = await supabase
+              .from("scheduled_notifications")
+              .select("id")
+              .eq("meeting_id", matchingId)
+              .eq("user_id", user.id)
+              .eq("notification_type", reminder.type)
+              .single()
+
+            if (existingNotification) {
+              console.log(`⚠️ Notification ${reminder.type} for user ${user.id} and meeting ${matchingId} already exists, skipping...`)
+              successCount++
+              continue
+            }
+
+            // Insert new notification only if it doesn't exist
             const { error } = await supabase
               .from("scheduled_notifications")
-              .upsert({
+              .insert({
                 meeting_id: matchingId,
                 user_id: user.id,
                 notification_type: reminder.type,
@@ -97,9 +112,7 @@ Deno.serve(async (req) => {
                   meeting_time: meetingDateTime.toISOString()
                 },
                 sent: false
-              }, {
-                onConflict: 'meeting_id,user_id,notification_type',
-                ignoreDuplicates: true
+              }
               })
 
             if (error) {

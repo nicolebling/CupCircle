@@ -93,7 +93,7 @@ Deno.serve(async (req) => {
     for (const notification of dueNotifications) {
       try {
         // Try to atomically claim this notification for processing
-        console.log(`🔒 Attempting to claim notification ${notification.id} for user ${notification.user_id} (${notification.notification_type})`)
+        console.log(`🔒 Attempting to claim notification ${notification.id} for user ${notification.user_id} (${notification.notification_type}) scheduled for ${notification.scheduled_time}`)
         
         const { data: claimedNotification, error: claimError } = await supabase
           .from('scheduled_notifications')
@@ -108,7 +108,7 @@ Deno.serve(async (req) => {
 
         // If claiming failed (notification was already processed), skip it
         if (claimError || !claimedNotification) {
-          console.log(`⚠️ Notification ${notification.id} already processed by another instance or claim failed:`, claimError)
+          console.log(`⚠️ Notification ${notification.id} already processed by another instance or claim failed:`, claimError?.message || 'No claimed notification returned')
           continue
         }
         
