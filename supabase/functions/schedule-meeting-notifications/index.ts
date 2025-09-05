@@ -10,6 +10,7 @@ interface ScheduleMeetingRequest {
   meetingDate: string // Format: "2025-04-29"
   startTime: string   // Format: "10:00:00"
   cafeName: string
+  timezone?: string   // Format: "America/New_York"
 }
 
 const supabase = createClient(
@@ -21,7 +22,7 @@ Deno.serve(async (req) => {
   try {
     console.log('Processing meeting notification scheduling request...')
     
-    const { matchingId, user1Id, user2Id, meetingDate, startTime, cafeName }: ScheduleMeetingRequest = await req.json()
+    const { matchingId, user1Id, user2Id, meetingDate, startTime, cafeName, timezone }: ScheduleMeetingRequest = await req.json()
 
     // Validate required fields
     if (!matchingId || !user1Id || !user2Id || !meetingDate || !startTime || !cafeName) {
@@ -37,8 +38,32 @@ Deno.serve(async (req) => {
       )
     }
 
+    // Timezone offset mappings (hours to add to local time to get UTC)
+    const timezoneOffsets = {
+      'America/New_York': -5,    // EST (winter) 
+      'America/Chicago': -6,     // CST
+      'America/Denver': -7,      // MST
+      'America/Los_Angeles': -8, // PST
+      'UTC': 0
+    };
+
+    // Determine if it's daylight saving time (rough approximation for 2025)
+    // DST typically runs from second Sunday in March to first Sunday in November
+    const meetingYear = new Date(meetingDate).getFullYear();
+    const isDST = (meetingMonth: number, meetingDay: number) => {
+      // March through October are definitely DST months
+      if (meetingMonth >= 3 && meetingMonth <= 10) return true;
+      // November and February are definitely not DST
+      if (meetingMonth === 1 || meetingMonth === 11) return false;
+      // For March and November, would need more precise calculation
+      return false;
+    };
+
+    const meetingMonth = new Date(meetingDate).getMonth();
+    const meetingDay = new Date(meetingDate).getDate();
+    
     // Parse the meeting date and time properly
-    const meetingDateTime = new Date(`${meetingDate}T${startTime}`)
+    let meetingDateTime = new Date(`${meetingDate}T${startTime}`);
     
     if (isNaN(meetingDateTime.getTime())) {
       return new Response(
@@ -52,6 +77,22 @@ Deno.serve(async (req) => {
         }
       )
     }
+
+    // Convert to UTC if timezone is provided
+    if (timezone && timezoneOffsets.hasOwnProperty(timezone)) {
+      let offset = timezoneOffsets[timezone];
+      
+      // Adjust for daylight saving time for US timezones
+      if (timezone.startsWith('America/') && isDST(meetingMonth, meetingDay)) {
+        offset += 1; // DST adds 1 hour (makes offset less negative)
+      }
+      
+      // Convert local time to UTC by subtracting the offset
+      meetingDateTime = new Date(meetingDateTime.getTime() - (offset * 60 * 60 * 1000));
+    }
+
+    console.log(`Meeting scheduled for ${meetingDate} ${startTime} in ${timezone || 'UTC'}`);
+    console.log(`Converted to UTC: ${meetingDateTime.toISOString()}`);
 
     // Get user names for personalized notifications
     const [user1Profile, user2Profile] = await Promise.all([

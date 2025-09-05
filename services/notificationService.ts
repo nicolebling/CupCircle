@@ -283,7 +283,8 @@ export const notificationService = {
     user2Id: string,
     meetingDate: string, // Format: "2025-04-29"
     startTime: string,   // Format: "10:00:00"
-    cafeName: string
+    cafeName: string,
+    timezone: string = 'America/New_York' // Default to NY timezone
   ) {
     try {
       console.log(`📅 Scheduling notifications for meeting ${matchingId}...`);
@@ -304,7 +305,8 @@ export const notificationService = {
           user2Id,
           meetingDate,
           startTime,
-          cafeName
+          cafeName,
+          timezone
         },
         headers: {
           Authorization: `Bearer ${session.access_token}`,
