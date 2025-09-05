@@ -61,16 +61,12 @@ Deno.serve(async (req) => {
     const now = new Date()
     console.log('Current time:', now.toISOString())
 
-    // Atomically get and mark notifications as processing to prevent duplicates
+    // First, get notifications that need processing
     const { data: dueNotifications, error: queryError } = await supabase
       .from('scheduled_notifications')
-      .update({ 
-        sent: true, 
-        sent_at: now.toISOString() 
-      })
+      .select('*')
       .eq('sent', false)
       .lte('scheduled_time', now.toISOString())
-      .select('*')
 
     if (queryError) {
       console.error('Error querying scheduled notifications:', queryError)
@@ -93,9 +89,27 @@ Deno.serve(async (req) => {
     let processedCount = 0
     let errorCount = 0
 
-    // Process each due notification
+    // Process each due notification with individual locking
     for (const notification of dueNotifications) {
       try {
+        // Try to atomically claim this notification for processing
+        const { data: claimedNotification, error: claimError } = await supabase
+          .from('scheduled_notifications')
+          .update({ 
+            sent: true, 
+            sent_at: now.toISOString() 
+          })
+          .eq('id', notification.id)
+          .eq('sent', false) // Only update if still not sent
+          .select('*')
+          .single()
+
+        // If claiming failed (notification was already processed), skip it
+        if (claimError || !claimedNotification) {
+          console.log(`Notification ${notification.id} already processed by another instance`)
+          continue
+        }
+
         // Get user's push token and notification preference
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
