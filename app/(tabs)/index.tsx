@@ -195,7 +195,8 @@ export default function CircleChatsScreen() {
           await notificationService.sendCoffeeConfirmationNotification(
             otherUserId,
             user?.id,
-            chat.meeting_location.split("|||")[0] || "a café"
+            chat.meeting_location.split("|||")[0] || "a café",
+            chat.match_id
           );
         }
 

@@ -1440,11 +1440,12 @@ export default function MatchingScreen() {
                           
 
                           // Send coffee request notification
-                          if (currentProfile.id) {
+                          if (currentProfile.id && data?.[0]?.match_id) {
                             await notificationService.sendCoffeeRequestNotification(
                               currentProfile.id,
                               user?.id,
-                              selectedCafe || "a café"
+                              selectedCafe || "a café",
+                              data[0].match_id
                             );
                           }
 
