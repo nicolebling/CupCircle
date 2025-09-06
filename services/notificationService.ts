@@ -87,22 +87,6 @@ export const notificationService = {
     metadata?: Record<string, any>,
   ) {
     try {
-      // Check for duplicate notifications if matching_id is provided
-      if (metadata?.matching_id && metadata?.type) {
-        const { data: existing } = await supabase
-          .from("notifications")
-          .select("id")
-          .eq("user_id", recipientUserId)
-          .eq("metadata->matching_id", metadata.matching_id)
-          .eq("metadata->type", metadata.type)
-          .single();
-
-        if (existing) {
-          console.log("Duplicate notification prevented for matching:", metadata.matching_id);
-          return;
-        }
-      }
-
       const { error } = await supabase.from("notifications").insert({
         user_id: recipientUserId,
         title,
@@ -128,7 +112,6 @@ export const notificationService = {
     recipientUserId: string,
     senderUserId: string,
     cafeName: string,
-    matchingId?: number,
   ) {
     try {
       // Fetch sender name from profiles table
@@ -144,7 +127,7 @@ export const notificationService = {
         recipientUserId,
         "☕ New Coffee Chat Request!",
         `${senderName} wants to meet you at ${cafeName.split("|||")[0]}`,
-        { type: "coffee_request", matching_id: matchingId },
+        { type: "coffee_request" },
       );
     } catch (error) {
       console.error("Error fetching sender name for coffee request notification:", error);
@@ -153,7 +136,7 @@ export const notificationService = {
         recipientUserId,
         "☕ New Coffee Chat Request!",
         `Someone wants to meet you at ${cafeName.split("|||")[0]}`,
-        { type: "coffee_request", matching_id: matchingId },
+        { type: "coffee_request" },
       );
     }
   },
@@ -162,7 +145,6 @@ export const notificationService = {
     recipientUserId: string,
     senderUserId: string,
     cafeName: string,
-    matchingId?: number,
   ) {
     try {
       // Fetch sender name from profiles table
@@ -178,7 +160,7 @@ export const notificationService = {
         recipientUserId,
         "✅ Coffee Chat Confirmed!",
         `Your coffee chat with ${senderName} at ${cafeName} is confirmed`,
-        { type: "coffee_confirmed", matching_id: matchingId },
+        { type: "coffee_confirmed" },
       );
     } catch (error) {
       console.error("Error fetching sender name for coffee confirmation notification:", error);
@@ -187,7 +169,7 @@ export const notificationService = {
         recipientUserId,
         "✅ Coffee Chat Confirmed!",
         `Your coffee chat at ${cafeName} is confirmed`,
-        { type: "coffee_confirmed", matching_id: matchingId },
+        { type: "coffee_confirmed" },
       );
     }
   },
