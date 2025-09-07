@@ -111,6 +111,7 @@ export default function MatchingScreen() {
   const [isPaidUser, setIsPaidUser] = useState(false);
   const [hasInitiallyLoaded, setHasInitiallyLoaded] = useState(false);
   const [featuredCafes, setFeaturedCafes] = useState<any[]>([]);
+  const [showSubscriptionSuccessModal, setShowSubscriptionSuccessModal] = useState(false);
   const PROFILES_PER_PAGE = 10;
 
   // Refs for auto-scroll functionality
@@ -398,6 +399,29 @@ export default function MatchingScreen() {
       fetchFeaturedCafes();
     }, [checkUserAvailability, checkSubscriptionAndPaywall, fetchUserCentroid, hasInitiallyLoaded, profiles.length]),
   );
+
+  // Add Superwall subscription event listener
+  useEffect(() => {
+    const handleSubscriptionStatusDidChange = (event: any) => {
+      console.log('Subscription status changed:', event);
+      if (event.newValue?.status?.toLowerCase() === 'active') {
+        // User successfully subscribed, show success modal
+        setShowSubscriptionSuccessModal(true);
+        setShowSubscriptionCard(false); // Hide subscription card if it was showing
+        // Refresh subscription status
+        checkSubscriptionAndPaywall();
+      }
+    };
+
+    // Listen for subscription status changes
+    const removeListener = Superwall.shared.addEventListener('subscriptionStatusDidChange', handleSubscriptionStatusDidChange);
+
+    return () => {
+      if (removeListener) {
+        removeListener();
+      }
+    };
+  }, [checkSubscriptionAndPaywall]);
 
   // Periodic background refresh for new profiles (every 5 minutes)
   useEffect(() => {
@@ -1759,6 +1783,25 @@ export default function MatchingScreen() {
       </>
       )}
 
+      {/* Subscription Success Modal */}
+      <Modal visible={showSubscriptionSuccessModal} transparent={true} animationType="fade">
+        <View style={styles.matchModalOverlay}>
+          <View style={[styles.matchModalContent, { backgroundColor: colors.card }]}>
+            <Text style={styles.subscriptionSuccessEmoji}>🎉</Text>
+            <Text style={[styles.matchTitle, { color: colors.text }]}>Welcome aboard!</Text>
+            <Text style={[styles.matchSubtitle, { color: colors.secondaryText }]}>
+              You now have unlimited coffee chats waiting for you—time to grow your circle.
+            </Text>
+            <TouchableOpacity
+              style={[styles.sendMessageButton, { backgroundColor: colors.primary }]}
+              onPress={() => setShowSubscriptionSuccessModal(false)}
+            >
+              <Text style={styles.sendMessageText}>Start Connecting</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
       {/* Match Animation Modal */}
       {/* <Modal visible={matchAnimation} transparent={true} animationType="fade">
         <View style={styles.matchModalOverlay}>
@@ -2064,6 +2107,10 @@ const styles = StyleSheet.create({
     padding: 30,
     alignItems: "center",
     width: "85%",
+  },
+  subscriptionSuccessEmoji: {
+    fontSize: 60,
+    marginBottom: 16,
   },
   matchTitle: {
     fontFamily: "K2D-Bold",
