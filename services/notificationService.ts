@@ -209,33 +209,26 @@ export const notificationService = {
   // Handle complete meeting cancellation (update status + cancel notifications)
   async cancelMeeting(meetingId: number, recipientUserId: string, senderUserId: string) {
     try {
-      console.log(`🚫 Starting cancellation process for meeting ${meetingId}...`);
-      console.log(`👥 Recipient: ${recipientUserId}, Sender: ${senderUserId}`);
+      console.log(`🚫 Cancelling meeting ${meetingId}...`);
 
       // 1. Update meeting status to cancelled in the database
-      console.log(`📝 Step 1: Updating meeting status to 'cancelled' for meeting ${meetingId}...`);
-      const { data: updateData, error: updateError } = await supabase
+      const { error: updateError } = await supabase
         .from("matching")
         .update({ status: "cancelled" })
-        .eq("match_id", meetingId)
-        .select();
+        .eq("match_id", meetingId);
 
       if (updateError) {
         console.error("❌ Error updating meeting status:", updateError);
         throw updateError;
       }
 
-      console.log(`✅ Meeting status updated successfully:`, updateData);
-
       // 2. Cancel all scheduled notifications for this meeting
-      console.log(`🗑️ Step 2: Cancelling scheduled notifications for meeting ${meetingId}...`);
       await this.cancelMeetingNotifications(meetingId);
 
       // 3. Send cancellation notification to the other user
-      console.log(`📧 Step 3: Sending cancellation notification to recipient ${recipientUserId}...`);
       await this.sendCoffeeCancellationNotification(recipientUserId, senderUserId);
 
-      console.log(`✅ Successfully completed all cancellation steps for meeting ${meetingId}`);
+      console.log(`✅ Successfully cancelled meeting ${meetingId} and notifications`);
     } catch (error) {
       console.error("❌ Failed to cancel meeting:", error);
       throw error;
@@ -391,55 +384,19 @@ export const notificationService = {
     try {
       console.log(`🗑️ Cancelling scheduled notifications for meeting ${meetingId}...`);
 
-      // First, let's see what notifications exist for this meeting
-      const { data: existingNotifications, error: queryError } = await supabase
-        .from("scheduled_notifications")
-        .select("*")
-        .eq("meeting_id", meetingId);
-
-      if (queryError) {
-        console.error("❌ Error querying existing notifications:", queryError);
-        throw queryError;
-      }
-
-      console.log(`📋 Found ${existingNotifications?.length || 0} total notifications for meeting ${meetingId}:`, existingNotifications);
-
-      // Filter to see which are unsent
-      const unsentNotifications = existingNotifications?.filter(notif => !notif.sent) || [];
-      console.log(`📋 Found ${unsentNotifications.length} unsent notifications to delete:`, unsentNotifications);
-
-      if (unsentNotifications.length === 0) {
-        console.log(`⚠️ No unsent notifications found for meeting ${meetingId} - nothing to delete`);
-        return;
-      }
-
       // Delete all unsent scheduled notifications for this meeting
-      const { data: deletedData, error: deleteError } = await supabase
+      const { error } = await supabase
         .from("scheduled_notifications")
         .delete()
         .eq("meeting_id", meetingId)
-        .eq("sent", false)
-        .select(); // This will return the deleted rows
+        .eq("sent", false);
 
-      if (deleteError) {
-        console.error("❌ Error deleting scheduled notifications:", deleteError);
-        throw deleteError;
+      if (error) {
+        console.error("❌ Error cancelling scheduled notifications:", error);
+        throw error;
       }
 
-      console.log(`✅ Successfully deleted ${deletedData?.length || 0} scheduled notifications for meeting ${meetingId}:`, deletedData);
-
-      // Verify deletion by checking again
-      const { data: remainingNotifications, error: verifyError } = await supabase
-        .from("scheduled_notifications")
-        .select("*")
-        .eq("meeting_id", meetingId);
-
-      if (verifyError) {
-        console.error("❌ Error verifying deletion:", verifyError);
-      } else {
-        console.log(`🔍 Verification: ${remainingNotifications?.length || 0} notifications remain for meeting ${meetingId}:`, remainingNotifications);
-      }
-
+      console.log(`✅ Successfully cancelled scheduled notifications for meeting ${meetingId}`);
     } catch (error) {
       console.error("❌ Failed to cancel scheduled notifications:", error);
       throw error;
