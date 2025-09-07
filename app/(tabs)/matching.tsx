@@ -78,10 +78,7 @@ interface TimeSlot {
 export default function MatchingScreen() {
   const router = useRouter(); // Initialize router
   // Expose the openFilterModal function to the header
-  global.matchingScreen = { 
-    openFilterModal: null,
-    showSubscriptionCard: false 
-  };
+  global.matchingScreen = { openFilterModal: null };
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const isDark = colorScheme === "dark";
@@ -885,13 +882,6 @@ export default function MatchingScreen() {
   };
   // Make the function available to the header
   global.matchingScreen.openFilterModal = openFilterModal;
-  
-  // Update global subscription card state
-  useEffect(() => {
-    if (global.matchingScreen) {
-      global.matchingScreen.showSubscriptionCard = showSubscriptionCard;
-    }
-  }, [showSubscriptionCard]);
 
   const applyFilters = async () => {
     setIsLoading(true);
