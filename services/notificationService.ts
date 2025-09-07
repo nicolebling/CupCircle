@@ -197,6 +197,37 @@ export const notificationService = {
     } catch (error) {
       console.error("Error fetching sender name for coffee cancellation notification:", error);
       // Fallback notification
+
+
+  // Handle complete meeting cancellation (update status + cancel notifications)
+  async cancelMeeting(meetingId: number, recipientUserId: string, senderUserId: string) {
+    try {
+      console.log(`🚫 Cancelling meeting ${meetingId}...`);
+
+      // 1. Update meeting status to cancelled in the database
+      const { error: updateError } = await supabase
+        .from("matching")
+        .update({ status: "cancelled" })
+        .eq("match_id", meetingId);
+
+      if (updateError) {
+        console.error("❌ Error updating meeting status:", updateError);
+        throw updateError;
+      }
+
+      // 2. Cancel all scheduled notifications for this meeting
+      await this.cancelMeetingNotifications(meetingId);
+
+      // 3. Send cancellation notification to the other user
+      await this.sendCoffeeCancellationNotification(recipientUserId, senderUserId);
+
+      console.log(`✅ Successfully cancelled meeting ${meetingId} and notifications`);
+    } catch (error) {
+      console.error("❌ Failed to cancel meeting:", error);
+      throw error;
+    }
+  },
+
       await this.createNotification(
         recipientUserId,
         "❌ Coffee Chat Cancelled",
@@ -347,6 +378,30 @@ export const notificationService = {
     } catch (error) {
       console.error('Error testing scheduled notifications:', error);
       return null;
+    }
+  },
+
+  // Cancel all scheduled notifications for a meeting
+  async cancelMeetingNotifications(meetingId: number) {
+    try {
+      console.log(`🗑️ Cancelling scheduled notifications for meeting ${meetingId}...`);
+
+      // Delete all unsent scheduled notifications for this meeting
+      const { error } = await supabase
+        .from("scheduled_notifications")
+        .delete()
+        .eq("meeting_id", meetingId)
+        .eq("sent", false);
+
+      if (error) {
+        console.error("❌ Error cancelling scheduled notifications:", error);
+        throw error;
+      }
+
+      console.log(`✅ Successfully cancelled scheduled notifications for meeting ${meetingId}`);
+    } catch (error) {
+      console.error("❌ Failed to cancel scheduled notifications:", error);
+      throw error;
     }
   },
 };

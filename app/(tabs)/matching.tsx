@@ -1461,6 +1461,18 @@ export default function MatchingScreen() {
                               user?.id,
                               selectedCafe || "a café"
                             );
+
+                            // Schedule meeting notifications if the meeting is confirmed
+                            if (data?.[0]?.match_id && selectedTimeSlot) {
+                              await notificationService.scheduleMeetingNotifications(
+                                data[0].match_id,
+                                user.id,
+                                currentProfile.id,
+                                selectedTimeSlot.date,
+                                selectedTimeSlot.start_time,
+                                selectedCafe || "a café"
+                              );
+                            }
                           }
 
                           // Show success alert to user
