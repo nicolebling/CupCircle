@@ -107,7 +107,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="profile"
         options={({ route }) => ({
-          title: route.params?.isEditMode ? 'Edit Profile' : 'My Profile',
+          title: route.params?.isEditMode ? 'Edit Profile' : 'Profile',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="person" size={size} color={color} />
           ),

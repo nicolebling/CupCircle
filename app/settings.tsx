@@ -432,7 +432,7 @@ export default function SettingsScreen() {
               Support
             </Text>
 
-            <TouchableOpacity
+            {/* <TouchableOpacity
               style={[styles.settingItem, { borderColor: colors.border }]}
               onPress={testScheduledNotifications}
             >
@@ -451,7 +451,7 @@ export default function SettingsScreen() {
                 size={20}
                 color={colors.secondaryText}
               />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
             <TouchableOpacity
               style={[styles.settingItem, { borderColor: colors.border }]}
