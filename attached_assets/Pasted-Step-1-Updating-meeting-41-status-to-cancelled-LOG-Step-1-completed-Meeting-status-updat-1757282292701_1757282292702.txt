@@ -1,0 +1,19 @@
+Step 1: Updating meeting 41 status to 'cancelled'...
+ LOG  ✅ Step 1 completed: Meeting status updated [{"created_at": "2025-07-18T16:33:48.001+00:00", "end_time": "15:30:00", "initial_message": "", "match_id": 41, "meeting_date": "2025-09-18", "meeting_location": "Le Café Coffee|||15 Hanover Pl, Brooklyn", "start_time": "10:00:00", "status": "cancelled", "timezone": "America/New_York", "user1_id": "88e21cad-2b7f-4b9a-b555-f03ec2bc243c", "user2_id": "f9a0c2c3-9c0c-4a46-accc-cbb48d54e439"}]
+ LOG  🔔 Step 2: Cancelling scheduled notifications for meeting 41...
+ LOG  🗑️ Starting cancellation process for meeting 41...
+ LOG  🔍 Query: meeting_id = 41 (type: number)
+ LOG  📡 Executing query: SELECT * FROM scheduled_notifications WHERE meeting_id = 41
+ LOG  📋 Raw query result: [{"body": "Your coffee chat with Yoyo Happy at Le Café Coffee is coming up in 1 hour!", "created_at": "2025-09-06T03:14:14.63716+00:00", "id": "ed7c16ea-7959-402e-8a1e-5320e84d7bc2", "meeting_id": 41, "metadata": {"cafe_name": "Le Café Coffee", "meeting_id": 41, "meeting_time": "2025-09-18T10:00:00.000-04:00", "meeting_time_utc": "2025-09-18T14:00:00.000Z", "partner_name": "Yoyo Happy", "timezone": "America/New_York"}, "notification_type": "reminder_1h", "scheduled_time": "2025-09-06T05:08:00+00:00", "sent": true, "sent_at": "2025-09-07T21:42:01.256+00:00", "title": "Coffee Chat in 1 hour", "user_id": "f9a0c2c3-9c0c-4a46-accc-cbb48d54e439"}, {"body": "Your coffee chat with Yoyo Happy at Le Café Coffee is coming up in 15 minutes!", "created_at": "2025-09-06T03:14:14.747659+00:00", "id": "27477aa1-9659-4746-8fd3-cdf9aca81edd", "meeting_id": 41, "metadata": {"cafe_name": "Le Café Coffee", "meeting_id": 41, "meeting_time": "2025-09-18T10:00:00.000-04:00", "meeting_time_utc": "2025-09-18T14:00:00.000Z", "partner_name": "Yoyo Happy", "timezone": "America/New_York"}, "notification_type": "reminder_15m", "scheduled_time": "2025-09-06T04:14:00+00:00", "sent": true, "sent_at": "2025-09-07T21:42:01.256+00:00", "title": "Coffee Chat in 15 minutes", "user_id": "f9a0c2c3-9c0c-4a46-accc-cbb48d54e439"}]
+ LOG  📋 Found 2 total notifications for meeting 41
+ LOG  📋 All notifications breakdown:
+ LOG    1. ID: ed7c16ea-7959-402e-8a1e-5320e84d7bc2, User: f9a0c2c3-9c0c-4a46-accc-cbb48d54e439, Type: reminder_1h, Sent: true, Time: 2025-09-06T05:08:00+00:00
+ LOG    2. ID: 27477aa1-9659-4746-8fd3-cdf9aca81edd, User: f9a0c2c3-9c0c-4a46-accc-cbb48d54e439, Type: reminder_15m, Sent: true, Time: 2025-09-06T04:14:00+00:00
+ LOG  📬 Found 0 unsent notifications to delete:
+ LOG  ℹ️ No unsent notifications found for meeting 41 - nothing to delete
+ LOG  ✅ Step 2 completed: Scheduled notifications cancelled
+ LOG  📲 Step 3: Sending cancellation notification to user 88e21cad-2b7f-4b9a-b555-f03ec2bc243c...
+ LOG  ✅ Notification created in DB - Edge Function will handle delivery
+ LOG  ✅ Step 3 completed: Cancellation notification sent
+ LOG  ✅ SUCCESS: Complete cancellation process finished for meeting 41
+ LOG  ✅ Meeting 41 cancellation completed successfully
