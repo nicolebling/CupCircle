@@ -178,19 +178,18 @@ export default function CircleChatsScreen() {
   }, [user]);
 
   const handleAction = async (chatId, action) => {
+    const chat = chats.find((c) => c.match_id === chatId);
+    const partnerProfile = getPartnerProfile(chat);
+    const partnerId = chat.user1_id === user.id ? chat.user2_id : chat.user1_id;
+
     try {
       if (action === "confirmed") {
-        // Get the chat details for notification
-        const chat = chats.find((c) => c.match_id === chatId);
-        const partnerProfile = getPartnerProfile(chat);
-
         await supabase
           .from("matching")
           .update({ status: "confirmed" })
           .eq("match_id", chatId);
 
         // Send coffee confirmation notification
-        const otherUserId = chat.user1_id === user.id ? chat.user2_id : chat.user1_id;
         if (otherUserId) {
           await notificationService.sendCoffeeConfirmationNotification(
             otherUserId,
@@ -218,45 +217,60 @@ export default function CircleChatsScreen() {
         // Refresh chats after update
         fetchChats();
       } else if (action === "cancel") {
-        // Get the chat details for notification before showing alert
-        const chat = chats.find((c) => c.match_id === chatId);
-        const partnerProfile = getPartnerProfile(chat);
-
-        // Immediately remove the chat from UI
         Alert.alert(
-          "Cancel Chat",
-          "Are you sure you want to cancel this chat?",
+          "Cancel Coffee Chat",
+          "Are you sure you want to cancel this coffee chat?",
           [
-            {
-              text: "Cancel",
-              style: "cancel",
-            },
+            { text: "No", style: "cancel" },
             {
               text: "Yes, Cancel",
               style: "destructive",
               onPress: async () => {
-                setChats((prevChats) =>
-                  prevChats.filter((chat) => chat.match_id !== chatId),
-                );
+                try {
+                  console.log(`🚫 User confirmed cancellation for meeting ${chatId}`);
+                  console.log(`👥 Partner ID: ${partnerId}, User ID: ${user?.id}`);
 
-                // Send cancellation notification to the other user
-                if (chat && partnerProfile) {
-                  const partnerId = chat.user1_id === user.id ? chat.user2_id : chat.user1_id;
-                  try {
-                    await notificationService.sendCoffeeCancellationNotification(
-                      partnerId,
-                      user.id
-                    );
-                  } catch (notifError) {
-                    console.error('Error sending coffee cancellation notification:', notifError);
-                  }
+                  // Use the complete cancelMeeting function that handles both status update AND notification deletion
+                  await notificationService.cancelMeeting(chatId, partnerId, user?.id);
+
+                  console.log(`✅ Meeting ${chatId} cancellation completed successfully`);
+                } catch (error) {
+                  console.error("❌ Error cancelling meeting:", error);
+                  console.error("Error details:", JSON.stringify(error));
                 }
 
-                // Update the database
-                await supabase
-                  .from("matching")
-                  .update({ status: "cancelled" })
-                  .eq("match_id", chatId);
+                // Refresh chats after update
+                fetchChats();
+              },
+            },
+          ],
+          { cancelable: true },
+        );
+      } else if (action === "decline") {
+        Alert.alert(
+          "Decline Coffee Chat",
+          "Are you sure you want to decline this coffee chat request?",
+          [
+            { text: "No", style: "cancel" },
+            {
+              text: "Yes, Decline",
+              style: "destructive",
+              onPress: async () => {
+                try {
+                  console.log(`❌ User declined meeting ${chatId}`);
+                  console.log(`👥 Partner ID: ${partnerId}, User ID: ${user?.id}`);
+
+                  // Use the complete cancelMeeting function for declines too
+                  await notificationService.cancelMeeting(chatId, partnerId, user?.id);
+
+                  console.log(`✅ Meeting ${chatId} decline completed successfully`);
+                } catch (error) {
+                  console.error("❌ Error declining meeting:", error);
+                  console.error("Error details:", JSON.stringify(error));
+                }
+
+                // Refresh chats after update
+                fetchChats();
               },
             },
           ],
