@@ -78,7 +78,10 @@ interface TimeSlot {
 export default function MatchingScreen() {
   const router = useRouter(); // Initialize router
   // Expose the openFilterModal function to the header
-  global.matchingScreen = { openFilterModal: null };
+  global.matchingScreen = { 
+    openFilterModal: null,
+    showSubscriptionCard: false 
+  };
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const isDark = colorScheme === "dark";
@@ -878,10 +881,22 @@ export default function MatchingScreen() {
   };
 
   const openFilterModal = () => {
-    setFilterModalVisible(true);
+    // If subscription card is showing, trigger paywall instead of opening filter modal
+    if (showSubscriptionCard) {
+      handleSubscribe();
+    } else {
+      setFilterModalVisible(true);
+    }
   };
   // Make the function available to the header
   global.matchingScreen.openFilterModal = openFilterModal;
+
+  // Update global subscription card state whenever it changes
+  useEffect(() => {
+    if (global.matchingScreen) {
+      global.matchingScreen.showSubscriptionCard = showSubscriptionCard;
+    }
+  }, [showSubscriptionCard]);
 
   const applyFilters = async () => {
     setIsLoading(true);
