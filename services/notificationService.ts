@@ -394,8 +394,10 @@ export const notificationService = {
   async cancelMeetingNotifications(meetingId: number) {
     try {
       console.log(`🗑️ Starting cancellation process for meeting ${meetingId}...`);
+      console.log(`🔍 Query: meeting_id = ${meetingId} (type: ${typeof meetingId})`);
 
-      // First, check what notifications exist for this meeting
+      // First, check what notifications exist for this meeting with detailed logging
+      console.log(`📡 Executing query: SELECT * FROM scheduled_notifications WHERE meeting_id = ${meetingId}`);
       const { data: existingNotifications, error: fetchError } = await supabase
         .from("scheduled_notifications")
         .select("*")
@@ -406,24 +408,30 @@ export const notificationService = {
         throw fetchError;
       }
 
-      console.log(`📋 Found ${existingNotifications?.length || 0} total notifications for meeting ${meetingId}:`, existingNotifications);
+      console.log(`📋 Raw query result:`, existingNotifications);
+      console.log(`📋 Found ${existingNotifications?.length || 0} total notifications for meeting ${meetingId}`);
+
+      if (existingNotifications && existingNotifications.length > 0) {
+        console.log(`📋 All notifications breakdown:`);
+        existingNotifications.forEach((notif, index) => {
+          console.log(`  ${index + 1}. ID: ${notif.id}, User: ${notif.user_id}, Type: ${notif.notification_type}, Sent: ${notif.sent}, Time: ${notif.scheduled_time}`);
+        });
+      }
 
       // Filter unsent notifications
       const unsentNotifications = existingNotifications?.filter(n => !n.sent) || [];
-      console.log(`📬 Found ${unsentNotifications.length} unsent notifications to delete:`, unsentNotifications.map(n => ({
-        id: n.id,
-        user_id: n.user_id,
-        notification_type: n.notification_type,
-        scheduled_time: n.scheduled_time,
-        sent: n.sent
-      })));
+      console.log(`📬 Found ${unsentNotifications.length} unsent notifications to delete:`);
+      unsentNotifications.forEach((notif, index) => {
+        console.log(`  Unsent ${index + 1}: ID: ${notif.id}, User: ${notif.user_id}, Type: ${notif.notification_type}`);
+      });
 
       if (unsentNotifications.length === 0) {
         console.log(`ℹ️ No unsent notifications found for meeting ${meetingId} - nothing to delete`);
         return;
       }
 
-      // Delete all unsent scheduled notifications for this meeting
+      // Delete all unsent scheduled notifications for this meeting with detailed logging
+      console.log(`🗑️ Executing DELETE query: DELETE FROM scheduled_notifications WHERE meeting_id = ${meetingId} AND sent = false`);
       const { data: deletedData, error: deleteError } = await supabase
         .from("scheduled_notifications")
         .delete()
@@ -433,12 +441,20 @@ export const notificationService = {
 
       if (deleteError) {
         console.error("❌ Error deleting scheduled notifications:", deleteError);
+        console.error("❌ Delete error details:", JSON.stringify(deleteError, null, 2));
         throw deleteError;
       }
 
-      console.log(`🗑️ Successfully deleted ${deletedData?.length || 0} notifications:`, deletedData);
+      console.log(`🗑️ Delete operation completed. Deleted ${deletedData?.length || 0} notifications`);
+      if (deletedData && deletedData.length > 0) {
+        console.log(`🗑️ Deleted notifications details:`);
+        deletedData.forEach((notif, index) => {
+          console.log(`  Deleted ${index + 1}: ID: ${notif.id}, User: ${notif.user_id}, Type: ${notif.notification_type}`);
+        });
+      }
 
       // Verify deletion by checking what's left
+      console.log(`🔍 Verification: Checking remaining notifications for meeting ${meetingId}...`);
       const { data: remainingNotifications, error: verifyError } = await supabase
         .from("scheduled_notifications")
         .select("*")
@@ -447,12 +463,19 @@ export const notificationService = {
       if (verifyError) {
         console.error("❌ Error verifying deletion:", verifyError);
       } else {
-        console.log(`✅ Verification: ${remainingNotifications?.length || 0} notifications remain for meeting ${meetingId}:`, remainingNotifications);
+        console.log(`✅ Verification: ${remainingNotifications?.length || 0} notifications remain for meeting ${meetingId}`);
+        if (remainingNotifications && remainingNotifications.length > 0) {
+          console.log(`📋 Remaining notifications:`);
+          remainingNotifications.forEach((notif, index) => {
+            console.log(`  Remaining ${index + 1}: ID: ${notif.id}, User: ${notif.user_id}, Type: ${notif.notification_type}, Sent: ${notif.sent}`);
+          });
+        }
       }
 
       console.log(`✅ Successfully cancelled scheduled notifications for meeting ${meetingId}`);
     } catch (error) {
       console.error("❌ Failed to cancel scheduled notifications:", error);
+      console.error("❌ Error details:", JSON.stringify(error, null, 2));
       throw error;
     }
   },
