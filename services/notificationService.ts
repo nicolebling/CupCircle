@@ -197,7 +197,14 @@ export const notificationService = {
     } catch (error) {
       console.error("Error fetching sender name for coffee cancellation notification:", error);
       // Fallback notification
-
+      await this.createNotification(
+        recipientUserId,
+        "❌ Coffee Chat Cancelled",
+        "Your coffee chat has been cancelled",
+        { type: "coffee_cancelled" },
+      );
+    }
+  },
 
   // Handle complete meeting cancellation (update status + cancel notifications)
   async cancelMeeting(meetingId: number, recipientUserId: string, senderUserId: string) {
@@ -225,15 +232,6 @@ export const notificationService = {
     } catch (error) {
       console.error("❌ Failed to cancel meeting:", error);
       throw error;
-    }
-  },
-
-      await this.createNotification(
-        recipientUserId,
-        "❌ Coffee Chat Cancelled",
-        "Your coffee chat has been cancelled",
-        { type: "coffee_cancelled" },
-      );
     }
   },
 
