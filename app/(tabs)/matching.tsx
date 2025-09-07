@@ -1616,20 +1616,6 @@ export default function MatchingScreen() {
             </View>
 
             <ScrollView style={styles.modalBody}>
-              {/* Test button for subscription success modal */}
-              <TouchableOpacity
-                style={[
-                  styles.testButton,
-                  { backgroundColor: colors.primary, marginBottom: 16 }
-                ]}
-                onPress={() => {
-                  setFilterModalVisible(false);
-                  setShowSubscriptionSuccessModal(true);
-                }}
-              >
-                <Text style={styles.testButtonText}>Test Subscription Success Modal</Text>
-              </TouchableOpacity>
-
               <Text style={[styles.filterLabel, { color: colors.text }]}>
                 Keyword Search
               </Text>
@@ -2316,16 +2302,5 @@ const styles = StyleSheet.create({
     fontFamily: "K2D-Medium",
     fontSize: 10,
     marginTop: 2,
-  },
-  testButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  testButtonText: {
-    color: 'white',
-    fontFamily: 'K2D-Medium',
-    fontSize: 14,
   },
 });
