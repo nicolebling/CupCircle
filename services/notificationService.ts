@@ -77,11 +77,11 @@ export const notificationService = {
       console.error("Error saving push token:", error);
     }
   },
-  
+
   // Instead of sending directly, create notification in DB
   async createNotification(
     recipientUserId: string,
-    
+
     title: string,
     body: string,
     metadata?: Record<string, any>,
@@ -390,92 +390,42 @@ export const notificationService = {
     }
   },
 
-  // Cancel all scheduled notifications for a meeting
+  // Cancel all scheduled notifications for a meeting via Edge Function
   async cancelMeetingNotifications(meetingId: number) {
     try {
-      console.log(`🗑️ Starting cancellation process for meeting ${meetingId}...`);
-      console.log(`🔍 Query: meeting_id = ${meetingId} (type: ${typeof meetingId})`);
+      console.log(`🔔 Calling Edge Function to cancel notifications for meeting ${meetingId}...`);
 
-      // First, check what notifications exist for this meeting with detailed logging
-      console.log(`📡 Executing query: SELECT * FROM scheduled_notifications WHERE meeting_id = ${meetingId}`);
-      const { data: existingNotifications, error: fetchError } = await supabase
-        .from("scheduled_notifications")
-        .select("*")
-        .eq("meeting_id", meetingId);
+      // Get the current session for authentication
+      const { data: { session } } = await supabase.auth.getSession();
 
-      if (fetchError) {
-        console.error("❌ Error fetching existing notifications:", fetchError);
-        throw fetchError;
+      if (!session?.access_token) {
+        console.error("❌ No authentication session available");
+        throw new Error("No authentication session available");
       }
 
-      console.log(`📋 Raw query result:`, existingNotifications);
-      console.log(`📋 Found ${existingNotifications?.length || 0} total notifications for meeting ${meetingId}`);
-
-      if (existingNotifications && existingNotifications.length > 0) {
-        console.log(`📋 All notifications breakdown:`);
-        existingNotifications.forEach((notif, index) => {
-          console.log(`  ${index + 1}. ID: ${notif.id}, User: ${notif.user_id}, Type: ${notif.notification_type}, Sent: ${notif.sent}, Time: ${notif.scheduled_time}`);
-        });
-      }
-
-      // Filter unsent notifications
-      const unsentNotifications = existingNotifications?.filter(n => !n.sent) || [];
-      console.log(`📬 Found ${unsentNotifications.length} unsent notifications to delete:`);
-      unsentNotifications.forEach((notif, index) => {
-        console.log(`  Unsent ${index + 1}: ID: ${notif.id}, User: ${notif.user_id}, Type: ${notif.notification_type}`);
+      // Call the edge function to cancel notifications
+      const { data, error } = await supabase.functions.invoke('cancel-meeting-notifications', {
+        body: {
+          meetingId
+        },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
       });
 
-      if (unsentNotifications.length === 0) {
-        console.log(`ℹ️ No unsent notifications found for meeting ${meetingId} - nothing to delete`);
-        return;
+      if (error) {
+        console.error("❌ Edge function error:", error);
+        throw new Error("Failed to cancel meeting notifications");
       }
 
-      // Delete all unsent scheduled notifications for this meeting with detailed logging
-      console.log(`🗑️ Executing DELETE query: DELETE FROM scheduled_notifications WHERE meeting_id = ${meetingId} AND sent = false`);
-      const { data: deletedData, error: deleteError } = await supabase
-        .from("scheduled_notifications")
-        .delete()
-        .eq("meeting_id", meetingId)
-        .eq("sent", false)
-        .select();
-
-      if (deleteError) {
-        console.error("❌ Error deleting scheduled notifications:", deleteError);
-        console.error("❌ Delete error details:", JSON.stringify(deleteError, null, 2));
-        throw deleteError;
+      if (data?.error) {
+        console.error("❌ Meeting notification cancellation failed:", data.error);
+        throw new Error(data.error);
       }
 
-      console.log(`🗑️ Delete operation completed. Deleted ${deletedData?.length || 0} notifications`);
-      if (deletedData && deletedData.length > 0) {
-        console.log(`🗑️ Deleted notifications details:`);
-        deletedData.forEach((notif, index) => {
-          console.log(`  Deleted ${index + 1}: ID: ${notif.id}, User: ${notif.user_id}, Type: ${notif.notification_type}`);
-        });
-      }
-
-      // Verify deletion by checking what's left
-      console.log(`🔍 Verification: Checking remaining notifications for meeting ${meetingId}...`);
-      const { data: remainingNotifications, error: verifyError } = await supabase
-        .from("scheduled_notifications")
-        .select("*")
-        .eq("meeting_id", meetingId);
-
-      if (verifyError) {
-        console.error("❌ Error verifying deletion:", verifyError);
-      } else {
-        console.log(`✅ Verification: ${remainingNotifications?.length || 0} notifications remain for meeting ${meetingId}`);
-        if (remainingNotifications && remainingNotifications.length > 0) {
-          console.log(`📋 Remaining notifications:`);
-          remainingNotifications.forEach((notif, index) => {
-            console.log(`  Remaining ${index + 1}: ID: ${notif.id}, User: ${notif.user_id}, Type: ${notif.notification_type}, Sent: ${notif.sent}`);
-          });
-        }
-      }
-
-      console.log(`✅ Successfully cancelled scheduled notifications for meeting ${meetingId}`);
+      console.log(`✅ Successfully cancelled notifications for meeting ${meetingId}:`, data);
     } catch (error) {
       console.error("❌ Failed to cancel scheduled notifications:", error);
-      console.error("❌ Error details:", JSON.stringify(error, null, 2));
       throw error;
     }
   },
