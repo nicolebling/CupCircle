@@ -206,17 +206,28 @@ export default function MatchingScreen() {
   }, [user?.id]);
 
   // Function to handle subscription button press
-  const handleSubscribe = () => {
+  const handleSubscribe = async () => {
     setShowSubscriptionCard(false);
     console.log("Triggering paywall from subscription card");
-    Superwall.shared.register({
-      placement: 'matching',
-    });
     
-    // Refresh subscription status after paywall interaction
-    setTimeout(() => {
-      checkSubscriptionAndPaywall();
-    }, 2000);
+    try {
+      await Superwall.shared.register({
+        placement: 'matching',
+      });
+      
+      // Check subscription status after paywall interaction
+      setTimeout(async () => {
+        const subscriptionStatus = await Superwall.shared.getSubscriptionStatus();
+        const status = subscriptionStatus?.status?.toLowerCase();
+        
+        if (status === 'active') {
+          setShowSubscriptionSuccessModal(true);
+          checkSubscriptionAndPaywall();
+        }
+      }, 1000);
+    } catch (error) {
+      console.error("Error triggering paywall:", error);
+    }
   };
 
   // Function to close subscription card
@@ -400,27 +411,14 @@ export default function MatchingScreen() {
     }, [checkUserAvailability, checkSubscriptionAndPaywall, fetchUserCentroid, hasInitiallyLoaded, profiles.length]),
   );
 
-  // Add Superwall subscription event listener
+  // Check subscription status periodically instead of using event listener
   useEffect(() => {
-    const handleSubscriptionStatusDidChange = (event: any) => {
-      console.log('Subscription status changed:', event);
-      if (event.newValue?.status?.toLowerCase() === 'active') {
-        // User successfully subscribed, show success modal
-        setShowSubscriptionSuccessModal(true);
-        setShowSubscriptionCard(false); // Hide subscription card if it was showing
-        // Refresh subscription status
-        checkSubscriptionAndPaywall();
-      }
-    };
+    const interval = setInterval(() => {
+      // Periodically check subscription status to detect changes
+      checkSubscriptionAndPaywall();
+    }, 3000); // Check every 3 seconds
 
-    // Listen for subscription status changes
-    const removeListener = Superwall.shared.addEventListener('subscriptionStatusDidChange', handleSubscriptionStatusDidChange);
-
-    return () => {
-      if (removeListener) {
-        removeListener();
-      }
-    };
+    return () => clearInterval(interval);
   }, [checkSubscriptionAndPaywall]);
 
   // Periodic background refresh for new profiles (every 5 minutes)
