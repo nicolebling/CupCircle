@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Alert,
+  Image,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -209,11 +210,19 @@ export default function ManageSubscriptionScreen() {
         <View style={[styles.planCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
           <View style={styles.planHeader}>
             <View style={[styles.planIcon, { backgroundColor: subscriptionInfo?.status === 'active' ? colors.primary : colors.border }]}>
-              <Ionicons 
-                name={subscriptionInfo?.status === 'active' ? "checkmark" : "cafe"} 
-                size={24} 
-                color={subscriptionInfo?.status === 'active' ? "white" : colors.secondaryText} 
-              />
+              {subscriptionInfo?.status === 'active' ? (
+                <Image 
+                  source={require('@/assets/images/onboarding-3.png')} 
+                  style={styles.planIconImage}
+                  resizeMode="contain"
+                />
+              ) : (
+                <Ionicons 
+                  name="cafe" 
+                  size={24} 
+                  color={colors.secondaryText} 
+                />
+              )}
             </View>
             <View style={styles.planInfo}>
               <Text style={[styles.planTitle, { color: colors.text }]}>
@@ -360,6 +369,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 16,
+  },
+  planIconImage: {
+    width: 32,
+    height: 32,
   },
   planInfo: {
     flex: 1,
