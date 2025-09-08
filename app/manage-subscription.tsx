@@ -232,12 +232,24 @@ export default function ManageSubscriptionScreen() {
 
           {subscriptionInfo?.status === 'active' && subscriptionInfo.renewalDate && (
             <View style={[styles.renewalInfo, { borderTopColor: colors.border }]}>
-              <View style={styles.renewalTextContainer}>
-                <Text style={[styles.renewalText, { color: colors.text }]}>
-                  Renews on {subscriptionInfo.renewalDate}
-                  {subscriptionInfo.price && ` for ${subscriptionInfo.price}`}
+              <View style={styles.renewalRow}>
+                <Text style={[styles.renewalLabel, { color: colors.secondaryText }]}>
+                  Next billing date
+                </Text>
+                <Text style={[styles.renewalDate, { color: colors.text }]}>
+                  {subscriptionInfo.renewalDate}
                 </Text>
               </View>
+              {subscriptionInfo.price && (
+                <View style={styles.renewalRow}>
+                  <Text style={[styles.renewalLabel, { color: colors.secondaryText }]}>
+                    Amount
+                  </Text>
+                  <Text style={[styles.renewalPrice, { color: colors.text }]}>
+                    {subscriptionInfo.price}
+                  </Text>
+                </View>
+              )}
             </View>
           )}
         </View>
@@ -376,14 +388,23 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingTop: 16,
   },
-  renewalTextContainer: {
+  renewalRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: 8,
   },
-  renewalText: {
-    fontSize: 16,
+  renewalLabel: {
+    fontSize: 14,
+    fontFamily: 'K2D-Regular',
+  },
+  renewalDate: {
+    fontSize: 14,
     fontFamily: 'K2D-Medium',
-    textAlign: 'center',
-    lineHeight: 22,
+  },
+  renewalPrice: {
+    fontSize: 16,
+    fontFamily: 'K2D-SemiBold',
   },
   section: {
     marginBottom: 24,
