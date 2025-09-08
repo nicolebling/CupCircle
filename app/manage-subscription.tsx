@@ -181,9 +181,9 @@ export default function ManageSubscriptionScreen() {
       case 'weekly':
         return 'Unlimited coffee chats for 7 days';
       case 'monthly':
-        return 'Unlimited coffee chats for 30 days';
+        return 'Unlimited coffee chats & filters for 30 days';
       case 'annually':
-        return 'Unlimited coffee chats for 365 days';
+        return '1 year of unlimited coffee chats';
       default:
         return 'Limited to 1 coffee chat';
     }
