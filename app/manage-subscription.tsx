@@ -232,24 +232,12 @@ export default function ManageSubscriptionScreen() {
 
           {subscriptionInfo?.status === 'active' && subscriptionInfo.renewalDate && (
             <View style={[styles.renewalInfo, { borderTopColor: colors.border }]}>
-              <View style={styles.renewalRow}>
-                <Text style={[styles.renewalLabel, { color: colors.secondaryText }]}>
-                  Next billing date
-                </Text>
-                <Text style={[styles.renewalDate, { color: colors.text }]}>
-                  {subscriptionInfo.renewalDate}
+              <View style={styles.renewalTextContainer}>
+                <Text style={[styles.renewalText, { color: colors.text }]}>
+                  Renews on {subscriptionInfo.renewalDate}
+                  {subscriptionInfo.price && ` for ${subscriptionInfo.price}`}
                 </Text>
               </View>
-              {subscriptionInfo.price && (
-                <View style={styles.renewalRow}>
-                  <Text style={[styles.renewalLabel, { color: colors.secondaryText }]}>
-                    Amount
-                  </Text>
-                  <Text style={[styles.renewalPrice, { color: colors.text }]}>
-                    {subscriptionInfo.price}
-                  </Text>
-                </View>
-              )}
             </View>
           )}
         </View>
@@ -388,23 +376,14 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingTop: 16,
   },
-  renewalRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  renewalTextContainer: {
     alignItems: 'center',
-    marginBottom: 8,
   },
-  renewalLabel: {
-    fontSize: 14,
-    fontFamily: 'K2D-Regular',
-  },
-  renewalDate: {
-    fontSize: 14,
-    fontFamily: 'K2D-Medium',
-  },
-  renewalPrice: {
+  renewalText: {
     fontSize: 16,
-    fontFamily: 'K2D-SemiBold',
+    fontFamily: 'K2D-Medium',
+    textAlign: 'center',
+    lineHeight: 22,
   },
   section: {
     marginBottom: 24,
