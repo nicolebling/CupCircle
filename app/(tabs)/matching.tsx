@@ -20,6 +20,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import Colors from "@/constants/Colors";
 import { supabase } from "@/lib/supabase";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { notificationService } from "@/services/notificationService";
 import { useRouter } from "expo-router"; // Import useRouter
 import ProfileCard from "@/components/ProfileCard";
@@ -112,7 +113,11 @@ export default function MatchingScreen() {
   const [hasInitiallyLoaded, setHasInitiallyLoaded] = useState(false);
   const [featuredCafes, setFeaturedCafes] = useState<any[]>([]);
   const [showSubscriptionSuccessModal, setShowSubscriptionSuccessModal] = useState(false);
+  const [viewedProfiles, setViewedProfiles] = useState<Set<string>>(new Set());
+  const [profileViewHistory, setProfileViewHistory] = useState<Map<string, number>>(new Map());
   const PROFILES_PER_PAGE = 10;
+  const FRESHNESS_THRESHOLD_HOURS = 24; // Hours before a profile can reappear
+  const FRESHNESS_ROTATION_DAYS = 7; // Days before all profiles rotate back
 
   // Refs for auto-scroll functionality
   const scrollViewRef = useRef<ScrollView>(null);
@@ -300,6 +305,117 @@ export default function MatchingScreen() {
     }
   }, []);
 
+  // Freshness utility functions
+  const updateProfileViewHistory = useCallback((profileId: string) => {
+    const now = Date.now();
+    setViewedProfiles(prev => new Set(prev).add(profileId));
+    setProfileViewHistory(prev => new Map(prev).set(profileId, now));
+  }, []);
+
+  const isProfileFresh = useCallback((profileId: string): boolean => {
+    if (!viewedProfiles.has(profileId)) return true; // Never seen = fresh
+    
+    const lastViewed = profileViewHistory.get(profileId);
+    if (!lastViewed) return true;
+    
+    const hoursSinceViewed = (Date.now() - lastViewed) / (1000 * 60 * 60);
+    return hoursSinceViewed >= FRESHNESS_THRESHOLD_HOURS;
+  }, [viewedProfiles, profileViewHistory]);
+
+  // Persistence functions for freshness data
+  const loadFreshnessData = useCallback(async () => {
+    if (!user?.id) return;
+    
+    try {
+      const viewedKey = `viewed_profiles_${user.id}`;
+      const historyKey = `profile_history_${user.id}`;
+      
+      const [viewedData, historyData] = await Promise.all([
+        AsyncStorage.getItem(viewedKey),
+        AsyncStorage.getItem(historyKey)
+      ]);
+      
+      if (viewedData) {
+        const viewedArray = JSON.parse(viewedData);
+        setViewedProfiles(new Set(viewedArray));
+      }
+      
+      if (historyData) {
+        const historyArray = JSON.parse(historyData);
+        setProfileViewHistory(new Map(historyArray));
+      }
+      
+      console.log(`Loaded freshness data: ${viewedData ? JSON.parse(viewedData).length : 0} viewed profiles`);
+    } catch (error) {
+      console.error('Error loading freshness data:', error);
+    }
+  }, [user?.id]);
+
+  const saveFreshnessData = useCallback(async () => {
+    if (!user?.id) return;
+    
+    try {
+      const viewedKey = `viewed_profiles_${user.id}`;
+      const historyKey = `profile_history_${user.id}`;
+      
+      await Promise.all([
+        AsyncStorage.setItem(viewedKey, JSON.stringify(Array.from(viewedProfiles))),
+        AsyncStorage.setItem(historyKey, JSON.stringify(Array.from(profileViewHistory.entries())))
+      ]);
+    } catch (error) {
+      console.error('Error saving freshness data:', error);
+    }
+  }, [user?.id, viewedProfiles, profileViewHistory]);
+
+  const applyFreshnessFilter = useCallback((profiles: Profile[]): Profile[] => {
+    if (profiles.length === 0) return profiles;
+
+    // Separate fresh and returning profiles
+    const freshProfiles = profiles.filter(profile => !viewedProfiles.has(profile.id));
+    const returningProfiles = profiles.filter(profile => 
+      viewedProfiles.has(profile.id) && isProfileFresh(profile.id)
+    );
+    const recentProfiles = profiles.filter(profile => 
+      viewedProfiles.has(profile.id) && !isProfileFresh(profile.id)
+    );
+
+    console.log(`Freshness breakdown: ${freshProfiles.length} fresh, ${returningProfiles.length} returning, ${recentProfiles.length} recent`);
+
+    // Priority order: Fresh profiles first, then returning profiles that passed threshold
+    let prioritizedProfiles = [...freshProfiles, ...returningProfiles];
+    
+    // If we don't have enough profiles, gradually add recent ones (oldest first)
+    if (prioritizedProfiles.length < PROFILES_PER_PAGE) {
+      const sortedRecentProfiles = recentProfiles.sort((a, b) => {
+        const timeA = profileViewHistory.get(a.id) || 0;
+        const timeB = profileViewHistory.get(b.id) || 0;
+        return timeA - timeB; // Oldest first
+      });
+      
+      const needed = Math.min(
+        PROFILES_PER_PAGE - prioritizedProfiles.length,
+        sortedRecentProfiles.length
+      );
+      
+      prioritizedProfiles = [...prioritizedProfiles, ...sortedRecentProfiles.slice(0, needed)];
+    }
+
+    // Shuffle within categories to avoid predictable ordering
+    const shuffleArray = (array: Profile[]) => {
+      const result = [...array];
+      for (let i = result.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [result[i], result[j]] = [result[j], result[i]];
+      }
+      return result;
+    };
+
+    const shuffledFresh = shuffleArray(freshProfiles);
+    const shuffledReturning = shuffleArray(returningProfiles);
+    
+    return [...shuffledFresh, ...shuffledReturning, ...prioritizedProfiles.slice(freshProfiles.length + returningProfiles.length)];
+  }, [viewedProfiles, profileViewHistory, isProfileFresh]);
+
   // Check if a cafe is featured in spotlight
   const isCafeFeatured = useCallback((cafeString: string) => {
     if (!cafeString || !featuredCafes.length) return false;
@@ -399,6 +515,9 @@ export default function MatchingScreen() {
   // Use useFocusEffect to run check when screen comes into focus
   useFocusEffect(
     useCallback(() => {
+      // Load freshness data first
+      loadFreshnessData();
+      
       // Only do full reload on initial load or if no profiles are loaded
       if (!hasInitiallyLoaded || profiles.length === 0) {
         checkUserAvailability();
@@ -408,8 +527,13 @@ export default function MatchingScreen() {
       checkSubscriptionAndPaywall();
       fetchUserCentroid();
       fetchFeaturedCafes();
-    }, [checkUserAvailability, checkSubscriptionAndPaywall, fetchUserCentroid, hasInitiallyLoaded, profiles.length]),
+    }, [checkUserAvailability, checkSubscriptionAndPaywall, fetchUserCentroid, hasInitiallyLoaded, profiles.length, loadFreshnessData]),
   );
+
+  // Save freshness data when it changes
+  useEffect(() => {
+    saveFreshnessData();
+  }, [viewedProfiles, profileViewHistory, saveFreshnessData]);
 
   // Check subscription status periodically instead of using event listener
   useEffect(() => {
@@ -779,6 +903,10 @@ export default function MatchingScreen() {
         console.log("No user centroid available for distance filtering");
       }
 
+      // Apply freshness filter to prioritize unseen and returning profiles
+      formattedProfiles = applyFreshnessFilter(formattedProfiles);
+      console.log(`Profiles after freshness filtering: ${formattedProfiles.length}`);
+
       // console.log("Formatted profiles:", formattedProfiles.length);
 
       // Store all profiles and set pagination
@@ -887,7 +1015,9 @@ export default function MatchingScreen() {
 
   const handleNext = () => {
     if (profiles.length > 0 && currentIndex < profiles.length - 1) {
-      //console.log(`Liked ${profiles[currentIndex].name}`);
+      // Track that user viewed this profile
+      updateProfileViewHistory(profiles[currentIndex].id);
+      
       cardOpacity.value = 0; // prepare next card to start invisible
       clearSelections(); // Clear all selections
       setCurrentIndex(currentIndex + 1); // trigger re-render
@@ -896,6 +1026,9 @@ export default function MatchingScreen() {
 
   const handlePrevious = () => {
     if (currentIndex > 0) {
+      // Track that user viewed this profile (going back also counts as viewing)
+      updateProfileViewHistory(profiles[currentIndex].id);
+      
       cardOpacity.value = 0; // prepare card to start invisible
       clearSelections(); // Clear all selections
       setCurrentIndex(currentIndex - 1); // trigger re-render, fade handled in useEffect
@@ -1491,6 +1624,9 @@ export default function MatchingScreen() {
                           // Brief delay to allow user to see the success message
                           await new Promise(resolve => setTimeout(resolve, 100));
                           
+                          // Track that user viewed and interacted with this profile
+                          updateProfileViewHistory(currentProfile.id);
+
                           // Clear selections after successful request
                           setSelectedCafe("");
                           setSelectedTimeSlot(null);
@@ -1764,6 +1900,10 @@ export default function MatchingScreen() {
                   setFilterExperienceLevels([]);
                   setFilterInterests([]);
                   setFilterMaxDistance(null);
+                  // Reset freshness tracking to show all profiles again
+                  setViewedProfiles(new Set());
+                  setProfileViewHistory(new Map());
+                  console.log("Cleared freshness history - all profiles will appear fresh");
                   // Also refresh profiles to reset distance ordering
                   setCurrentIndex(0);
                   await fetchProfiles();
