@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { useNavigation } from "expo-router";
+import { useNavigation, useFocusEffect } from "expo-router";
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { useAuth } from "@/contexts/AuthContext";
@@ -51,6 +51,13 @@ export default function ManageSubscriptionScreen() {
   useEffect(() => {
     fetchSubscriptionInfo();
   }, []);
+
+  // Refresh subscription info whenever the screen comes into focus
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchSubscriptionInfo();
+    }, [])
+  );
 
   const fetchSubscriptionInfo = async () => {
     try {
@@ -122,19 +129,30 @@ export default function ManageSubscriptionScreen() {
 
   const handleChangePlan = async () => {
     try {
+      setActionLoading(true);
       
       await Superwall.shared.register({
         placement: 'subscription_onPress',
       });
       
       // Refresh subscription info after paywall interaction
+      // Use multiple attempts to ensure we catch the status change
       setTimeout(() => {
         fetchSubscriptionInfo();
+      }, 1000);
       
-      }, 2000);
+      setTimeout(() => {
+        fetchSubscriptionInfo();
+      }, 3000);
+      
+      setTimeout(() => {
+        fetchSubscriptionInfo();
+        setActionLoading(false);
+      }, 5000);
+      
     } catch (error) {
       console.error("Error triggering paywall:", error);
-     
+      setActionLoading(false);
     }
   };
 
@@ -314,6 +332,21 @@ export default function ManageSubscriptionScreen() {
         </View>
 
         <View style={styles.footerInfo}>
+          <TouchableOpacity
+            style={[styles.refreshButton, { borderColor: colors.border }]}
+            onPress={fetchSubscriptionInfo}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator size="small" color={colors.primary} />
+            ) : (
+              <Ionicons name="refresh" size={20} color={colors.primary} />
+            )}
+            <Text style={[styles.refreshText, { color: colors.primary }]}>
+              Refresh Status
+            </Text>
+          </TouchableOpacity>
+          
           <Text style={[styles.footerText, { color: colors.secondaryText }]}>
             Subscriptions are managed through your device's app store. You can cancel anytime from your subscription settings.
           </Text>
@@ -457,6 +490,21 @@ const styles = StyleSheet.create({
   },
   footerInfo: {
     marginBottom: 32,
+  },
+  refreshButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    borderWidth: 1,
+    marginBottom: 16,
+    gap: 8,
+  },
+  refreshText: {
+    fontSize: 14,
+    fontFamily: 'K2D-Medium',
   },
   footerText: {
     fontSize: 14,
