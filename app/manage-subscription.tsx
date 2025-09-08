@@ -124,7 +124,7 @@ export default function ManageSubscriptionScreen() {
     try {
       setActionLoading(true);
       await Superwall.shared.register({
-        placement: 'subscription_management',
+        placement: 'subscription_onPress',
       });
       
       // Refresh subscription info after paywall interaction
