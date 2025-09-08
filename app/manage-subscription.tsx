@@ -122,7 +122,7 @@ export default function ManageSubscriptionScreen() {
 
   const handleChangePlan = async () => {
     try {
-      setActionLoading(true);
+      
       await Superwall.shared.register({
         placement: 'subscription_onPress',
       });
@@ -130,11 +130,11 @@ export default function ManageSubscriptionScreen() {
       // Refresh subscription info after paywall interaction
       setTimeout(() => {
         fetchSubscriptionInfo();
-        setActionLoading(false);
+      
       }, 2000);
     } catch (error) {
       console.error("Error triggering paywall:", error);
-      setActionLoading(false);
+     
     }
   };
 
@@ -255,7 +255,7 @@ export default function ManageSubscriptionScreen() {
         </View>
 
         {/* Plan Benefits */}
-        <View style={styles.section}>
+        {/* <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>
             {subscriptionInfo?.status === 'active' ? 'Your Benefits' : 'Upgrade Benefits'}
           </Text>
@@ -280,7 +280,7 @@ export default function ManageSubscriptionScreen() {
               Priority matching
             </Text>
           </View>
-        </View>
+        </View> */}
 
         {/* Actions */}
         <View style={styles.actionsSection}>
