@@ -99,7 +99,7 @@ export default function MatchingScreen() {
   >([]);
   const [filterInterests, setFilterInterests] = useState<string[]>([]);
   const [filterKeyword, setFilterKeyword] = useState("");
-  const [filterMaxDistance, setFilterMaxDistance] = useState<number>(50); // Default 50 miles
+  const [filterMaxDistance, setFilterMaxDistance] = useState<number | null>(null); // No distance filter by default
   const [userCentroid, setUserCentroid] = useState<{ latitude: number; longitude: number } | null>(null);
   const [matchAnimation, setMatchAnimation] = useState(false);
   const [hasAvailability, setHasAvailability] = useState(false);
@@ -1720,13 +1720,13 @@ export default function MatchingScreen() {
               </Text>
               <View style={styles.distanceContainer}>
                 <Text style={[styles.distanceLabel, { color: colors.secondaryText }]}>
-                  Within {Math.round(filterMaxDistance)} miles
+                  {filterMaxDistance !== null ? `Within ${Math.round(filterMaxDistance)} miles` : 'Any distance'}
                 </Text>
                 <Slider
                   style={styles.distanceSlider}
                   minimumValue={1}
                   maximumValue={50}
-                  value={filterMaxDistance}
+                  value={filterMaxDistance || 25}
                   onValueChange={setFilterMaxDistance}
                   step={1}
                   minimumTrackTintColor={colors.primary}
@@ -1741,6 +1741,14 @@ export default function MatchingScreen() {
                     50 miles
                   </Text>
                 </View>
+                <TouchableOpacity
+                  style={[styles.clearDistanceButton, { borderColor: colors.border }]}
+                  onPress={() => setFilterMaxDistance(null)}
+                >
+                  <Text style={[styles.clearDistanceText, { color: colors.secondaryText }]}>
+                    Clear distance filter
+                  </Text>
+                </TouchableOpacity>
               </View>
             </ScrollView>
             <View style={styles.modalFooter}>
@@ -1755,7 +1763,7 @@ export default function MatchingScreen() {
                   setFilterIndustries([]);
                   setFilterExperienceLevels([]);
                   setFilterInterests([]);
-                  setFilterMaxDistance(50);
+                  setFilterMaxDistance(null);
                   // Also refresh profiles to reset distance ordering
                   setCurrentIndex(0);
                   await fetchProfiles();
@@ -2289,6 +2297,18 @@ const styles = StyleSheet.create({
     marginTop: -8,
   },
   distanceEndLabel: {
+    fontFamily: "K2D-Regular",
+    fontSize: 12,
+  },
+  clearDistanceButton: {
+    marginTop: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  clearDistanceText: {
     fontFamily: "K2D-Regular",
     fontSize: 12,
   },
