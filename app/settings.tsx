@@ -351,11 +351,7 @@ export default function SettingsScreen() {
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.settingItem, { borderColor: colors.border }]}
-              onPress={() => {
-                Superwall.shared.register({
-                  placement: 'subscription_onPress',
-                });
-              }}
+              onPress={() => router.push('/manage-subscription')}
             >
               <View style={styles.settingContent}>
                 <Ionicons name="cube-outline" size={22} color={colors.text} />
