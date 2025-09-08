@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import {
   SafeAreaView,
@@ -56,7 +57,7 @@ export default function ManageSubscriptionScreen() {
       setLoading(true);
       const subscriptionStatus = await Superwall.shared.getSubscriptionStatus();
       console.log("Subscription status:", subscriptionStatus);
-
+      
       let planInfo: SubscriptionInfo = {
         status: 'free',
         planType: 'free'
@@ -64,10 +65,10 @@ export default function ManageSubscriptionScreen() {
 
       if (subscriptionStatus?.status) {
         const status = subscriptionStatus.status.toLowerCase();
-
+        
         if (status === 'active') {
           planInfo.status = 'active';
-
+          
           // Try to extract plan type from product identifier
           const productId = subscriptionStatus.productIdentifier?.toLowerCase() || '';
           if (productId.includes('weekly')) {
@@ -79,9 +80,9 @@ export default function ManageSubscriptionScreen() {
           } else {
             planInfo.planType = 'monthly'; // default assumption
           }
-
+          
           planInfo.productIdentifier = subscriptionStatus.productIdentifier;
-
+          
           // Format renewal date if available
           if (subscriptionStatus.renewalDate) {
             const renewalDate = new Date(subscriptionStatus.renewalDate);
@@ -91,7 +92,7 @@ export default function ManageSubscriptionScreen() {
               day: 'numeric'
             });
           }
-
+          
           // Set price based on plan type (you may want to get this from Superwall or store it)
           switch (planInfo.planType) {
             case 'weekly':
@@ -106,7 +107,7 @@ export default function ManageSubscriptionScreen() {
           }
         }
       }
-
+      
       setSubscriptionInfo(planInfo);
     } catch (error) {
       console.error("Error fetching subscription info:", error);
@@ -122,18 +123,15 @@ export default function ManageSubscriptionScreen() {
   const handleChangePlan = async () => {
     try {
       setActionLoading(true);
-      console.log('Triggering Superwall paywall from manage subscription');
       await Superwall.shared.register({
-        placement: 'manage_subscription',
+        placement: 'subscription_onPress',
       });
-
-      // Always stop loading after paywall interaction (whether user completes or cancels)
-      setActionLoading(false);
-
-      // Refresh subscription info after a short delay to catch any changes
+      
+      // Refresh subscription info after paywall interaction
       setTimeout(() => {
         fetchSubscriptionInfo();
-      }, 1000);
+        setActionLoading(false);
+      }, 2000);
     } catch (error) {
       console.error("Error triggering paywall:", error);
       setActionLoading(false);
@@ -261,21 +259,21 @@ export default function ManageSubscriptionScreen() {
           <Text style={[styles.sectionTitle, { color: colors.text }]}>
             {subscriptionInfo?.status === 'active' ? 'Your Benefits' : 'Upgrade Benefits'}
           </Text>
-
+          
           <View style={[styles.benefitItem, { borderColor: colors.border }]}>
             <Ionicons name="infinite" size={20} color={colors.primary} />
             <Text style={[styles.benefitText, { color: colors.text }]}>
               Unlimited coffee chat requests
             </Text>
           </View>
-
+          
           <View style={[styles.benefitItem, { borderColor: colors.border }]}>
             <Ionicons name="filter" size={20} color={colors.primary} />
             <Text style={[styles.benefitText, { color: colors.text }]}>
               Advanced filtering options
             </Text>
           </View>
-
+          
           <View style={[styles.benefitItem, { borderColor: colors.border }]}>
             <Ionicons name="flash" size={20} color={colors.primary} />
             <Text style={[styles.benefitText, { color: colors.text }]}>
