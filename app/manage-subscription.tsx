@@ -129,7 +129,7 @@ export default function ManageSubscriptionScreen() {
 
   const handleChangePlan = async () => {
     try {
-      setActionLoading(true);
+      // setActionLoading(true);
       
       await Superwall.shared.register({
         placement: 'subscription_onPress',
@@ -147,12 +147,12 @@ export default function ManageSubscriptionScreen() {
       
       setTimeout(() => {
         fetchSubscriptionInfo();
-        setActionLoading(false);
+        // setActionLoading(false);
       }, 5000);
       
     } catch (error) {
       console.error("Error triggering paywall:", error);
-      setActionLoading(false);
+      // setActionLoading(false);
     }
   };
 
@@ -332,7 +332,7 @@ export default function ManageSubscriptionScreen() {
         </View>
 
         <View style={styles.footerInfo}>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={[styles.refreshButton, { borderColor: colors.border }]}
             onPress={fetchSubscriptionInfo}
             disabled={loading}
@@ -345,7 +345,7 @@ export default function ManageSubscriptionScreen() {
             <Text style={[styles.refreshText, { color: colors.primary }]}>
               Refresh Status
             </Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           
           <Text style={[styles.footerText, { color: colors.secondaryText }]}>
             Subscriptions are managed through your device's app store. You can cancel anytime from your subscription settings.
