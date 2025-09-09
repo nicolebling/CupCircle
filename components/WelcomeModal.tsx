@@ -34,7 +34,7 @@ export default function WelcomeModal({ visible, onContinue }: WelcomeModalProps)
         <View style={[styles.modalContainer, { backgroundColor: colors.background }]}>
           <View style={styles.content}>
             <Text style={[styles.headline, { color: colors.text }]}>
-              ✨ Welcome to CupCircle!
+              Welcome to CupCircle!
             </Text>
             
             <Text style={[styles.description, { color: colors.secondaryText }]}>
