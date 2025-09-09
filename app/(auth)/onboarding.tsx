@@ -14,11 +14,13 @@ import ExperienceLevelSelector from '@/components/ExperienceLevelSelector';
 import CafeSelector from '@/components/CafeSelector';
 import EmploymentHistoryEntry from '@/components/EmploymentHistoryEntry';
 import CareerTransitionEntry from '@/components/CareerTransitionEntry';
+import WelcomeModal from '@/components/WelcomeModal';
 
 export default function OnboardingScreen() {
   const { user, updateUser } = useAuth();
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(1);
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
   const [profileData, setProfileData] = useState({
     name: '',
     last_name: '',
@@ -171,13 +173,19 @@ export default function OnboardingScreen() {
         // Don't block the user flow if push notifications fail
       }
 
-      router.replace('/(tabs)/matching');
+      // Show welcome modal instead of immediately navigating
+      setShowWelcomeModal(true);
     } catch (error) {
       console.error('Failed to save profile', error);
       alert('Failed to save profile information. Please try again.');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleWelcomeModalContinue = () => {
+    setShowWelcomeModal(false);
+    router.replace('/(tabs)/matching');
   };
 
   const renderStep = () => {
@@ -459,6 +467,11 @@ export default function OnboardingScreen() {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
+
+      <WelcomeModal
+        visible={showWelcomeModal}
+        onContinue={handleWelcomeModalContinue}
+      />
     </SafeAreaView>
   );
 }
