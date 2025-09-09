@@ -37,16 +37,11 @@ type AuthContextType = {
   session: Session | null;
   profile: Profile | null;
   loading: boolean;
-  showWelcomeModal: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, name: string) => Promise<void>;
   signOut: () => Promise<void>;
   fetchProfile: () => Promise<Profile | null>;
   updateUser: (userData: Partial<Profile>) => Promise<void>;
-  refreshUser: () => Promise<void>;
-  signInWithApple: () => Promise<void>;
-  signInWithGoogle: () => Promise<void>;
-  setWelcomeModalShown: () => void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -58,7 +53,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       setSession(session);
@@ -301,54 +295,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
       if (error) throw error;
 
-      // Check if this is completing onboarding (has all required fields)
-      if (userData.name && userData.occupation && userData.bio && userData.education && 
-          userData.experience_level && userData.industry_categories?.length && 
-          userData.interests?.length && userData.favorite_cafes?.length && userData.photo_url) {
-        setShowWelcomeModal(true);
-      }
-
-      // Fetch the updated user data
-      await refreshUser();
+      setProfile((prev) => (prev ? { ...prev, ...userData } : null));
     } catch (error) {
       console.error("Update user failed:", error);
       throw error;
     }
-  };
-
-  const setWelcomeModalShown = () => {
-    setShowWelcomeModal(false);
-  };
-
-  // Placeholder for refreshUser, signInWithApple, signInWithGoogle if not implemented
-  const refreshUser = async () => {
-    console.log("refreshUser called");
-    // Implement refreshUser logic if needed
-  };
-  const signInWithApple = async () => {
-    console.log("signInWithApple called");
-    // Implement signInWithApple logic if needed
-  };
-  const signInWithGoogle = async () => {
-    console.log("signInWithGoogle called");
-    // Implement signInWithGoogle logic if needed
-  };
-
-  const value = {
-    user,
-    session,
-    profile,
-    loading,
-    isFirstTimeUser,
-    signIn,
-    signUp,
-    signOut,
-    fetchProfile,
-    updateUser,
-    refreshUser,
-    signInWithApple,
-    signInWithGoogle,
-    setFirstTimeUserComplete,
   };
 
   return (
@@ -358,16 +309,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         session,
         profile,
         loading,
-        showWelcomeModal,
         signIn,
         signUp,
         signOut,
         fetchProfile,
         updateUser,
-        refreshUser,
-        signInWithApple,
-        signInWithGoogle,
-        setWelcomeModalShown,
       }}
     >
       {children}

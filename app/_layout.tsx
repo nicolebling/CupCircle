@@ -23,8 +23,6 @@ import { router } from 'expo-router';
 import { useOnboarding } from "@/hooks/useOnboarding";
 import OnboardingScreens from "@/components/OnboardingScreens";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import WelcomeModal from '@/components/WelcomeModal';
 
 // Suppress animation warnings in development
 if (__DEV__) {
@@ -41,7 +39,7 @@ if (__DEV__) {
 SplashScreen.preventAutoHideAsync();
 
 function RootLayoutNav() {
-  const { user, loading, showWelcomeModal, setWelcomeModalShown } = useAuth();
+  const { user, loading } = useAuth();
   const segments = useSegments();
   const router = useRouter();
   const colorScheme = useColorScheme();
@@ -62,12 +60,12 @@ function RootLayoutNav() {
       const currentSegment = segments[0];
       const authSegment = segments[1];
 
-      console.log('Navigation check:', {
-        currentSegment,
-        authSegment,
-        readyForNewPassword,
-        user: !!user,
-        hasCompletedOnboarding
+      console.log('Navigation check:', { 
+        currentSegment, 
+        authSegment, 
+        readyForNewPassword, 
+        user: !!user, 
+        hasCompletedOnboarding 
       });
 
       // Priority 1: Handle password recovery - redirect to reset-password if recovery is ready
@@ -78,21 +76,21 @@ function RootLayoutNav() {
         }
         return; // Don't process other conditions when in recovery mode
       }
-
+      
       // Priority 2: Show onboarding for first-time users (only when not in recovery)
       if (!user && !hasCompletedOnboarding && !showOnboarding) {
         console.log('Showing onboarding for new user');
         setShowOnboarding(true);
         return;
       }
-
+      
       // Priority 3: Handle unauthenticated users who completed onboarding
       if (!user && hasCompletedOnboarding && currentSegment !== "(auth)") {
         console.log('Redirecting unauthenticated user to login');
         router.replace("/(auth)/login");
         return;
       }
-
+      
       // Priority 4: Handle authenticated users (redirect away from auth pages)
       if (user && currentSegment === "(auth)" && authSegment !== "onboarding") {
         console.log('Redirecting authenticated user to main app');
@@ -127,38 +125,31 @@ function RootLayoutNav() {
   }
 
   return (
-    <>
-      <Stack
-        screenOptions={{
-          headerStyle: {
-            backgroundColor: colors.background,
-          },
-          headerTintColor: colors.text,
-          headerTitleStyle: {
-            fontFamily: "K2D-SemiBold",
-          },
+    <Stack
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: colors.background,
+        },
+        headerTintColor: colors.text,
+        headerTitleStyle: {
+          fontFamily: "K2D-SemiBold",
+        },
+        animation: "slide_from_right",
+      }}
+    >
+      <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen name="messages" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="settings"
+        options={{
+          title: "Settings",
+          headerShown: true,
           animation: "slide_from_right",
         }}
-      >
-        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="messages" options={{ headerShown: false }} />
-        <Stack.Screen
-          name="settings"
-          options={{
-            title: "Settings",
-            headerShown: true,
-            animation: "slide_from_right",
-          }}
-        />
-        <Stack.Screen name="+not-found" options={{ title: "Not Found" }} />
-      </Stack>
-      
-      <WelcomeModal 
-        visible={showWelcomeModal} 
-        onContinue={setWelcomeModalShown} 
       />
-    </>
+      <Stack.Screen name="+not-found" options={{ title: "Not Found" }} />
+    </Stack>
   );
 }
 
