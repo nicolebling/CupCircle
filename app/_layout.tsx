@@ -41,7 +41,7 @@ if (__DEV__) {
 SplashScreen.preventAutoHideAsync();
 
 function RootLayoutNav() {
-  const { user, loading } = useAuth();
+  const { user, loading, showWelcomeModal, setWelcomeModalShown } = useAuth();
   const segments = useSegments();
   const router = useRouter();
   const colorScheme = useColorScheme();
@@ -127,31 +127,38 @@ function RootLayoutNav() {
   }
 
   return (
-    <Stack
-      screenOptions={{
-        headerStyle: {
-          backgroundColor: colors.background,
-        },
-        headerTintColor: colors.text,
-        headerTitleStyle: {
-          fontFamily: "K2D-SemiBold",
-        },
-        animation: "slide_from_right",
-      }}
-    >
-      <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      <Stack.Screen name="messages" options={{ headerShown: false }} />
-      <Stack.Screen
-        name="settings"
-        options={{
-          title: "Settings",
-          headerShown: true,
+    <>
+      <Stack
+        screenOptions={{
+          headerStyle: {
+            backgroundColor: colors.background,
+          },
+          headerTintColor: colors.text,
+          headerTitleStyle: {
+            fontFamily: "K2D-SemiBold",
+          },
           animation: "slide_from_right",
         }}
+      >
+        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="messages" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="settings"
+          options={{
+            title: "Settings",
+            headerShown: true,
+            animation: "slide_from_right",
+          }}
+        />
+        <Stack.Screen name="+not-found" options={{ title: "Not Found" }} />
+      </Stack>
+      
+      <WelcomeModal 
+        visible={showWelcomeModal} 
+        onContinue={setWelcomeModalShown} 
       />
-      <Stack.Screen name="+not-found" options={{ title: "Not Found" }} />
-    </Stack>
+    </>
   );
 }
 

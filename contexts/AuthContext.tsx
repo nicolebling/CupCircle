@@ -37,7 +37,7 @@ type AuthContextType = {
   session: Session | null;
   profile: Profile | null;
   loading: boolean;
-  isFirstTimeUser: boolean;
+  showWelcomeModal: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, name: string) => Promise<void>;
   signOut: () => Promise<void>;
@@ -46,7 +46,7 @@ type AuthContextType = {
   refreshUser: () => Promise<void>;
   signInWithApple: () => Promise<void>;
   signInWithGoogle: () => Promise<void>;
-  setFirstTimeUserComplete: () => void;
+  setWelcomeModalShown: () => void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -58,7 +58,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isFirstTimeUser, setIsFirstTimeUser] = useState(false);
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       setSession(session);
@@ -301,9 +301,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
       if (error) throw error;
 
-      // Check if this is a first-time profile completion
-      if (!user?.name && userData.name) {
-        setIsFirstTimeUser(true);
+      // Check if this is completing onboarding (has all required fields)
+      if (userData.name && userData.occupation && userData.bio && userData.education && 
+          userData.experience_level && userData.industry_categories?.length && 
+          userData.interests?.length && userData.favorite_cafes?.length && userData.photo_url) {
+        setShowWelcomeModal(true);
       }
 
       // Fetch the updated user data
@@ -314,8 +316,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  const setFirstTimeUserComplete = () => {
-    setIsFirstTimeUser(false);
+  const setWelcomeModalShown = () => {
+    setShowWelcomeModal(false);
   };
 
   // Placeholder for refreshUser, signInWithApple, signInWithGoogle if not implemented
@@ -356,7 +358,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         session,
         profile,
         loading,
-        isFirstTimeUser,
+        showWelcomeModal,
         signIn,
         signUp,
         signOut,
@@ -365,7 +367,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         refreshUser,
         signInWithApple,
         signInWithGoogle,
-        setFirstTimeUserComplete,
+        setWelcomeModalShown,
       }}
     >
       {children}
