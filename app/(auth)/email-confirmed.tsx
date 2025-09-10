@@ -166,7 +166,7 @@ export default function EmailConfirmedScreen() {
             
             <Text style={[styles.description, { color: theme.colors.text }]}>
               {confirmed 
-                ? "Your email has been successfully confirmed! Let's get your profile set up so you can start connecting with others."
+                ? "Your email has been successfully confirmed. You can now complete your profile setup."
                 : error || "There was an issue confirming your email. Please try again."
               }
             </Text>
@@ -179,7 +179,7 @@ export default function EmailConfirmedScreen() {
               onPress={confirmed ? handleContinue : handleRetry}
             >
               <Text style={styles.buttonText}>
-                {confirmed ? "Start Profile Setup" : "Try Again"}
+                {confirmed ? "Continue to Setup" : "Try Again"}
               </Text>
             </TouchableOpacity>
 
