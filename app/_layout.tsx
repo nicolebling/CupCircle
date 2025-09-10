@@ -91,10 +91,16 @@ function RootLayoutNav() {
         return;
       }
       
-      // Priority 4: Handle authenticated users (redirect away from auth pages)
+      // Priority 4: Handle authenticated users - check if they need onboarding
       if (user && currentSegment === "(auth)" && authSegment !== "onboarding") {
-        console.log('Redirecting authenticated user to main app');
-        router.replace("/(tabs)/matching");
+        // Check if user has completed their profile
+        if (!user.name || !user.occupation || !user.city || !user.bio || !user.photo_url) {
+          console.log('Authenticated user needs to complete onboarding');
+          router.replace("/(auth)/onboarding");
+        } else {
+          console.log('Redirecting authenticated user to main app');
+          router.replace("/(tabs)/matching");
+        }
         return;
       }
     }, 50); // Reduced timeout for faster response
