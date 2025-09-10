@@ -142,8 +142,14 @@ export default function LoginScreen() {
           Alert.alert('Welcome back!', 'Please complete your profile to continue.');
           router.replace('/(auth)/onboarding');
         } else {
-          // Existing users always go to matching, regardless of profile completeness
-          router.replace('/(tabs)/matching');
+          // Check if user has completed their profile
+          if (!profileData.name || !profileData.occupation || !profileData.city || !profileData.bio || !profileData.photo_url) {
+            Alert.alert('Welcome back!', 'Please complete your profile to continue.');
+            router.replace('/(auth)/onboarding');
+          } else {
+            // Profile is complete, go to matching
+            router.replace('/(tabs)/matching');
+          }
         }
       } catch (checkError) {
         console.error("Error in profile check:", checkError);
@@ -212,8 +218,14 @@ export default function LoginScreen() {
               Alert.alert('Welcome!', 'Please complete your profile to continue.');
               router.replace('/(auth)/onboarding');
             } else {
-              // Existing Apple users always go to matching, regardless of profile completeness
-              router.replace('/(tabs)/matching');
+              // Check if user has completed their profile
+              if (!profileData.name || !profileData.occupation || !profileData.city || !profileData.bio || !profileData.photo_url) {
+                Alert.alert('Welcome back!', 'Please complete your profile to continue.');
+                router.replace('/(auth)/onboarding');
+              } else {
+                // Profile is complete, go to matching
+                router.replace('/(tabs)/matching');
+              }
             }
           } catch (checkError) {
             console.error("Error in profile check:", checkError);
@@ -279,8 +291,14 @@ export default function LoginScreen() {
               Alert.alert('Welcome!', 'Please complete your profile to continue.');
               router.replace('/(auth)/onboarding');
             } else {
-              // Existing Google users always go to matching, regardless of profile completeness
-              router.replace('/(tabs)/matching');
+              // Check if user has completed their profile
+              if (!profileData.name || !profileData.occupation || !profileData.city || !profileData.bio || !profileData.photo_url) {
+                Alert.alert('Welcome back!', 'Please complete your profile to continue.');
+                router.replace('/(auth)/onboarding');
+              } else {
+                // Profile is complete, go to matching
+                router.replace('/(tabs)/matching');
+              }
             }
           } catch (checkError) {
             console.error("Error in profile check:", checkError);
