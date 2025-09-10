@@ -72,6 +72,9 @@ export default function SignUpScreen() {
       const { data, error } = await supabase.auth.signUp({
         email: email,
         password: password,
+        options: {
+          emailRedirectTo: 'cupcircle://email-confirmed'
+        }
       })
 
       if (error) {
@@ -87,14 +90,20 @@ export default function SignUpScreen() {
           setError("Please enter a valid email address.");
         }
       } else {
-        // console.log("Signup successful:", data)
-        // console.log("User created:", data.user)
-        // console.log("Session created:", data.session)
-        // console.log("User metadata:", data.user?.user_metadata)
-        // console.log("Authentication method:", data.user?.app_metadata)
-
-        // Create profile for the new user
-        if (data.user) {
+        console.log("Signup successful:", data)
+        
+        if (data.user && !data.session) {
+          // User created but needs email confirmation
+          setToastMessage("Please check your email and click the confirmation link to activate your account.");
+          setToastVisible(true);
+          
+          // Show success message and redirect to login
+          setTimeout(() => {
+            router.replace('/(auth)/email-confirmation');
+          }, 2000);
+        } else if (data.user && data.session) {
+          // User created and automatically signed in (email confirmation disabled)
+          // Create profile for the new user
           try {
             // Check if profile already exists
             const { data: existingProfile, error: checkError } = await supabase
@@ -104,7 +113,6 @@ export default function SignUpScreen() {
               .single();
 
             if (checkError && checkError.code !== 'PGRST116') {
-              // PGRST116 means not found, which is expected
               console.error("Error checking for existing profile:", checkError);
             }
 
@@ -122,21 +130,14 @@ export default function SignUpScreen() {
 
               if (profileError) {
                 console.error("Profile creation error:", profileError);
-                console.error("Profile error details:", JSON.stringify(profileError));
-                // Don't sign out - just continue to profile setup
-                console.log("Continuing to profile setup despite profile creation error");
               }
-            } else {
-              console.log("Profile already exists, continuing to profile setup");
             }
           } catch (profileCreationError) {
             console.error("Exception during profile creation:", profileCreationError);
-            // Don't sign out - just continue to profile setup
-            console.log("Continuing to profile setup despite exception");
           }
-        }
 
-        router.replace('/(auth)/onboarding');
+          router.replace('/(auth)/onboarding');
+        }
       }
     } catch (e) {
       console.error("Signup exception:", e)
